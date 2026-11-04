@@ -15,6 +15,23 @@ enum Effect {
 	PRODUZIONE_PERCENTUALE,   ## Percentuale sulla produzione della risorsa indicata in "resource".
 	PRODUZIONE_PER_EDIFICIO,  ## Unità in più della risorsa "resource" per ogni edificio interessato.
 	DANNO_TRUPPA,             ## Percentuale sul danno di una truppa.
+	VALORE_PERCENTUALE,       ## Percentuale su un valore di battaglia ("battle_value") di edifici e truppe.
+	VALORE_FISSO,             ## Unità in più su un valore di battaglia, solo per chi lo ha già.
+	SCUDO_INIZIALE,           ## Scudo con cui la nazione inizia ogni scontro (GDD §8.2, v0.16).
+	CORRUZIONE_INIZIALE,      ## Corruzione con cui la nazione inizia ogni scontro.
+	SABOTAGGIO_INIZIALE,      ## Millisecondi di Sabotaggio su un edificio a caso a inizio scontro.
+	CIBO_TRUPPA,              ## Percentuale sul Cibo consumato da una truppa (GDD §5.4).
+}
+
+## Valori di battaglia di edifici e truppe che un modificatore può cambiare.
+enum BattleValue {
+	DANNO,
+	SCUDO,
+	CURA,
+	CORRUZIONE,
+	ASSEDIO,
+	INEFFICIENZA,
+	SABOTAGGIO,
 }
 
 enum Target {
@@ -49,6 +66,8 @@ enum Stacking {
 @export var target_tag: StringName = &""
 ## Risorsa interessata (per PRODUZIONE_PERCENTUALE e PRODUZIONE_PER_EDIFICIO).
 @export var resource: Res.Type = Res.Type.ORO
+## Valore di battaglia interessato (per VALORE_PERCENTUALE e VALORE_FISSO).
+@export var battle_value: BattleValue = BattleValue.DANNO
 ## Percentuale per gli effetti in percentuale, numero intero per gli altri.
 @export var amount: int = 0
 @export var duration_kind: Duration = Duration.ANNI

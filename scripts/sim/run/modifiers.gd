@@ -126,6 +126,21 @@ func flat_production(type: Res.Type, piece: BoardPiece) -> int:
 	return total
 
 
+## Variazione di un valore di battaglia di un elemento (VALORE_PERCENTUALE o VALORE_FISSO).
+func battle_value(effect: ModifierDef.Effect, value: ModifierDef.BattleValue, piece: BoardPiece) -> int:
+	var total: int = 0
+	for modifier: ActiveModifier in active:
+		var def: ModifierDef = modifier.def
+		if def.effect != effect or def.battle_value != value:
+			continue
+		if modifier.target_piece != null and modifier.target_piece != piece:
+			continue
+		if not _tag_matches(def, piece):
+			continue
+		total += def.amount
+	return total
+
+
 ## Percentuale sulla produzione totale di una risorsa (PRODUZIONE_PERCENTUALE).
 func production_percent(type: Res.Type) -> int:
 	var total: int = 0

@@ -375,7 +375,7 @@ func _feed_troops() -> void:
 	var eaten: int = 0
 	for i: int in order:
 		var piece: BoardPiece = board.troops[i]
-		var ration: int = piece.troop.food_tenths
+		var ration: int = troop_ration(piece)
 		if stock[Res.Type.CIBO] >= ration:
 			stock[Res.Type.CIBO] -= ration
 			eaten += ration
@@ -461,30 +461,20 @@ func reward_choices() -> Array[RewardDef]:
 	return won_encounter.rewards
 
 
-## Edificio come entrerà in battaglia, con i modificatori applicati (es. Inefficienza).
-## Se serve restituisce una copia: le schede del catalogo non vengono mai toccate.
+## Edificio come entrerà in battaglia: livello e modificatori (GDD §6.5, §8).
 func effective_building(piece: BoardPiece) -> BuildingDef:
-	var change: int = modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA, piece)
-	if change == 0:
-		return piece.building
-	var copy: BuildingDef = piece.building.duplicate() as BuildingDef
-	copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(copy.mana_interval_ms, change))
-	return copy
+	return ElementStats.building(piece.building, piece, modifiers, piece.level, run_rules)
 
 
-## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5).
+## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5, §8).
 func effective_troop(piece: BoardPiece) -> TroopDef:
-	var cooldown_change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
-	if piece.hungry:
-		cooldown_change += run_rules.hunger_cooldown_percent
-	var damage_change: int = modifiers.percent(ModifierDef.Effect.DANNO_TRUPPA, piece)
-	damage_change += run_rules.troop_damage_percent_per_level * (piece.level - 1)
-	if cooldown_change == 0 and damage_change == 0:
-		return piece.troop
-	var copy: TroopDef = piece.troop.duplicate() as TroopDef
-	copy.cooldown_ms = maxi(1, Modifiers.apply_percent(copy.cooldown_ms, cooldown_change))
-	copy.damage = Modifiers.apply_percent(copy.damage, damage_change)
-	return copy
+	var hunger: int = run_rules.hunger_cooldown_percent if piece.hungry else 0
+	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger)
+
+
+## Cibo consumato da una truppa a inizio anno, in decimi (GDD §5.4).
+func troop_ration(piece: BoardPiece) -> int:
+	return Modifiers.apply_percent(piece.troop.food_tenths, modifiers.percent(ModifierDef.Effect.CIBO_TRUPPA, piece))
 
 
 ## Le due nazioni dell'ultima battaglia: [giocatore, avversario].
@@ -1033,6 +1023,7 @@ func _refund(piece: BoardPiece) -> void:
 
 func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> BattleSim.Outcome:
 	var player: BattleSideSetup = BattleSideSetup.new(_battle_buildings(), _battle_troops(), player_resistance())
+	_apply_start_values(player, modifiers)
 	_last_setups = [player, enemy]
 	last_battle_seed = run_seed * 7919 + year * 104729 + int(kind)
 	last_battle = BattleSim.new(battle_rules, player, enemy, last_battle_seed)
@@ -1197,24 +1188,20 @@ func _ghost_setup() -> BattleSideSetup:
 	var ghost_modifiers: Modifiers = _identity_modifiers(current_ghost.identity)
 	var buildings: Array[BuildingDef] = []
 	for def: BuildingDef in current_ghost.buildings:
-		var change: int = ghost_modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA, BoardPiece.of_building(def, 0))
-		var copy: BuildingDef = def
-		if change != 0:
-			copy = def.duplicate() as BuildingDef
-			copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(def.mana_interval_ms, change))
-		buildings.append(copy)
+		buildings.append(ElementStats.building(def, BoardPiece.of_building(def, 0), ghost_modifiers, 1, run_rules))
 	var troops: Array[TroopDef] = []
 	for def: TroopDef in current_ghost.troops:
-		var piece: BoardPiece = BoardPiece.of_troop(def, 0)
-		var cooldown_change: int = ghost_modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
-		var damage_change: int = ghost_modifiers.percent(ModifierDef.Effect.DANNO_TRUPPA, piece)
-		var copy: TroopDef = def
-		if cooldown_change != 0 or damage_change != 0:
-			copy = def.duplicate() as TroopDef
-			copy.cooldown_ms = maxi(1, Modifiers.apply_percent(def.cooldown_ms, cooldown_change))
-			copy.damage = Modifiers.apply_percent(def.damage, damage_change)
-		troops.append(copy)
-	return BattleSideSetup.new(buildings, troops, ghost_resistance())
+		troops.append(ElementStats.troop(def, BoardPiece.of_troop(def, 0), ghost_modifiers, 1, run_rules))
+	var setup: BattleSideSetup = BattleSideSetup.new(buildings, troops, ghost_resistance())
+	_apply_start_values(setup, ghost_modifiers)
+	return setup
+
+
+## Valori di partenza dello scontro cambiati dai modificatori (GDD §8.2, v0.16).
+static func _apply_start_values(setup: BattleSideSetup, mods: Modifiers) -> void:
+	setup.start_shield = maxi(0, mods.flat(ModifierDef.Effect.SCUDO_INIZIALE))
+	setup.start_corruption = maxi(0, mods.flat(ModifierDef.Effect.CORRUZIONE_INIZIALE))
+	setup.start_building_sabotage_ms = maxi(0, mods.flat(ModifierDef.Effect.SABOTAGGIO_INIZIALE))
 
 
 ## Metà di un numero intero, arrotondata per difetto (per numeri non negativi).

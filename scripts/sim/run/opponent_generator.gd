@@ -75,8 +75,7 @@ static func _nation_name(rules: GeneratorRules, rng: RandomNumberGenerator) -> S
 static func _leveled(def: TroopDef, level: int, run_rules: RunRules) -> TroopDef:
 	if level <= 1:
 		return def
-	var copy: TroopDef = def.duplicate() as TroopDef
-	copy.damage = Modifiers.apply_percent(def.damage, run_rules.troop_damage_percent_per_level * (level - 1))
+	var copy: TroopDef = ElementStats.troop(def, null, null, level, run_rules)
 	copy.display_name = "%s (liv. %d)" % [def.display_name, level]
 	return copy
 
