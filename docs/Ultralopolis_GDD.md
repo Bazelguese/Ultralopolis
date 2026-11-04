@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.12
+## Game Design Document — v0.16
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.12 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.16 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -81,7 +81,7 @@ Questi principi valgono per tutto il contenuto futuro. Un nuovo elemento che li 
 |---|---|---|
 | P1 | **Le conseguenze negative deviano, non debilitano.** Un malus deve spingere il giocatore a ragionare in modo diverso per un periodo, non indebolirlo pesantemente. Esempio: produzione di Ricerca dimezzata per un anno, durante il quale il giocatore può orientarsi su altro. | Confermato |
 | P2 | **La potenza segue il progresso.** Effetti molto forti non devono essere disponibili dall’inizio della run. | Direzione |
-| P2a | Il meccanismo naturale per farlo sono le ere: gli effetti più forti vengono sbloccati da ere avanzate. | Proposta |
+| P2a | Il meccanismo naturale per farlo sono le ere: gli effetti più forti vengono sbloccati da ere avanzate. | Confermato (v0.15) |
 | P3 | **Gli edifici si distinguono per il rapporto fra le due funzioni.** La doppia funzione crea scelte solo se edifici diversi bilanciano diversamente produzione economica e mana (es. molta Ricerca e poco mana, poco Oro e molto mana). Se un edificio fosse migliore su entrambi i fronti, la scelta sparirebbe. | Proposta |
 | P4 | **La battaglia deve spiegarsi da sola.** Il giocatore deve poter capire perché una truppa non si è attivata (mana insufficiente, cooldown, effetto avversario). Con la priorità da destra verso sinistra, la leggibilità fa parte della meccanica. | Proposta |
 | P5 | **Il contenuto si esprime con il linguaggio del nucleo.** Nuovi edifici, truppe, eventi e malus vanno descritti con risorse, slot, cooldown, mana, Resistenza e modificatori già esistenti (§8). Ciò che richiede una nuova famiglia di effetti o una nuova risorsa è una modifica del nucleo. | Proposta |
@@ -142,7 +142,7 @@ Esempio: perdere nell’anno 3 costa 3 Prestigio; perdere nell’anno 8 costa 8.
 
 Non sono previste per ora regole per recuperare Prestigio o ricompense speciali all’attivazione dell’ultima possibilità.
 
-**Pareggio — Confermato.** Il pareggio (doppio azzeramento della Resistenza nello stesso istante, §7.5) conta come **vittoria**: aggiunge una vittoria e non fa perdere Prestigio. Il giocatore però subisce, come in una sconfitta, i **malus che il fantasma infligge** (le conseguenze lasciate dalle armi avversarie, §11.1 e §13.2). Durante l’ultima possibilità un pareggio quindi non termina la run. Nel primo prototipo i fantasmi non infliggono malus, perciò il pareggio equivale a una vittoria.
+**Pareggio — Confermato.** Il pareggio (entrambe le nazioni cadono nello stesso istante, per Resistenza a zero o per Corruzione, §7.5 e §7.6) conta come **vittoria**: aggiunge una vittoria e non fa perdere Prestigio. Il giocatore però subisce, come in una sconfitta, i **malus che il fantasma infligge** (le conseguenze lasciate dalle armi avversarie, §11.1 e §13.2). Durante l’ultima possibilità un pareggio quindi non termina la run. Nel primo prototipo i fantasmi non infliggono malus, perciò il pareggio equivale a una vittoria.
 
 **Da definire:** conseguenze di abbandono e trattamento dei combattimenti che non terminano.
 
@@ -252,7 +252,8 @@ Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; l
 | Blu | Diplomazia e sapere |
 | Energetico | Vale come mana di qualsiasi colore |
 
-- Ogni edificio produce mana di un colore; il colore indica anche la famiglia dell’edificio.
+- Un edificio che produce mana ha un colore, che indica anche la sua famiglia.
+- Un edificio **senza mana** è **neutro**: non ha colore. Come ogni altro edificio, può essere disponibile a tutti oppure peculiare di certe nazioni, come esclusivo dell’identità o di una via (§9.2, §10.4) — Confermato (modifica del nucleo, v0.16).
 - Ogni truppa chiede mana di un colore, oppure nessuno.
 - Una truppa paga **prima con il proprio colore e poi con l’energetico**.
 
@@ -294,17 +295,19 @@ Sono ammesse **copie multiple** dello stesso edificio o della stessa truppa — 
 
 Quantità, nomi e statistiche sono placeholder. Eventuali varianti per popolo restano una proposta.
 
-### 6.3 Espansione della plancia — Da definire
+### 6.3 Espansione della plancia — Confermato nelle fonti (modifica del nucleo, v0.15); quantità e prezzi placeholder
 
-Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) rende l’espansione uno degli assi principali di progressione della run. Che cosa concede gli spazi non è ancora stabilito. Ipotesi:
+Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) rende l’espansione uno degli assi principali di progressione della run. Gli spazi arrivano da **tre fonti insieme**:
 
-- ricompense legate all’ingresso nelle ere;
-- edifici che concedono spazi, ad esempio una caserma che aggiunge spazi truppa;
-- acquisto di spazi con l’Oro, come opportunità.
+- l’**ingresso nelle ere**: ogni era indica nei dati quanti spazi edificio e truppa concede (§10);
+- **edifici che concedono spazi**, ad esempio una caserma che aggiunge spazi truppa;
+- l’**acquisto di spazi con l’Oro**, come opportunità (Architetti, Quartiermastro, §4.2).
 
-Un edificio che concede spazi occuperebbe a sua volta uno spazio edificio, quindi entrerebbe nella stessa scelta della doppia funzione.
+Un edificio che concede spazi occupa a sua volta uno spazio edificio, quindi entra nella stessa scelta della doppia funzione.
 
-Il prototipo usa provvisoriamente tutte e tre le vie, per poter provare una plancia che cresce (§16.3). Non è una regola.
+Anche il bonus immediato di una via (§10.4) può concedere spazi, se i suoi dati lo prevedono.
+
+**Da definire:** quantità e prezzi di ciascuna fonte; layout della plancia.
 
 ### 6.4 Vendita e sostituzione — Confermato
 
@@ -325,7 +328,7 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
 - Ogni edificio e ogni truppa ha dei **livelli** (3 livelli).
 - Il costo di ogni livello è scritto nei dati dell’elemento e usa le risorse della sua famiglia (es. Ferro per le truppe, Legno o Pietra per gli edifici, Fauna per la cavalleria).
 - La maggior parte dei potenziamenti si fa **in qualunque momento fuori dal combattimento** e non consuma opportunità; alcuni potenziamenti speciali arrivano da eventi o opportunità.
-- Effetti: le truppe fanno più danno, gli edifici producono di più (valori placeholder, §16.3).
+- Effetti: ogni livello aumenta **tutti i valori d’effetto** dell’elemento (danno, scudo, cura, Corruzione, danno agli scudi, durate di Inefficienza e Sabotaggio); gli edifici producono anche più risorse per fase (valori placeholder, §16.3) — Confermato (v0.16).
 
 ### 6.6 Etichette — Confermato
 
@@ -342,7 +345,7 @@ La stessa simulazione regola gli scontri contro i fantasmi e, nella proposta att
 
 ### 7.1 Obiettivo — Confermato
 
-Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro.
+Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro. Si perde anche quando la **Corruzione** accumulata raggiunge la Resistenza (§7.6.3).
 
 Truppe ed edifici non hanno punti vita individuali e non vengono eliminati durante la battaglia nella base.
 
@@ -395,6 +398,8 @@ Gli edifici producono mana durante il combattimento in una **riserva condivisa**
 
 Ogni colore ha la sua riserva; il mana energetico copre qualsiasi colore (§5.3).
 
+Oltre al mana, un edificio può produrre scudo, cura e Corruzione (§7.6.5): allo scadere del suo **unico intervallo** produce tutto insieme — Confermato.
+
 **Da definire:** capienza della riserva e interazioni che la alterano.
 
 ### 7.5 Tempistiche e casi limite
@@ -402,13 +407,108 @@ Ogni colore ha la sua riserva; il mana energetico copre qualsiasi colore (§5.3)
 | Regola | Stato |
 |---|---|
 | Truppe ed edifici iniziano la battaglia con cooldown e intervallo di produzione **pieni** | Confermato |
-| Nello stesso istante si risolve **prima la produzione di mana**, poi l’attivazione delle truppe | Confermato |
-| Le due nazioni agiscono **in contemporanea**; se entrambe arrivano a Resistenza zero nello stesso istante, lo scontro è un pareggio (§3.4) | Confermato |
+| Nello stesso istante si risolve **prima la produzione di mana**, poi l’attivazione delle truppe; l’ordine completo è in §7.6.6 | Confermato |
+| Le due nazioni agiscono **in contemporanea**; se entrambe cadono nello stesso istante (Resistenza a zero o Corruzione, §7.6.3), lo scontro è un pareggio (§3.4) | Confermato |
 | **Logoramento** contro gli stalli: dopo **45 secondi** di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo (ispirato alla tempesta di sabbia di The Bazaar) | Confermato; forma del danno placeholder (§16.3) |
-| **Nessuna casualità** nella battaglia | Confermato |
+| Il logoramento è un danno come gli altri: viene **assorbito dallo scudo** e le cure lo compensano (§7.6) | Confermato (v0.13) |
+| **Casualità ammessa** in battaglia, sempre con un **seme registrato**: lo stesso seme dà sempre lo stesso scontro. Ogni contenuto che usa il caso va segnalato come tale | Confermato (modifica del nucleo, v0.14; sostituisce “nessuna casualità”) |
 | Pausa, cambio di velocità e possibilità di saltare la visualizzazione | Confermato, presenti nel prototipo |
 
 La simulazione non deve dipendere dalla velocità grafica del dispositivo, per ottenere scontri riproducibili.
+
+### 7.6 Difesa, Corruzione e Assedio — Confermato (modifica del nucleo, v0.13)
+
+Oltre al danno, la battaglia conosce due forme di difesa (**Scudo** e **Cura**), un modo diverso di vincere (**Corruzione**) e un contro dedicato agli scudi (**attacco d’assedio**). Insieme formano un triangolo: nessuna difesa vale contro tutto.
+
+| | contro il Danno | contro la Corruzione |
+|---|---|---|
+| Scudo | Assorbe | Inutile |
+| Cura | Recupera la Resistenza persa | Allontana la soglia, alzando la Resistenza |
+| Attacco d’assedio | Serve solo a togliere lo scudo avversario | — |
+
+Scudo e cura sono disponibili **dalla prima era**. Nessuno di questi effetti ha un legame fisso con temi, risorse o etichette, salvo l’attacco d’assedio (§7.6.4): si decide elemento per elemento nel catalogo. Tutti i valori sono placeholder (§16.3).
+
+#### 7.6.1 Scudo
+
+- Ogni nazione ha una **riserva di scudo unica**, come la riserva di mana; le truppe non hanno punti vita individuali (§7.1).
+- Lo scudo **parte da zero** a inizio scontro. È il valore di base: un modificatore può cambiarlo (§8.2).
+- Il danno colpisce **prima lo scudo** e solo ciò che avanza arriva alla Resistenza.
+- Lo scudo **resta finché non viene consumato** e **non ha tetto**.
+- Anche il logoramento viene assorbito dallo scudo (§7.5).
+
+#### 7.6.2 Cura
+
+- Una cura ridà Resistenza persa, **mai oltre la Resistenza massima**.
+- Nessuna regola speciale contro gli scontri che si trascinano: il logoramento cresce a ogni secondo e prima o poi supera qualsiasi cura.
+- Conseguenza dell’ordine dell’istante (§7.6.6): una cura arrivata su Resistenza piena va persa, anche se nello stesso istante arriva un colpo.
+
+#### 7.6.3 Corruzione
+
+- Ogni nazione ha un contatore di **Corruzione** che parte da zero e **si accumula** durante lo scontro. Zero è il valore di base: un modificatore può cambiarlo (§8.2).
+- Quando la Corruzione è **pari o superiore alla Resistenza attuale**, la nazione perde lo scontro.
+- La Corruzione **non tocca lo scudo** e lo scudo non la ferma: è il contro naturale di una nazione molto difensiva.
+- La Corruzione **non scende mai** durante lo scontro. L’unica risposta è alzare la Resistenza con la cura.
+- Danno e Corruzione lavorano a tenaglia: il danno abbassa la Resistenza, la Corruzione sale verso di essa.
+
+La Corruzione sostituisce la precedente proposta di un’erosione continua simile al veleno (§8.3).
+
+#### 7.6.4 Attacco d’assedio
+
+- Solo le truppe con etichetta **Assedio** (§6.6) possono avere un attacco d’assedio.
+- È un **secondo valore** della truppa, il danno agli scudi, che colpisce **solo lo scudo**, prima del danno normale. Esempio placeholder: Arieti, 10 agli scudi + 3 di danno.
+- Se l’avversario non ha scudo, il danno agli scudi va perso.
+- La truppa paga il suo normale costo in mana all’attivazione, come ogni altra truppa (§7.2).
+
+#### 7.6.5 Fonti
+
+| Fonte | Che cosa può produrre |
+|---|---|
+| Edificio | Allo scadere del suo unico intervallo (§7.4): mana, scudo, cura e Corruzione all’avversario, **in qualsiasi combinazione**. Un edificio senza mana è neutro (§5.3). |
+| Truppa | All’attivazione: danno, scudo, cura e Corruzione all’avversario, **in qualsiasi combinazione**; le truppe Assedio anche il danno agli scudi. |
+
+La libertà delle combinazioni sposta il peso sul bilanciamento del catalogo: un elemento misto non deve essere migliore su tutti i fronti (P3).
+
+#### 7.6.6 Ordine dentro lo stesso istante
+
+1. Gli edifici che hanno finito l’intervallo producono mana, scudo, cura e Corruzione.
+2. Le truppe pronte si attivano da destra verso sinistra (§7.3).
+3. Si applicano le cure e lo scudo nuovo.
+4. Il danno agli scudi (attacco d’assedio) toglie scudo.
+5. Il danno normale e il logoramento colpiscono lo scudo, poi la Resistenza.
+6. Alla **fine dell’istante** si controlla chi è caduto: Resistenza a zero, oppure Corruzione pari o superiore alla Resistenza. Se cadono entrambe le nazioni, è un pareggio (§3.4).
+
+Inefficienza e Sabotaggio prodotti in un istante (passi 1 e 2) valgono **dall’istante successivo** (§7.7).
+
+### 7.7 Inefficienza e Sabotaggio — Confermato (modifica del nucleo, v0.14)
+
+Due effetti che agiscono sui **timer** degli elementi avversari (ricarica delle truppe, intervallo degli edifici), senza eliminarli.
+
+| Effetto | Funzionamento |
+|---|---|
+| **Inefficienza** (rallenta) | Per una durata in secondi, il timer del bersaglio avanza **più piano**. L’intensità è un **valore unico** uguale per tutti (placeholder: metà velocità, §16.3); gli elementi si distinguono solo per la durata. |
+| **Sabotaggio** (blocca) | Per una durata in secondi, il timer del bersaglio è **fermo** e il bersaglio **non può attivarsi**, nemmeno se è pronto e il mana è disponibile. |
+
+#### 7.7.1 Fonti e bersagli
+
+- Possono averli sia le **truppe** (all’attivazione) sia gli **edifici** (allo scadere dell’intervallo), in qualsiasi combinazione con gli altri effetti (§7.6.5).
+- Colpiscono truppe ed edifici. Ogni effetto dichiara nei dati la propria **categoria di bersaglio**: solo truppe, solo edifici o qualsiasi elemento.
+- Su un edificio, rallentare o bloccare il timer rallenta o ferma **tutto ciò che produce** (mana, scudo, cura, Corruzione), perché l’edificio ha un unico intervallo (§7.4).
+- Se non esiste un bersaglio valido nella categoria, l’effetto va perso.
+- Un modificatore può far partire uno scontro con un elemento già rallentato o sabotato (§8.2).
+
+#### 7.7.2 Scelta del bersaglio: a caso, a rotazione
+
+- Il bersaglio si sceglie **a caso** fra gli elementi validi della categoria, con il seme dello scontro (§7.5).
+- La scelta è **a rotazione**, come pescare da un sacchetto: un elemento non viene colpito di nuovo finché tutti gli altri elementi validi non sono stati colpiti una volta; poi la rotazione ricomincia.
+- La rotazione è **unica per nazione**: tutti gli effetti dello stesso tipo (Inefficienza o Sabotaggio) e della stessa categoria di una nazione la condividono, così due sabotatori colpiscono elementi diversi.
+
+#### 7.7.3 Durata e sovrapposizioni
+
+- Se un elemento già colpito viene colpito di nuovo dallo stesso effetto, **le durate si sommano**.
+- Un elemento insieme rallentato e bloccato: **il blocco prevale**; intanto la durata di entrambi gli effetti scorre normalmente.
+- Gli effetti valgono **dall’istante successivo** a quello in cui sono stati prodotti: le due nazioni agiscono in contemporanea, quindi una truppa sabotata nello stesso istante in cui si attiva si attiva comunque.
+
+Conseguenza: l’Inefficienza **non ha effetto immediato** su una truppa già pronta in attesa di mana, perché il suo timer è già a zero; conta dalla ricarica successiva, se è ancora attiva. Il Sabotaggio invece la blocca subito.
 
 ## 8. Linguaggio degli effetti e modificatori — Proposta
 
@@ -425,7 +525,7 @@ Questa sezione è il punto di innesto per i contenuti futuri: ogni nuovo element
 
 | Campo | Significato |
 |---|---|
-| Bersaglio | Che cosa viene modificato: Resistenza, riserva di mana, una truppa, un edificio, una risorsa del Magazzino, una produzione, gli spazi, le offerte. |
+| Bersaglio | Che cosa viene modificato: Resistenza, riserva di mana, una truppa, un edificio, una risorsa del Magazzino, una produzione, gli spazi, le offerte, i valori di partenza dello scontro (scudo, Corruzione, elementi rallentati o sabotati; dalla v0.16). |
 | Effetto | La variazione applicata. |
 | Durata | Istantaneo, secondi di battaglia, numero di fasi o di anni. |
 | Origine | Chi o che cosa lo ha generato (un evento, un incontro, una nazione avversaria). |
@@ -449,7 +549,7 @@ Primo catalogo di malus del prototipo (valori placeholder):
 |---|---|
 | Ricerca dimezzata | La Ricerca prodotta a ogni fase è dimezzata (esempio di P1). |
 | Oro dimezzato | L’Oro prodotto a ogni fase è dimezzato. |
-| Inefficienza | Un edificio produce mana più lentamente in battaglia (§8.3). |
+| Inefficienza | Un edificio produce mana più lentamente in battaglia: la versione di run, per tutta la battaglia, dell’effetto di §7.7. |
 | Truppa provata | Una truppa ha la ricarica più lunga in battaglia. |
 | Mercati diffidenti | Rinnovare le offerte costa di più. |
 | Mercanti in fuga | Ogni opportunità mostra un’alternativa in meno. |
@@ -460,15 +560,17 @@ I nomi tematici sono suggeriti dal creatore al posto dei termini generici del ge
 
 | Famiglia | Nome tematico proposto | Funzione | Stato |
 |---|---|---|---|
-| Danno | — | Riduce la Resistenza avversaria. | Base |
-| Erosione | **Corruzione** (al posto di Veleno) | Riduzione continua nel tempo. | Proposta |
-| Rallentamento | **Inefficienza** (al posto di Rallentamento) | Allunga cooldown o ritmo di produzione; applicata a un edificio produttore di mana è particolarmente tematica. | Proposta |
-| Disattivazione | **Sabotaggio** (al posto di Distruggi) | Impedisce o ritarda l’attivazione di un elemento, senza eliminarlo. | Proposta |
+| Danno | — | Riduce la Resistenza avversaria (prima lo scudo, §7.6.1). | Base |
+| Danno agli scudi | **Attacco d’assedio** | Toglie solo scudo, prima del danno normale; solo truppe Assedio (§7.6.4). | Confermato (v0.13) |
+| Difesa | **Scudo**, **Cura** | Assorbe il danno; ridà Resistenza persa (§7.6.1, §7.6.2). | Confermato (v0.13) |
+| Accumulo | **Corruzione** (al posto di Veleno) | Contatore che sconfigge la nazione quando raggiunge la Resistenza (§7.6.3). Sostituisce la precedente proposta di erosione continua. | Confermato (v0.13) |
+| Rallentamento | **Inefficienza** (al posto di Rallentamento) | Per una durata, il timer del bersaglio avanza più piano (§7.7). | Confermato (v0.14) |
+| Disattivazione | **Sabotaggio** (al posto di Distruggi) | Per una durata, il timer del bersaglio è fermo e il bersaglio non può attivarsi (§7.7). | Confermato (v0.14) |
 | Eliminazione | **Uccidi** | Rimuove un elemento dallo scontro. | Spunto: oggi gli elementi non vengono eliminati in battaglia (§7.1), quindi richiede una modifica del nucleo. |
 
-Il primo prototipo usa **solo la famiglia Danno**; le altre famiglie verranno valutate in seguito.
+Il primo prototipo usa per ora **solo la famiglia Danno**. Difesa, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio sono confermati nel design; quando introdurli nel prototipo è da decidere.
 
-Il rapporto fra Corruzione come erosione e Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
+Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
 
 ---
 
@@ -490,7 +592,7 @@ Il rapporto fra Corruzione come erosione e Diplomazia come sistema di accordi o 
 |---|---|
 | Tutte e cinque le dimensioni sono presenti fin da subito | Confermato |
 | La nazione si crea **come in un GDR**: prima dell’anno 1 il giocatore vede tutte le opzioni e sceglie nome, un popolo, un governo, un credo, una cultura e alcuni perk iniziali; poi la run procede | Confermato |
-| Per ora l’identità resta fissa durante la run; il cambiamento (riforme, conversioni, trasformazioni culturali) arriverà più avanti | Confermato / Direzione |
+| Per ora popolo, governo, credo e cultura restano fissi durante la run; il loro cambiamento (riforme, conversioni, trasformazioni culturali) arriverà più avanti. L’identità però **cresce** con le vie scelte entrando nelle ere (§10.4) | Confermato / Direzione |
 | Anche i fantasmi hanno un’identità, che vale per la loro Resistenza e per i loro tratti in battaglia | Confermato |
 | Le nazioni create **restano salvate** sul PC; si possono **modificare** o **eliminare** (con conferma). Da una nazione salvata si possono giocare più run | Confermato |
 
@@ -514,7 +616,7 @@ Catalogo del prototipo (placeholder): 3 popoli (Montanari, Popolo del delta, Pop
 
 **Da definire:** incompatibilità fra elementi, livelli o rarità dei perk, altre fonti di perk.
 
-L’identità dovrebbe influenzare opportunità, risposte agli eventi, strategie disponibili e, in futuro, abilità speciali (ad esempio i malus con nome, Parte III). Il modo in cui può cambiare durante la partita resta da progettare: riforme politiche, conversioni religiose e trasformazioni culturali sono possibilità, non regole.
+L’identità dovrebbe influenzare opportunità, risposte agli eventi, strategie disponibili e, in futuro, abilità speciali (ad esempio i malus con nome, Parte III). Il modo in cui può cambiare durante la partita resta da progettare: riforme politiche, conversioni religiose e trasformazioni culturali sono possibilità, non regole. Le **vie delle ere** (§10.4) sono il primo modo confermato in cui l’identità cresce durante la run: usano la stessa scheda di §9.2 e si aggiungono agli elementi scelti alla creazione, senza sostituirli.
 
 **Proposta non adottata:** partire con un’identità ridotta e far emergere cultura e credo attraverso gli eventi. Il creatore ha scelto tutte le dimensioni fin dalla fondazione; l’idea resta fra gli spunti (Parte III).
 
@@ -528,25 +630,55 @@ Le ere dipendono dall’investimento in Ricerca, non da un calendario uguale per
 
 La **Ricerca si conserva e viene spesa** per avanzare quando il giocatore può pagare il costo. Il passaggio non avviene automaticamente al raggiungimento di una soglia.
 
-### 10.2 Base di lavoro — Proposta
+### 10.2 Che cosa fa un’era — Confermato (v0.15)
 
-Tre ere iniziali, con nomi di lavoro “Fondazione”, “Sviluppo” e “Ascesa” (placeholder). Costi placeholder.
+| Effetto dell’ingresso in un’era | Riferimento |
+|---|---|
+| Sblocca il catalogo di offerte dell’era; quelle delle ere precedenti non restano disponibili | §10.3 |
+| Concede spazi edificio e truppa, nella quantità indicata nei dati dell’era | §6.3 |
+| Alza la quota di Resistenza dovuta all’era | §7.1.1 |
+| Dalla seconda era in poi, chiede di **scegliere una via** | §10.4 |
+| Rende disponibili gli effetti più forti (P2a) | §2 |
 
-Una nuova era sblocca offerte e possibilità di miglioramento. Gli elementi posseduti restano utilizzabili e non migliorano automaticamente: il vantaggio tecnologico richiede anche la capacità economica di acquistare ciò che viene sbloccato.
+Gli elementi posseduti restano utilizzabili e non migliorano automaticamente: il vantaggio tecnologico richiede anche la capacità economica di acquistare ciò che viene sbloccato.
 
-Le ere sono anche il veicolo proposto per P2a (effetti forti solo in ere avanzate) e una delle ipotesi per l’espansione della plancia (§6.3).
+La struttura è **lineare**: ere in sequenza, senza albero tecnologico. La scelta e la specializzazione passano per le vie (§10.4). La Ricerca serve, per ora, solo a passare d’era.
 
-### 10.3 Questioni aperte
+**Costo — Confermato nella forma:** ogni era costa più Ricerca della precedente, senza meccanismi di recupero per chi è rimasto indietro. Valori placeholder.
 
-**Confermato:** l’avanzamento si può pagare in entrambe le macrofasi e non consuma un’opportunità. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+**Numero di ere — Da definire:** il prototipo ne usa 3 (“Fondazione”, “Sviluppo”, “Ascesa”, nomi placeholder); il numero della run completa si decide dopo i playtest. Ogni era in più richiede un catalogo base e nuove vie con i loro esclusivi (§10.4).
+
+### 10.3 Regole del passaggio — Confermato
+
+L’avanzamento si può pagare in entrambe le macrofasi e non consuma un’opportunità. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+
+### 10.4 Le vie — Confermato (v0.15)
+
+Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una direzione di sviluppo che diventa parte della sua identità (es. Via del Commercio, Via della Guerra, Via della Fede; nomi placeholder). Ogni era diventa così un capitolo della storia della nazione.
+
+| Regola | Stato |
+|---|---|
+| La scelta è **obbligatoria**, al momento dell’ingresso nell’era | Confermato |
+| Si sceglie **fra 3 vie** | Confermato |
+| Ogni era ha un **pool di vie**. Le 3 proposte sono pescate dal pool, con più probabilità per le vie coerenti con l’identità e con le vie già scelte; alcune vie possono essere esclusive di certe identità o di certe vie precedenti | Confermato |
+| Una via usa la **stessa scheda degli elementi dell’identità** (§9.2) | Confermato |
+| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi; dare un tratto permanente (§8); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
+| Gli effetti sono **liberi**: possono riferirsi a etichette o a elementi specifici, caso per caso nel catalogo | Confermato |
+| Gli **elementi esclusivi** di una via sono **diversi per ogni era**: una via scelta nell’era 2 ha esclusivi propri per l’era 2, per l’era 3 e per le successive. Gli esclusivi di un’era passata spariscono come le altre offerte | Confermato |
+| Le vie si accumulano: nessuna sostituisce le precedenti o gli elementi scelti alla creazione | Confermato |
+
+Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un’etichetta continua a contare.
+
+Quando introdurre le vie nel prototipo è da decidere.
+
+### 10.5 Questioni aperte
 
 **Da definire:**
 
-- Costo definitivo delle ere e andamento fra un’era e la successiva.
-- Tecnologie individuali, albero di ricerca o specializzazioni.
-- Rapporto fra ricerca e identità della civiltà.
-
-Per la prima prova è prevista la sola progressione delle ere, senza albero tecnologico.
+- Costi definitivi delle ere e andamento fra un’era e la successiva.
+- Numero definitivo di ere (§10.2).
+- Catalogo delle vie e dei loro esclusivi.
+- Altri usi della Ricerca oltre al passaggio d’era (ad esempio tecnologie come offerte), se serviranno.
 
 ## 11. Fantasmi e asincronia
 
@@ -560,7 +692,7 @@ Un’arma del fantasma può lasciare una conseguenza nella run del giocatore att
 
 L’avversario viene fissato prima delle occasioni di spionaggio e rimane lo stesso fino allo scontro.
 
-**Proposta:** abbinare nazioni dello stesso anno senza obbligare alla stessa era, così l’investimento tecnologico conserva valore. I criteri definitivi di matchmaking non sono approvati.
+**Confermato (v0.15):** l’avversario è un fantasma dello **stesso anno**, anche se di un’era diversa, così l’investimento tecnologico conserva valore. Gli altri criteri di matchmaking restano da definire.
 
 ### 11.3 Popolamento iniziale — Confermato
 
@@ -570,7 +702,7 @@ Per il primo prototipo si usano avversari locali di prova (§16.3); non costitui
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
-Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi e versione delle regole. Se il combattimento introduce casualità, va gestito anche il seme casuale.
+Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi e versione delle regole. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
 
 È proposto di salvare le **statistiche complete** degli elementi e non solo il loro identificativo: se in seguito un elemento viene ribilanciato, la copia continua a combattere com’era stata registrata.
 
@@ -580,7 +712,7 @@ Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordin
 
 Ottenere informazioni sull’avversario prima dello scontro e poter intervenire su minacce specifiche. L’esempio iniziale: una statistica di spionaggio che permette di scoprire un oggetto bellico forte e sabotarlo, impedendone o ritardandone l’attivazione.
 
-Lo spionaggio appartiene soprattutto alla Preparazione e usa il fantasma già selezionato. Raccogliere informazioni e sabotare sono azioni distinte; il loro rapporto resta da progettare. Il sabotaggio si esprime con la famiglia Disattivazione (§8.3).
+Lo spionaggio appartiene soprattutto alla Preparazione e usa il fantasma già selezionato. Raccogliere informazioni e sabotare sono azioni distinte; il loro rapporto resta da progettare. Il sabotaggio si esprime con la famiglia Disattivazione (§8.3): l’effetto in battaglia è definito in §7.7, mentre il modo di applicarlo prima dello scontro resta Direzione.
 
 **Da definire:** formula, probabilità, costi, durata, bersagli consentiti, contromisure. Ritardare un produttore di mana è un’interazione coerente con il sistema, non una regola approvata.
 
@@ -602,7 +734,7 @@ Durata, origine e cumulabilità dei malus del prototipo sono fissate in §8.2.1.
 
 ### 13.3 Corruzione e diplomazia
 
-Il creatore ha suggerito Corruzione o Diplomazia come reinterpretazioni tematiche di effetti simili al veleno. La distinzione fra corruzione come erosione e diplomazia come sistema di accordi o diserzioni è una proposta, non una decisione.
+Il creatore ha suggerito Corruzione o Diplomazia come reinterpretazioni tematiche di effetti simili al veleno. Dalla v0.13 la Corruzione in battaglia è un accumulo che sconfigge la nazione quando raggiunge la Resistenza (§7.6.3), non più un’erosione. La Diplomazia come sistema di accordi o diserzioni resta una proposta, non una decisione.
 
 ### 13.4 Struttura dati di un evento — Proposta
 
@@ -634,12 +766,12 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Contesto | Informazioni essenziali |
 |---|---|
 | Run | Anno, fase, era, vittorie, Prestigio, ultima possibilità. |
-| Economia | Oro e Ricerca nel Magazzino; produzione prevista per fase. |
+| Economia | Risorse nel Magazzino; produzione prevista per fase. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
 | Ricerca | Costo della prossima era e risorsa disponibile. |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
-| Battaglia | Resistenza delle due parti, mana, cooldown, unità in attesa e motivo dell’attesa. |
+| Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa, elementi rallentati o sabotati con durata residua e origine. |
 | Esito | Risultato, perdita di Prestigio, vittorie, conseguenze. |
 
 **Piattaforma — Confermato:** PC. Una fila fino a 12 truppe e una fino a 10 edifici condizionano comunque inquadratura e layout.
@@ -667,10 +799,9 @@ Idee annotate per il futuro. Non vanno implementate nella base; la base non deve
 | Malus che porta il nome della nazione che lo ha inflitto | Creatore | Non sempre presente: effetto speciale di certi perk o abilità legati a razza e identità. Usa il campo Origine (§8.2). |
 | Eventi a scelta con testo e opzioni | Creatore | Seconda forma degli incontri del mondo, dopo gli scontri automatici. |
 | Diplomazia come accordi o diserzioni | Creatore | Vedi §13.3. |
-| Più tipi di mana per colore e tema (rosso guerra, blu diplomazia, verde ricchezza) | Creatore | Direzione in §5.3; modifica del nucleo quando introdotti. |
 | Identità emergente (cultura e credo dagli eventi) | Proposta precedente | Non confermata; vedi §9. |
 | Nemesi: ritrovare più avanti una copia dello stesso giocatore che ci ha sconfitto | Proposta di Claude | Non discussa. Dà continuità narrativa agli avversari in un contesto asincrono. |
-| Scudo, cura e riduzione del danno | Proposta precedente | Non confermati e non richiesti dalla prima simulazione. |
+| Riduzione del danno a ogni colpo | Proposta precedente | Scudo e cura sono confermati dalla v0.13 (§7.6); la riduzione per colpo resta uno spunto. Punirebbe gli eserciti di truppe veloci e deboli. |
 | Recupero del Prestigio | — | Nessuna regola prevista. |
 | Progressione fra run | — | Non definita. |
 
@@ -743,7 +874,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Convenzione | Stato |
 |---|---|
 | Run di prova di 3 anni completi | Limite del prototipo; la run completa resta di 10 vittorie (§3.4). |
-| Spazi della plancia da tre vie insieme: ingresso nelle ere, edifici che concedono spazi (es. Caserma), acquisto di spazi come offerta | Provvisoria finché §6.3 non è definito. |
+| Quantità di spazi concessi da ere, edifici e acquisti, e loro prezzi | Placeholder (le tre fonti sono confermate, §6.3). |
+| Pescata delle 3 vie: peso base 1, +1 per ogni elemento dell’identità o via già scelta che la favorisce; se il pool ha meno di 3 vie valide, si mostrano tutte | Provvisoria, come per le opportunità. |
 | Entrando in una nuova era, le alternative dell’opportunità in corso vengono ripescate gratis dalla nuova era | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
 | Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
@@ -774,11 +906,14 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Dei tratti di un fantasma valgono in battaglia solo quelli su tutta la nazione | Provvisoria. |
 | Se si arriva alla creazione da Gioca (nessuna nazione salvata), dopo il salvataggio si torna alla lista delle nazioni | Provvisoria. |
 | Tasso del mercato: 2 unità di una risorsa → 1 Oro, uguale per tutte | Placeholder. |
-| Potenziamenti: truppe +50% danno per livello; edifici +1 a ogni risorsa che producono per livello | Placeholder. |
+| Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto; gli edifici anche +1 a ogni risorsa che producono per fase. Il mana prodotto non cambia | Placeholder. |
 | I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
 | Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
+| Valori di scudo, cura, Corruzione e danno agli scudi di edifici e truppe | Placeholder. |
+| Intensità dell’Inefficienza: il timer avanza a metà velocità; durate di Inefficienza e Sabotaggio | Placeholder. |
+| Ogni scontro ha un proprio seme, ricavato dal seme della run e dall’anno, e salvato con la battaglia | Convenzione tecnica, per riprodurre lo scontro (§7.5). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -792,6 +927,10 @@ Criteri di accettazione proposti per il prototipo:
 | Costruzione durante Produzione | Nessuna raccolta retroattiva; prima produzione in Preparazione. |
 | Risorse non spese | Conservate al cambio fase e al cambio anno. |
 | Passaggio di era | Ricerca pagata una volta; resto conservato; offerte coerenti con l’era. |
+| Ingresso in un’era | Spazi e quota di Resistenza dell’era concessi; dalla seconda era, scelta obbligatoria fra 3 vie. |
+| Vie | Le 3 proposte vengono dal pool dell’era, pesate da identità e vie precedenti; la via scelta applica bonus immediato e tratto permanente. |
+| Esclusivi delle vie | Compaiono fra le offerte solo nell’era a cui appartengono e solo per chi ha la via. |
+| Abbinamento dei fantasmi | Stesso anno, era qualsiasi. |
 | Truppa pronta senza mana | In attesa, senza consumi né cooldown aggiuntivo; il motivo è visibile. |
 | Più truppe pronte | Valutazione da destra a sinistra. |
 | Prima truppa troppo costosa | Saltata; la successiva può usare il mana disponibile. |
@@ -800,6 +939,19 @@ Criteri di accettazione proposti per il prototipo:
 | Stesso istante | Prima la produzione di mana, poi le attivazioni. |
 | Logoramento | Nessun danno prima di 45 secondi; poi danno crescente a entrambe le nazioni. |
 | Doppio azzeramento | Pareggio: vittoria aggiunta, nessuna perdita di Prestigio, malus del fantasma applicati. |
+| Scudo | Parte da zero; assorbe il danno prima della Resistenza; resta finché non viene consumato, senza tetto. |
+| Logoramento con scudo | Il danno del logoramento viene assorbito dallo scudo. |
+| Cura | Ridà Resistenza senza superare il massimo; nello stesso istante si applica prima del danno. |
+| Corruzione | Sconfitta quando è pari o superiore alla Resistenza attuale, anche con scudo pieno; non scende mai. |
+| Attacco d’assedio | Toglie solo scudo, prima del danno normale; senza scudo va perso; solo truppe Assedio. |
+| Caduta simultanea per danno e Corruzione | Pareggio. |
+| Stesso seme | Lo stesso scontro con lo stesso seme dà sempre lo stesso risultato. |
+| Inefficienza | Il timer del bersaglio avanza più piano per la durata; su un edificio rallenta tutte le sue produzioni. |
+| Sabotaggio | Il bersaglio non si attiva per la durata, anche se pronto e con mana disponibile. |
+| Rotazione dei bersagli | Nessun elemento valido viene colpito due volte prima che siano stati colpiti tutti; la rotazione è condivisa dalla nazione. |
+| Colpo ripetuto | Le durate di Inefficienza o Sabotaggio si sommano. |
+| Tempismo | Un elemento sabotato nello stesso istante in cui si attiva si attiva comunque; il blocco vale dall’istante successivo. |
+| Rallentato e sabotato insieme | Il blocco prevale; le durate di entrambi scorrono. |
 | Resistenza | Somma di era, identità, anni, edifici e truppe all’inizio dello scontro. |
 | Vendita | Rimborso pari a metà del prezzo pagato, arrotondato per difetto. |
 | Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo e si dimezza a ogni nuova opportunità. |
@@ -823,9 +975,8 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Priorità | Questione |
 |---|---|
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
-| Prima di ampliare la plancia | Che cosa concede gli spazi (§6.3), quantità e prezzi; layout. |
-| Prima di ampliare la ricerca | Numero e identità definitive delle ere; costo del passaggio. |
-| Prima di più tipi di mana | Colori, temi e vincoli di compatibilità (§5.3). |
+| Prima di ampliare la plancia | Quantità e prezzi degli spazi (§6.3); layout. |
+| Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
 | Per lo spionaggio | Informazioni visibili, costi, bersagli, effetti, contromisure. |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
@@ -846,10 +997,14 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Opportunità | Momento di scelta interno a una macrofase. |
 | Incontro del mondo | Minaccia o evento dell’anno (es. barbari, pirati); inizialmente uno scontro contro una plancia generata. |
 | Plancia generata | Plancia avversaria creata dal gioco per un incontro del mondo. |
-| Magazzino | Riserva persistente di Oro e Ricerca. |
+| Magazzino | Riserva persistente di tutte le risorse (§5.3). |
 | Mana | Risorsa prodotta in battaglia e spesa per attivare le truppe. |
 | Cooldown | Tempo di attesa fra due attivazioni. |
 | Resistenza | Capacità della nazione di sopravvivere al singolo scontro. |
+| Scudo | Riserva di battaglia che assorbe il danno prima della Resistenza. |
+| Cura | Effetto che ridà Resistenza persa, senza superare il massimo. |
+| Corruzione | Contatore di battaglia che sconfigge la nazione quando raggiunge la Resistenza. |
+| Attacco d’assedio | Danno che colpisce solo lo scudo; proprio delle truppe Assedio. |
 | Prestigio | Risorsa che determina la sopravvivenza della run dopo le sconfitte. |
 | Fantasma | Copia di una nazione avversaria usata per uno scontro asincrono. |
 | Era | Livello di sviluppo tecnologico raggiunto spendendo Ricerca. |
@@ -860,6 +1015,33 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.16 — 4 novembre 2026** (modifica del nucleo per gli edifici neutri)
+- Edifici senza mana: neutri, senza colore; possono essere comuni o esclusivi di certe nazioni (§5.3).
+- I modificatori possono cambiare i valori di partenza dello scontro: scudo, Corruzione, elementi rallentati o sabotati (§7.6, §7.7, §8.2).
+- Potenziamenti: ogni livello aumenta tutti i valori d’effetto (§6.5, §16.3).
+- Il catalogo placeholder dei contenuti è in `docs/Catalogo.md`.
+
+**v0.15 — 4 novembre 2026** (modifica del nucleo per gli spazi della plancia)
+- Ere lineari con scelta obbligatoria di una via fra 3 dalla seconda era; le vie usano la scheda dell’identità, compaiono da un pool pesato e hanno esclusivi diversi per ogni era (§10.2, §10.4).
+- Costo delle ere crescente, senza recupero; numero di ere da definire dopo i playtest, 3 nel prototipo (§10.2).
+- Spazi della plancia da tre fonti insieme: ere, edifici, acquisto con Oro (§6.3).
+- P2a confermato: gli effetti più forti si sbloccano nelle ere avanzate (§2).
+- Fantasmi dello stesso anno, anche di era diversa (§11.2).
+- L’identità cresce con le vie (§9); aggiornati convenzioni, criteri di verifica e decisioni aperte (§16.3, §17, §18).
+
+**v0.14 — 4 novembre 2026** (modifica del nucleo)
+- Casualità ammessa in battaglia, sempre con seme registrato; sostituisce “nessuna casualità” (§7.5, §11.4).
+- Nuova §7.7: Inefficienza (rallenta) e Sabotaggio (blocca) su truppe ed edifici, con bersaglio a caso a rotazione condivisa dalla nazione, durate sommate, effetto dall’istante successivo e blocco che prevale.
+- Aggiornati malus Inefficienza, famiglie di effetti, spionaggio, informazioni di battaglia, convenzioni e criteri di verifica (§8.2.1, §8.3, §12, §14.3, §16.3, §17).
+
+**v0.13 — 4 novembre 2026** (modifica del nucleo)
+- Nuova §7.6: Scudo e Cura (famiglia Difesa), Corruzione come accumulo che sconfigge quando raggiunge la Resistenza, attacco d’assedio che colpisce solo gli scudi (solo truppe Assedio).
+- Edifici e truppe possono produrre mana, scudo, cura e Corruzione in qualsiasi combinazione; un edificio produce tutto allo scadere del suo unico intervallo (§7.4, §7.6.5).
+- Il logoramento viene assorbito dallo scudo; ordine completo dentro lo stesso istante (§7.5, §7.6.6).
+- Pareggio anche per caduta simultanea dovuta alla Corruzione (§3.4).
+- Aggiornati famiglie di effetti, riserva di spunti, informazioni di battaglia, convenzioni, criteri di verifica e glossario (§8.3, §13.3, Parte III, §14.3, §16.3, §17, §19).
+- Correzioni: tolti dagli spunti e dalle decisioni aperte i tipi di mana, già confermati in v0.12; il Magazzino contiene tutte le risorse (§14.3, §19).
 
 **v0.12 — 4 novembre 2026** (modifica del nucleo)
 - Nuove risorse: Cibo, Legno, Pietra, Ferro, Fauna, Fede, Influenza; mercato delle risorse a tasso fisso (§5.3).
