@@ -1,7 +1,7 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 1 — 4 novembre 2026
-**Riferimento:** Game Design Document v0.15 (`docs/Ultralopolis_GDD.md`)
+**Versione:** bozza 2 — 4 novembre 2026
+**Riferimento:** Game Design Document v0.16 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Questo catalogo **non è ancora nel gioco**: i file dati (`data/catalog/`) contengono la versione precedente e verranno aggiornati quando si deciderà di implementarlo.
 
 Il GDD resta la fonte di verità per le regole. Questo documento contiene solo **contenuti**; dove un contenuto richiederebbe una regola nuova è segnalato in §7.
@@ -64,11 +64,15 @@ Gli esclusivi (delle vie e dell’identità) hanno **+1 punto** di budget rispet
 
 ### 1.6 Potenziamenti
 
-Costi: livello 2 = 2 × era, livello 3 = 3 × era unità della risorsa di famiglia (edifici: Legno, Pietra se Difensivi; truppe: Ferro, Fauna se Cavalleria o Fauna, Fede se Sacre). Effetti: vedi §7, questione F.
+Costi: livello 2 = 2 × era, livello 3 = 3 × era unità della risorsa di famiglia (edifici: Legno, Pietra se Difensivi; truppe: Ferro, Fauna se Cavalleria o Fauna, Fede se Sacre).
+
+Effetti (GDD §6.5): ogni livello dà **+50% a tutti i valori d’effetto**, durate comprese, arrotondato per difetto; gli edifici anche +1 a ogni risorsa per fase. Il mana prodotto non cambia.
 
 ### 1.7 Colori del mana
 
 Il colore segue la famiglia (§5.3 del GDD): **rosso** Militare, Estrattivo, Difensivo; **verde** Commerciale, Agricolo, Fauna; **blu** Sapere, Sacro. Ogni era ha truppe di tutti e tre i colori, così ogni famiglia di edifici serve anche in battaglia.
+
+Un edificio **senza mana è neutro** e non compare fra le offerte comuni: si ottiene solo come esclusivo dell’identità o di una via (§5.3 del GDD). Per questo tutti gli edifici base producono almeno un po’ di mana.
 
 ---
 
@@ -87,7 +91,7 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Biblioteca | Sapere | blu | Ricerca 2 | 1 mana ogni 2 s | — | 4 |
 | Santuario | Sacro | blu | Fede 2 | 1 mana + 1 cura ogni 2 s | — | 4,5 |
 | Caserma | Militare | rosso | Ferro 1 | 1 mana ogni 3 s | +1 spazio truppa | 3,8 |
-| Palizzata | Difensivo | rosso | Pietra 1, Legno 1 | 3 scudo ogni 3 s (nessun mana) | — | 4 |
+| Palizzata | Difensivo | rosso | Pietra 1, Legno 1 | 1 mana + 2 scudo ogni 3 s | — | 4,3 |
 
 ### 2.2 Era 2 — budget 6, costo 7 Oro
 
@@ -111,7 +115,7 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Cattedrale | Sacro | blu | Fede 4 | 3 mana ogni 2 s | — | 8 |
 | Cittadella | Difensivo, Militare | rosso | Ferro 1 | 1 mana + 1 scudo ogni 2 s | +2 spazi truppa | 8 |
 | Arsenale | Militare | rosso | Oro 1, Ferro 2 | 3 mana ogni 2 s | — | 8 |
-| Bastioni | Difensivo | rosso | Pietra 2 | 7 scudo ogni 3 s (nessun mana) | — | 8 |
+| Bastioni | Difensivo | rosso | Pietra 2 | 1 mana + 6 scudo ogni 3 s | — | 8,3 |
 | Ospedale | Sapere | blu | Ricerca 1 | 1 mana + 3 cura ogni 2 s | — | 7,5 |
 | Rete di informatori | Commerciale | verde | Oro 2, Influenza 3 | 1 mana + Sabotaggio 2 s (truppe) ogni 4 s | — | 7,5 |
 
@@ -164,7 +168,7 @@ Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “E
 | Paladini | Fanteria, Sacro | blu 4 | 2 s | Danno 10, Cura 6 | 0,5 | 16 |
 | Inquisitori | Sacro | blu 4 | 3 s | Corruzione 12 | 0,5 | 18 |
 
-### 3.4 Quando compaiono gli effetti (proposta, §7 questione B)
+### 3.4 Quando compaiono gli effetti — deciso con Davide
 
 | Effetto | Prima era |
 |---|---|
@@ -230,7 +234,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | Osservatorio | Sapere | 2 | Sapere | blu | Ricerca 5 | 1 mana ogni 2 s | 7 |
 | Compagnia commerciale | Commercio | 3 | Commerciale | verde | Oro 5 | 2 mana ogni 2 s | 9 |
 | Borsa | Oro | 3 | Commerciale | verde | Oro 7 | 1 mana ogni 2 s | 9 |
-| Reliquiario | Rivelazione | 3 | Sacro | blu | Fede 2 | 2 cura + 2 Corruzione ogni 2 s (nessun mana) | 8,5 |
+| Reliquiario | Rivelazione | 3 | Sacro | **neutro** | Fede 2 | 2 cura + 2 Corruzione ogni 2 s (nessun mana) | 8,5 |
 | Totem degli antenati | Spiriti | 3 | Sacro, Fauna | verde | Fauna 2 | 2 mana + 2 scudo + 1 cura ogni 2 s | 9,5 |
 
 **Truppe** (budget dell’era +1)
@@ -292,20 +296,24 @@ I sei malus esistenti restano (Ricerca dimezzata, Oro dimezzato, Inefficienza, T
 
 ## 7. Questioni per Davide
 
-Il catalogo funziona solo se queste questioni vengono decise. Alcune toccano regole del GDD.
+### 7.1 Decise (bozza 2)
+
+| # | Questione | Decisione |
+|---|---|---|
+| A | Edifici senza mana | Sono **neutri** e si ottengono solo come esclusivi dell’identità o delle vie (GDD §5.3, v0.16). Palizzata e Bastioni ricevono un po’ di mana; il Reliquiario resta neutro. |
+| B | Era degli effetti | Come in §3.4. |
+| C | Valori di partenza dello scontro | I modificatori possono cambiarli (GDD §8.2, v0.16): Semi del dissenso e Rete compromessa restano. |
+| F | Potenziamenti | +50% a tutti i valori d’effetto per livello (GDD §6.5, v0.16). |
+
+### 7.2 Ancora aperte
 
 | # | Questione | Proposta |
 |---|---|---|
-| A | Il GDD (§5.3) dice “ogni edificio produce mana di un colore”, ma dalla v0.13 un edificio può produrre solo difesa (Palizzata, Bastioni, Reliquiario). | Ogni edificio ha un **colore di famiglia** anche se produce 0 mana. Da correggere nel GDD. |
-| B | In che era compaiono gli effetti (P2a)? | Tabella di §3.4: Corruzione debole dall’era 1, Assedio e Inefficienza dall’era 2, Sabotaggio dall’era 3. |
-| C | Scudo e Corruzione partono da zero (§7.6 del GDD). Un malus o un perk può cambiare il valore di partenza (Semi del dissenso) o far partire un elemento sabotato (Rete compromessa)? | Sì: le regole fissano il valore di base, i modificatori possono alterarlo. |
 | D | Via dell’Ombra modifica la **durata** di Inefficienza e Sabotaggio: è un bersaglio nuovo per i modificatori (§8.2 del GDD). | Ammetterlo, oppure sostituire il tratto. |
 | E | Elementi spostati o tolti: Consolato e Stalle passano all’era 2 (per avere 8 edifici per era); la Cava esce dal catalogo (la Pietra arriva da Miniera, Palizzata, Cantiere, Bastioni). | Confermare o scegliere altri spostamenti. |
-| F | I potenziamenti oggi danno “+50% danno per livello” (§16.3 del GDD), ma le truppe ora hanno anche scudo, cura, Corruzione… | +50% a **tutti** i valori d’effetto (durate comprese) per livello. |
 | G | Numeri che cambiano molto rispetto ai dati attuali: Moschettieri da 10 a 5 di danno (erano fuori scala), costi uniformi per era (4 / 7 / 10). | Accettare come effetto della regola di budget. |
 | H | Dimensioni ipotizzate: pool di 4 vie per era più le esclusive; 1 elemento esclusivo per via e per era; esclusivi +1 punto. | Confermare. |
-
----
+| I | Gli edifici neutri si possono ottenere anche come ricompense degli incontri del mondo? | Da decidere; per ora solo identità e vie. |
 
 ## 8. Riepilogo dei numeri
 
