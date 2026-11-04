@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.13
+## Game Design Document — v0.14
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.13 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.14 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -408,7 +408,7 @@ Oltre al mana, un edificio può produrre scudo, cura e Corruzione (§7.6.5): all
 | Le due nazioni agiscono **in contemporanea**; se entrambe cadono nello stesso istante (Resistenza a zero o Corruzione, §7.6.3), lo scontro è un pareggio (§3.4) | Confermato |
 | **Logoramento** contro gli stalli: dopo **45 secondi** di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo (ispirato alla tempesta di sabbia di The Bazaar) | Confermato; forma del danno placeholder (§16.3) |
 | Il logoramento è un danno come gli altri: viene **assorbito dallo scudo** e le cure lo compensano (§7.6) | Confermato (v0.13) |
-| **Nessuna casualità** nella battaglia | Confermato |
+| **Casualità ammessa** in battaglia, sempre con un **seme registrato**: lo stesso seme dà sempre lo stesso scontro. Ogni contenuto che usa il caso va segnalato come tale | Confermato (modifica del nucleo, v0.14; sostituisce “nessuna casualità”) |
 | Pausa, cambio di velocità e possibilità di saltare la visualizzazione | Confermato, presenti nel prototipo |
 
 La simulazione non deve dipendere dalla velocità grafica del dispositivo, per ottenere scontri riproducibili.
@@ -474,6 +474,38 @@ La libertà delle combinazioni sposta il peso sul bilanciamento del catalogo: un
 5. Il danno normale e il logoramento colpiscono lo scudo, poi la Resistenza.
 6. Alla **fine dell’istante** si controlla chi è caduto: Resistenza a zero, oppure Corruzione pari o superiore alla Resistenza. Se cadono entrambe le nazioni, è un pareggio (§3.4).
 
+Inefficienza e Sabotaggio prodotti in un istante (passi 1 e 2) valgono **dall’istante successivo** (§7.7).
+
+### 7.7 Inefficienza e Sabotaggio — Confermato (modifica del nucleo, v0.14)
+
+Due effetti che agiscono sui **timer** degli elementi avversari (ricarica delle truppe, intervallo degli edifici), senza eliminarli.
+
+| Effetto | Funzionamento |
+|---|---|
+| **Inefficienza** (rallenta) | Per una durata in secondi, il timer del bersaglio avanza **più piano**. L’intensità è un **valore unico** uguale per tutti (placeholder: metà velocità, §16.3); gli elementi si distinguono solo per la durata. |
+| **Sabotaggio** (blocca) | Per una durata in secondi, il timer del bersaglio è **fermo** e il bersaglio **non può attivarsi**, nemmeno se è pronto e il mana è disponibile. |
+
+#### 7.7.1 Fonti e bersagli
+
+- Possono averli sia le **truppe** (all’attivazione) sia gli **edifici** (allo scadere dell’intervallo), in qualsiasi combinazione con gli altri effetti (§7.6.5).
+- Colpiscono truppe ed edifici. Ogni effetto dichiara nei dati la propria **categoria di bersaglio**: solo truppe, solo edifici o qualsiasi elemento.
+- Su un edificio, rallentare o bloccare il timer rallenta o ferma **tutto ciò che produce** (mana, scudo, cura, Corruzione), perché l’edificio ha un unico intervallo (§7.4).
+- Se non esiste un bersaglio valido nella categoria, l’effetto va perso.
+
+#### 7.7.2 Scelta del bersaglio: a caso, a rotazione
+
+- Il bersaglio si sceglie **a caso** fra gli elementi validi della categoria, con il seme dello scontro (§7.5).
+- La scelta è **a rotazione**, come pescare da un sacchetto: un elemento non viene colpito di nuovo finché tutti gli altri elementi validi non sono stati colpiti una volta; poi la rotazione ricomincia.
+- La rotazione è **unica per nazione**: tutti gli effetti dello stesso tipo (Inefficienza o Sabotaggio) e della stessa categoria di una nazione la condividono, così due sabotatori colpiscono elementi diversi.
+
+#### 7.7.3 Durata e sovrapposizioni
+
+- Se un elemento già colpito viene colpito di nuovo dallo stesso effetto, **le durate si sommano**.
+- Un elemento insieme rallentato e bloccato: **il blocco prevale**; intanto la durata di entrambi gli effetti scorre normalmente.
+- Gli effetti valgono **dall’istante successivo** a quello in cui sono stati prodotti: le due nazioni agiscono in contemporanea, quindi una truppa sabotata nello stesso istante in cui si attiva si attiva comunque.
+
+Conseguenza: l’Inefficienza **non ha effetto immediato** su una truppa già pronta in attesa di mana, perché il suo timer è già a zero; conta dalla ricarica successiva, se è ancora attiva. Il Sabotaggio invece la blocca subito.
+
 ## 8. Linguaggio degli effetti e modificatori — Proposta
 
 Questa sezione è il punto di innesto per i contenuti futuri: ogni nuovo elemento dovrebbe poter essere descritto con le voci seguenti (P5).
@@ -513,7 +545,7 @@ Primo catalogo di malus del prototipo (valori placeholder):
 |---|---|
 | Ricerca dimezzata | La Ricerca prodotta a ogni fase è dimezzata (esempio di P1). |
 | Oro dimezzato | L’Oro prodotto a ogni fase è dimezzato. |
-| Inefficienza | Un edificio produce mana più lentamente in battaglia (§8.3). |
+| Inefficienza | Un edificio produce mana più lentamente in battaglia: la versione di run, per tutta la battaglia, dell’effetto di §7.7. |
 | Truppa provata | Una truppa ha la ricarica più lunga in battaglia. |
 | Mercati diffidenti | Rinnovare le offerte costa di più. |
 | Mercanti in fuga | Ogni opportunità mostra un’alternativa in meno. |
@@ -528,11 +560,11 @@ I nomi tematici sono suggeriti dal creatore al posto dei termini generici del ge
 | Danno agli scudi | **Attacco d’assedio** | Toglie solo scudo, prima del danno normale; solo truppe Assedio (§7.6.4). | Confermato (v0.13) |
 | Difesa | **Scudo**, **Cura** | Assorbe il danno; ridà Resistenza persa (§7.6.1, §7.6.2). | Confermato (v0.13) |
 | Accumulo | **Corruzione** (al posto di Veleno) | Contatore che sconfigge la nazione quando raggiunge la Resistenza (§7.6.3). Sostituisce la precedente proposta di erosione continua. | Confermato (v0.13) |
-| Rallentamento | **Inefficienza** (al posto di Rallentamento) | Allunga cooldown o ritmo di produzione; applicata a un edificio produttore di mana è particolarmente tematica. | Proposta |
-| Disattivazione | **Sabotaggio** (al posto di Distruggi) | Impedisce o ritarda l’attivazione di un elemento, senza eliminarlo. | Proposta |
+| Rallentamento | **Inefficienza** (al posto di Rallentamento) | Per una durata, il timer del bersaglio avanza più piano (§7.7). | Confermato (v0.14) |
+| Disattivazione | **Sabotaggio** (al posto di Distruggi) | Per una durata, il timer del bersaglio è fermo e il bersaglio non può attivarsi (§7.7). | Confermato (v0.14) |
 | Eliminazione | **Uccidi** | Rimuove un elemento dallo scontro. | Spunto: oggi gli elementi non vengono eliminati in battaglia (§7.1), quindi richiede una modifica del nucleo. |
 
-Il primo prototipo usa per ora **solo la famiglia Danno**. Difesa, Corruzione e attacco d’assedio sono confermati nel design; quando introdurli nel prototipo è da decidere. Inefficienza e Sabotaggio verranno valutati in seguito.
+Il primo prototipo usa per ora **solo la famiglia Danno**. Difesa, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio sono confermati nel design; quando introdurli nel prototipo è da decidere.
 
 Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
 
@@ -636,7 +668,7 @@ Per il primo prototipo si usano avversari locali di prova (§16.3); non costitui
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
-Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi e versione delle regole. Se il combattimento introduce casualità, va gestito anche il seme casuale.
+Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi e versione delle regole. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
 
 È proposto di salvare le **statistiche complete** degli elementi e non solo il loro identificativo: se in seguito un elemento viene ribilanciato, la copia continua a combattere com’era stata registrata.
 
@@ -646,7 +678,7 @@ Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordin
 
 Ottenere informazioni sull’avversario prima dello scontro e poter intervenire su minacce specifiche. L’esempio iniziale: una statistica di spionaggio che permette di scoprire un oggetto bellico forte e sabotarlo, impedendone o ritardandone l’attivazione.
 
-Lo spionaggio appartiene soprattutto alla Preparazione e usa il fantasma già selezionato. Raccogliere informazioni e sabotare sono azioni distinte; il loro rapporto resta da progettare. Il sabotaggio si esprime con la famiglia Disattivazione (§8.3).
+Lo spionaggio appartiene soprattutto alla Preparazione e usa il fantasma già selezionato. Raccogliere informazioni e sabotare sono azioni distinte; il loro rapporto resta da progettare. Il sabotaggio si esprime con la famiglia Disattivazione (§8.3): l’effetto in battaglia è definito in §7.7, mentre il modo di applicarlo prima dello scontro resta Direzione.
 
 **Da definire:** formula, probabilità, costi, durata, bersagli consentiti, contromisure. Ritardare un produttore di mana è un’interazione coerente con il sistema, non una regola approvata.
 
@@ -705,7 +737,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
 | Ricerca | Costo della prossima era e risorsa disponibile. |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
-| Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa. |
+| Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa, elementi rallentati o sabotati con durata residua e origine. |
 | Esito | Risultato, perdita di Prestigio, vittorie, conseguenze. |
 
 **Piattaforma — Confermato:** PC. Una fila fino a 12 truppe e una fino a 10 edifici condizionano comunque inquadratura e layout.
@@ -845,6 +877,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
 | Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
 | Valori di scudo, cura, Corruzione e danno agli scudi di edifici e truppe | Placeholder. |
+| Intensità dell’Inefficienza: il timer avanza a metà velocità; durate di Inefficienza e Sabotaggio | Placeholder. |
+| Ogni scontro ha un proprio seme, ricavato dal seme della run e dall’anno, e salvato con la battaglia | Convenzione tecnica, per riprodurre lo scontro (§7.5). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -872,6 +906,13 @@ Criteri di accettazione proposti per il prototipo:
 | Corruzione | Sconfitta quando è pari o superiore alla Resistenza attuale, anche con scudo pieno; non scende mai. |
 | Attacco d’assedio | Toglie solo scudo, prima del danno normale; senza scudo va perso; solo truppe Assedio. |
 | Caduta simultanea per danno e Corruzione | Pareggio. |
+| Stesso seme | Lo stesso scontro con lo stesso seme dà sempre lo stesso risultato. |
+| Inefficienza | Il timer del bersaglio avanza più piano per la durata; su un edificio rallenta tutte le sue produzioni. |
+| Sabotaggio | Il bersaglio non si attiva per la durata, anche se pronto e con mana disponibile. |
+| Rotazione dei bersagli | Nessun elemento valido viene colpito due volte prima che siano stati colpiti tutti; la rotazione è condivisa dalla nazione. |
+| Colpo ripetuto | Le durate di Inefficienza o Sabotaggio si sommano. |
+| Tempismo | Un elemento sabotato nello stesso istante in cui si attiva si attiva comunque; il blocco vale dall’istante successivo. |
+| Rallentato e sabotato insieme | Il blocco prevale; le durate di entrambi scorrono. |
 | Resistenza | Somma di era, identità, anni, edifici e truppe all’inizio dello scontro. |
 | Vendita | Rimborso pari a metà del prezzo pagato, arrotondato per difetto. |
 | Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo e si dimezza a ogni nuova opportunità. |
@@ -935,6 +976,11 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.14 — 4 novembre 2026** (modifica del nucleo)
+- Casualità ammessa in battaglia, sempre con seme registrato; sostituisce “nessuna casualità” (§7.5, §11.4).
+- Nuova §7.7: Inefficienza (rallenta) e Sabotaggio (blocca) su truppe ed edifici, con bersaglio a caso a rotazione condivisa dalla nazione, durate sommate, effetto dall’istante successivo e blocco che prevale.
+- Aggiornati malus Inefficienza, famiglie di effetti, spionaggio, informazioni di battaglia, convenzioni e criteri di verifica (§8.2.1, §8.3, §12, §14.3, §16.3, §17).
 
 **v0.13 — 4 novembre 2026** (modifica del nucleo)
 - Nuova §7.6: Scudo e Cura (famiglia Difesa), Corruzione come accumulo che sconfigge quando raggiunge la Resistenza, attacco d’assedio che colpisce solo gli scudi (solo truppe Assedio).
