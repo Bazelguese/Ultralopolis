@@ -8,6 +8,10 @@ var troop: TroopDef
 ## Valore per il rimborso: il prezzo pagato; per le ricompense il prezzo di catalogo;
 ## 0 per la dotazione iniziale. La vendita rimborsa metà di questo valore.
 var paid: int = 0
+## Livello raggiunto con i potenziamenti (GDD §6.5).
+var level: int = 1
+## true se la truppa non ha mangiato all'ultimo consumo di Cibo (GDD §5.4).
+var hungry: bool = false
 
 
 static func of_building(def: BuildingDef, p_paid: int) -> BoardPiece:

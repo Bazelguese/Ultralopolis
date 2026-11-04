@@ -12,6 +12,9 @@ enum Effect {
 	COSTO_RINNOVO,        ## Oro in più (o in meno) per rinnovare le offerte.
 	ALTERNATIVE_OFFERTE,  ## Alternative in più (o in meno) in ogni opportunità.
 	RESISTENZA,           ## Resistenza in più (o in meno) negli scontri.
+	PRODUZIONE_PERCENTUALE,   ## Percentuale sulla produzione della risorsa indicata in "resource".
+	PRODUZIONE_PER_EDIFICIO,  ## Unità in più della risorsa "resource" per ogni edificio interessato.
+	DANNO_TRUPPA,             ## Percentuale sul danno di una truppa.
 }
 
 enum Target {
@@ -42,6 +45,10 @@ enum Stacking {
 @export var is_malus: bool = true
 @export var effect: Effect = Effect.PRODUZIONE_RICERCA
 @export var target: Target = Target.NAZIONE
+## Se indicata, l'effetto vale solo per gli edifici o le truppe con questa etichetta (GDD §6.6).
+@export var target_tag: StringName = &""
+## Risorsa interessata (per PRODUZIONE_PERCENTUALE e PRODUZIONE_PER_EDIFICIO).
+@export var resource: Res.Type = Res.Type.ORO
 ## Percentuale per gli effetti in percentuale, numero intero per gli altri.
 @export var amount: int = 0
 @export var duration_kind: Duration = Duration.ANNI

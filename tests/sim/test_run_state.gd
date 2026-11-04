@@ -27,6 +27,7 @@ func _troop(id: StringName, era: int, cost: int, damage: int) -> TroopDef:
 	def.mana_cost = 0
 	def.cooldown_ms = 100
 	def.damage = damage
+	def.food_tenths = 0  # Qui non si prova la fame (vedi test_resources.gd).
 	return def
 
 

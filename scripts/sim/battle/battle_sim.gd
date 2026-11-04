@@ -29,6 +29,13 @@ enum TroopState {
 const SIDE_A: int = 0
 const SIDE_B: int = 1
 
+## Colori del mana (GDD §5.3). L'energetico vale come qualsiasi colore.
+const MANA_ROSSO: StringName = &"rosso"
+const MANA_VERDE: StringName = &"verde"
+const MANA_BLU: StringName = &"blu"
+const MANA_ENERGETICO: StringName = &"energetico"
+const MANA_COLORS: Array[StringName] = [&"rosso", &"verde", &"blu", &"energetico"]
+
 
 ## Stato in battaglia di una nazione.
 class SideState:
@@ -47,6 +54,26 @@ class SideState:
 
 	func get_mana(mana_type: StringName) -> int:
 		return mana.get(mana_type, 0)
+
+	## Mana spendibile da una truppa di un colore: il suo colore più l'energetico.
+	func spendable(mana_type: StringName) -> int:
+		if mana_type == MANA_ENERGETICO:
+			return get_mana(MANA_ENERGETICO)
+		return get_mana(mana_type) + get_mana(MANA_ENERGETICO)
+
+	## Paga prima con il colore richiesto, poi con l'energetico (GDD §5.3).
+	func pay(mana_type: StringName, cost: int) -> void:
+		var own: int = mini(get_mana(mana_type), cost)
+		mana[mana_type] = get_mana(mana_type) - own
+		var rest: int = cost - own
+		if rest > 0:
+			mana[MANA_ENERGETICO] = get_mana(MANA_ENERGETICO) - rest
+
+	func total_mana() -> int:
+		var total: int = 0
+		for value: int in mana.values():
+			total += value
+		return total
 
 
 var rules: BattleRules
@@ -117,7 +144,10 @@ func get_max_resistance(side: int) -> int:
 	return _sides[side].max_resistance
 
 
-func get_mana(side: int, mana_type: StringName = &"neutro") -> int:
+## Mana di un colore; senza colore restituisce il totale di tutti i colori.
+func get_mana(side: int, mana_type: StringName = &"") -> int:
+	if mana_type == &"":
+		return _sides[side].total_mana()
 	return _sides[side].get_mana(mana_type)
 
 
@@ -187,7 +217,7 @@ func _activate_troops(side_index: int) -> int:
 		if state.cooldown_left_ms[i] > 0:
 			continue
 		var troop: TroopDef = state.troops[i]
-		var available: int = state.get_mana(troop.mana_type)
+		var available: int = state.spendable(troop.mana_type)
 		if available < troop.mana_cost:
 			# Saltata: niente consumo, niente nuova ricarica, nessun mana prenotato.
 			if not state.waiting_for_mana[i]:
@@ -195,11 +225,11 @@ func _activate_troops(side_index: int) -> int:
 				_record(side_index, BattleEvent.Kind.IN_ATTESA_MANA, i, 0, available)
 			continue
 		if troop.mana_cost > 0:
-			state.mana[troop.mana_type] = available - troop.mana_cost
+			state.pay(troop.mana_type, troop.mana_cost)
 		state.waiting_for_mana[i] = false
 		state.cooldown_left_ms[i] = troop.cooldown_ms
 		total_damage += troop.damage
-		_record(side_index, BattleEvent.Kind.ATTIVAZIONE, i, troop.damage, state.get_mana(troop.mana_type))
+		_record(side_index, BattleEvent.Kind.ATTIVAZIONE, i, troop.damage, state.spendable(troop.mana_type))
 	return total_damage
 
 

@@ -51,6 +51,8 @@ func troop_defs() -> Array[TroopDef]:
 func can_sell_building(index: int) -> bool:
 	if index < 0 or index >= buildings.size():
 		return false
+	if buildings[index].building.is_capital:
+		return false
 	var defs: Array[BuildingDef] = building_defs()
 	defs.remove_at(index)
 	return _fits(defs, buildings.size() - 1, troops.size())
@@ -59,6 +61,8 @@ func can_sell_building(index: int) -> bool:
 ## Sostituire un edificio con un altro non deve lasciare elementi senza spazio.
 func can_replace_building(index: int, new_def: BuildingDef) -> bool:
 	if index < 0 or index >= buildings.size():
+		return false
+	if buildings[index].building.is_capital:
 		return false
 	var defs: Array[BuildingDef] = building_defs()
 	defs[index] = new_def

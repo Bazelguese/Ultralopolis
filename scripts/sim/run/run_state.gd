@@ -60,9 +60,20 @@ var prestige: int = 0
 var last_chance: bool = false
 var run_end: RunEnd = RunEnd.NESSUNA
 
-## Magazzino (GDD §5.3).
-var gold: int = 0
-var research: int = 0
+## Magazzino (GDD §5.3): una casella per risorsa, in unità interne (il Cibo in decimi).
+var stock: Array[int] = Res.empty()
+
+var gold: int:
+	get:
+		return stock[Res.Type.ORO]
+	set(value):
+		stock[Res.Type.ORO] = value
+
+var research: int:
+	get:
+		return stock[Res.Type.RICERCA]
+	set(value):
+		stock[Res.Type.RICERCA] = value
 
 var board: NationBoard = NationBoard.new()
 ## Malus e bonus attivi (GDD §8).
@@ -217,15 +228,162 @@ func perks() -> Array[IdentityDef]:
 
 
 ## Oro e Ricerca che gli edifici depositeranno all'inizio della prossima macrofase.
-## Tiene conto dei modificatori attivi (es. Ricerca dimezzata).
 func production_preview() -> Vector2i:
-	var preview: Vector2i = Vector2i.ZERO
+	var all: Array[int] = production_per_phase()
+	return Vector2i(all[Res.Type.ORO], all[Res.Type.RICERCA])
+
+
+## Tutte le risorse che gli edifici depositeranno all'inizio della prossima macrofase,
+## in unità interne. Tiene conto di livelli e modificatori (es. Ricerca dimezzata).
+func production_per_phase() -> Array[int]:
+	var totals: Array[int] = Res.empty()
 	for piece: BoardPiece in board.buildings:
-		preview.x += piece.building.gold_per_phase
-		preview.y += piece.building.research_per_phase
-	preview.x = Modifiers.apply_percent(preview.x, modifiers.percent(ModifierDef.Effect.PRODUZIONE_ORO))
-	preview.y = Modifiers.apply_percent(preview.y, modifiers.percent(ModifierDef.Effect.PRODUZIONE_RICERCA))
-	return preview
+		var produced: Array[int] = building_production(piece)
+		for type: int in range(Res.COUNT):
+			totals[type] += produced[type]
+	for type: Res.Type in Res.NAMES:
+		totals[type] = Modifiers.apply_percent(totals[type], _production_percent(type))
+	return totals
+
+
+## Produzione per fase di un singolo edificio, in unità interne, con il suo livello
+## e i modificatori che lo riguardano (GDD §6.5).
+func building_production(piece: BoardPiece) -> Array[int]:
+	var produced: Array[int] = Res.empty()
+	for type: Res.Type in Res.NAMES:
+		var amount: int = piece.building.production(type)
+		if amount > 0:
+			amount += run_rules.building_production_per_level * (piece.level - 1)
+		amount += modifiers.flat_production(type, piece)
+		produced[type] = maxi(0, amount) * Res.scale(type)
+	return produced
+
+
+func _production_percent(type: Res.Type) -> int:
+	var total: int = modifiers.production_percent(type)
+	if type == Res.Type.ORO:
+		total += modifiers.percent(ModifierDef.Effect.PRODUZIONE_ORO)
+	elif type == Res.Type.RICERCA:
+		total += modifiers.percent(ModifierDef.Effect.PRODUZIONE_RICERCA)
+	return total
+
+
+## Quantità di una risorsa nel Magazzino, come la vede il giocatore (es. "3,5").
+func stock_text(type: Res.Type) -> String:
+	return Res.format(type, stock[type])
+
+
+# --- Potenziamenti (GDD §6.5) ------------------------------------------------------
+
+## Costo per portare l'elemento al livello successivo, oppure null se non si può più potenziare.
+func upgrade_cost_of(piece: BoardPiece) -> ResourceAmounts:
+	if piece.level >= run_rules.max_level:
+		return null
+	var costs: Array[ResourceAmounts] = piece.building.upgrade_costs if piece.building != null else piece.troop.upgrade_costs
+	var index: int = piece.level - 1
+	if index >= costs.size() or costs[index] == null:
+		return null
+	return costs[index]
+
+
+func can_pay(amounts: ResourceAmounts) -> bool:
+	for type: Res.Type in Res.NAMES:
+		if stock[type] < amounts.internal(type):
+			return false
+	return true
+
+
+func upgrade_troop(index: int) -> bool:
+	if index < 0 or index >= board.troops.size():
+		return _fail("Truppa non valida.")
+	return _upgrade(board.troops[index])
+
+
+func upgrade_building(index: int) -> bool:
+	if index < 0 or index >= board.buildings.size():
+		return _fail("Edificio non valido.")
+	return _upgrade(board.buildings[index])
+
+
+## I potenziamenti si fanno in qualunque momento fuori dal combattimento e non
+## consumano l'opportunità.
+func _upgrade(piece: BoardPiece) -> bool:
+	if not _require_not_over():
+		return false
+	var cost: ResourceAmounts = upgrade_cost_of(piece)
+	if cost == null:
+		return _fail("%s non si può potenziare oltre." % piece.display_name())
+	if not can_pay(cost):
+		return _fail("Risorse insufficienti (servono %s)." % cost.describe())
+	for type: Res.Type in Res.NAMES:
+		stock[type] -= cost.internal(type)
+	piece.level += 1
+	_log("%s sale al livello %d (%s)." % [piece.display_name(), piece.level, cost.describe()])
+	return true
+
+
+# --- Mercato delle risorse (GDD §5.3) -------------------------------------------
+
+## Vende risorse in cambio di Oro, a tasso fisso. units: unità intere da vendere
+## (multiplo del tasso). Si può fare in Produzione e Preparazione, senza consumare l'opportunità.
+func sell_resource(type: Res.Type, units: int) -> bool:
+	if not _require_shopping():
+		return false
+	if type == Res.Type.ORO:
+		return _fail("L'Oro non si vende.")
+	var rate: int = run_rules.market_units_per_gold
+	if units <= 0 or units % rate != 0:
+		return _fail("Si vende a gruppi di %d." % rate)
+	var internal_amount: int = units * Res.scale(type)
+	if stock[type] < internal_amount:
+		return _fail("%s insufficiente." % Res.NAMES[type])
+	stock[type] -= internal_amount
+	@warning_ignore("integer_division")
+	var earned: int = units / rate
+	gold += earned
+	_log("Mercato: venduti %d %s per %d Oro." % [units, Res.NAMES[type], earned])
+	return true
+
+
+# --- Cibo e mantenimento (GDD §5.4) ---------------------------------------------
+
+## Consumo di Cibo a inizio anno: mangiano prima le truppe più lente (a parità, quelle
+## più a destra). Chi non riceve tutta la sua razione resta affamato fino all'anno dopo.
+func _feed_troops() -> void:
+	var order: Array[int] = []
+	for i: int in range(board.troops.size()):
+		order.append(i)
+	order.sort_custom(_slower_first)
+	var hungry_names: PackedStringArray = PackedStringArray()
+	var eaten: int = 0
+	for i: int in order:
+		var piece: BoardPiece = board.troops[i]
+		var ration: int = piece.troop.food_tenths
+		if stock[Res.Type.CIBO] >= ration:
+			stock[Res.Type.CIBO] -= ration
+			eaten += ration
+			piece.hungry = false
+		else:
+			piece.hungry = true
+			hungry_names.append(piece.display_name())
+	_log("Le truppe consumano %s Cibo." % Res.format(Res.Type.CIBO, eaten))
+	if not hungry_names.is_empty():
+		_log("Senza cibo (ricarica più lenta per un anno): %s." % ", ".join(hungry_names))
+
+
+## Ordine del pasto: ricarica più lunga prima; a parità, la truppa più a destra.
+func _slower_first(a: int, b: int) -> bool:
+	var cooldown_a: int = _fed_cooldown(board.troops[a])
+	var cooldown_b: int = _fed_cooldown(board.troops[b])
+	if cooldown_a != cooldown_b:
+		return cooldown_a > cooldown_b
+	return a > b
+
+
+## Ricarica di una truppa senza contare la fame.
+func _fed_cooldown(piece: BoardPiece) -> int:
+	var change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
+	return maxi(1, Modifiers.apply_percent(piece.troop.cooldown_ms, change))
 
 
 func is_shopping_phase() -> bool:
@@ -297,13 +455,18 @@ func effective_building(piece: BoardPiece) -> BuildingDef:
 	return copy
 
 
-## Truppa come entrerà in battaglia, con i modificatori applicati (es. ricarica più lunga).
+## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5).
 func effective_troop(piece: BoardPiece) -> TroopDef:
-	var change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
-	if change == 0:
+	var cooldown_change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
+	if piece.hungry:
+		cooldown_change += run_rules.hunger_cooldown_percent
+	var damage_change: int = modifiers.percent(ModifierDef.Effect.DANNO_TRUPPA, piece)
+	damage_change += run_rules.troop_damage_percent_per_level * (piece.level - 1)
+	if cooldown_change == 0 and damage_change == 0:
 		return piece.troop
 	var copy: TroopDef = piece.troop.duplicate() as TroopDef
-	copy.cooldown_ms = maxi(1, Modifiers.apply_percent(copy.cooldown_ms, change))
+	copy.cooldown_ms = maxi(1, Modifiers.apply_percent(copy.cooldown_ms, cooldown_change))
+	copy.damage = Modifiers.apply_percent(copy.damage, damage_change)
 	return copy
 
 
@@ -440,6 +603,8 @@ func sell_building(index: int) -> bool:
 		return false
 	if index < 0 or index >= board.buildings.size():
 		return _fail("Edificio non valido.")
+	if board.buildings[index].building.is_capital:
+		return _fail("La Capitale non si può vendere.")
 	if not board.can_sell_building(index):
 		return _fail("Prima libera gli spazi che questo edificio concede.")
 	var piece: BoardPiece = board.buildings[index]
@@ -591,6 +756,9 @@ func _start_year(new_year: int) -> void:
 	_log("— Anno %d —" % year)
 	for message: String in modifiers.on_new_year(year):
 		_log(message)
+	# Il consumo di Cibo avviene a inizio anno, dall'anno 2 (GDD §5.4).
+	if year >= 2:
+		_feed_troops()
 	_enter_phase(Phase.PRODUZIONE)
 
 
@@ -605,10 +773,13 @@ func _enter_phase(new_phase: Phase) -> void:
 
 ## Ogni edificio presente deposita le sue risorse, una volta per macrofase (GDD §5.2).
 func _collect_production() -> void:
-	var collected: Vector2i = production_preview()
-	gold += collected.x
-	research += collected.y
-	_log("%s: gli edifici producono %d Oro e %d Ricerca." % [phase_name(), collected.x, collected.y])
+	var collected: Array[int] = production_per_phase()
+	var parts: PackedStringArray = PackedStringArray()
+	for type: Res.Type in Res.NAMES:
+		stock[type] += collected[type]
+		if collected[type] != 0:
+			parts.append("%s %s" % [Res.format(type, collected[type]), Res.NAMES[type]])
+	_log("%s: gli edifici producono %s." % [phase_name(), ", ".join(parts) if not parts.is_empty() else "nulla"])
 
 
 func _next_opportunity() -> void:
@@ -783,6 +954,8 @@ func _place_building(def: BuildingDef, price: int, value: int, replace_index: in
 		return true
 	if replace_index < 0:
 		return _fail("Plancia piena: scegli un edificio da sostituire.")
+	if replace_index < board.buildings.size() and board.buildings[replace_index].building.is_capital:
+		return _fail("La Capitale non si può sostituire.")
 	if not board.can_replace_building(replace_index, def):
 		return _fail("Sostituzione non possibile: lascerebbe elementi senza spazio.")
 	var old_piece: BoardPiece = board.buildings[replace_index]

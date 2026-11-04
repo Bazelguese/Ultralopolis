@@ -97,6 +97,7 @@ func prune(board: NationBoard) -> Array[String]:
 
 
 ## Somma degli effetti in percentuale (per la nazione o per un elemento preciso).
+## Un effetto con etichetta vale solo per gli elementi che la hanno (GDD §6.6).
 func percent(effect: ModifierDef.Effect, piece: BoardPiece = null) -> int:
 	var total: int = 0
 	for modifier: ActiveModifier in active:
@@ -104,8 +105,47 @@ func percent(effect: ModifierDef.Effect, piece: BoardPiece = null) -> int:
 			continue
 		if modifier.target_piece != null and modifier.target_piece != piece:
 			continue
+		if not _tag_matches(modifier.def, piece):
+			continue
 		total += modifier.def.amount
 	return total
+
+
+## Unità in più di una risorsa prodotte da un edificio (PRODUZIONE_PER_EDIFICIO).
+func flat_production(type: Res.Type, piece: BoardPiece) -> int:
+	var total: int = 0
+	for modifier: ActiveModifier in active:
+		var def: ModifierDef = modifier.def
+		if def.effect != ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO or def.resource != type:
+			continue
+		if modifier.target_piece != null and modifier.target_piece != piece:
+			continue
+		if not _tag_matches(def, piece):
+			continue
+		total += def.amount
+	return total
+
+
+## Percentuale sulla produzione totale di una risorsa (PRODUZIONE_PERCENTUALE).
+func production_percent(type: Res.Type) -> int:
+	var total: int = 0
+	for modifier: ActiveModifier in active:
+		if modifier.def.effect == ModifierDef.Effect.PRODUZIONE_PERCENTUALE and modifier.def.resource == type:
+			total += modifier.def.amount
+	return total
+
+
+## true se il modificatore non ha etichetta, o se l'elemento la possiede.
+static func _tag_matches(def: ModifierDef, piece: BoardPiece) -> bool:
+	if def.target_tag == &"":
+		return true
+	if piece == null:
+		return false
+	if piece.building != null:
+		return piece.building.tags.has(def.target_tag)
+	if piece.troop != null:
+		return piece.troop.tags.has(def.target_tag)
+	return false
 
 
 ## Somma degli effetti a numero intero (costo di rinnovo, alternative).

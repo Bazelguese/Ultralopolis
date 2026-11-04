@@ -43,6 +43,7 @@ func before_each() -> void:
 	sword.id = &"spade"
 	sword.display_name = "Spade"
 	sword.cooldown_ms = 2000
+	sword.food_tenths = 0  # Qui non si prova la fame.
 	killer = TroopDef.new()
 	killer.id = &"distruttori"
 	killer.cooldown_ms = 100

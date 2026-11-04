@@ -26,6 +26,20 @@ extends Resource
 @export var max_building_slots: int = 10
 @export var max_troop_slots: int = 12
 
+@export_group("Risorse e mantenimento")
+## Unità di una risorsa da vendere al mercato per ottenere 1 Oro (GDD §5.3).
+@export var market_units_per_gold: int = 2
+## Aumento della ricarica di una truppa affamata, in percentuale (GDD §5.4: +50%).
+@export var hunger_cooldown_percent: int = 50
+
+@export_group("Potenziamenti")
+## Livello massimo di edifici e truppe (GDD §6.5).
+@export var max_level: int = 3
+## Danno in più per ogni livello oltre il primo, in percentuale.
+@export var troop_damage_percent_per_level: int = 50
+## Unità in più, per ogni livello oltre il primo, di ogni risorsa che l'edificio produce.
+@export var building_production_per_level: int = 1
+
 @export_group("Opportunità")
 ## Opportunità per macrofase (GDD §4.2: 2).
 @export var opportunities_per_phase: int = 2

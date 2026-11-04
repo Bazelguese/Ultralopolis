@@ -11,16 +11,27 @@ extends Resource
 @export_range(1, 10) var era: int = 1
 ## Prezzo in Oro.
 @export var cost_gold: int = 0
+## Etichette (GDD §6.6), es. &"Agricolo", &"Sacro".
+@export var tags: Array[StringName] = []
+## La Capitale non si può vendere né sostituire (GDD §6.2).
+@export var is_capital: bool = false
 
-@export_group("Fuori dal combattimento")
-## Oro depositato nel Magazzino all'inizio di ogni macrofase.
+@export_group("Produzione per fase")
+## Risorse depositate nel Magazzino all'inizio di ogni macrofase (unità intere).
 @export var gold_per_phase: int = 0
-## Ricerca depositata nel Magazzino all'inizio di ogni macrofase.
 @export var research_per_phase: int = 0
+@export var food_per_phase: int = 0
+@export var wood_per_phase: int = 0
+@export var stone_per_phase: int = 0
+@export var iron_per_phase: int = 0
+@export var fauna_per_phase: int = 0
+@export var faith_per_phase: int = 0
+@export var influence_per_phase: int = 0
 
 @export_group("In battaglia")
-## Tipo di mana prodotto. Per ora esiste un solo tipo (GDD §5.3).
-@export var mana_type: StringName = &"neutro"
+## Colore del mana prodotto: rosso, verde, blu o energetico (GDD §5.3).
+## Indica anche la famiglia dell'edificio.
+@export var mana_type: StringName = &"energetico"
 ## Mana prodotto a ogni intervallo.
 @export var mana_amount: int = 0
 ## Intervallo di produzione in millisecondi. Parte pieno a inizio battaglia.
@@ -31,3 +42,22 @@ extends Resource
 @export var extra_building_slots: int = 0
 ## Spazi truppa aggiunti alla plancia finché l'edificio è costruito (GDD §6.3).
 @export var extra_troop_slots: int = 0
+
+@export_group("Potenziamenti")
+## Costo per salire di livello: posizione 0 = dal livello 1 al 2, posizione 1 = dal 2 al 3 (GDD §6.5).
+@export var upgrade_costs: Array[ResourceAmounts] = []
+
+
+## Produzione per fase di una risorsa, in unità intere.
+func production(type: Res.Type) -> int:
+	match type:
+		Res.Type.ORO: return gold_per_phase
+		Res.Type.RICERCA: return research_per_phase
+		Res.Type.CIBO: return food_per_phase
+		Res.Type.LEGNO: return wood_per_phase
+		Res.Type.PIETRA: return stone_per_phase
+		Res.Type.FERRO: return iron_per_phase
+		Res.Type.FAUNA: return fauna_per_phase
+		Res.Type.FEDE: return faith_per_phase
+		Res.Type.INFLUENZA: return influence_per_phase
+	return 0
