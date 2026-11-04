@@ -17,7 +17,17 @@ const MISURA_AZIONE: Vector2 = Vector2(1.7, 1.95)
 const SCALA_SCELTA: float = 1.45
 const Z_TRUPPE: float = 1.75
 const Z_EDIFICI: float = 4.4
-const X_SPAZI: float = 0.9
+## Bordo sinistro del primo spazio: gli spazi si allineano a destra dello stemma.
+const X_INIZIO_SPAZI: float = -9.6
+## Bordo sinistro della lastra (fisso: stemma e riserva stanno qui).
+const BORDO_SINISTRO_LASTRA: float = -12.605
+const MARGINE_DESTRO_LASTRA: float = 0.35
+const PROFONDITA_LASTRA: float = 5.0
+## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
+const LARGHEZZA_LASTRA_PIENA: float = 24.35
+const SCALA_MASSIMA: float = 1.4
+const SCALA_MASSIMA_SCONTRO: float = 1.2
+const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
 const SPAZI_TRUPPE: int = 12
 const SPAZI_EDIFICI: int = 10
@@ -27,15 +37,24 @@ const MASSIMO_GEMME_IN_VOLO: int = 24
 
 const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 27.0, 14.6)
 const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, 0.9)
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 28.4, 14.5)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 0.0)
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 28.4, 15.6)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.1)
 
 var run: RunState
 
 var _camera: Camera3D
 var _luce_atmosfera: OmniLight3D
 var _hud: HudPlancia
+## Contiene i due lati: si ingrandisce e si centra in base a quanti spazi si vedono.
+var _plancia: Node3D
 var _radici: Array[Node3D] = [null, null]
+var _lastre: Array[MeshInstance3D] = [null, null]
+var _bordi_lastre: Array[Array] = [[], []]
+var _larghezze: Array[float] = [LARGHEZZA_LASTRA_PIENA, LARGHEZZA_LASTRA_PIENA]
+var _nota_ordine: Label3D
+var _animazione_plancia: Tween
+## All'inizio di una partita la plancia compare già della misura giusta, senza animazione.
+var _disponi_subito: bool = true
 var _pezzi: Array[Node3D] = [null, null]
 var _truppe: Array[Array] = [[], []]
 var _edifici: Array[Array] = [[], []]
@@ -56,6 +75,9 @@ var _scritte_riserva: Array[Dictionary] = [{}, {}]
 var _gemme_riserva: Array[Dictionary] = [{}, {}]
 
 var _scelte: Array[Tessera3D] = []
+var _costi_scelte: Array[Label3D] = []
+## Riconosce le stesse scelte di prima: in quel caso non si rifanno né la carta né l'entrata.
+var _firma_scelte: String = ""
 var _contenitore_scelte: Node3D
 var _tipo_scelta: TipoScelta = TipoScelta.NESSUNA
 var _modo: Modo = Modo.NORMALE
@@ -80,6 +102,8 @@ var _scritte_uscite: Array[int] = [0, 0]
 func _ready() -> void:
 	_crea_ambiente()
 	_crea_tavolo()
+	_plancia = Node3D.new()
+	add_child(_plancia)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_crea_lato(lato)
 	_contenitore_scelte = Node3D.new()
@@ -121,6 +145,8 @@ func _nuova_run() -> void:
 	if run.phase == RunState.Phase.CREAZIONE_NAZIONE:
 		run.found_nation(nazione.nation_name, nazione.resolve(catalogo))
 	_modo = Modo.NORMALE
+	_disponi_subito = true
+	_firma_scelte = ""
 	_aggiorna_tutto()
 
 
@@ -227,42 +253,93 @@ func _colore_lato(lato: int) -> Color:
 ## Il lato avversario è specchiato: truppe verso il centro, edifici dietro.
 func _crea_lato(lato: int) -> void:
 	var radice: Node3D = Node3D.new()
-	add_child(radice)
+	_plancia.add_child(radice)
 	_radici[lato] = radice
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5 * _segno(lato)
-	_crea_lastra(radice, Vector3(-0.43, 0.0, z_centro), Vector2(24.35, 5.0), _colore_lato(lato))
+	_crea_lastra(radice, lato, z_centro, _colore_lato(lato))
 	_crea_medaglione(radice, lato, z_centro)
 	_crea_riserva(radice, lato, z_centro)
 	_pezzi[lato] = Node3D.new()
 	radice.add_child(_pezzi[lato])
 	if lato == Lato.GIOCATORE:
-		var nota: Label3D = StileVisivo.scritta("LE TRUPPE AGISCONO DA DESTRA VERSO SINISTRA  ←", StileVisivo.FONT_TESTO_FORTE, 50, StileVisivo.TESTO_TENUE)
-		nota.position = Vector3(7.0, 0.02, 0.0)
-		radice.add_child(nota)
+		# Fra la fila delle truppe e quella degli edifici, allineata a destra.
+		_nota_ordine = StileVisivo.scritta("LE TRUPPE AGISCONO DA DESTRA VERSO SINISTRA  ←", StileVisivo.FONT_TESTO_FORTE, 42, StileVisivo.TESTO_TENUE)
+		_nota_ordine.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		_nota_ordine.position = Vector3(0.0, 0.02, (Z_TRUPPE + MISURA_TRUPPA.y * 0.5 + Z_EDIFICI - MISURA_EDIFICIO.y * 0.5) * 0.5)
+		radice.add_child(_nota_ordine)
+	_imposta_larghezza_lastra(lato, LARGHEZZA_LASTRA_PIENA)
 
 
-func _crea_lastra(radice: Node3D, centro: Vector3, misura: Vector2, colore: Color) -> void:
+## Lastra con bordo luminoso. La larghezza si cambia poi con _imposta_larghezza_lastra.
+func _crea_lastra(radice: Node3D, lato: int, z_centro: float, colore: Color) -> void:
 	var lastra: MeshInstance3D = MeshInstance3D.new()
 	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(misura.x, 0.4, misura.y)
+	forma.size = Vector3(LARGHEZZA_LASTRA_PIENA, 0.4, PROFONDITA_LASTRA)
 	lastra.mesh = forma
 	lastra.material_override = StileVisivo.materiale_pietra(StileVisivo.PIETRA, 2.5)
-	lastra.position = centro + Vector3(0.0, -0.18, 0.0)
+	lastra.position = Vector3(0.0, -0.18, z_centro)
 	radice.add_child(lastra)
+	_lastre[lato] = lastra
 	var luce: StandardMaterial3D = StileVisivo.materiale_luminoso(colore, 1.3)
 	_materiali_bordo.append(luce)
-	var lati: Array[Vector3] = [
-		Vector3(0.0, 0.0, -misura.y * 0.5), Vector3(0.0, 0.0, misura.y * 0.5),
-		Vector3(-misura.x * 0.5, 0.0, 0.0), Vector3(misura.x * 0.5, 0.0, 0.0),
-	]
-	for i: int in range(lati.size()):
+	_bordi_lastre[lato] = []
+	for i: int in range(4):
 		var bordo: MeshInstance3D = MeshInstance3D.new()
 		var forma_bordo: BoxMesh = BoxMesh.new()
-		forma_bordo.size = Vector3(misura.x + 0.1, 0.07, 0.07) if i < 2 else Vector3(0.07, 0.07, misura.y + 0.1)
+		forma_bordo.size = Vector3(LARGHEZZA_LASTRA_PIENA + 0.1, 0.07, 0.07) if i < 2 else Vector3(0.07, 0.07, PROFONDITA_LASTRA + 0.1)
 		bordo.mesh = forma_bordo
 		bordo.material_override = luce
-		bordo.position = centro + lati[i] + Vector3(0.0, 0.035, 0.0)
+		var z: float = z_centro + (PROFONDITA_LASTRA * (-0.5 if i == 0 else 0.5) if i < 2 else 0.0)
+		bordo.position = Vector3(0.0, 0.035, z)
 		radice.add_child(bordo)
+		_bordi_lastre[lato].append(bordo)
+
+
+## La lastra parte sempre dallo stemma e si allunga verso destra quanto servono gli spazi.
+func _imposta_larghezza_lastra(lato: int, larghezza: float) -> void:
+	_larghezze[lato] = larghezza
+	var centro_x: float = BORDO_SINISTRO_LASTRA + larghezza * 0.5
+	(_lastre[lato].mesh as BoxMesh).size.x = larghezza
+	_lastre[lato].position.x = centro_x
+	var bordi: Array = _bordi_lastre[lato]
+	for i: int in range(2):
+		var bordo: MeshInstance3D = bordi[i]
+		(bordo.mesh as BoxMesh).size.x = larghezza + 0.1
+		bordo.position.x = centro_x
+	(bordi[2] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA
+	(bordi[3] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + larghezza
+	if lato == Lato.GIOCATORE and _nota_ordine != null:
+		_nota_ordine.position.x = BORDO_SINISTRO_LASTRA + larghezza - MARGINE_DESTRO_LASTRA
+
+
+## Larghezza della lastra che contiene tanti spazi (almeno due edifici, per non farla troppo corta).
+func _larghezza_per(spazi_truppe: int, spazi_edifici: int) -> float:
+	var contenuto: float = maxf(maxf(spazi_truppe * PASSO_TRUPPE, spazi_edifici * PASSO_EDIFICI), 2.0 * PASSO_EDIFICI)
+	return (X_INIZIO_SPAZI - BORDO_SINISTRO_LASTRA) + contenuto + MARGINE_DESTRO_LASTRA
+
+
+## Quanto ingrandire la plancia perché la lastra più larga riempia lo spazio di una plancia piena.
+func _scala_per(larghezza: float, massima: float) -> float:
+	return clampf(LARGHEZZA_LASTRA_PIENA / maxf(larghezza, 1.0), 1.0, massima)
+
+
+## Ingrandisce e centra la plancia. In partita la lastra del giocatore cresce attorno al suo centro,
+## un po' spostata verso l'alto per non coprire i comandi; in uno scontro i due lati restano
+## simmetrici rispetto al centro del tavolo.
+func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: float) -> void:
+	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
+	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 1.1
+	var posizione: Vector3 = Vector3(MIRA_PARTITA.x - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
+	if _animazione_plancia != null and _animazione_plancia.is_valid():
+		_animazione_plancia.kill()
+	if durata <= 0.0:
+		_plancia.scale = Vector3.ONE * scala
+		_plancia.position = posizione
+		return
+	_animazione_plancia = create_tween()
+	_animazione_plancia.set_parallel(true)
+	_animazione_plancia.tween_property(_plancia, "scale", Vector3.ONE * scala, durata).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	_animazione_plancia.tween_property(_plancia, "position", posizione, durata).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
 func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
@@ -397,23 +474,32 @@ func _crea_spazio(genitore: Node3D, posizione: Vector3, misura: Vector2, disponi
 	spazio.material_override = StileVisivo.materiale_velo(colore)
 	spazio.position = posizione + Vector3(0.0, 0.012, 0.0)
 	genitore.add_child(spazio)
-	if disponibile:
-		var scritta: Label3D = StileVisivo.scritta("LIBERO", StileVisivo.FONT_TITOLI, 46, Color(colore_lato, 0.85), 0.0, 6)
-		scritta.position = Vector3(0.0, 0.004, 0.0)
-		spazio.add_child(scritta)
+	var scritta: Label3D = StileVisivo.scritta("LIBERO" if disponibile else "DA CONQUISTARE", StileVisivo.FONT_TITOLI, 46 if disponibile else 34, Color(colore_lato, 0.85) if disponibile else Color(StileVisivo.TESTO_TENUE, 0.6), 0.0, 6)
+	scritta.position = Vector3(0.0, 0.004, 0.0)
+	spazio.add_child(scritta)
 	return spazio
 
 
 func _posizione_truppa(lato: int, i: int) -> Vector3:
-	return Vector3(X_SPAZI + (i - (SPAZI_TRUPPE - 1) * 0.5) * PASSO_TRUPPE, 0.02, Z_TRUPPE * _segno(lato))
+	return Vector3(X_INIZIO_SPAZI + (i + 0.5) * PASSO_TRUPPE, 0.02, Z_TRUPPE * _segno(lato))
 
 
 func _posizione_edificio(lato: int, i: int) -> Vector3:
-	return Vector3(X_SPAZI + (i - (SPAZI_EDIFICI - 1) * 0.5) * PASSO_EDIFICI, 0.02, Z_EDIFICI * _segno(lato))
+	return Vector3(X_INIZIO_SPAZI + (i + 0.5) * PASSO_EDIFICI, 0.02, Z_EDIFICI * _segno(lato))
 
 
-## Ricostruisce le carte di un lato. Gli spazi vuoti si mostrano solo per il giocatore.
-func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int) -> void:
+## Quanti spazi mostrare in una fila: quelli occupati o disponibili, più uno chiuso
+## (se se ne possono ancora conquistare) per ricordare che la plancia può crescere.
+func _spazi_mostrati(occupati: int, capacita: int, massimo: int, chiuso: bool) -> int:
+	var quanti: int = maxi(occupati, capacita)
+	if chiuso and quanti < massimo:
+		quanti += 1
+	return mini(quanti, massimo)
+
+
+## Ricostruisce le carte di un lato e allarga la sua lastra quanto serve.
+## Gli spazi vuoti si mostrano solo per il giocatore. nitidezza: risoluzione delle facce.
+func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int, spazi_chiusi: bool, nitidezza: float) -> void:
 	for figlio: Node in _pezzi[lato].get_children():
 		figlio.queue_free()
 	_truppe[lato] = []
@@ -423,17 +509,20 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 		_spazio_libero_edificio = null
 		_spazio_libero_truppa = null
 	var colore: Color = _colore_lato(lato)
-	for i: int in range(SPAZI_TRUPPE):
+	var spazi_truppe: int = _spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, spazi_chiusi)
+	var spazi_edifici: int = _spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, spazi_chiusi)
+	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici))
+	for i: int in range(spazi_truppe):
 		if i < truppe.size():
-			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i))
+			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i, nitidezza))
 			_lampi[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
 			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_truppa(lato, i), MISURA_TRUPPA, i < capacita_truppe, colore)
 			if i < capacita_truppe and _spazio_libero_truppa == null:
 				_spazio_libero_truppa = spazio
-	for i: int in range(SPAZI_EDIFICI):
+	for i: int in range(spazi_edifici):
 		if i < edifici.size():
-			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i))
+			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i, nitidezza))
 		elif lato == Lato.GIOCATORE:
 			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_edificio(lato, i), MISURA_EDIFICIO, i < capacita_edifici, colore)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
@@ -447,40 +536,66 @@ func _costruisci_plancia_giocatore() -> void:
 	var truppe: Array[SchedaCarta] = []
 	for pezzo: BoardPiece in run.board.troops:
 		truppe.append(SchedaCarta.da_pezzo(run, pezzo))
-	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, run.board.building_capacity(), run.board.troop_capacity())
+	var capacita_edifici: int = run.board.building_capacity()
+	var capacita_truppe: int = run.board.troop_capacity()
+	var larghezza: float = _larghezza_per(
+			_spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, true),
+			_spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, true))
+	var scala: float = _scala_per(larghezza, SCALA_MASSIMA)
+	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, capacita_edifici, capacita_truppe, true, scala)
+	var animata: bool = not _disponi_subito and (_plancia.scale.x != scala or _modo == Modo.SCONTRO)
+	_disponi_subito = false
+	_disponi_plancia(scala, larghezza, false, DURATA_DISPOSIZIONE if animata else 0.0)
 
 
 # --- Scelte sul tavolo: offerte, incontri, ricompense, fantasma ----------------------
 
+## Mette sul tavolo le scelte del momento. Se sono le stesse di prima (es. dopo una vendita
+## o uno spostamento) le carte restano dove sono: cambiano solo il prezzo e se si può pagare.
 func _costruisci_scelte() -> void:
-	for figlio: Node in _contenitore_scelte.get_children():
-		figlio.queue_free()
-	_scelte = []
 	var schede: Array[SchedaCarta] = []
-	_tipo_scelta = TipoScelta.NESSUNA
+	var origini: Array[Object] = []
+	var tipo: TipoScelta = TipoScelta.NESSUNA
 	var fase: int = run.phase
 	if not run.way_choices.is_empty():
-		_tipo_scelta = TipoScelta.VIA
+		tipo = TipoScelta.VIA
 		for via: IdentityDef in run.way_choices:
 			schede.append(SchedaCarta.da_via(via))
+			origini.append(via)
 		fase = -1
 	match fase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-			_tipo_scelta = TipoScelta.OFFERTA
+			tipo = TipoScelta.OFFERTA
 			for offerta: Offer in run.offers:
 				schede.append(SchedaCarta.da_offerta(run, offerta))
+				origini.append(offerta)
 		RunState.Phase.SCELTA_INCONTRO:
-			_tipo_scelta = TipoScelta.INCONTRO
+			tipo = TipoScelta.INCONTRO
 			for incontro: EncounterDef in run.encounter_choices:
 				schede.append(SchedaCarta.da_incontro(incontro))
+				origini.append(incontro)
 		RunState.Phase.RICOMPENSA_INCONTRO:
-			_tipo_scelta = TipoScelta.RICOMPENSA
+			tipo = TipoScelta.RICOMPENSA
 			for ricompensa: RewardDef in run.reward_choices():
 				schede.append(SchedaCarta.da_ricompensa(ricompensa))
+				origini.append(ricompensa)
 		RunState.Phase.SCONTRO_FANTASMA:
 			if run.current_ghost != null:
-				_tipo_scelta = TipoScelta.FANTASMA
+				tipo = TipoScelta.FANTASMA
 				schede.append(SchedaCarta.da_fantasma(run, run.current_ghost))
+				origini.append(run.current_ghost)
+	var firma: String = "%d|%d|%d|%d" % [tipo, run.year, run.phase, run.opportunity_number]
+	for origine: Object in origini:
+		firma += "|%d" % origine.get_instance_id()
+	if firma == _firma_scelte and _scelte.size() == schede.size():
+		_aggiorna_scelte(schede)
+		return
+	_firma_scelte = firma
+	_tipo_scelta = tipo
+	for figlio: Node in _contenitore_scelte.get_children():
+		figlio.queue_free()
+	_scelte = []
+	_costi_scelte = []
 	for i: int in range(schede.size()):
 		var scheda: SchedaCarta = schede[i]
 		var misura: Vector2 = MISURA_AZIONE
@@ -496,14 +611,23 @@ func _costruisci_scelte() -> void:
 			var sopra: Label3D = StileVisivo.scritta(scheda.sopratitolo.to_upper(), StileVisivo.FONT_TITOLI, 42, StileVisivo.TESTO, 0.0, 10)
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
 			tessera.add_child(sopra)
-		if scheda.costo != "":
-			var costo: Label3D = StileVisivo.scritta(scheda.costo, StileVisivo.FONT_TITOLI, 54, StileVisivo.ORO_LUCE if scheda.disponibile else StileVisivo.PERICOLO, 0.0, 12)
-			costo.position = Vector3(0.0, 0.02, misura.y * 0.5 + 0.27)
-			tessera.add_child(costo)
+		var costo: Label3D = StileVisivo.scritta(scheda.costo, StileVisivo.FONT_TITOLI, 54, StileVisivo.ORO_LUCE if scheda.disponibile else StileVisivo.PERICOLO, 0.0, 12)
+		costo.position = Vector3(0.0, 0.02, misura.y * 0.5 + 0.27)
+		tessera.add_child(costo)
+		_costi_scelte.append(costo)
 		_scelte.append(tessera)
 		var entrata: Tween = create_tween()
 		entrata.tween_interval(0.07 * i)
 		entrata.tween_property(tessera, "position", arrivo, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Stesse scelte di prima: si aggiornano prezzo, colore del prezzo e velo, senza animazioni.
+func _aggiorna_scelte(schede: Array[SchedaCarta]) -> void:
+	for i: int in range(schede.size()):
+		var scheda: SchedaCarta = schede[i]
+		_scelte[i].aggiorna_scheda(scheda)
+		_costi_scelte[i].text = scheda.costo
+		_costi_scelte[i].modulate = StileVisivo.ORO_LUCE if scheda.disponibile else StileVisivo.PERICOLO
 
 
 func _togli_scelte() -> void:
@@ -512,6 +636,8 @@ func _togli_scelte() -> void:
 		uscita.tween_property(tessera, "position", tessera.position + Vector3(0.0, 6.0, -4.0), 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		uscita.tween_callback(tessera.queue_free)
 	_scelte = []
+	_costi_scelte = []
+	_firma_scelte = ""
 	_tipo_scelta = TipoScelta.NESSUNA
 
 
@@ -635,7 +761,7 @@ func _vola_e_esegui(tessera: Tessera3D, azione: Callable) -> void:
 	volo.set_parallel(true)
 	volo.tween_property(tessera, "global_position", destinazione + Vector3(0.0, 2.0, 0.0), 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	volo.tween_property(tessera, "rotation_degrees", Vector3.ZERO, 0.3)
-	volo.tween_property(tessera, "scale", Vector3.ONE, 0.3)
+	volo.tween_property(tessera, "scale", _plancia.scale, 0.3)
 	volo.chain().tween_property(tessera, "global_position", destinazione, 0.18).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	volo.chain().tween_callback(func() -> void: _esegui(azione.call()))
 
@@ -748,14 +874,18 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 		edifici.append(SchedaCarta.da_edificio(_setups[0].buildings[i], run.board.buildings[i].level if stessi_edifici else 1))
 	for i: int in range(_setups[0].troops.size()):
 		truppe.append(SchedaCarta.da_truppa(_setups[0].troops[i], run.board.troops[i].level if stesse_truppe else 1))
-	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size())
 	var edifici_avversari: Array[SchedaCarta] = []
 	for def: BuildingDef in _setups[1].buildings:
 		edifici_avversari.append(SchedaCarta.da_edificio(def))
 	var truppe_avversarie: Array[SchedaCarta] = []
 	for def: TroopDef in _setups[1].troops:
 		truppe_avversarie.append(SchedaCarta.da_truppa(def))
-	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0)
+	# Nello scontro si vedono solo gli elementi schierati; i due lati hanno la stessa scala.
+	var larghezza: float = maxf(_larghezza_per(truppe.size(), edifici.size()), _larghezza_per(truppe_avversarie.size(), edifici_avversari.size()))
+	var scala: float = _scala_per(larghezza, SCALA_MASSIMA_SCONTRO)
+	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size(), false, scala)
+	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0, false, scala)
+	_disponi_plancia(scala, larghezza, true, 0.7)
 	_nomi_lato[Lato.AVVERSARIO].text = run.last_opponent_name.trim_prefix("Fantasma: ").to_upper()
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_riserve[lato].visible = true
@@ -1028,8 +1158,13 @@ func _chiudi_scontro() -> void:
 	_sim = null
 	_modo = Modo.NORMALE
 	_hud.modalita_scontro(false)
+	# La plancia torna com'è fuori dagli scontri: niente riserva di mana, Scudo o Corruzione.
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_riserve[lato].visible = false
+		_segnalini_scudo[lato].visible = false
+		_segnalini_corruzione[lato].visible = false
+		for i: int in range(_lampi[lato].size()):
+			_lampi[lato][i] = 0.0
 	var avversario: Node3D = _radici[Lato.AVVERSARIO]
 	var uscita: Tween = create_tween()
 	uscita.set_parallel(true)

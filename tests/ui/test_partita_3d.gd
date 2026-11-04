@@ -138,3 +138,65 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
 	scelte = _scena.get("_scelte")
 	assert_eq(scelte.size(), run.offers.size(), "Dopo la via tornano le offerte.")
+
+
+## Cambiare qualcosa sulla plancia non rifà le offerte: restano le stesse carte, senza nuova entrata.
+func test_le_offerte_restano_ferme_se_cambia_solo_la_plancia() -> void:
+	var run: RunState = _run()
+	var prima: Array = (_scena.get("_scelte") as Array).duplicate()
+	assert_true(run.move_troop(0, 1), "Si sposta una truppa.")
+	_scena.call("_aggiorna_tutto")
+	var dopo: Array = _scena.get("_scelte")
+	assert_eq(dopo.size(), prima.size())
+	for i: int in range(dopo.size()):
+		assert_same(dopo[i], prima[i], "La carta %d è la stessa di prima." % i)
+	var hud: HudPlancia = _scena.get("_hud")
+	hud.passa.emit()
+	dopo = _scena.get("_scelte")
+	assert_false(dopo.is_empty() or dopo[0] == prima[0], "Passando arrivano carte nuove.")
+
+
+## Dopo uno scontro la plancia torna pulita: niente Scudo, Corruzione o riserva di mana rimasti.
+func test_dopo_lo_scontro_la_plancia_si_azzera() -> void:
+	var run: RunState = _run()
+	while run.phase == RunState.Phase.PRODUZIONE:
+		run.pass_opportunity()
+	_scena.call("_aggiorna_tutto")
+	var scelte: Array = _scena.get("_scelte")
+	_scena.call("_clic_scelta", scelte[0])
+	_scena.call("_salta_scontro")
+	# Come se lo scontro fosse finito con Scudo e Corruzione ancora in gioco.
+	for nome: String in ["_segnalini_scudo", "_segnalini_corruzione", "_riserve"]:
+		for segnalino: Node3D in (_scena.get(nome) as Array):
+			segnalino.visible = true
+	_scena.call("_mostra_esito")
+	var hud: HudPlancia = _scena.get("_hud")
+	hud.call("_on_continua_esito")
+	for nome: String in ["_segnalini_scudo", "_segnalini_corruzione", "_riserve"]:
+		for segnalino: Node3D in (_scena.get(nome) as Array):
+			assert_false(segnalino.visible, "%s nascosto dopo lo scontro." % nome)
+	assert_eq(_carte("_truppe", 0).size(), run.board.troops.size(), "Le carte tornano quelle della plancia.")
+	assert_eq(_scena.get("_modo"), 0)
+
+
+func test_le_risorse_sono_tutte_sempre_visibili() -> void:
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var valori: Dictionary = hud.get("_valori_risorse")
+	assert_eq(valori.size(), Res.COUNT, "Una casella per ogni risorsa.")
+	for tipo: int in valori:
+		var etichetta: Label = valori[tipo]
+		assert_true(etichetta.is_visible_in_tree(), "%s visibile." % Res.NAMES[tipo])
+	assert_eq((valori[Res.Type.LEGNO] as Label).text, run.stock_text(Res.Type.LEGNO))
+	hud.modalita_scontro(true, "Prova")
+	assert_true((valori[Res.Type.ORO] as Label).is_visible_in_tree(), "Anche durante gli scontri.")
+
+
+## La plancia mostra gli spazi disponibili più uno da conquistare, non tutti i 12.
+func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
+	var run: RunState = _run()
+	var larghezze: Array = _scena.get("_larghezze")
+	var attesa: float = _scena.call("_larghezza_per", run.board.troop_capacity() + 1, run.board.building_capacity() + 1)
+	assert_almost_eq(float(larghezze[0]), attesa, 0.001)
+	var plancia: Node3D = _scena.get("_plancia")
+	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
