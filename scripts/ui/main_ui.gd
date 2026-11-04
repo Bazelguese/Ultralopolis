@@ -449,6 +449,8 @@ func _show_ghost() -> void:
 		card.add_child(box)
 		box.add_child(UiKit.wrapped(ghost.display_name, 20))
 		box.add_child(UiKit.wrapped("Era: %s · Resistenza %d" % [run.era_name(ghost.era), run.ghost_resistance()], 15))
+		if not ghost.identity.is_empty():
+			box.add_child(UiKit.wrapped("Identità: %s" % UiKit.identity_text(ghost.identity).replace("\n", " — "), 15, Color(0.75, 0.8, 1.0)))
 		box.add_child(UiKit.wrapped("Edifici: %s" % _names_b(ghost.buildings), 15))
 		box.add_child(UiKit.wrapped("Truppe (da sinistra a destra): %s" % _names_t(ghost.troops), 15))
 		for def: ModifierDef in ghost.malus:

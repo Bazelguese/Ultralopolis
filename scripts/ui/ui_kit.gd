@@ -81,7 +81,11 @@ static func building_details(def: BuildingDef, produced: Array[int] = []) -> Str
 		if amount > 0:
 			parts.append("+%s %s" % [Res.format(type, amount), Res.NAMES[type]])
 	var economy: String = ", ".join(parts) + " a fase" if not parts.is_empty() else "Nessuna risorsa"
-	var text: String = "%s\nMana %s: +%d ogni %s" % [economy, def.mana_type, def.mana_amount, seconds(def.mana_interval_ms)]
+	var battle: String = "Mana %s: +%d" % [def.mana_type, def.mana_amount] if def.mana_amount > 0 else "Neutro (nessun mana)"
+	var effects: String = building_effects(def)
+	if effects != "":
+		battle += " · " + effects
+	var text: String = "%s\n%s ogni %s" % [economy, battle, seconds(def.mana_interval_ms)]
 	if def.extra_building_slots > 0:
 		text += "\n+%d spazio edificio" % def.extra_building_slots
 	if def.extra_troop_slots > 0:
@@ -93,10 +97,44 @@ static func building_details(def: BuildingDef, produced: Array[int] = []) -> Str
 
 static func troop_details(def: TroopDef) -> String:
 	var cost: String = "senza mana" if def.mana_cost == 0 else "%d mana %s" % [def.mana_cost, def.mana_type]
-	var text: String = "Danno %d, %s\nRicarica %s · Cibo %s" % [def.damage, cost, seconds(def.cooldown_ms), Res.format(Res.Type.CIBO, def.food_tenths)]
+	var effects: String = troop_effects(def)
+	var text: String = "%s\n%s · Ricarica %s · Cibo %s" % [effects if effects != "" else "Nessun effetto", cost, seconds(def.cooldown_ms), Res.format(Res.Type.CIBO, def.food_tenths)]
 	if not def.tags.is_empty():
 		text += "\n[%s]" % ", ".join(def.tags)
 	return text
+
+
+## Effetti di una truppa a ogni attivazione, es. "Danno 4 · Scudo 2" (GDD §7.6, §7.7).
+static func troop_effects(def: TroopDef) -> String:
+	var parts: PackedStringArray = _effect_parts(def.damage, def.shield, def.heal, def.corruption,
+			def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target)
+	if def.siege_damage > 0:
+		parts.insert(0, "Assedio %d" % def.siege_damage)
+	return " · ".join(parts)
+
+
+## Effetti di un edificio a ogni intervallo, oltre al mana.
+static func building_effects(def: BuildingDef) -> String:
+	return " · ".join(_effect_parts(0, def.shield, def.heal, def.corruption,
+			def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target))
+
+
+static func _effect_parts(damage: int, shield: int, heal: int, corruption: int, slow_ms: int,
+		slow_target: TimerTarget.Kind, sabotage_ms: int, sabotage_target: TimerTarget.Kind) -> PackedStringArray:
+	var parts: PackedStringArray = PackedStringArray()
+	if damage > 0:
+		parts.append("Danno %d" % damage)
+	if shield > 0:
+		parts.append("Scudo %d" % shield)
+	if heal > 0:
+		parts.append("Cura %d" % heal)
+	if corruption > 0:
+		parts.append("Corruzione %d" % corruption)
+	if slow_ms > 0:
+		parts.append("Rallenta %s (%s)" % [seconds(slow_ms), TimerTarget.NAMES[slow_target]])
+	if sabotage_ms > 0:
+		parts.append("Sabota %s (%s)" % [seconds(sabotage_ms), TimerTarget.NAMES[sabotage_target]])
+	return parts
 
 
 ## Riassunto dell'identità: "Popolo · Governo · ..." e i perk su una seconda riga.

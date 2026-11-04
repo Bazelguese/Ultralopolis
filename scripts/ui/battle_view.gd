@@ -31,6 +31,7 @@ var _troop_states: Array[Array] = [[], []]
 var _troop_panels: Array[Array] = [[], []]
 var _building_bars: Array[Array] = [[], []]
 var _building_panels: Array[Array] = [[], []]
+var _building_states: Array[Array] = [[], []]
 
 
 ## setups: le due nazioni come sono entrate in battaglia (giocatore, avversario).
@@ -140,8 +141,9 @@ func _build_side(side: int) -> Control:
 	top.add_child(mana_label)
 	_mana_labels[side] = mana_label
 
-	var buildings_row: HBoxContainer = HBoxContainer.new()
-	buildings_row.add_theme_constant_override("separation", 8)
+	var buildings_row: HFlowContainer = HFlowContainer.new()
+	buildings_row.add_theme_constant_override("h_separation", 8)
+	buildings_row.add_theme_constant_override("v_separation", 6)
 	column.add_child(buildings_row)
 	buildings_row.add_child(UiKit.label("Edifici:", 16))
 	for i: int in range(setup_data.buildings.size()):
@@ -149,18 +151,24 @@ func _build_side(side: int) -> Control:
 		var piece: PanelContainer = UiKit.panel(UiKit.COLOR_BUILDING, Vector2(150, 0))
 		var piece_box: VBoxContainer = VBoxContainer.new()
 		piece.add_child(piece_box)
-		piece_box.add_child(UiKit.label("%s\n+%d mana %s" % [def.display_name, def.mana_amount, def.mana_type], 15))
+		var produced: String = "+%d mana %s" % [def.mana_amount, def.mana_type] if def.mana_amount > 0 else "neutro"
+		var extra: String = UiKit.building_effects(def)
+		piece_box.add_child(UiKit.label("%s\n%s%s" % [def.display_name, produced, "\n" + extra if extra != "" else ""], 15))
 		var production: ProgressBar = ProgressBar.new()
 		production.max_value = def.mana_interval_ms
 		production.custom_minimum_size = Vector2(0, 10)
 		production.show_percentage = false
 		piece_box.add_child(production)
+		var building_state: Label = UiKit.label("", 13, UiKit.COLOR_WARNING)
+		piece_box.add_child(building_state)
+		_building_states[side].append(building_state)
 		buildings_row.add_child(piece)
 		_building_bars[side].append(production)
 		_building_panels[side].append(piece)
 
-	var troops_row: HBoxContainer = HBoxContainer.new()
-	troops_row.add_theme_constant_override("separation", 8)
+	var troops_row: HFlowContainer = HFlowContainer.new()
+	troops_row.add_theme_constant_override("h_separation", 8)
+	troops_row.add_theme_constant_override("v_separation", 6)
 	column.add_child(troops_row)
 	troops_row.add_child(UiKit.label("Truppe:", 16))
 	for i: int in range(setup_data.troops.size()):
@@ -169,7 +177,8 @@ func _build_side(side: int) -> Control:
 		var piece_box: VBoxContainer = VBoxContainer.new()
 		piece.add_child(piece_box)
 		var cost_text: String = "senza mana" if def.mana_cost == 0 else "%d mana %s" % [def.mana_cost, def.mana_type]
-		piece_box.add_child(UiKit.label("%s\n%d danni, %s" % [def.display_name, def.damage, cost_text], 16))
+		var effects: String = UiKit.troop_effects(def)
+		piece_box.add_child(UiKit.label("%s\n%s\n%s" % [def.display_name, effects if effects != "" else "nessun effetto", cost_text], 15))
 		var cooldown: ProgressBar = ProgressBar.new()
 		cooldown.max_value = def.cooldown_ms
 		cooldown.custom_minimum_size = Vector2(0, 12)
@@ -189,7 +198,8 @@ func _refresh() -> void:
 	for side: int in range(2):
 		var resistance: int = _sim.get_resistance(side)
 		_resistance_bars[side].value = maxi(resistance, 0)
-		_resistance_labels[side].text = "Resistenza %d / %d" % [resistance, _sim.get_max_resistance(side)]
+		_resistance_labels[side].text = "Resistenza %d / %d · Scudo %d · Corruzione %d" % [
+			resistance, _sim.get_max_resistance(side), _sim.get_shield(side), _sim.get_corruption(side)]
 		var mana_parts: PackedStringArray = PackedStringArray()
 		for color: StringName in BattleSim.MANA_COLORS:
 			mana_parts.append("%s %d" % [color, _sim.get_mana(side, color)])
@@ -197,6 +207,8 @@ func _refresh() -> void:
 		for i: int in range(_building_bars[side].size()):
 			var bar: ProgressBar = _building_bars[side][i]
 			bar.value = bar.max_value - _sim.get_building_production_left_ms(side, i)
+			var building_state: Label = _building_states[side][i]
+			building_state.text = _timer_status(_sim.get_building_slow_ms(side, i), _sim.get_building_sabotage_ms(side, i))
 		for i: int in range(_troop_bars[side].size()):
 			var bar: ProgressBar = _troop_bars[side][i]
 			var state_label: Label = _troop_states[side][i]
@@ -211,7 +223,15 @@ func _refresh() -> void:
 				BattleSim.TroopState.IN_RICARICA:
 					bar.value = bar.max_value - left
 					state_label.text = "Ricarica: %s" % UiKit.seconds(left)
-					state_label.remove_theme_color_override("font_color")
+					var slow: String = _timer_status(_sim.get_troop_slow_ms(side, i), 0)
+					if slow != "":
+						state_label.text += " — " + slow
+						state_label.add_theme_color_override("font_color", UiKit.COLOR_WARNING)
+					else:
+						state_label.remove_theme_color_override("font_color")
+				BattleSim.TroopState.SABOTATA:
+					state_label.text = _timer_status(0, _sim.get_troop_sabotage_ms(side, i)) + ": non si attiva"
+					state_label.add_theme_color_override("font_color", UiKit.COLOR_ERROR)
 	var running: bool = _sim.outcome == BattleSim.Outcome.IN_CORSO
 	_pause_button.disabled = not running
 	_speed_button.disabled = not running
@@ -235,6 +255,35 @@ func _show_step_events(animate: bool = true) -> void:
 					_flash(_building_panels[event.side][event.index], Color(1.0, 1.3, 1.6))
 			BattleEvent.Kind.LOGORAMENTO:
 				_log("%s: logoramento, %s perde %d." % [UiKit.seconds(event.time_ms), _side_names[event.side], event.amount], UiKit.COLOR_ERROR)
+			BattleEvent.Kind.SCUDO:
+				_log("%s: %s guadagna %d scudo." % [UiKit.seconds(event.time_ms), _side_names[event.side], event.amount], Color(0.6, 0.8, 1.0))
+			BattleEvent.Kind.CURA:
+				_log("%s: %s recupera %d Resistenza." % [UiKit.seconds(event.time_ms), _side_names[event.side], event.amount], Color(0.55, 0.9, 0.55))
+			BattleEvent.Kind.CORRUZIONE:
+				_log("%s: %s subisce %d Corruzione." % [UiKit.seconds(event.time_ms), _side_names[event.side], event.amount], Color(0.8, 0.55, 1.0))
+			BattleEvent.Kind.ASSEDIO:
+				_log("%s: l'assedio toglie %d scudo a %s." % [UiKit.seconds(event.time_ms), event.amount, _side_names[event.side]], UiKit.COLOR_WARNING)
+			BattleEvent.Kind.RALLENTATO:
+				_log("%s: %s di %s rallentato per %s." % [UiKit.seconds(event.time_ms), _element_name(event.side, event.index), _side_names[event.side], UiKit.seconds(event.amount)], UiKit.COLOR_WARNING)
+			BattleEvent.Kind.SABOTATO:
+				_log("%s: %s di %s sabotato per %s." % [UiKit.seconds(event.time_ms), _element_name(event.side, event.index), _side_names[event.side], UiKit.seconds(event.amount)], UiKit.COLOR_ERROR)
+
+
+## "Rallentato 1.5 s" o "Sabotato 2.0 s" (il blocco prevale, GDD §7.7.3).
+func _timer_status(slow_ms: int, sabotage_ms: int) -> String:
+	if sabotage_ms > 0:
+		return "Sabotato %s" % UiKit.seconds(sabotage_ms)
+	if slow_ms > 0:
+		return "Rallentato %s" % UiKit.seconds(slow_ms)
+	return ""
+
+
+func _element_name(side: int, index: int) -> String:
+	if index >= BattleSim.TROOP_INDEX_OFFSET:
+		return _setups[side].troops[index - BattleSim.TROOP_INDEX_OFFSET].display_name
+	if index >= 0 and index < _setups[side].buildings.size():
+		return _setups[side].buildings[index].display_name
+	return "Un elemento"
 
 
 func _flash(node: Control, color: Color) -> void:

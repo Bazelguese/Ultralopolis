@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.17
+## Game Design Document — v0.18
 
 **Data:** 4 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -569,7 +569,7 @@ I nomi tematici sono suggeriti dal creatore al posto dei termini generici del ge
 | Disattivazione | **Sabotaggio** (al posto di Distruggi) | Per una durata, il timer del bersaglio è fermo e il bersaglio non può attivarsi (§7.7). | Confermato (v0.14) |
 | Eliminazione | **Uccidi** | Rimuove un elemento dallo scontro. | Spunto: oggi gli elementi non vengono eliminati in battaglia (§7.1), quindi richiede una modifica del nucleo. |
 
-Il primo prototipo usa per ora **solo la famiglia Danno**. Difesa, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio sono confermati nel design; quando introdurli nel prototipo è da decidere.
+Dalla v0.18 il prototipo usa **tutte** queste famiglie tranne Eliminazione: Danno, attacco d’assedio, Scudo, Cura, Corruzione, Inefficienza e Sabotaggio.
 
 Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
 
@@ -670,7 +670,7 @@ Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una 
 
 Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un’etichetta continua a contare.
 
-Quando introdurre le vie nel prototipo è da decidere.
+Le vie sono nel prototipo dalla v0.18, con il catalogo di `docs/Catalogo.md`.
 
 ### 10.5 Questioni aperte
 
@@ -915,6 +915,9 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Valori di scudo, cura, Corruzione e danno agli scudi di edifici e truppe | Placeholder. |
 | Intensità dell’Inefficienza: il timer avanza a metà velocità; durate di Inefficienza e Sabotaggio | Placeholder. |
 | Ogni scontro ha un proprio seme, ricavato dal seme della run e dall’anno, e salvato con la battaglia | Convenzione tecnica, per riprodurre lo scontro (§7.5). |
+| Valori di battaglia di un elemento: prima il livello (+50% a livello), poi le percentuali dei modificatori, poi le aggiunte fisse; le aggiunte fisse valgono solo per chi ha già quel valore (es. “chi cura cura 1 in più”) | Provvisoria (v0.18). |
+| I fantasmi generati scelgono a caso una via per ogni era raggiunta, fra quelle a loro consentite | Provvisoria (v0.18). |
+| I malus nuovi del Catalogo entrano anche fra i malus dei fantasmi generati | Provvisoria (v0.18). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -1017,6 +1020,11 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.18 — 4 novembre 2026** (implementazione)
+- Nel prototipo: scudo, cura, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio con seme casuale (§7.6, §7.7); valori di partenza dello scontro (§8.2); potenziamenti su tutti i valori d’effetto (§6.5); ere con le vie (§10.4); edifici neutri (§5.3).
+- Il catalogo di `docs/Catalogo.md` (bozza 3) è nei dati del gioco.
+- Nuove convenzioni su ordine dei calcoli, vie dei fantasmi generati e malus (§16.3).
 
 **v0.17 — 4 novembre 2026** (unione con il lavoro della sessione parallela)
 - Il prototipo gioca una run completa, fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale (§15.2).
