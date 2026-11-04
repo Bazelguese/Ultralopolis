@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.16
+## Game Design Document — v0.18
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.16 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -124,6 +124,7 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | Una sconfitta durante l’ultima possibilità **termina la run** | Confermato |
 | Ricompense per la vittoria: edifici, truppe, perk o risorse. Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (i perk entrano quando esisteranno, §9) |
 | Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
+| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17); regole di crescita placeholder (§16.3) |
 
 ### 3.4 Vittoria e fine della run — Base adottata
 
@@ -568,7 +569,7 @@ I nomi tematici sono suggeriti dal creatore al posto dei termini generici del ge
 | Disattivazione | **Sabotaggio** (al posto di Distruggi) | Per una durata, il timer del bersaglio è fermo e il bersaglio non può attivarsi (§7.7). | Confermato (v0.14) |
 | Eliminazione | **Uccidi** | Rimuove un elemento dallo scontro. | Spunto: oggi gli elementi non vengono eliminati in battaglia (§7.1), quindi richiede una modifica del nucleo. |
 
-Il primo prototipo usa per ora **solo la famiglia Danno**. Difesa, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio sono confermati nel design; quando introdurli nel prototipo è da decidere.
+Dalla v0.18 il prototipo usa **tutte** queste famiglie tranne Eliminazione: Danno, attacco d’assedio, Scudo, Cura, Corruzione, Inefficienza e Sabotaggio.
 
 Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
 
@@ -669,7 +670,7 @@ Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una 
 
 Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un’etichetta continua a contare.
 
-Quando introdurre le vie nel prototipo è da decidere.
+Le vie sono nel prototipo dalla v0.18, con il catalogo di `docs/Catalogo.md`.
 
 ### 10.5 Questioni aperte
 
@@ -698,7 +699,7 @@ L’avversario viene fissato prima delle occasioni di spionaggio e rimane lo ste
 
 La scarsità di avversari nei primi tempi non è considerata un problema: il creatore popolerà il gioco con fantasmi ricavati dalle proprie partite sulla versione definitiva. I playtest diventano così avversari utili.
 
-Per il primo prototipo si usano avversari locali di prova (§16.3); non costituiscono multiplayer online. Il salvataggio della propria nazione come fantasma è rimandato a dopo il prototipo.
+Per il prototipo si usano avversari locali (§16.3); non costituiscono multiplayer online. Negli anni senza un fantasma scritto a mano il gioco **genera** una nazione avversaria dal catalogo (nome, Capitale, edifici, truppe, era, identità, perk e un malus), sempre più forte con gli anni e riproducibile con il seme della run — Confermato (v0.17). Il salvataggio della propria nazione come fantasma è rimandato.
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
@@ -818,7 +819,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 ### 15.2 Funzioni da includere
 
 - Nuova run con dotazione iniziale comune.
-- Run di prova di 3 anni completi (§16.3).
+- Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
 - Due macrofasi con raccolta automatica all’ingresso e 2 opportunità ciascuna, da 3 alternative.
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
@@ -873,13 +874,13 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 
 | Convenzione | Stato |
 |---|---|
-| Run di prova di 3 anni completi | Limite del prototipo; la run completa resta di 10 vittorie (§3.4). |
+| Fantasmi e incontri scritti a mano per gli anni 1–3; dopo vengono generati. Crescita: un’era ogni 4 anni, più edifici e truppe ogni anno, truppe di un livello in più ogni 4 anni (file dati del generatore) | Placeholder. |
 | Quantità di spazi concessi da ere, edifici e acquisti, e loro prezzi | Placeholder (le tre fonti sono confermate, §6.3). |
 | Pescata delle 3 vie: peso base 1, +1 per ogni elemento dell’identità o via già scelta che la favorisce; se il pool ha meno di 3 vie valide, si mostrano tutte | Provvisoria, come per le opportunità. |
 | Entrando in una nuova era, le alternative dell’opportunità in corso vengono ripescate gratis dalla nuova era | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
 | Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
-| Se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
+| Senza regole di generazione nei dati, se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
 | Pool di offerte basato solo sull’era (l’identità non esiste ancora) | Semplificazione del prototipo. |
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
 | Tre ere e relativo catalogo | Base di prova; nomi, costi e statistiche placeholder. |
@@ -914,6 +915,9 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Valori di scudo, cura, Corruzione e danno agli scudi di edifici e truppe | Placeholder. |
 | Intensità dell’Inefficienza: il timer avanza a metà velocità; durate di Inefficienza e Sabotaggio | Placeholder. |
 | Ogni scontro ha un proprio seme, ricavato dal seme della run e dall’anno, e salvato con la battaglia | Convenzione tecnica, per riprodurre lo scontro (§7.5). |
+| Valori di battaglia di un elemento: prima il livello (+50% a livello), poi le percentuali dei modificatori, poi le aggiunte fisse; le aggiunte fisse valgono solo per chi ha già quel valore (es. “chi cura cura 1 in più”) | Provvisoria (v0.18). |
+| I fantasmi generati scelgono a caso una via per ogni era raggiunta, fra quelle a loro consentite | Provvisoria (v0.18). |
+| I malus nuovi del Catalogo entrano anche fra i malus dei fantasmi generati | Provvisoria (v0.18). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -960,6 +964,7 @@ Criteri di accettazione proposti per il prototipo:
 | Prima discesa a zero Prestigio | Run ancora attiva in ultima possibilità. |
 | Ulteriore sconfitta | Fine della run. |
 | Decima vittoria | Fine della run con successo. |
+| Anni oltre quelli scritti a mano | Fantasma e 3 incontri generati, uguali a parità di seme. |
 | Modificatore pluriennale | Applicato per la durata prevista e poi rimosso; esempio: Ricerca dimezzata per un anno. |
 | Stesso malus due volte | Si allunga la durata, l’effetto non raddoppia. |
 | Sconfitta o pareggio contro un fantasma | Si applicano i suoi malus, con il suo nome come origine. |
@@ -1015,6 +1020,16 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.18 — 4 novembre 2026** (implementazione)
+- Nel prototipo: scudo, cura, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio con seme casuale (§7.6, §7.7); valori di partenza dello scontro (§8.2); potenziamenti su tutti i valori d’effetto (§6.5); ere con le vie (§10.4); edifici neutri (§5.3).
+- Il catalogo di `docs/Catalogo.md` (bozza 3) è nei dati del gioco.
+- Nuove convenzioni su ordine dei calcoli, vie dei fantasmi generati e malus (§16.3).
+
+**v0.17 — 4 novembre 2026** (unione con il lavoro della sessione parallela)
+- Il prototipo gioca una run completa, fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale (§15.2).
+- Fantasmi e incontri generati dal catalogo negli anni senza dati scritti a mano (§3.3, §11.3, §16.3).
+- Nota: questa sessione aveva numerato queste modifiche “v0.13” in parallelo alla v0.13 su difesa e Corruzione; qui sono riunite come v0.17.
 
 **v0.16 — 4 novembre 2026** (modifica del nucleo per gli edifici neutri)
 - Edifici senza mana: neutri, senza colore; possono essere comuni o esclusivi di certe nazioni (§5.3).

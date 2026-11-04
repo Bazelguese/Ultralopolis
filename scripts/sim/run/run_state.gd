@@ -98,6 +98,23 @@ var last_battle: BattleSim
 var last_battle_kind: BattleKind = BattleKind.NESSUNA
 var last_opponent_name: String = ""
 var _last_setups: Array[BattleSideSetup] = []
+## Seme dell'ultimo scontro, ricavato dal seme della run, dall'anno e dal tipo di scontro (§16.3).
+var last_battle_seed: int = 0
+
+## Riepilogo di un anno della run (per la schermata finale).
+class YearRecord:
+	var year: int = 0
+	var era: int = 1
+	var encounter_name: String = ""
+	var encounter_result: String = ""
+	var ghost_name: String = ""
+	var ghost_result: String = ""
+	var prestige_after: int = 0
+	var wins_after: int = 0
+
+
+## Un riepilogo per ogni anno giocato, dal primo all'ultimo.
+var history: Array[YearRecord] = []
 
 ## Cronaca della run per il giocatore, dal più vecchio al più recente.
 var chronicle: Array[String] = []
@@ -106,8 +123,10 @@ var last_error: String = ""
 
 ## Nome scelto dal giocatore per la sua nazione.
 var nation_name: String = "La tua nazione"
-## Identità adottata: popolo, governo, credo, cultura e perk (GDD §9).
+## Identità adottata: popolo, governo, credo, cultura, perk e vie (GDD §9, §10.4).
 var identity: Array[IdentityDef] = []
+## Vie proposte entrando nell'era: finché non se ne sceglie una, le altre azioni aspettano.
+var way_choices: Array[IdentityDef] = []
 
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
@@ -358,7 +377,7 @@ func _feed_troops() -> void:
 	var eaten: int = 0
 	for i: int in order:
 		var piece: BoardPiece = board.troops[i]
-		var ration: int = piece.troop.food_tenths
+		var ration: int = troop_ration(piece)
 		if stock[Res.Type.CIBO] >= ration:
 			stock[Res.Type.CIBO] -= ration
 			eaten += ration
@@ -444,30 +463,20 @@ func reward_choices() -> Array[RewardDef]:
 	return won_encounter.rewards
 
 
-## Edificio come entrerà in battaglia, con i modificatori applicati (es. Inefficienza).
-## Se serve restituisce una copia: le schede del catalogo non vengono mai toccate.
+## Edificio come entrerà in battaglia: livello e modificatori (GDD §6.5, §8).
 func effective_building(piece: BoardPiece) -> BuildingDef:
-	var change: int = modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA, piece)
-	if change == 0:
-		return piece.building
-	var copy: BuildingDef = piece.building.duplicate() as BuildingDef
-	copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(copy.mana_interval_ms, change))
-	return copy
+	return ElementStats.building(piece.building, piece, modifiers, piece.level, run_rules)
 
 
-## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5).
+## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5, §8).
 func effective_troop(piece: BoardPiece) -> TroopDef:
-	var cooldown_change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
-	if piece.hungry:
-		cooldown_change += run_rules.hunger_cooldown_percent
-	var damage_change: int = modifiers.percent(ModifierDef.Effect.DANNO_TRUPPA, piece)
-	damage_change += run_rules.troop_damage_percent_per_level * (piece.level - 1)
-	if cooldown_change == 0 and damage_change == 0:
-		return piece.troop
-	var copy: TroopDef = piece.troop.duplicate() as TroopDef
-	copy.cooldown_ms = maxi(1, Modifiers.apply_percent(copy.cooldown_ms, cooldown_change))
-	copy.damage = Modifiers.apply_percent(copy.damage, damage_change)
-	return copy
+	var hunger: int = run_rules.hunger_cooldown_percent if piece.hungry else 0
+	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger)
+
+
+## Cibo consumato da una truppa a inizio anno, in decimi (GDD §5.4).
+func troop_ration(piece: BoardPiece) -> int:
+	return Modifiers.apply_percent(piece.troop.food_tenths, modifiers.percent(ModifierDef.Effect.CIBO_TRUPPA, piece))
 
 
 ## Le due nazioni dell'ultima battaglia: [giocatore, avversario].
@@ -480,7 +489,7 @@ func last_battle_setups() -> Array[BattleSideSetup]:
 func make_battle_replay() -> BattleSim:
 	if _last_setups.size() != 2:
 		return null
-	return BattleSim.new(battle_rules, _last_setups[0], _last_setups[1])
+	return BattleSim.new(battle_rules, _last_setups[0], _last_setups[1], last_battle_seed)
 
 
 # --- Azioni delle opportunità -----------------------------------------------
@@ -590,6 +599,10 @@ func advance_era() -> bool:
 	board.base_building_slots += next.bonus_building_slots
 	board.base_troop_slots += next.bonus_troop_slots
 	_log("La nazione entra nell'era %s (%d Ricerca)." % [next.display_name, cost])
+	# Dalla seconda era si sceglie una via fra 3 (GDD §10.4).
+	way_choices = _draw_ways(next)
+	if not way_choices.is_empty():
+		_log("Scegli la via della nazione per l'era %s." % next.display_name)
 	# Le offerte delle ere precedenti non restano disponibili (GDD §10.3):
 	# le alternative in corso vengono ripescate gratis dalla nuova era.
 	_draw_offers()
@@ -645,6 +658,9 @@ func choose_encounter(index: int) -> bool:
 	var encounter: EncounterDef = encounter_choices[index]
 	var enemy: BattleSideSetup = BattleSideSetup.new(encounter.buildings, encounter.troops, encounter.resistance)
 	var outcome: BattleSim.Outcome = _fight(BattleKind.INCONTRO, encounter.display_name, enemy)
+	if not history.is_empty():
+		history[-1].encounter_name = "%s (%s)" % [encounter.display_name, encounter.difficulty_label]
+		history[-1].encounter_result = _outcome_word(outcome)
 
 	if _player_won_or_drew(outcome):
 		# Il pareggio vale come vittoria (GDD §3.4).
@@ -676,6 +692,8 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 			gold += reward.amount
 		RewardDef.Kind.RICERCA:
 			research += reward.amount
+		RewardDef.Kind.RISORSA:
+			stock[reward.resource] += reward.amount * Res.scale(reward.resource)
 		RewardDef.Kind.EDIFICIO:
 			# Gratis, ma vale come il prezzo di catalogo quando si vende (GDD §6.4).
 			if not _place_building(reward.building, 0, reward.building.cost_gold, replace_index):
@@ -715,6 +733,9 @@ func fight_ghost() -> bool:
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
 	for message: String in modifiers.on_ghost_fight_done():
 		_log(message)
+	if not history.is_empty():
+		history[-1].ghost_name = ghost_name
+		history[-1].ghost_result = _outcome_word(outcome)
 
 	if _player_won_or_drew(outcome):
 		wins += 1
@@ -750,10 +771,17 @@ func fight_ghost() -> bool:
 # --- Parti interne ----------------------------------------------------------
 
 func _start_year(new_year: int) -> void:
+	_update_last_record()
 	year = new_year
 	current_ghost = _ghost_for_year(year)
 	encounter_choices = _encounters_for_year(year)
 	_log("— Anno %d —" % year)
+	var record: YearRecord = YearRecord.new()
+	record.year = year
+	record.era = era
+	record.prestige_after = prestige
+	record.wins_after = wins
+	history.append(record)
 	for message: String in modifiers.on_new_year(year):
 		_log(message)
 	# Il consumo di Cibo avviene a inizio anno, dall'anno 2 (GDD §5.4).
@@ -1001,8 +1029,10 @@ func _refund(piece: BoardPiece) -> void:
 
 func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> BattleSim.Outcome:
 	var player: BattleSideSetup = BattleSideSetup.new(_battle_buildings(), _battle_troops(), player_resistance())
+	_apply_start_values(player, modifiers)
 	_last_setups = [player, enemy]
-	last_battle = BattleSim.new(battle_rules, player, enemy)
+	last_battle_seed = run_seed * 7919 + year * 104729 + int(kind)
+	last_battle = BattleSim.new(battle_rules, player, enemy, last_battle_seed)
 	last_battle_kind = kind
 	last_opponent_name = opponent_name
 	var outcome: BattleSim.Outcome = last_battle.run_to_end()
@@ -1039,12 +1069,33 @@ func _battle_troops() -> Array[TroopDef]:
 	return defs
 
 
+## Aggiorna Prestigio, vittorie ed era dell'ultimo anno registrato.
+func _update_last_record() -> void:
+	if history.is_empty():
+		return
+	history[-1].prestige_after = prestige
+	history[-1].wins_after = wins
+	history[-1].era = era
+
+
+static func _outcome_word(outcome: BattleSim.Outcome) -> String:
+	match outcome:
+		BattleSim.Outcome.VITTORIA_A:
+			return "Vittoria"
+		BattleSim.Outcome.VITTORIA_B:
+			return "Sconfitta"
+		BattleSim.Outcome.PAREGGIO:
+			return "Pareggio"
+	return "Interrotto"
+
+
 func _player_won_or_drew(outcome: BattleSim.Outcome) -> bool:
 	return outcome == BattleSim.Outcome.VITTORIA_A \
 		or outcome == BattleSim.Outcome.PAREGGIO \
 		or outcome == BattleSim.Outcome.INTERROTTA
 
 
+## Fantasma dell'anno: quello scritto nei dati, altrimenti uno generato (GDD §11.3).
 func _ghost_for_year(target_year: int) -> GhostDef:
 	var best: GhostDef = null
 	for ghost: GhostDef in catalog.ghosts:
@@ -1052,21 +1103,28 @@ func _ghost_for_year(target_year: int) -> GhostDef:
 			return ghost
 		if ghost.year < target_year and (best == null or ghost.year > best.year):
 			best = ghost
+	if catalog.generator != null:
+		return OpponentGenerator.generate_ghost(catalog, catalog.generator, run_rules, target_year, run_seed)
 	if best != null:
 		push_warning("RunState: nessun fantasma per l'anno %d, uso quello dell'anno %d." % [target_year, best.year])
 	return best
 
 
+## Incontri dell'anno: quelli scritti nei dati, completati fino a 3 con incontri generati (GDD §3.3).
 func _encounters_for_year(target_year: int) -> Array[EncounterDef]:
 	var found: Array[EncounterDef] = []
 	for encounter: EncounterDef in catalog.encounters:
 		if encounter.year == target_year and found.size() < 3:
 			found.append(encounter)
+	if found.size() < 3 and catalog.generator != null:
+		found.append_array(OpponentGenerator.generate_encounters(catalog, catalog.generator, run_rules,
+				target_year, run_seed, 3 - found.size(), found.size()))
 	return found
 
 
 func _end_run(result: RunEnd) -> void:
 	run_end = result
+	_update_last_record()
 	phase = Phase.FINE_RUN
 	offers = []
 	match result:
@@ -1081,7 +1139,59 @@ func _end_run(result: RunEnd) -> void:
 func _require_shopping() -> bool:
 	if not is_shopping_phase():
 		return _fail("Questa azione è possibile solo in Produzione o Preparazione.")
+	if not way_choices.is_empty():
+		return _fail("Prima scegli la via della nazione.")
 	return true
+
+
+# --- Vie delle ere (GDD §10.4) -----------------------------------------------------
+
+## Sceglie una delle vie proposte: diventa parte dell'identità, con il suo bonus immediato.
+func choose_way(index: int) -> bool:
+	if index < 0 or index >= way_choices.size():
+		return _fail("Via non valida.")
+	var way: IdentityDef = way_choices[index]
+	way_choices = []
+	_adopt_identity(way)
+	# Le offerte in corso tengono conto della via appena scelta.
+	_draw_offers()
+	return true
+
+
+## Tre vie pescate dal pool dell'era, pesate da identità e vie già scelte (§16.3).
+func _draw_ways(era_def: EraDef) -> Array[IdentityDef]:
+	var pool: Array[IdentityDef] = []
+	var weights: Array[int] = []
+	for way: IdentityDef in era_def.ways:
+		if identity.has(way):
+			continue
+		if not way.requires_any.is_empty():
+			var allowed: bool = false
+			for needed: Resource in way.requires_any:
+				if identity.has(needed):
+					allowed = true
+			if not allowed:
+				continue
+		var weight: int = 1
+		for element: IdentityDef in identity:
+			if way.favored_by.has(element):
+				weight += 1
+		pool.append(way)
+		weights.append(weight)
+	var picked: Array[IdentityDef] = []
+	for i: int in range(mini(3, pool.size())):
+		var total: int = 0
+		for weight: int in weights:
+			total += weight
+		var roll: int = _rng.randi_range(0, total - 1)
+		var pick: int = 0
+		while roll >= weights[pick]:
+			roll -= weights[pick]
+			pick += 1
+		picked.append(pool[pick])
+		pool.remove_at(pick)
+		weights.remove_at(pick)
+	return picked
 
 
 func _require_not_over() -> bool:
@@ -1099,6 +1209,11 @@ func _adopt_identity(def: IdentityDef) -> void:
 	_log("%s: %s." % [IdentityDef.DIMENSION_NAMES[def.dimension], def.display_name])
 	gold += def.extra_gold
 	research += def.extra_research
+	if def.extra_resources != null:
+		for type: Res.Type in Res.NAMES:
+			stock[type] += def.extra_resources.internal(type)
+	board.base_building_slots += def.extra_building_slots
+	board.base_troop_slots += def.extra_troop_slots
 	for building: BuildingDef in def.extra_buildings:
 		if board.can_add_building(building):
 			board.buildings.append(BoardPiece.of_building(building, 0))
@@ -1135,22 +1250,21 @@ func _identity_modifiers(elements: Array[IdentityDef]) -> Modifiers:
 func _ghost_setup() -> BattleSideSetup:
 	var ghost_modifiers: Modifiers = _identity_modifiers(current_ghost.identity)
 	var buildings: Array[BuildingDef] = []
-	var interval_change: int = ghost_modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA)
 	for def: BuildingDef in current_ghost.buildings:
-		var copy: BuildingDef = def
-		if interval_change != 0:
-			copy = def.duplicate() as BuildingDef
-			copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(def.mana_interval_ms, interval_change))
-		buildings.append(copy)
+		buildings.append(ElementStats.building(def, BoardPiece.of_building(def, 0), ghost_modifiers, 1, run_rules))
 	var troops: Array[TroopDef] = []
-	var cooldown_change: int = ghost_modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA)
 	for def: TroopDef in current_ghost.troops:
-		var copy: TroopDef = def
-		if cooldown_change != 0:
-			copy = def.duplicate() as TroopDef
-			copy.cooldown_ms = maxi(1, Modifiers.apply_percent(def.cooldown_ms, cooldown_change))
-		troops.append(copy)
-	return BattleSideSetup.new(buildings, troops, ghost_resistance())
+		troops.append(ElementStats.troop(def, BoardPiece.of_troop(def, 0), ghost_modifiers, 1, run_rules))
+	var setup: BattleSideSetup = BattleSideSetup.new(buildings, troops, ghost_resistance())
+	_apply_start_values(setup, ghost_modifiers)
+	return setup
+
+
+## Valori di partenza dello scontro cambiati dai modificatori (GDD §8.2, v0.16).
+static func _apply_start_values(setup: BattleSideSetup, mods: Modifiers) -> void:
+	setup.start_shield = maxi(0, mods.flat(ModifierDef.Effect.SCUDO_INIZIALE))
+	setup.start_corruption = maxi(0, mods.flat(ModifierDef.Effect.CORRUZIONE_INIZIALE))
+	setup.start_building_sabotage_ms = maxi(0, mods.flat(ModifierDef.Effect.SABOTAGGIO_INIZIALE))
 
 
 ## Metà di un numero intero, arrotondata per difetto (per numeri non negativi).

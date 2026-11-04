@@ -35,7 +35,8 @@ extends Resource
 @export_group("Potenziamenti")
 ## Livello massimo di edifici e truppe (GDD §6.5).
 @export var max_level: int = 3
-## Danno in più per ogni livello oltre il primo, in percentuale.
+## Aumento di tutti i valori d'effetto per ogni livello oltre il primo, in percentuale
+## (danno, scudo, cura, Corruzione, assedio, durate; il mana non cambia, GDD §6.5).
 @export var troop_damage_percent_per_level: int = 50
 ## Unità in più, per ogni livello oltre il primo, di ogni risorsa che l'edificio produce.
 @export var building_production_per_level: int = 1

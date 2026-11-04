@@ -3,11 +3,11 @@
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_x2ubn"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_17nd2"]
 
-[sub_resource type="Resource" id="Resource_fj8ix"]
+[sub_resource type="Resource" id="Resource_17nd2"]
 script = ExtResource("2_17nd2")
 legno = 2
 
-[sub_resource type="Resource" id="Resource_ptkkn"]
+[sub_resource type="Resource" id="Resource_fj8ix"]
 script = ExtResource("2_17nd2")
 legno = 3
 
@@ -15,11 +15,11 @@ legno = 3
 script = ExtResource("1_x2ubn")
 id = &"porto_fluviale"
 display_name = "Porto fluviale"
-cost_gold = 5
+cost_gold = 4
 tags = Array[StringName]([&"Commerciale"])
-gold_per_phase = 4
-food_per_phase = 1
+gold_per_phase = 2
+food_per_phase = 2
 mana_type = &"verde"
 mana_amount = 1
-mana_interval_ms = 3000
-upgrade_costs = Array[ExtResource("2_17nd2")]([SubResource("Resource_fj8ix"), SubResource("Resource_ptkkn")])
+mana_interval_ms = 2000
+upgrade_costs = Array[ExtResource("2_17nd2")]([SubResource("Resource_17nd2"), SubResource("Resource_fj8ix")])

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_efnmg"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_alw40"]
+
+[sub_resource type="Resource" id="Resource_efnmg"]
+script = ExtResource("2_alw40")
+legno = 6
+
+[sub_resource type="Resource" id="Resource_alw40"]
+script = ExtResource("2_alw40")
+legno = 9
+
+[resource]
+script = ExtResource("1_efnmg")
+id = &"rete_di_informatori"
+display_name = "Rete di informatori"
+era = 3
+cost_gold = 10
+tags = Array[StringName]([&"Commerciale"])
+gold_per_phase = 2
+influence_per_phase = 3
+mana_type = &"verde"
+mana_amount = 1
+mana_interval_ms = 4000
+sabotage_ms = 2000
+upgrade_costs = Array[ExtResource("2_alw40")]([SubResource("Resource_efnmg"), SubResource("Resource_alw40")])

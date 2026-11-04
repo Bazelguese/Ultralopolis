@@ -11,6 +11,7 @@
 [ext_resource type="Resource" path="res://data/catalog/buildings/accademia.tres" id="8_1d6je"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/cava.tres" id="8_cd6s8"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/miniera.tres" id="9_hkuyl"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/palizzata.tres" id="9_i5efv"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/tempio.tres" id="9_qwot4"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/stalle.tres" id="10_7tkbw"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/fortezza.tres" id="10_8ha0l"]
@@ -23,15 +24,22 @@
 [ext_resource type="Script" path="res://scripts/sim/data/encounter_def.gd" id="16_eg6f4"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_1_briganti.tres" id="17_p5yub"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_1_barbari.tres" id="18_eicds"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/granaio.tres" id="18_uq48l"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_1_pirati.tres" id="19_7hwyi"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fonderia.tres" id="19_j2ke1"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_2_predoni.tres" id="20_5hcq5"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/loggia_segreta.tres" id="20_68fgc"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_2_orda.tres" id="21_mleo8"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_2_flotta_pirata.tres" id="22_3lga0"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_3_ribelli.tres" id="23_su3wr"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_3_invasori.tres" id="24_16be3"]
 [ext_resource type="Resource" path="res://data/catalog/encounters/anno_3_armata_del_mare.tres" id="25_fb16c"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/arsenale.tres" id="25_noghk"]
 [ext_resource type="Script" path="res://scripts/sim/data/era_def.gd" id="26_7jtq1"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/bastioni.tres" id="26_udfno"]
 [ext_resource type="Resource" path="res://data/catalog/eras/era_1_fondazione.tres" id="27_6fg57"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/ospedale.tres" id="27_mm2r4"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/rete_di_informatori.tres" id="28_hxuc8"]
 [ext_resource type="Resource" path="res://data/catalog/eras/era_2_sviluppo.tres" id="28_sahax"]
 [ext_resource type="Resource" path="res://data/catalog/eras/era_3_ascesa.tres" id="29_gw2p0"]
 [ext_resource type="Script" path="res://scripts/sim/data/ghost_def.gd" id="30_75gny"]
@@ -42,6 +50,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="34_0738x"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="34_uymuy"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="35_fp2ii"]
+[ext_resource type="Resource" path="res://data/rules/generator_rules.tres" id="35_hkuyl"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/costruttori.tres" id="35_p4jue"]
 [ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="35_tye5o"]
 [ext_resource type="Resource" path="res://data/catalog/identita/popolo_del_delta.tres" id="36_2n8s1"]
@@ -85,13 +94,29 @@
 [ext_resource type="Resource" path="res://data/catalog/perk/contrattatori.tres" id="51_ifash"]
 [ext_resource type="Resource" path="res://data/catalog/perk/consiglio_allargato.tres" id="52_wu0fy"]
 [ext_resource type="Resource" path="res://data/catalog/perk/allevatori.tres" id="58_cd6s8"]
+[ext_resource type="Resource" path="res://data/catalog/perk/veleni_sottili.tres" id="68_1w4xj"]
+[ext_resource type="Resource" path="res://data/catalog/perk/erboristi_di_corte.tres" id="69_wrjoy"]
+[ext_resource type="Resource" path="res://data/catalog/perk/genio_militare.tres" id="70_jdf2v"]
+[ext_resource type="Resource" path="res://data/catalog/perk/mura_di_pietra.tres" id="71_h1k3v"]
+[ext_resource type="Resource" path="res://data/catalog/troops/scudieri.tres" id="89_37c6u"]
+[ext_resource type="Resource" path="res://data/catalog/troops/erboristi.tres" id="92_th4bj"]
+[ext_resource type="Resource" path="res://data/catalog/troops/sobillatori.tres" id="93_hklf0"]
+[ext_resource type="Resource" path="res://data/catalog/troops/guastatori.tres" id="97_ef0js"]
+[ext_resource type="Resource" path="res://data/catalog/troops/arcieri_a_cavallo.tres" id="99_doj33"]
+[ext_resource type="Resource" path="res://data/catalog/troops/confraternita.tres" id="100_pd8uj"]
+[ext_resource type="Resource" path="res://data/catalog/troops/predicatori.tres" id="101_frcdp"]
+[ext_resource type="Resource" path="res://data/catalog/troops/granatieri.tres" id="103_77qp0"]
+[ext_resource type="Resource" path="res://data/catalog/troops/corazzieri.tres" id="106_5o45o"]
+[ext_resource type="Resource" path="res://data/catalog/troops/spie.tres" id="107_ij48a"]
+[ext_resource type="Resource" path="res://data/catalog/troops/inquisitori.tres" id="109_8aigl"]
 
 [resource]
 script = ExtResource("34_2n8s1")
-buildings = Array[ExtResource("1_5durs")]([ExtResource("2_edyp4"), ExtResource("3_w7ipk"), ExtResource("4_ciikw"), ExtResource("5_qoebk"), ExtResource("6_asy6l"), ExtResource("7_rvnac"), ExtResource("8_cd6s8"), ExtResource("9_hkuyl"), ExtResource("10_7tkbw"), ExtResource("11_rht80"), ExtResource("7_223dg"), ExtResource("8_1d6je"), ExtResource("9_qwot4"), ExtResource("10_8ha0l"), ExtResource("11_stkxd"), ExtResource("12_45xg6"), ExtResource("13_0738x"), ExtResource("14_p4jue"), ExtResource("15_5do7l")])
-troops = Array[ExtResource("35_fp2ii")]([ExtResource("36_03c6b"), ExtResource("37_rvnac"), ExtResource("38_cd6s8"), ExtResource("39_hkuyl"), ExtResource("40_7tkbw"), ExtResource("41_rht80"), ExtResource("42_ynrp2"), ExtResource("43_v1cj4"), ExtResource("44_dt2h5"), ExtResource("45_nc1ak"), ExtResource("46_hcct1"), ExtResource("47_6hmn4"), ExtResource("48_f4eue")])
+buildings = Array[ExtResource("1_5durs")]([ExtResource("2_edyp4"), ExtResource("7_rvnac"), ExtResource("9_hkuyl"), ExtResource("3_w7ipk"), ExtResource("4_ciikw"), ExtResource("5_qoebk"), ExtResource("6_asy6l"), ExtResource("9_i5efv"), ExtResource("8_cd6s8"), ExtResource("11_rht80"), ExtResource("10_7tkbw"), ExtResource("8_1d6je"), ExtResource("7_223dg"), ExtResource("11_stkxd"), ExtResource("10_8ha0l"), ExtResource("9_qwot4"), ExtResource("18_uq48l"), ExtResource("19_j2ke1"), ExtResource("20_68fgc"), ExtResource("13_0738x"), ExtResource("12_45xg6"), ExtResource("14_p4jue"), ExtResource("15_5do7l"), ExtResource("25_noghk"), ExtResource("26_udfno"), ExtResource("27_mm2r4"), ExtResource("28_hxuc8")])
+troops = Array[ExtResource("35_fp2ii")]([ExtResource("36_03c6b"), ExtResource("38_cd6s8"), ExtResource("37_rvnac"), ExtResource("89_37c6u"), ExtResource("40_7tkbw"), ExtResource("39_hkuyl"), ExtResource("92_th4bj"), ExtResource("93_hklf0"), ExtResource("43_v1cj4"), ExtResource("42_ynrp2"), ExtResource("44_dt2h5"), ExtResource("97_ef0js"), ExtResource("41_rht80"), ExtResource("99_doj33"), ExtResource("100_pd8uj"), ExtResource("101_frcdp"), ExtResource("47_6hmn4"), ExtResource("103_77qp0"), ExtResource("45_nc1ak"), ExtResource("48_f4eue"), ExtResource("106_5o45o"), ExtResource("107_ij48a"), ExtResource("46_hcct1"), ExtResource("109_8aigl")])
 eras = Array[ExtResource("26_7jtq1")]([ExtResource("27_6fg57"), ExtResource("28_sahax"), ExtResource("29_gw2p0")])
 ghosts = Array[ExtResource("30_75gny")]([ExtResource("31_mpbka"), ExtResource("32_uymuy"), ExtResource("33_tye5o")])
 encounters = Array[ExtResource("16_eg6f4")]([ExtResource("17_p5yub"), ExtResource("18_eicds"), ExtResource("19_7hwyi"), ExtResource("20_5hcq5"), ExtResource("21_mleo8"), ExtResource("22_3lga0"), ExtResource("23_su3wr"), ExtResource("24_16be3"), ExtResource("25_fb16c")])
 opportunities = Array[ExtResource("34_0738x")]([ExtResource("35_p4jue"), ExtResource("36_5do7l"), ExtResource("37_eg6f4"), ExtResource("38_p5yub"), ExtResource("39_eicds"), ExtResource("40_7hwyi"), ExtResource("41_5hcq5"), ExtResource("42_mleo8"), ExtResource("43_3lga0"), ExtResource("44_su3wr"), ExtResource("45_16be3")])
-identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8")])
+identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8"), ExtResource("68_1w4xj"), ExtResource("69_wrjoy"), ExtResource("70_jdf2v"), ExtResource("71_h1k3v")])
+generator = ExtResource("35_hkuyl")

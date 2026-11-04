@@ -23,8 +23,22 @@ extends Resource
 @export var mana_cost: int = 0
 ## Tempo di ricarica in millisecondi. Parte pieno a inizio battaglia.
 @export var cooldown_ms: int = 1000
-## Danno inflitto alla Resistenza avversaria a ogni attivazione.
+## Danno inflitto a ogni attivazione: colpisce prima lo scudo, poi la Resistenza (GDD §7.6).
 @export var damage: int = 0
+## Scudo aggiunto alla propria riserva a ogni attivazione (GDD §7.6.1).
+@export var shield: int = 0
+## Resistenza recuperata a ogni attivazione, mai oltre il massimo (GDD §7.6.2).
+@export var heal: int = 0
+## Corruzione inflitta all'avversario a ogni attivazione (GDD §7.6.3).
+@export var corruption: int = 0
+## Danno agli scudi (attacco d'assedio): solo truppe con etichetta Assedio (GDD §7.6.4).
+@export var siege_damage: int = 0
+## Inefficienza inflitta (millisecondi) e sua categoria di bersaglio (GDD §7.7).
+@export var inefficiency_ms: int = 0
+@export var inefficiency_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
+## Sabotaggio inflitto (millisecondi) e sua categoria di bersaglio (GDD §7.7).
+@export var sabotage_ms: int = 0
+@export var sabotage_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
 
 @export_group("Potenziamenti")
 ## Costo per salire di livello: posizione 0 = dal livello 1 al 2, posizione 1 = dal 2 al 3 (GDD §6.5).

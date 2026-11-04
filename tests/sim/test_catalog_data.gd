@@ -54,7 +54,10 @@ func test_colori_etichette_e_capitale() -> void:
 	var catalog: CatalogDef = _catalog()
 	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
 	for def: BuildingDef in catalog.buildings:
-		assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
+		if def.mana_amount == 0:
+			assert_eq(def.mana_type, BattleSim.MANA_NEUTRO, "Senza mana l'edificio è neutro (%s)" % def.id)
+		else:
+			assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
 		assert_false(def.tags.is_empty(), "Etichette di %s" % def.id)
 		assert_false(def.is_capital, "La Capitale non è fra le offerte (%s)" % def.id)
 	for def: TroopDef in catalog.troops:
@@ -67,13 +70,27 @@ func test_colori_etichette_e_capitale() -> void:
 		assert_gt(rules.starting_buildings[0].production(type), 0, "La Capitale produce %s" % Res.NAMES[type])
 
 
+func test_catalogo_bozza_3() -> void:
+	var catalog: CatalogDef = _catalog()
+	assert_eq(catalog.buildings.size(), 27, "27 edifici (Catalogo §8).")
+	assert_eq(catalog.troops.size(), 24, "24 truppe.")
+	assert_eq(catalog.eras[1].ways.size(), 4, "4 vie nell'era 2.")
+	assert_eq(catalog.eras[2].ways.size(), 5, "4 vie più l'esclusiva nell'era 3.")
+	for def: TroopDef in catalog.troops:
+		if def.siege_damage > 0:
+			assert_true(def.tags.has(&"Assedio"), "Solo le truppe Assedio hanno l'attacco d'assedio (%s)." % def.id)
+	var perks: int = IdentityRules.options(catalog, IdentityDef.Dimension.PERK).size()
+	assert_eq(perks, 11, "7 perk esistenti + 4 nuovi.")
+	assert_eq(catalog.generator.ghost_malus_pool.size(), 12, "6 malus esistenti + 6 nuovi.")
+
+
 func test_identita_complete() -> void:
 	var catalog: CatalogDef = _catalog()
 	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
 	var counts: Dictionary[IdentityDef.Dimension, int] = {}
 	for def: IdentityDef in catalog.identities:
 		counts[def.dimension] = counts.get(def.dimension, 0) + 1
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		assert_gt(counts.get(dimension, 0), 0, "Opzioni per %s" % IdentityDef.DIMENSION_NAMES[dimension])
 	assert_gte(counts.get(IdentityDef.Dimension.PERK, 0), rules.starting_perks, "Abbastanza perk iniziali")
 	for ghost: GhostDef in catalog.ghosts:
@@ -95,8 +112,8 @@ func test_ogni_fase_ha_almeno_tre_tipi_di_opportunita() -> void:
 
 func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
 	var catalog: CatalogDef = _catalog()
-	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
-	for year: int in range(1, rules.prototype_years + 1):
+	assert_not_null(catalog.generator, "Dopo gli anni scritti a mano, fantasmi e incontri sono generati.")
+	for year: int in range(1, 4):
 		var ghosts: int = 0
 		for ghost: GhostDef in catalog.ghosts:
 			if ghost.year == year:
@@ -118,7 +135,7 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 	var run: RunState = RunState.new(_catalog(), load(RUN_RULES_PATH) as RunRules,
 			load(BATTLE_RULES_PATH) as BattleRules, load(RESISTANCE_RULES_PATH) as ResistanceRules, 7)
 	var choices: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = run.identity_options(dimension)
 		var count: int = run.starting_perk_count() if dimension == IdentityDef.Dimension.PERK else mini(1, options.size())
 		for i: int in range(count):
@@ -146,4 +163,5 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 				run.fight_ghost()
 	assert_true(run.is_over(), "La run termina.")
 	assert_lt(guard, 1000, "Nessun ciclo infinito.")
-	assert_eq(run.year, 3, "La run di prova dura 3 anni.")
+	assert_ne(run.run_end, RunState.RunEnd.FINE_PROVA, "La run è completa: finisce con vittoria o sconfitta.")
+	assert_eq(run.history.size(), run.year, "Un riepilogo per ogni anno.")

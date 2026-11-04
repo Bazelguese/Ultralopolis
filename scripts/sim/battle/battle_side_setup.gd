@@ -10,6 +10,11 @@ var buildings: Array[BuildingDef] = []
 var troops: Array[TroopDef] = []
 ## Resistenza con cui la nazione inizia lo scontro.
 var max_resistance: int = 0
+## Valori di partenza che un modificatore può cambiare (GDD §8.2, v0.16).
+var start_shield: int = 0
+var start_corruption: int = 0
+## Un edificio a caso parte sabotato per questi millisecondi (es. malus Rete compromessa).
+var start_building_sabotage_ms: int = 0
 
 
 func _init(p_buildings: Array[BuildingDef] = [], p_troops: Array[TroopDef] = [], p_max_resistance: int = 0) -> void:

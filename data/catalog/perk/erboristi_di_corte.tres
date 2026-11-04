@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_pr1rh"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_85soo"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_l7vmi"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_mljvl"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/erboristi_di_corte.tres" id="5_mn3tu"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_mrpdi"]
+
+[resource]
+script = ExtResource("6_mrpdi")
+id = &"erboristi_di_corte"
+display_name = "Erboristi di corte"
+description = "Gli elementi che curano curano 1 in più."
+dimension = 4
+permanent_modifiers = Array[ExtResource("4_mljvl")]([ExtResource("5_mn3tu")])

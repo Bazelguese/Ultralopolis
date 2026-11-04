@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_4qeox"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_x46ao"]
+
+[sub_resource type="Resource" id="Resource_4qeox"]
+script = ExtResource("2_x46ao")
+pietra = 2
+
+[sub_resource type="Resource" id="Resource_x46ao"]
+script = ExtResource("2_x46ao")
+pietra = 3
+
+[resource]
+script = ExtResource("1_4qeox")
+id = &"palizzata"
+display_name = "Palizzata"
+cost_gold = 4
+tags = Array[StringName]([&"Difensivo"])
+wood_per_phase = 1
+stone_per_phase = 1
+mana_type = &"neutro"
+mana_interval_ms = 3000
+shield = 3
+upgrade_costs = Array[ExtResource("2_x46ao")]([SubResource("Resource_4qeox"), SubResource("Resource_x46ao")])

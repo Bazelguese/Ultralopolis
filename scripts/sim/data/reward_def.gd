@@ -8,6 +8,7 @@ enum Kind {
 	EDIFICIO,
 	TRUPPA,
 	PERK,
+	RISORSA,  ## Una risorsa del Magazzino diversa da Oro e Ricerca (vedi "resource").
 }
 
 @export var kind: Kind = Kind.ORO
@@ -19,6 +20,8 @@ enum Kind {
 @export var troop: TroopDef
 ## Perk ottenuto (per PERK).
 @export var perk: IdentityDef
+## Risorsa ricevuta (per RISORSA), in unità intere indicate da "amount".
+@export var resource: Res.Type = Res.Type.LEGNO
 
 
 func describe() -> String:
@@ -33,4 +36,6 @@ func describe() -> String:
 			return "Truppa: %s" % (troop.display_name if troop != null else "?")
 		Kind.PERK:
 			return "Perk: %s" % (perk.display_name if perk != null else "?")
+		Kind.RISORSA:
+			return "%d %s" % [amount, Res.NAMES[resource]]
 	return "?"

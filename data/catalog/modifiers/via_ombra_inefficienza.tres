@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_xmlxq"]
+
+[resource]
+script = ExtResource("1_xmlxq")
+id = &"via_ombra_inefficienza"
+display_name = "Via dell'Ombra"
+description = "Inefficienza inflitta: 1 s in più."
+is_malus = false
+effect = 11
+battle_value = 5
+amount = 1000
+duration_kind = 2
+stacking = 1

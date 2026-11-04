@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_ndcj7"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_hdlsk"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_r3byp"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_2pgm6"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/mura_di_pietra.tres" id="5_2qsuf"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_wici2"]
+
+[resource]
+script = ExtResource("6_wici2")
+id = &"mura_di_pietra"
+display_name = "Mura di pietra"
+description = "Gli edifici Difensivi producono 1 scudo in più."
+dimension = 4
+permanent_modifiers = Array[ExtResource("4_2pgm6")]([ExtResource("5_2qsuf")])

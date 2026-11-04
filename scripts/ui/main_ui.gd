@@ -159,7 +159,7 @@ func _new_run() -> void:
 ## Nazione di prova: il primo elemento di ogni dimensione e i primi perk.
 func _test_nation(catalog: CatalogDef, run_rules: RunRules) -> NationTemplate:
 	var choices: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = IdentityRules.options(catalog, dimension)
 		var count: int = IdentityRules.starting_perk_count(catalog, run_rules) if dimension == IdentityDef.Dimension.PERK else mini(1, options.size())
 		for i: int in range(count):
@@ -343,6 +343,9 @@ func _refresh_actions() -> void:
 		_action_box.add_child(UiKit.wrapped("Plancia piena: clicca «Sostituisci» sull'elemento da rimpiazzare.\nRiceverai metà del prezzo che avevi pagato.", 20, UiKit.COLOR_WARNING))
 		_action_box.add_child(UiKit.button("Annulla", _on_cancel_pending))
 		return
+	if not run.way_choices.is_empty():
+		_show_ways()
+		return
 	match run.phase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
 			_show_opportunity()
@@ -446,6 +449,8 @@ func _show_ghost() -> void:
 		card.add_child(box)
 		box.add_child(UiKit.wrapped(ghost.display_name, 20))
 		box.add_child(UiKit.wrapped("Era: %s · Resistenza %d" % [run.era_name(ghost.era), run.ghost_resistance()], 15))
+		if not ghost.identity.is_empty():
+			box.add_child(UiKit.wrapped("Identità: %s" % UiKit.identity_text(ghost.identity).replace("\n", " — "), 15, Color(0.75, 0.8, 1.0)))
 		box.add_child(UiKit.wrapped("Edifici: %s" % _names_b(ghost.buildings), 15))
 		box.add_child(UiKit.wrapped("Truppe (da sinistra a destra): %s" % _names_t(ghost.troops), 15))
 		for def: ModifierDef in ghost.malus:
@@ -465,9 +470,33 @@ func _show_end() -> void:
 		RunState.RunEnd.FINE_PROVA:
 			text = "Fine della run di prova (%d anni)." % run.year
 	_action_box.add_child(UiKit.wrapped(text, 28, UiKit.COLOR_WARNING))
-	_action_box.add_child(UiKit.wrapped("Vittorie: %d · Prestigio: %d · Seme della run: %d" % [run.wins, run.prestige, run.run_seed], 18))
+	_action_box.add_child(UiKit.wrapped("%s — %d anni · Vittorie %d/%d · Prestigio %d · Era %s · Seme %d" % [
+		run.nation_name, run.year, run.wins, run.run_rules.wins_needed, run.prestige, run.era_name(), run.run_seed], 18))
 	_action_box.add_child(UiKit.button("Nuova run con la stessa nazione", _new_run))
 	_action_box.add_child(UiKit.button("Menu principale", _on_menu))
+	_action_box.add_child(UiKit.label("Riepilogo anno per anno", 22, UiKit.COLOR_WARNING))
+	var table: GridContainer = GridContainer.new()
+	table.columns = 6
+	table.add_theme_constant_override("h_separation", 18)
+	for heading: String in ["Anno", "Era", "Incontro", "Fantasma", "Vittorie", "Prestigio"]:
+		table.add_child(UiKit.label(heading, 16, Color(0.75, 0.8, 1.0)))
+	for record: RunState.YearRecord in run.history:
+		table.add_child(UiKit.label(str(record.year), 15))
+		table.add_child(UiKit.label(run.era_name(record.era), 15))
+		table.add_child(UiKit.label("%s: %s" % [record.encounter_name, record.encounter_result] if record.encounter_name != "" else "—", 15, _result_color(record.encounter_result)))
+		table.add_child(UiKit.label("%s: %s" % [record.ghost_name.trim_prefix("Fantasma: "), record.ghost_result] if record.ghost_name != "" else "—", 15, _result_color(record.ghost_result)))
+		table.add_child(UiKit.label(str(record.wins_after), 15))
+		table.add_child(UiKit.label(str(record.prestige_after), 15))
+	_action_box.add_child(table)
+
+
+func _result_color(result: String) -> Color:
+	match result:
+		"Vittoria", "Pareggio":
+			return Color(0.55, 0.9, 0.55)
+		"Sconfitta":
+			return UiKit.COLOR_ERROR
+	return Color.WHITE
 
 
 func _refresh_chronicle() -> void:
@@ -514,6 +543,25 @@ func _on_replace(replace_index: int) -> void:
 		_act(run.buy_offer(index, replace_index))
 	elif kind == PendingKind.RICOMPENSA:
 		_act(run.take_reward(index, replace_index))
+
+
+## Scelta della via entrando in una nuova era (GDD §10.4).
+func _show_ways() -> void:
+	_action_box.add_child(UiKit.wrapped("Nuova era: %s — scegli la via della nazione" % run.era_name(), 24))
+	_action_box.add_child(UiKit.wrapped("La via diventa parte della tua identità: offerte, elementi esclusivi, un tratto permanente e un bonus immediato.", 16))
+	for i: int in range(run.way_choices.size()):
+		var way: IdentityDef = run.way_choices[i]
+		var card: PanelContainer = UiKit.panel(UiKit.COLOR_ENCOUNTER)
+		var box: VBoxContainer = VBoxContainer.new()
+		card.add_child(box)
+		box.add_child(UiKit.wrapped(way.display_name, 20))
+		box.add_child(UiKit.wrapped(way.description, 15))
+		box.add_child(UiKit.button("Scegli questa via", _on_choose_way.bind(i)))
+		_action_box.add_child(card)
+
+
+func _on_choose_way(index: int) -> void:
+	_act(run.choose_way(index))
 
 
 ## Seconda scelta di un'offerta (quale bonus, quale truppa, quale malus).

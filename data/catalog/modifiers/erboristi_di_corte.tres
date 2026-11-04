@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_34eor"]
+
+[resource]
+script = ExtResource("1_34eor")
+id = &"erboristi_di_corte"
+display_name = "Erboristi di corte"
+description = "Cura +1 per chi cura."
+is_malus = false
+effect = 11
+battle_value = 2
+amount = 1
+duration_kind = 2
+stacking = 1

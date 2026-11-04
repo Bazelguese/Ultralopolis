@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_ivbjd"]
+
+[resource]
+script = ExtResource("1_ivbjd")
+id = &"via_fede_sacri"
+display_name = "Via della Fede"
+description = "+1 Fede per fase da ogni edificio Sacro."
+is_malus = false
+effect = 8
+target_tag = &"Sacro"
+resource = 7
+amount = 1
+duration_kind = 2
+stacking = 1

@@ -32,10 +32,19 @@ extends Resource
 ## Colore del mana prodotto: rosso, verde, blu o energetico (GDD §5.3).
 ## Indica anche la famiglia dell'edificio.
 @export var mana_type: StringName = &"energetico"
-## Mana prodotto a ogni intervallo.
+## Mana prodotto a ogni intervallo. Zero = edificio neutro, senza colore (GDD §5.3).
 @export var mana_amount: int = 0
-## Intervallo di produzione in millisecondi. Parte pieno a inizio battaglia.
+## Intervallo di produzione in millisecondi (unico per tutto ciò che produce). Parte pieno.
 @export var mana_interval_ms: int = 1000
+## Scudo, cura e Corruzione all'avversario prodotti a ogni intervallo (GDD §7.6.5).
+@export var shield: int = 0
+@export var heal: int = 0
+@export var corruption: int = 0
+## Inefficienza e Sabotaggio inflitti a ogni intervallo (GDD §7.7).
+@export var inefficiency_ms: int = 0
+@export var inefficiency_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
+@export var sabotage_ms: int = 0
+@export var sabotage_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
 
 @export_group("Spazi concessi")
 ## Spazi edificio aggiunti alla plancia finché l'edificio è costruito (GDD §6.3).

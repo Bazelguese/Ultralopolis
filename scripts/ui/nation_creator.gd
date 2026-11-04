@@ -74,7 +74,7 @@ func _load_editing() -> void:
 
 func _refresh() -> void:
 	UiKit.clear(_columns)
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = IdentityRules.options(_catalog, dimension)
 		if options.is_empty():
 			continue
@@ -129,7 +129,7 @@ func _summary_text() -> String:
 
 func _choices() -> Array[IdentityDef]:
 	var choices: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		if _choice.has(dimension):
 			choices.append(_choice[dimension])
 	choices.append_array(_perks)

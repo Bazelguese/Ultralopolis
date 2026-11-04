@@ -2,7 +2,7 @@
 
 **Versione:** bozza 3 — 4 novembre 2026
 **Riferimento:** Game Design Document v0.16 (`docs/Ultralopolis_GDD.md`)
-**Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Questo catalogo **non è ancora nel gioco**: i file dati (`data/catalog/`) contengono la versione precedente e verranno aggiornati quando si deciderà di implementarlo.
+**Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
 
 Il GDD resta la fonte di verità per le regole. Questo documento contiene solo **contenuti**; dove un contenuto richiederebbe una regola nuova è segnalato in §7.
 
