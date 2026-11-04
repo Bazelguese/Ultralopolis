@@ -18,6 +18,7 @@ var _riga: Label
 var _malus: Label
 var _fame: Label
 var _stato: Label
+var _dimensione_stato: int = 8
 
 # Misure calcolate in base alla grandezza della carta.
 var _bordo: float = 6.0
@@ -49,6 +50,7 @@ func imposta_stato(testo: String, colore: Color) -> void:
 	colore_stato = colore
 	_stato.text = testo
 	_stato.visible = testo != ""
+	_adatta_riquadro(_stato, StileVisivo.FONT_NUMERI, _dimensione_stato, _area_basso.size)
 	var chiaro: bool = colore.get_luminance() > 0.55
 	_stato.add_theme_color_override("font_color", StileVisivo.NOTTE if chiaro else Color.WHITE)
 	_stato.add_theme_constant_override("outline_size", 0 if chiaro else 6)
@@ -70,8 +72,10 @@ func _calcola_misure() -> void:
 	_area_arte = Rect2(margine, margine, size.x - margine * 2.0, altezza_arte)
 	var altezza_nome: float = size.y * 0.14
 	_area_nome = Rect2(_bordo, _area_arte.end.y + lato * 0.02, size.x - _bordo * 2.0, altezza_nome)
-	var inizio_basso: float = _area_nome.end.y + lato * 0.03
-	_area_basso = Rect2(margine, inizio_basso, size.x - margine * 2.0, size.y - _bordo - lato * 0.04 - inizio_basso)
+	# Le pastiglie restano ben dentro la cornice anche viste piccole e in prospettiva.
+	var inizio_basso: float = _area_nome.end.y + lato * 0.04
+	var rientro: float = margine + lato * 0.025
+	_area_basso = Rect2(rientro, inizio_basso, size.x - rientro * 2.0, size.y - _bordo - lato * 0.075 - inizio_basso)
 	_pastiglie.clear()
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var meta: float = (_area_basso.size.x - lato * 0.04) * 0.5
@@ -201,7 +205,7 @@ func _pastiglia(area: Rect2, colore: Color, icona: String) -> void:
 	fondo.border_color = colore.lightened(0.25)
 	fondo.border_width_top = 2
 	_sopra.draw_style_box(fondo, area)
-	var lato_icona: float = area.size.y * 0.62
+	var lato_icona: float = area.size.y * 0.54
 	var centro: Vector2 = Vector2(area.position.x + area.size.y * 0.5, area.get_center().y)
 	match icona:
 		"spada":
@@ -306,6 +310,7 @@ func _crea_scritte() -> void:
 	_nome.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_nome.clip_text = true
 	_nome.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_adatta(_nome, StileVisivo.FONT_TITOLI, int(_area_nome.size.y * 0.62), _area_nome.size.x - lato * 0.06)
 	add_child(_nome)
 
 	var testi: Array[String] = []
@@ -320,6 +325,7 @@ func _crea_scritte() -> void:
 		var testo: Label = _etichetta(testi[i], StileVisivo.FONT_TITOLI, int(area.size.y * 0.62), Color.WHITE, 6)
 		testo.position = area.position + Vector2(area.size.y * 0.85, 0.0)
 		testo.size = Vector2(area.size.x - area.size.y * 0.95, area.size.y)
+		_adatta(testo, StileVisivo.FONT_TITOLI, int(area.size.y * 0.62), testo.size.x - 6.0)
 		testo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		testo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		add_child(testo)
@@ -331,9 +337,11 @@ func _crea_scritte() -> void:
 		_riga.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_riga.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_riga.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_adatta_riquadro(_riga, StileVisivo.FONT_NUMERI, int(_area_basso.size.y * 0.42), _area_basso.size)
 		add_child(_riga)
 
 	_malus = _etichetta(scheda.malus.to_upper(), StileVisivo.FONT_TITOLI, int(lato * 0.075), Color.WHITE, 0)
+	_adatta(_malus, StileVisivo.FONT_TITOLI, int(lato * 0.075), size.x - 24.0 - _bordo * 2.0)
 	_malus.position = Vector2(size.x * 0.5, _area_arte.end.y - lato * 0.11)
 	_malus.reset_size()
 	_malus.position.x -= _malus.size.x * 0.5
@@ -347,7 +355,8 @@ func _crea_scritte() -> void:
 	_fame.visible = scheda.affamata
 	add_child(_fame)
 
-	_stato = _etichetta("", StileVisivo.FONT_NUMERI, int(_area_basso.size.y * 0.36), Color.WHITE, 6)
+	_dimensione_stato = int(_area_basso.size.y * 0.36)
+	_stato = _etichetta("", StileVisivo.FONT_NUMERI, _dimensione_stato, Color.WHITE, 6)
 	_stato.position = _area_basso.position
 	_stato.size = _area_basso.size
 	_stato.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -364,3 +373,26 @@ func _etichetta(testo: String, font: Font, dimensione: int, colore: Color, conto
 		risultato.add_theme_constant_override("outline_size", contorno)
 		risultato.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
 	return risultato
+
+
+## Riduce il carattere finché il testo sta su una riga larga al massimo "larghezza".
+func _adatta(etichetta: Label, font: Font, dimensione: int, larghezza: float) -> void:
+	var misura: int = maxi(dimensione, 8)
+	while misura > 8 and font.get_string_size(etichetta.text, HORIZONTAL_ALIGNMENT_LEFT, -1, misura).x > larghezza:
+		misura -= 1
+	etichetta.add_theme_font_size_override("font_size", misura)
+
+
+## Come _adatta, per i testi che vanno a capo: devono stare dentro il riquadro "area".
+func _adatta_riquadro(etichetta: Label, font: Font, dimensione: int, area: Vector2) -> void:
+	var misura: int = maxi(dimensione, 8)
+	var larghezza: float = area.x - 10.0
+	while misura > 8 and font.get_multiline_string_size(etichetta.text, HORIZONTAL_ALIGNMENT_CENTER, larghezza, misura).y > area.y * 0.92:
+		misura -= 1
+	etichetta.add_theme_font_size_override("font_size", misura)
+
+
+## Le offerte restano sul tavolo: quando cambia solo se si possono pagare, si aggiorna il velo.
+func imposta_disponibile(disponibile: bool) -> void:
+	scheda.disponibile = disponibile
+	_sopra.queue_redraw()

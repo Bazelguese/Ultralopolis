@@ -153,6 +153,16 @@ func _aggiorna_alone() -> void:
 	_materiale_alone.albedo_color = colore
 
 
+## La stessa carta con dati aggiornati (es. ora si può pagare): niente ricostruzione,
+## si ridisegna la faccia solo se cambia la disponibilità.
+func aggiorna_scheda(nuova: SchedaCarta) -> void:
+	var cambiata: bool = nuova.disponibile != _faccia.scheda.disponibile
+	scheda = nuova
+	if cambiata:
+		_faccia.imposta_disponibile(nuova.disponibile)
+		_ridisegna()
+
+
 ## frazione: 0 = appena attivata, 1 = pronta.
 func imposta_ricarica(frazione: float) -> void:
 	var resto: float = clampf(1.0 - frazione, 0.0, 1.0)
