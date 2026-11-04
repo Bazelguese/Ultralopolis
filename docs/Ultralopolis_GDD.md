@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.20
+## Game Design Document — v0.21
 
 **Data:** 4 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -94,14 +94,23 @@ Ogni partita è una nuova storia di una civiltà. “Campagna” descrive eventu
 
 Gli elementi posseduti e le conseguenze persistono all’interno della run. Progressione permanente fra run, sblocchi di account o ricompense collezionabili non sono definiti.
 
-### 3.2 Anni e scontri — Confermato
+### 3.2 Anni e scontri — Confermato (struttura dei round v0.21)
 
-La run è divisa in anni. Ogni anno contiene due macrofasi:
+La run è divisa in anni. Ogni anno ha due metà separate dall’incontro del mondo e si chiude con uno scontro contro un fantasma:
 
-1. **Produzione**: sviluppo dell’economia e della nazione.
-2. **Preparazione**: organizzazione della forza militare per lo scontro.
+1. **Prima metà (Produzione)**: 5 round di scelte.
+2. **Scontro di mezzo**: l’incontro del mondo (§3.3).
+3. **Seconda metà (Preparazione)**: 5 round di scelte.
+4. **Scontro automatico contro un fantasma**, seguito dall’esito e dalle eventuali conseguenze.
 
-Ogni macrofase contiene più momenti di scelta fra opportunità alternative. L’anno si conclude con uno **scontro automatico contro un fantasma**, seguito dall’esito e dalle eventuali conseguenze. È previsto uno scontro contro un fantasma alla fine di ogni anno.
+In ogni round il giocatore ascolta uno dei consiglieri della nazione (§4.2). Edifici e truppe si ottengono in **entrambe le metà**: la divisione fra una fase di sola costruzione e una di sola disposizione non vale più.
+
+| Regola | Stato |
+|---|---|
+| 5 round, scontro di mezzo, 5 round, scontro con il fantasma | Confermato (v0.21) |
+| Edifici e truppe disponibili in entrambe le metà | Confermato (v0.21) |
+| La produzione resta all’inizio delle due metà (§5.2); l’economia non cambia | Confermato (v0.21) |
+| Le due metà mantengono i nomi Produzione e Preparazione | Proposta: i nomi vanno rivisti, ora che le metà non si distinguono per contenuto |
 
 La durata in minuti della run non è ancora fissata.
 
@@ -123,6 +132,7 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | Conseguenza della sconfitta: l’**Oro del Magazzino viene dimezzato** (arrotondato per difetto); **nessuna perdita di Prestigio** | Confermato; entità da tarare nel playtest |
 | Una sconfitta durante l’ultima possibilità **termina la run** | Confermato |
 | Ricompense per la vittoria: edifici, truppe, perk o risorse. Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (i perk entrano quando esisteranno, §9) |
+| Una vittoria (anche un pareggio) dà inoltre un **bottino fisso** di Oro e Ricerca, più alto per gli incontri più difficili | Confermato (v0.21); valori placeholder (§16.3) |
 | Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
 | Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17); regole di crescita placeholder (§16.3) |
 
@@ -132,7 +142,7 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 |---|---|
 | Vittorie necessarie | 10 scontri contro fantasmi vinti, anche non consecutivi. |
 | Prestigio iniziale | 20. |
-| Vittoria annuale | Aggiunge una vittoria al totale della run. |
+| Vittoria annuale | Aggiunge una vittoria al totale della run e dà un **bottino fisso** di Oro e Ricerca (Confermato v0.21; valori placeholder, §16.3). |
 | Sconfitta annuale | Fa perdere Prestigio pari al numero dell’anno corrente. |
 | Primo esaurimento del Prestigio | Attiva l’ultima possibilità; la run continua. |
 | Sconfitta durante l’ultima possibilità | Termina la run. |
@@ -156,55 +166,86 @@ Non sono previste per ora regole per recuperare Prestigio o ricompense speciali 
 | Nuovo anno | Conservazione della nazione, del Magazzino e dei modificatori attivi; aggiornamento delle durate. |
 | Selezione del fantasma | L’avversario dell’anno viene fissato. |
 | Inizio Produzione | Tutti gli edifici già costruiti producono le rispettive risorse. |
-| Scelte di Produzione | Opportunità di costruzione e sviluppo. |
+| Round 1–5 | In ogni round si sceglie un consigliere e una sua proposta (§4.2). |
 | Incontro del mondo | Scelta fra 3 incontri e scontro automatico contro una plancia generata (§3.3). |
 | Inizio Preparazione | Tutti gli edifici già costruiti producono di nuovo. |
-| Scelte di Preparazione | Reclutamento, organizzazione della plancia e, in futuro, spionaggio e operazioni militari. |
+| Round 6–10 | Come nella prima metà; lo spionaggio (§12) agisce sul fantasma già fissato. |
 | Combattimento contro il fantasma | Produzione di mana e attivazione automatica delle truppe. |
-| Esito | Vittoria o sconfitta, aggiornamento della run ed eventuali conseguenze. |
+| Esito | Vittoria o sconfitta, bottino, aggiornamento della run ed eventuali conseguenze. |
 
-Il fantasma va fissato **prima delle opportunità di spionaggio** e non cambia dopo che il giocatore ha investito per ottenere informazioni su di esso — Confermato.
+Il fantasma va fissato **prima dei round** (e quindi delle proposte di spionaggio) e non cambia dopo che il giocatore ha investito per ottenere informazioni su di esso — Confermato.
 
-### 4.2 Scelte alternative — Confermato nella struttura
+### 4.2 Il Consiglio — Confermato nella struttura (v0.21)
 
-Le macrofasi non rappresentano un unico acquisto: contengono più occasioni nelle quali il giocatore sceglie che cosa fare, rinunciando alle alternative per quel momento. Mercanti, costruttori, studiosi, assemblee, ambasciate e reclutatori sono esempi di opportunità, non un catalogo definitivo.
+Al posto dei mercanti di The Bazaar la nazione ha un **Consiglio**: consiglieri di tipo diverso (economico, agricolo, costruttore, comandante, spionaggio…). Ogni consigliere ha un proprio pool di proposte: **azioni** (tutto ciò che non è l’acquisto di un elemento) ed **edifici e truppe a lui affini**. Il Consiglio dà una direzione al giocatore: prima sceglie a chi dare ascolto, poi che cosa fare.
 
-La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogni opportunità interna.
+La produzione di risorse avviene all’inizio delle **due metà**, non a ogni round (§5.2).
 
 | Regola | Stato |
 |---|---|
-| **2 opportunità** per macrofase (come le due scelte prima e le due dopo lo scontro con i mostri in The Bazaar) | Confermato |
-| Ogni opportunità mostra **3 alternative** | Confermato |
-| Ogni alternativa è un **singolo acquisto o una singola scelta**: prenderne una chiude l’opportunità. Alcune alternative chiedono una seconda scelta interna (quale bonus, quale truppa, quale malus) | Confermato |
-| In ogni fase **la prima opportunità è dedicata agli elementi**: in Produzione 3 edifici diversi, in Preparazione 3 truppe diverse, dell’era corrente (esclusivi compresi) | Confermato (v0.20) |
-| Nell’altra opportunità le 3 alternative sono **tipi di opportunità diversi**, pescati a caso con la stessa probabilità; per costruttori e reclutatori si pesca poi l’edificio o la truppa dell’era corrente | Confermato |
-| Le azioni che non sono acquisti di elementi o di spazi **non costano Oro**, ma altre risorse coerenti con il tema | Confermato (v0.20); valori placeholder |
-| Produzione è la fase di **costruzione** (offerte di edifici); Preparazione è la fase di **disposizione** (offerte di truppe) | Confermato |
-| Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
-| Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
-| Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo e continua a crescere fra un’opportunità e l’altra | Confermato; valori placeholder |
-| Il rinnovo costa **sempre almeno 1 Oro**, anche con i bonus che lo riducono | Confermato (v0.20) |
-| A ogni nuova opportunità si dimezza l’**aumento accumulato** del costo di rinnovo (arrotondato per difetto); il costo non scende mai sotto quello iniziale. Esempio: costo iniziale 1, +1 a rinnovo; dopo 4 rinnovi il costo è 5 (aumento +4); all’opportunità successiva l’aumento diventa +2 e il costo 3 | Confermato |
+| In ogni round compaiono **3 consiglieri** pescati a caso, diversi fra loro | Confermato |
+| Il giocatore ne sceglie **uno**; la scelta è definitiva per il round | Confermato |
+| Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato |
+| Ogni round ha un **tipo**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
+| In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tipo è visibile prima di scegliere il consigliere | Proposta |
+| Un consigliere che non ha niente da proporre per il tipo del round non viene pescato in quel round | Proposta |
+| Si può **passare**: senza scegliere un consigliere, oppure dopo averlo scelto senza prendere nulla. Passare non dà nulla | Passare: Confermato; dopo la scelta del consigliere: Proposta |
+| Il **rinnovo** a pagamento ripesca le proposte del consigliere scelto | Proposta |
+| Il rinnovo costa Oro, almeno 1; il costo aumenta a ogni rinnovo e a ogni nuovo round si dimezza l’aumento accumulato (arrotondato per difetto), senza scendere sotto il costo iniziale | Confermato |
+| Le azioni **non costano Oro**, ma altre risorse coerenti con il tema; edifici, truppe e spazi si pagano in Oro | Confermato (v0.20) |
+| L’**identità** della nazione (popolo, governo, credo, cultura, vie) rende più frequenti alcuni consiglieri, già nel prototipo | Confermato |
+| Gli edifici e le truppe proposti sono dell’era corrente, esclusivi delle vie compresi | Confermato |
+| Una proposta che in quel momento non ha senso non compare (es. accorciare un malus senza malus attivi, spazi oltre il massimo) | Confermato |
 
-**Tipi di opportunità del prototipo — provvisori** (valori placeholder):
+#### 4.2.1 Livelli dei consiglieri — Confermato (v0.21)
 
-| Fase | Opportunità | Effetto |
-|---|---|---|
-| Produzione | Costruttori | Costruisci un edificio. |
-| Produzione | Architetti | Compri uno spazio edificio. |
-| Produzione | Studiosi | Paghi Legno, ottieni subito Ricerca. |
-| Produzione | Esattori | Ottieni subito Oro. |
-| Produzione | Mercante | Scambi Ricerca con Oro. |
-| Produzione | Assemblea | Per un anno, a scelta: +50% Oro oppure +50% Ricerca. |
-| Preparazione | Reclutatori | Recluti una truppa. |
-| Preparazione | Quartiermastro | Compri uno spazio truppa. |
-| Preparazione | Addestramento | Paghi Ferro: per un anno, una truppa a scelta ha la ricarica più corta. |
-| Preparazione | Fortificazioni | Paghi Pietra: Resistenza in più nel prossimo scontro con il fantasma (bersaglio Resistenza, §8.2). |
-| Preparazione | Ambasciata | Paghi Influenza: accorcia di un anno un malus attivo a scelta; se si azzera, sparisce (rimozione anticipata, §13.2). |
+I consiglieri hanno **3 livelli**, legati all’**era**: Funzionari, Ministri e Gran Consiglieri (nomi placeholder). Un livello più alto ha un pool più ricco e proposte più forti.
 
-Un tipo che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, Addestramento senza truppe, spazi oltre il massimo).
+- **Proposta:** il livello è quello dell’era corrente; entrando in una nuova era tutto il Consiglio sale di livello.
+- **Da definire con il bilanciamento:** se le proposte migliori costano di più o lo stesso.
 
-**Da definire:** catalogo definitivo delle opportunità, frequenza degli eventi.
+#### 4.2.2 Consiglieri speciali — Confermato (v0.21)
+
+- **Clown:** propone **4 elementi**, edifici e truppe mescolati, ciascuno con un mana diverso. Proposta: i quattro mana sono rosso, verde, blu e neutro (un edificio neutro).
+- **Anziano:** propone **perk** ed **elementi neutrali**. Proposta: gli elementi neutrali sono gli edifici neutri, perché non esistono truppe neutre.
+- **Proposta:** Clown e Anziano ignorano il tipo del round.
+
+#### 4.2.3 Consiglio del prototipo — Proposta
+
+Nomi, pool e costi placeholder. Le azioni riprendono le opportunità del prototipo precedente. L’affinità di un elemento si legge dalle sue etichette (§6.6), con eccezioni per singoli elementi nei dati.
+
+| Consigliere | Azioni | Elementi affini | Paga le azioni con |
+|---|---|---|---|
+| Tesoriere (economico) | Esattori: Oro subito · Mercante: Ricerca in Oro · Assemblea: +50% Oro o Ricerca per un anno | edifici Commerciali | Ricerca, Influenza |
+| Fattore (agricolo) | Scorte: Cibo e Fauna in cambio di Legno · Razioni: per un anno le truppe mangiano meno | edifici Agricoli e Fauna; truppe Cavalleria | Legno, Fauna |
+| Architetto (costruttore) | Architetti: spazio edificio · Potenzia un edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | edifici Estrattivi e Difensivi; truppe Assedio | Pietra, Legno (lo spazio in Oro) |
+| Generale (comandante) | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno · Potenzia una truppa | edifici Militari; truppe Fanteria e Tiratori | Ferro (lo spazio in Oro) |
+| Studioso | Studiosi: Legno in Ricerca | edifici del Sapere | Legno |
+| Sacerdote | Incanta una truppa (§4.3), un’azione per ogni effetto | edifici e truppe Sacri | Fede |
+| Diplomatico | Ambasciata: accorcia un malus attivo | Consolato, Sobillatori | Influenza |
+| Maestro delle spie | Sabotaggio o rallentamento del fantasma (§12) | elementi che rallentano o sabotano | Influenza |
+| Clown | — | 4 elementi di mana diverso | — |
+| Anziano | Un perk (§9.3) | edifici neutri | Fede e Influenza |
+
+Un tipo di proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
+
+**Da definire:** catalogo definitivo del Consiglio e dei pool, frequenza dei consiglieri, eventi.
+
+### 4.3 Incanto — Confermato (v0.21), valori placeholder
+
+Il Sacerdote può **incantare** una truppa: le aggiunge un effetto in battaglia e un costo di mana.
+
+| Regola | Stato |
+|---|---|
+| Effetti possibili: quelli esistenti, cioè danno, scudo, cura, Corruzione e rallentamento (§7.6, §7.7) | Confermato |
+| Solo le truppe si possono incantare, non gli edifici | Confermato |
+| Una truppa che non usava mana, dopo l’incanto ne richiede | Confermato |
+| Ogni truppa si può incantare **una sola volta** | Confermato |
+| Il mana richiesto è del colore della truppa; se la truppa non usava mana, è del colore dell’incanto. Costo in più: 2 mana | Proposta |
+| Valore dell’effetto: circa metà del danno di una truppa dell’era; cresce con i potenziamenti come gli altri valori (§6.5) | Proposta |
+| L’incanto resta sulla truppa per tutta la run e si perde se la truppa viene venduta o sostituita | Proposta |
+
+Nel linguaggio degli effetti (§8) un incanto è un modificatore permanente sulla truppa, con l’incanto come origine. A differenza delle aggiunte fisse dei modificatori, che valgono solo per chi ha già quel valore (§16.3), l’incanto **aggiunge un effetto che la truppa non aveva**.
 
 ## 5. Economia
 
@@ -245,7 +286,7 @@ Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; l
 - Un edificio può produrre più risorse a ogni fase.
 - I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
 
-**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare l’opportunità. Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
+**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
 
 **Mana — Confermato.** Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia. Mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
 
@@ -305,7 +346,7 @@ Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) r
 
 - l’**ingresso nelle ere**: ogni era indica nei dati quanti spazi edificio e truppa concede (§10);
 - **edifici che concedono spazi**, ad esempio una caserma che aggiunge spazi truppa;
-- l’**acquisto di spazi con l’Oro**, come opportunità (Architetti, Quartiermastro, §4.2).
+- l’**acquisto di spazi con l’Oro**, come proposte dell’Architetto e del Generale (§4.2.3).
 
 Un edificio che concede spazi occupa a sua volta uno spazio edificio, quindi entra nella stessa scelta della doppia funzione.
 
@@ -331,7 +372,7 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
 
 - Ogni edificio e ogni truppa ha dei **livelli** (3 livelli).
 - Il costo di ogni livello è scritto nei dati dell’elemento e usa le risorse della sua famiglia (es. Ferro per le truppe, Legno o Pietra per gli edifici, Fauna per la cavalleria).
-- La maggior parte dei potenziamenti si fa **in qualunque momento fuori dal combattimento** e non consuma opportunità; alcuni potenziamenti speciali arrivano da eventi o opportunità.
+- La maggior parte dei potenziamenti si fa **in qualunque momento fuori dal combattimento** e non consuma il round; alcuni potenziamenti arrivano anche da eventi o dalle proposte del Consiglio (§4.2.3).
 - Effetti: ogni livello aumenta **tutti i valori d’effetto** dell’elemento (danno, scudo, cura, Corruzione, danno agli scudi, durate di Inefficienza e Sabotaggio); gli edifici producono anche più risorse per fase (valori placeholder, §16.3) — Confermato (v0.16).
 
 ### 6.6 Etichette — Confermato
@@ -499,6 +540,7 @@ Due effetti che agiscono sui **timer** degli elementi avversari (ricarica delle 
 - Su un edificio, rallentare o bloccare il timer rallenta o ferma **tutto ciò che produce** (mana, scudo, cura, Corruzione), perché l’edificio ha un unico intervallo (§7.4).
 - Se non esiste un bersaglio valido nella categoria, l’effetto va perso.
 - Un modificatore può far partire uno scontro con un elemento già rallentato o sabotato (§8.2).
+- **Confermato (v0.21):** lo spionaggio prima dello scontro (§12) sceglie il bersaglio con il criterio scritto nella proposta: a caso, l’elemento a un’estremità della fila (il più a destra, che agisce per primo, o il più a sinistra), il più lento o il più veloce. Per una truppa conta la ricarica, per un edificio l’intervallo; a parità decide la posizione più a destra.
 
 #### 7.7.2 Scelta del bersaglio: a caso, a rotazione
 
@@ -556,7 +598,7 @@ Primo catalogo di malus del prototipo (valori placeholder):
 | Inefficienza | Un edificio produce mana più lentamente in battaglia: la versione di run, per tutta la battaglia, dell’effetto di §7.7. |
 | Truppa provata | Una truppa ha la ricarica più lunga in battaglia. |
 | Mercati diffidenti | Rinnovare le offerte costa di più. |
-| Mercanti in fuga | Ogni opportunità mostra un’alternativa in meno. |
+| Mercanti in fuga | Ogni consigliere mostra una proposta in meno (prima del Consiglio: un’alternativa in meno per opportunità). |
 
 ### 8.3 Famiglie di effetti
 
@@ -606,7 +648,7 @@ Popoli, governi, credi, culture e perk usano la stessa scheda. Ogni elemento pu�
 
 - dare una **quota di Resistenza** (§7.1.1);
 - cambiare la **dotazione iniziale** (Oro, Ricerca, edifici, truppe);
-- rendere alcune **opportunità esclusive o più frequenti** (§4.2);
+- rendere alcuni **consiglieri o proposte esclusivi o più frequenti** (§4.2);
 - concedere **edifici o truppe esclusivi**;
 - dare un **tratto permanente**, cioè un modificatore che dura tutta la run (§8).
 
@@ -614,7 +656,7 @@ Altri effetti verranno aggiunti man mano che le meccaniche si ampliano.
 
 ### 9.3 Perk — Confermato
 
-I perk funzionano come le abilità di The Bazaar: bonus passivi. Alcuni si scelgono alla creazione della nazione, altri si ottengono durante la run (per ora come ricompense degli incontri del mondo, §3.3). Numero dei perk iniziali: placeholder (§16.3).
+I perk funzionano come le abilità di The Bazaar: bonus passivi. Alcuni si scelgono alla creazione della nazione, altri si ottengono durante la run: come ricompense degli incontri del mondo (§3.3) e dall’Anziano del Consiglio (§4.2.2, v0.21). Numero dei perk iniziali: placeholder (§16.3).
 
 Catalogo del prototipo (placeholder): 3 popoli (Montanari, Popolo del delta, Popolo delle foreste), 3 governi (Monarchia, Repubblica, Teocrazia), 3 credi (Culto del Sole, Antichi spiriti, Ordine della Ragione), 3 culture (guerriera, mercantile, erudita), 6 perk.
 
@@ -654,7 +696,7 @@ La struttura è **lineare**: ere in sequenza, senza albero tecnologico. La scelt
 
 ### 10.3 Regole del passaggio — Confermato
 
-L’avanzamento si può pagare in entrambe le macrofasi e non consuma un’opportunità. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+L’avanzamento si può pagare in entrambe le metà dell’anno e non consuma il round. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
 
 ### 10.4 Le vie — Confermato (v0.15)
 
@@ -712,13 +754,22 @@ Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordin
 
 **Da definire:** momento di pubblicazione della copia, backend, autenticazione, criteri di selezione, gestione delle versioni, controlli contro dati non validi.
 
-## 12. Spionaggio e sabotaggio — Direzione
+## 12. Spionaggio e sabotaggio — Confermato nella forma (v0.21), valori placeholder
 
-Ottenere informazioni sull’avversario prima dello scontro e poter intervenire su minacce specifiche. L’esempio iniziale: una statistica di spionaggio che permette di scoprire un oggetto bellico forte e sabotarlo, impedendone o ritardandone l’attivazione.
+Ottenere informazioni sull’avversario prima dello scontro e poter intervenire su minacce specifiche. Lo spionaggio usa il fantasma già selezionato (§11.2). Il sabotaggio si esprime con la famiglia Disattivazione (§8.3) e con gli effetti di battaglia di §7.7.
 
-Lo spionaggio appartiene soprattutto alla Preparazione e usa il fantasma già selezionato. Raccogliere informazioni e sabotare sono azioni distinte; il loro rapporto resta da progettare. Il sabotaggio si esprime con la famiglia Disattivazione (§8.3): l’effetto in battaglia è definito in §7.7, mentre il modo di applicarlo prima dello scontro resta Direzione.
+| Regola | Stato |
+|---|---|
+| Lo spionaggio passa per il **Maestro delle spie**, uno dei consiglieri (§4.2) | Confermato |
+| Ogni proposta fa partire lo scontro con un elemento nemico **sabotato** o **rallentato** per alcuni secondi | Confermato |
+| Il bersaglio dipende dalla proposta: **a caso**, a un’**estremità** della fila, il **più lento** o il **più veloce** (§7.7.1) | Confermato |
+| Il Maestro delle spie propone anche edifici e truppe che rallentano o sabotano | Confermato |
+| Vale per lo scontro con il fantasma dell’anno, anche se comprato nella prima metà | Proposta |
+| Durate: 5 s di Sabotaggio, 10 s di Inefficienza; si paga in Influenza | Proposta (placeholder) |
+| Una proposta indica se colpisce truppe, edifici o qualsiasi elemento | Proposta |
+| Il fantasma non spia il giocatore: è una registrazione (§11.1) | Proposta |
 
-**Da definire:** formula, probabilità, costi, durata, bersagli consentiti, contromisure. Ritardare un produttore di mana è un’interazione coerente con il sistema, non una regola approvata.
+**Da definire:** informazioni visibili sulla plancia del fantasma, una statistica di spionaggio, contromisure.
 
 ## 13. Eventi e conseguenze
 
@@ -824,7 +875,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Due macrofasi con raccolta automatica all’ingresso e 2 opportunità ciascuna, da 3 alternative.
+- Due macrofasi con raccolta automatica all’ingresso e 2 opportunità ciascuna, da 3 alternative. In sviluppo (v0.21): 5 round per metà con il Consiglio (§4.2).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
 - Riordino delle truppe fuori dal combattimento.
@@ -880,7 +931,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Fantasmi e incontri scritti a mano per gli anni 1–3; dopo vengono generati. Crescita: un’era ogni 4 anni, più edifici e truppe ogni anno, truppe di un livello in più ogni 4 anni (file dati del generatore) | Placeholder. |
 | Quantità di spazi concessi da ere, edifici e acquisti, e loro prezzi | Placeholder (le tre fonti sono confermate, §6.3). |
 | Pescata delle 3 vie: peso base 1, +1 per ogni elemento dell’identità o via già scelta che la favorisce; se il pool ha meno di 3 vie valide, si mostrano tutte | Provvisoria, come per le opportunità. |
-| Entrando in una nuova era, le alternative dell’opportunità in corso vengono ripescate gratis dalla nuova era | Accettata dal creatore. |
+| Entrando in una nuova era, le proposte del round in corso vengono ripescate gratis dalla nuova era (prima del Consiglio: le alternative dell’opportunità) | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
 | Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
 | Senza regole di generazione nei dati, se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
@@ -900,10 +951,11 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se l’elemento colpito viene venduto o sostituito, il malus finisce | Provvisoria. |
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
-| Almeno 1 alternativa per opportunità | Provvisoria. |
+| Almeno 1 proposta per consigliere (prima del Consiglio: 1 alternativa per opportunità) | Provvisoria. |
 | Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Influenza; Processione 2 Fede. Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
-| Un’opportunità favorita da un elemento dell’identità ha peso +1 per ogni elemento che la favorisce (peso base 1) | Provvisoria. |
+| Bottino dei nemici sconfitti: fantasma 3 Oro e 2 Ricerca; incontri facile 2 Oro e 1 Ricerca, media 3 e 2, difficile 4 e 3 | Placeholder (v0.21). |
+| Un consigliere o una proposta favoriti da un elemento dell’identità hanno peso +1 per ogni elemento che li favorisce (peso base 1) | Provvisoria (estesa ai consiglieri, v0.21). |
 | Edifici e truppe della dotazione dell’identità entrano solo se c’è spazio, e come la dotazione iniziale non rimborsano nulla | Provvisoria. |
 | I tratti permanenti non si possono accorciare con l’Ambasciata | Provvisoria. |
 | Un perk già posseduto non si può prendere di nuovo come ricompensa | Provvisoria. |
@@ -961,7 +1013,7 @@ Criteri di accettazione proposti per il prototipo:
 | Rallentato e sabotato insieme | Il blocco prevale; le durate di entrambi scorrono. |
 | Resistenza | Somma di era, identità, anni, edifici e truppe all’inizio dello scontro. |
 | Vendita | Rimborso pari a metà del prezzo pagato, arrotondato per difetto. |
-| Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo e si dimezza a ogni nuova opportunità. |
+| Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo e l’aumento si dimezza a ogni nuovo round. |
 | Avvio di un nuovo combattimento | Resistenza ripristinata; mana secondo la convenzione scelta. |
 | Sconfitta nell’anno N | Perdita di N Prestigio, salvo ultima possibilità già attiva. |
 | Prima discesa a zero Prestigio | Run ancora attiva in ultima possibilità. |
@@ -973,8 +1025,13 @@ Criteri di accettazione proposti per il prototipo:
 | Sconfitta o pareggio contro un fantasma | Si applicano i suoi malus, con il suo nome come origine. |
 | Scontro contro plancia generata | Stessa simulazione e stesse regole dello scontro contro un fantasma. |
 | Sconfitta contro un incontro del mondo | Oro del Magazzino dimezzato (per difetto); Prestigio e vittorie invariati; durante l’ultima possibilità la run termina. |
-| Vittoria contro un incontro del mondo | Il giocatore può scegliere una ricompensa dal pool dell’incontro, oppure nessuna. |
-| Spionaggio (futuro) | Informazione relativa alla copia effettivamente affrontata. |
+| Vittoria contro un incontro del mondo | Bottino fisso di Oro e Ricerca; poi il giocatore può scegliere una ricompensa dal pool dell’incontro, oppure nessuna. |
+| Vittoria o pareggio contro il fantasma | Bottino fisso di Oro e Ricerca; nessun bottino in caso di sconfitta. |
+| Anno | 5 round, incontro del mondo, 5 round, fantasma; produzione solo all’inizio delle due metà. |
+| Round | 3 consiglieri diversi; scelto uno, 3 proposte (4 dal Clown), se ne prende una sola o si passa. |
+| Tipo del round | Un round Edifici propone solo edifici, Truppe solo truppe, Azioni solo azioni; Clown e Anziano fanno eccezione. |
+| Incanto | Una sola volta per truppa; aggiunge l’effetto e il costo di mana, anche a una truppa che non usava mana. |
+| Spionaggio | Lo scontro con il fantasma parte con l’elemento scelto dal criterio della proposta già sabotato o rallentato; con lo stesso seme è sempre lo stesso. |
 
 Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il motivo di una mancata attivazione è leggibile? Investire in Ricerca è un’alternativa credibile? Le due fasi offrono decisioni diverse? L’economia può riprendersi dopo una sconfitta? Un malus fa cambiare piano o si limita a pesare?
 
@@ -986,7 +1043,8 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di ampliare la plancia | Quantità e prezzi degli spazi (§6.3); layout. |
 | Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
-| Per lo spionaggio | Informazioni visibili, costi, bersagli, effetti, contromisure. |
+| Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
+| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno. |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
 | Più avanti | Progressione fra run, audio, monetizzazione, stile visivo. |
 
@@ -1023,6 +1081,13 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.21 — 4 novembre 2026** (dopo le partite di Davide)
+- L’anno ha 5 round, l’incontro del mondo, altri 5 round e il fantasma; edifici e truppe si ottengono in entrambe le metà (§3.2, §4.1). L’economia non cambia.
+- Il **Consiglio** sostituisce le opportunità: 3 consiglieri a caso per round, se ne sceglie uno, si prende una delle sue 3 proposte; tipi di round, livelli legati all’era, Clown e Anziano (§4.2). Pool del prototipo in Proposta.
+- **Incanto** delle truppe (§4.3).
+- **Spionaggio** con il Maestro delle spie: sabotaggio o rallentamento all’inizio dello scontro con il fantasma, con criterio di bersaglio (§7.7.1, §12).
+- **Bottino** fisso di Oro e Ricerca per i nemici sconfitti (§3.3, §3.4, §16.3); già nel prototipo.
 
 **v0.20 — 4 novembre 2026** (dopo le prime partite di Davide)
 - La prima opportunità di ogni fase offre solo elementi: 3 edifici in Produzione, 3 truppe in Preparazione (§4.2).
