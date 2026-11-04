@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_mmyf0"]
+
+[resource]
+script = ExtResource("1_mmyf0")
+id = &"inefficienza"
+display_name = "Inefficienza"
+description = "Un edificio danneggiato produce mana più lentamente in battaglia."
+effect = 2
+target = 1
+amount = 50

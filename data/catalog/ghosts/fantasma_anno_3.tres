@@ -6,7 +6,9 @@
 [ext_resource type="Resource" path="res://data/catalog/buildings/tempio.tres" id="4_dvitb"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/bottega.tres" id="5_8h7ni"]
 [ext_resource type="Script" path="res://scripts/sim/data/ghost_def.gd" id="6_jal01"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="6_q2ukg"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="7_1qkeg"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/oro_dimezzato.tres" id="7_nwifq"]
 [ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="8_nut7c"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="9_1r0ae"]
 [ext_resource type="Resource" path="res://data/catalog/troops/cavalieri.tres" id="10_lneyy"]
@@ -18,3 +20,4 @@ year = 3
 era = 2
 buildings = Array[ExtResource("1_0lsv0")]([ExtResource("2_q2ukg"), ExtResource("3_nwifq"), ExtResource("4_dvitb"), ExtResource("5_8h7ni")])
 troops = Array[ExtResource("7_1qkeg")]([ExtResource("8_nut7c"), ExtResource("9_1r0ae"), ExtResource("10_lneyy")])
+malus = Array[ExtResource("6_q2ukg")]([ExtResource("7_nwifq")])

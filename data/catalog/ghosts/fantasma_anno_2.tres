@@ -4,8 +4,10 @@
 [ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_h8na3"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/santuario.tres" id="3_has84"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/mercato.tres" id="4_tewop"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="5_has84"]
 [ext_resource type="Script" path="res://scripts/sim/data/ghost_def.gd" id="5_u1opf"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="6_5v8ac"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/inefficienza.tres" id="6_tewop"]
 [ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="7_3onjo"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="8_sphtm"]
 [ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="9_c5gbu"]
@@ -16,3 +18,4 @@ display_name = "Fantasma: Contea di Rocca Bruna"
 year = 2
 buildings = Array[ExtResource("1_wxxeq")]([ExtResource("2_h8na3"), ExtResource("3_has84"), ExtResource("4_tewop")])
 troops = Array[ExtResource("6_5v8ac")]([ExtResource("7_3onjo"), ExtResource("8_sphtm"), ExtResource("9_c5gbu")])
+malus = Array[ExtResource("5_has84")]([ExtResource("6_tewop")])

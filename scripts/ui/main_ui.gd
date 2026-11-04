@@ -17,6 +17,7 @@ var _buildings_row: HBoxContainer
 var _troops_title: Label
 var _troops_row: HBoxContainer
 var _resistance_label: Label
+var _modifiers_box: VBoxContainer
 var _action_box: VBoxContainer
 var _message_label: Label
 var _chronicle: RichTextLabel
@@ -78,6 +79,8 @@ func _build_layout() -> void:
 	board_box.add_child(UiKit.label("La tua plancia", 26))
 	_resistance_label = UiKit.label("", 18)
 	board_box.add_child(_resistance_label)
+	_modifiers_box = VBoxContainer.new()
+	board_box.add_child(_modifiers_box)
 	_buildings_title = UiKit.label("", 20)
 	board_box.add_child(_buildings_title)
 	_buildings_row = _wrapping_row(board_box)
@@ -159,6 +162,12 @@ func _refresh_status() -> void:
 func _refresh_board() -> void:
 	var board: NationBoard = run.board
 	_resistance_label.text = "" if run.is_over() else "Resistenza nel prossimo scontro: %d" % run.player_resistance()
+	UiKit.clear(_modifiers_box)
+	if not run.modifiers.active.is_empty():
+		_modifiers_box.add_child(UiKit.label("Effetti attivi:", 18, UiKit.COLOR_WARNING))
+		for modifier: ActiveModifier in run.modifiers.active:
+			var color: Color = UiKit.COLOR_ERROR if modifier.def.is_malus else Color(0.5, 0.9, 0.5)
+			_modifiers_box.add_child(UiKit.wrapped("• %s\n   %s" % [modifier.describe(), modifier.def.description], 15, color))
 	var replacing_building: bool = _pending_replaces_building()
 	var replacing_troop: bool = _pending_replaces_troop()
 
@@ -170,7 +179,8 @@ func _refresh_board() -> void:
 		var box: VBoxContainer = VBoxContainer.new()
 		card.add_child(box)
 		box.add_child(UiKit.label(piece.building.display_name, 20))
-		box.add_child(UiKit.label(UiKit.building_details(piece.building), 14))
+		box.add_child(UiKit.label(UiKit.building_details(run.effective_building(piece)), 14))
+		_add_piece_modifiers(box, piece)
 		if replacing_building:
 			var can_replace: bool = run.board.can_replace_building(i, _pending_building_def())
 			box.add_child(UiKit.button("Sostituisci" if can_replace else "Concede spazi occupati", _on_replace.bind(i), can_replace))
@@ -190,7 +200,8 @@ func _refresh_board() -> void:
 		var box: VBoxContainer = VBoxContainer.new()
 		card.add_child(box)
 		box.add_child(UiKit.label("%d. %s" % [i + 1, piece.troop.display_name], 20))
-		box.add_child(UiKit.label(UiKit.troop_details(piece.troop), 14))
+		box.add_child(UiKit.label(UiKit.troop_details(run.effective_troop(piece)), 14))
+		_add_piece_modifiers(box, piece)
 		if replacing_troop:
 			box.add_child(UiKit.button("Sostituisci", _on_replace.bind(i)))
 		elif not run.is_over():
@@ -202,6 +213,13 @@ func _refresh_board() -> void:
 		_troops_row.add_child(card)
 	for i: int in range(board.troop_capacity() - board.troops.size()):
 		_troops_row.add_child(_empty_slot())
+
+
+## Segnala sulla carta i malus o bonus che colpiscono proprio quell'elemento.
+func _add_piece_modifiers(box: VBoxContainer, piece: BoardPiece) -> void:
+	for modifier: ActiveModifier in run.modifiers.for_piece(piece):
+		var color: Color = UiKit.COLOR_ERROR if modifier.def.is_malus else Color(0.5, 0.9, 0.5)
+		box.add_child(UiKit.label("⚠ %s" % modifier.def.display_name, 14, color))
 
 
 func _empty_slot() -> Control:
@@ -313,6 +331,8 @@ func _show_ghost() -> void:
 		box.add_child(UiKit.wrapped("Era: %s · Resistenza %d" % [run.era_name(ghost.era), run.ghost_resistance()], 15))
 		box.add_child(UiKit.wrapped("Edifici: %s" % _names_b(ghost.buildings), 15))
 		box.add_child(UiKit.wrapped("Truppe (da sinistra a destra): %s" % _names_t(ghost.troops), 15))
+		for def: ModifierDef in ghost.malus:
+			box.add_child(UiKit.wrapped("Se perdi o pareggi subisci: %s per %d anno/i — %s" % [def.display_name, def.duration_years, def.description], 15, UiKit.COLOR_WARNING))
 		_action_box.add_child(card)
 	_action_box.add_child(UiKit.wrapped("Puoi ancora riordinare o vendere le truppe prima di combattere.\nSe perdi, perdi %d Prestigio." % run.year, 16))
 	_action_box.add_child(UiKit.button("Combatti", _on_fight_ghost))

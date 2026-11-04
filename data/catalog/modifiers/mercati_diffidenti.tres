@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_3lgsx"]
+
+[resource]
+script = ExtResource("1_3lgsx")
+id = &"mercati_diffidenti"
+display_name = "Mercati diffidenti"
+description = "Rinnovare le offerte costa 2 Oro in più."
+effect = 4
+amount = 2

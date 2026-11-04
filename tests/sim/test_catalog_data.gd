@@ -59,6 +59,9 @@ func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
 			if ghost.year == year:
 				ghosts += 1
 		assert_eq(ghosts, 1, "Un fantasma per l'anno %d" % year)
+		for ghost: GhostDef in catalog.ghosts:
+			if ghost.year == year:
+				assert_false(ghost.malus.is_empty(), "Ogni fantasma ha un malus (anno %d)" % year)
 		var encounters: int = 0
 		for encounter: EncounterDef in catalog.encounters:
 			if encounter.year == year:

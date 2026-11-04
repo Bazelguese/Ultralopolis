@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_eb5jy"]
+
+[resource]
+script = ExtResource("1_eb5jy")
+id = &"truppa_provata"
+display_name = "Truppa provata"
+description = "Una truppa stremata ha la ricarica più lunga in battaglia."
+effect = 3
+target = 2
+amount = 50

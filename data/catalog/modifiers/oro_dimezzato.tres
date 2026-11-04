@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_ermxo"]
+
+[resource]
+script = ExtResource("1_ermxo")
+id = &"oro_dimezzato"
+display_name = "Oro dimezzato"
+description = "I commerci sono interrotti: l'Oro prodotto a ogni fase è dimezzato."
+effect = 0
+amount = -50

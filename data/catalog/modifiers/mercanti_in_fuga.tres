@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_3kpsr"]
+
+[resource]
+script = ExtResource("1_3kpsr")
+id = &"mercanti_in_fuga"
+display_name = "Mercanti in fuga"
+description = "Ogni opportunità mostra un'alternativa in meno."
+effect = 5
+amount = -1

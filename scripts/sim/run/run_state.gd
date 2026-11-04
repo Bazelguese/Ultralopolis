@@ -200,6 +200,27 @@ func reward_choices() -> Array[RewardDef]:
 	return won_encounter.rewards
 
 
+## Edificio come entrerà in battaglia, con i modificatori applicati (es. Inefficienza).
+## Se serve restituisce una copia: le schede del catalogo non vengono mai toccate.
+func effective_building(piece: BoardPiece) -> BuildingDef:
+	var change: int = modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA, piece)
+	if change == 0:
+		return piece.building
+	var copy: BuildingDef = piece.building.duplicate() as BuildingDef
+	copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(copy.mana_interval_ms, change))
+	return copy
+
+
+## Truppa come entrerà in battaglia, con i modificatori applicati (es. ricarica più lunga).
+func effective_troop(piece: BoardPiece) -> TroopDef:
+	var change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
+	if change == 0:
+		return piece.troop
+	var copy: TroopDef = piece.troop.duplicate() as TroopDef
+	copy.cooldown_ms = maxi(1, Modifiers.apply_percent(copy.cooldown_ms, change))
+	return copy
+
+
 ## Le due nazioni dell'ultima battaglia: [giocatore, avversario].
 func last_battle_setups() -> Array[BattleSideSetup]:
 	return _last_setups
@@ -442,11 +463,11 @@ func fight_ghost() -> bool:
 
 func _start_year(new_year: int) -> void:
 	year = new_year
-	for message: String in modifiers.on_new_year(year):
-		_log(message)
 	current_ghost = _ghost_for_year(year)
 	encounter_choices = _encounters_for_year(year)
 	_log("— Anno %d —" % year)
+	for message: String in modifiers.on_new_year(year):
+		_log(message)
 	_enter_phase(Phase.PRODUZIONE)
 
 
@@ -615,32 +636,17 @@ func _prune_modifiers() -> void:
 		_log(message)
 
 
-## Edifici come entrano in battaglia: copie con i modificatori applicati (es. Inefficienza).
-## Le schede del catalogo non vengono mai toccate.
 func _battle_buildings() -> Array[BuildingDef]:
 	var defs: Array[BuildingDef] = []
 	for piece: BoardPiece in board.buildings:
-		var change: int = modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA, piece)
-		if change == 0:
-			defs.append(piece.building)
-			continue
-		var copy: BuildingDef = piece.building.duplicate() as BuildingDef
-		copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(copy.mana_interval_ms, change))
-		defs.append(copy)
+		defs.append(effective_building(piece))
 	return defs
 
 
-## Truppe come entrano in battaglia: copie con i modificatori applicati (es. ricarica più lunga).
 func _battle_troops() -> Array[TroopDef]:
 	var defs: Array[TroopDef] = []
 	for piece: BoardPiece in board.troops:
-		var change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
-		if change == 0:
-			defs.append(piece.troop)
-			continue
-		var copy: TroopDef = piece.troop.duplicate() as TroopDef
-		copy.cooldown_ms = maxi(1, Modifiers.apply_percent(copy.cooldown_ms, change))
-		defs.append(copy)
+		defs.append(effective_troop(piece))
 	return defs
 
 
