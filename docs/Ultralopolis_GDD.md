@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.10
+## Game Design Document — v0.11
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.10 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.11 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -447,6 +447,7 @@ Il rapporto fra Corruzione come erosione e Diplomazia come sistema di accordi o 
 | La nazione si crea **come in un GDR**: prima dell’anno 1 il giocatore vede tutte le opzioni e sceglie nome, un popolo, un governo, un credo, una cultura e alcuni perk iniziali; poi la run procede | Confermato |
 | Per ora l’identità resta fissa durante la run; il cambiamento (riforme, conversioni, trasformazioni culturali) arriverà più avanti | Confermato / Direzione |
 | Anche i fantasmi hanno un’identità, che vale per la loro Resistenza e per i loro tratti in battaglia | Confermato |
+| Le nazioni create **restano salvate** sul PC; si possono **modificare** o **eliminare** (con conferma). Da una nazione salvata si possono giocare più run | Confermato |
 
 ### 9.2 Che cosa fa un elemento dell’identità — Confermato, elenco aperto
 
@@ -598,7 +599,16 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 
 **Piattaforma — Confermato:** PC. Una fila fino a 12 truppe e una fino a 10 edifici condizionano comunque inquadratura e layout.
 
-**Confermato:** risoluzione di riferimento 1920×1080; interfaccia in italiano. Il primo prototipo parte con un’**interfaccia semplice e provvisoria** per provare le regole; la plancia 3D arriva in un secondo momento.
+**Confermato:** risoluzione di riferimento 1920×1080; interfaccia in italiano.
+
+**Schermate — Confermato:**
+
+| Schermata | Contenuto |
+|---|---|
+| Menu principale | Gioca, Crea nazione, Esci dal gioco. |
+| Gioca | Se esistono nazioni create, si sceglie con quale giocare; altrimenti si va alla creazione. |
+| Crea nazione | Schermata a parte (§9.1). Creata dal menu, si torna al menu principale. |
+| Partita | Plancia, opportunità, incontri e battaglie; si può tornare al menu o ricominciare con la stessa nazione. | Il primo prototipo parte con un’**interfaccia semplice e provvisoria** per provare le regole; la plancia 3D arriva in un secondo momento.
 
 ---
 
@@ -717,6 +727,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | I tratti permanenti non si possono accorciare con l’Ambasciata | Provvisoria. |
 | Un perk già posseduto non si può prendere di nuovo come ricompensa | Provvisoria. |
 | Dei tratti di un fantasma valgono in battaglia solo quelli su tutta la nazione | Provvisoria. |
+| Se si arriva alla creazione da Gioca (nessuna nazione salvata), dopo il salvataggio si torna alla lista delle nazioni | Provvisoria. |
+| Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
 | Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
@@ -799,6 +811,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.11 — 4 novembre 2026**
+- Menu principale con Gioca, Crea nazione ed Esci; creazione della nazione in una schermata a parte (§14.3).
+- Le nazioni create restano salvate e si possono modificare o eliminare (§9.1).
 
 **v0.10 — 4 novembre 2026**
 - Identità della civiltà: creazione della nazione come in un GDR con tutte e cinque le dimensioni; effetti possibili di ogni elemento; perk come abilità passive, alcune iniziali e altre come ricompense; identità anche per i fantasmi (§9).
