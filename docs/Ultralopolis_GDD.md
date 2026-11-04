@@ -700,7 +700,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Contesto | Informazioni essenziali |
 |---|---|
 | Run | Anno, fase, era, vittorie, Prestigio, ultima possibilità. |
-| Economia | Oro e Ricerca nel Magazzino; produzione prevista per fase. |
+| Economia | Risorse nel Magazzino; produzione prevista per fase. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
 | Ricerca | Costo della prossima era e risorsa disponibile. |
@@ -733,7 +733,6 @@ Idee annotate per il futuro. Non vanno implementate nella base; la base non deve
 | Malus che porta il nome della nazione che lo ha inflitto | Creatore | Non sempre presente: effetto speciale di certi perk o abilità legati a razza e identità. Usa il campo Origine (§8.2). |
 | Eventi a scelta con testo e opzioni | Creatore | Seconda forma degli incontri del mondo, dopo gli scontri automatici. |
 | Diplomazia come accordi o diserzioni | Creatore | Vedi §13.3. |
-| Più tipi di mana per colore e tema (rosso guerra, blu diplomazia, verde ricchezza) | Creatore | Direzione in §5.3; modifica del nucleo quando introdotti. |
 | Identità emergente (cultura e credo dagli eventi) | Proposta precedente | Non confermata; vedi §9. |
 | Nemesi: ritrovare più avanti una copia dello stesso giocatore che ci ha sconfitto | Proposta di Claude | Non discussa. Dà continuità narrativa agli avversari in un contesto asincrono. |
 | Riduzione del danno a ogni colpo | Proposta precedente | Scudo e cura sono confermati dalla v0.13 (§7.6); la riduzione per colpo resta uno spunto. Punirebbe gli eserciti di truppe veloci e deboli. |
@@ -898,7 +897,6 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
 | Prima di ampliare la plancia | Che cosa concede gli spazi (§6.3), quantità e prezzi; layout. |
 | Prima di ampliare la ricerca | Numero e identità definitive delle ere; costo del passaggio. |
-| Prima di più tipi di mana | Colori, temi e vincoli di compatibilità (§5.3). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
 | Per lo spionaggio | Informazioni visibili, costi, bersagli, effetti, contromisure. |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
@@ -919,7 +917,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Opportunità | Momento di scelta interno a una macrofase. |
 | Incontro del mondo | Minaccia o evento dell’anno (es. barbari, pirati); inizialmente uno scontro contro una plancia generata. |
 | Plancia generata | Plancia avversaria creata dal gioco per un incontro del mondo. |
-| Magazzino | Riserva persistente di Oro e Ricerca. |
+| Magazzino | Riserva persistente di tutte le risorse (§5.3). |
 | Mana | Risorsa prodotta in battaglia e spesa per attivare le truppe. |
 | Cooldown | Tempo di attesa fra due attivazioni. |
 | Resistenza | Capacità della nazione di sopravvivere al singolo scontro. |
@@ -944,6 +942,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - Il logoramento viene assorbito dallo scudo; ordine completo dentro lo stesso istante (§7.5, §7.6.6).
 - Pareggio anche per caduta simultanea dovuta alla Corruzione (§3.4).
 - Aggiornati famiglie di effetti, riserva di spunti, informazioni di battaglia, convenzioni, criteri di verifica e glossario (§8.3, §13.3, Parte III, §14.3, §16.3, §17, §19).
+- Correzioni: tolti dagli spunti e dalle decisioni aperte i tipi di mana, già confermati in v0.12; il Magazzino contiene tutte le risorse (§14.3, §19).
 
 **v0.12 — 4 novembre 2026** (modifica del nucleo)
 - Nuove risorse: Cibo, Legno, Pietra, Ferro, Fauna, Fede, Influenza; mercato delle risorse a tasso fisso (§5.3).
