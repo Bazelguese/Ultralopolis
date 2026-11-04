@@ -27,8 +27,16 @@ func test_regole_confermate_nel_gdd() -> void:
 	assert_eq(rules.starting_troop_slots, 3, "GDD §6.1")
 	assert_eq(rules.max_building_slots, 10, "GDD §6.1")
 	assert_eq(rules.max_troop_slots, 12, "GDD §6.1")
-	assert_eq(rules.opportunities_per_phase, 2, "GDD §4.2")
-	assert_eq(rules.alternatives_per_opportunity, 3, "GDD §4.2")
+	assert_eq(rules.rounds_per_half, 5, "GDD §3.2: 5 round per metà")
+	assert_eq(rules.councillors_per_round, 3, "GDD §4.2: 3 consiglieri")
+	assert_eq(rules.proposals_per_councillor, 3, "GDD §4.2: 3 proposte")
+	assert_eq(rules.clown_proposals, 4, "GDD §4.2.2: il Clown ne propone 4")
+	assert_eq(rules.tier_names.size(), 3, "GDD §4.2.1: 3 livelli")
+	var types: Array[int] = []
+	for type: int in rules.round_types:
+		types.append(type)
+	types.sort()
+	assert_eq(types, [0, 1, 2, 3, 3] as Array[int], "GDD §4.2: Azioni, Edifici, Truppe e due Misti")
 	assert_eq(rules.starting_research, 0, "GDD §6.2")
 	assert_eq(rules.starting_buildings.size(), 1, "GDD §6.2: un edificio di base")
 	assert_eq(rules.starting_troops.size(), 1, "GDD §6.2: una truppa di base")
@@ -97,17 +105,37 @@ func test_identita_complete() -> void:
 		assert_false(ghost.identity.is_empty(), "Identità del fantasma %s" % ghost.display_name)
 
 
-func test_ogni_fase_ha_almeno_tre_tipi_di_opportunita() -> void:
+func test_il_consiglio() -> void:
 	var catalog: CatalogDef = _catalog()
-	var production: int = 0
-	var preparation: int = 0
-	for opportunity: OpportunityDef in catalog.opportunities:
-		if opportunity.phase == OpportunityDef.Phase.PRODUZIONE:
-			production += 1
-		else:
-			preparation += 1
-	assert_gte(production, 3, "Produzione")
-	assert_gte(preparation, 3, "Preparazione")
+	var ids: Array[StringName] = []
+	var specials: Array[CouncillorDef.Special] = []
+	for def: CouncillorDef in catalog.councillors:
+		ids.append(def.id)
+		specials.append(def.special)
+	assert_eq(catalog.councillors.size(), 10, "10 consiglieri (GDD §4.2.3).")
+	assert_true(specials.has(CouncillorDef.Special.CLOWN), "C'è il Clown.")
+	assert_true(specials.has(CouncillorDef.Special.ANZIANO), "C'è l'Anziano.")
+	for action: OpportunityDef in catalog.opportunities:
+		assert_true(ids.has(action.councillor), "%s appartiene a un consigliere esistente." % action.id)
+	for def: CouncillorDef in catalog.councillors:
+		if def.special != CouncillorDef.Special.NESSUNO:
+			continue
+		var has_something: bool = false
+		for action: OpportunityDef in catalog.opportunities:
+			if action.councillor == def.id:
+				has_something = true
+		for building: BuildingDef in catalog.buildings:
+			if def.is_affine_building(building):
+				has_something = true
+		for troop: TroopDef in catalog.troops:
+			if def.is_affine_troop(troop):
+				has_something = true
+		assert_true(has_something, "%s ha qualcosa da proporre." % def.display_name)
+	var kinds: Array[OpportunityDef.Kind] = []
+	for action: OpportunityDef in catalog.opportunities:
+		kinds.append(action.kind)
+	for kind: OpportunityDef.Kind in [OpportunityDef.Kind.INCANTA, OpportunityDef.Kind.SPIONAGGIO, OpportunityDef.Kind.PERK, OpportunityDef.Kind.POTENZIA_EDIFICIO, OpportunityDef.Kind.POTENZIA_TRUPPA]:
+		assert_true(kinds.has(kind), "Il catalogo ha azioni di tipo %d." % kind)
 
 
 func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
@@ -142,16 +170,22 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 			choices.append(options[i])
 	assert_true(run.found_nation("Prova", choices), "La nazione si crea con i dati veri.")
 	var guard: int = 0
-	while not run.is_over() and guard < 1000:
+	while not run.is_over() and guard < 5000:
 		guard += 1
 		match run.phase:
 			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-				# Compra la prima offerta che si può pagare senza sostituzioni, altrimenti passa.
+				if not run.way_choices.is_empty():
+					run.choose_way(0)
+					continue
+				if run.is_choosing_councillor() and not run.councillor_choices.is_empty():
+					run.choose_councillor(0)
+					continue
+				# Compra la prima proposta che si può pagare senza sostituzioni, altrimenti passa.
 				var bought: bool = false
 				for i: int in range(run.offers.size()):
 					var offer: Offer = run.offers[i]
-					if offer.price <= run.gold and not run.offer_needs_replacement(offer):
-						bought = run.buy_offer(i)
+					if run.can_afford(offer) and not run.offer_needs_replacement(offer):
+						bought = run.buy_offer(i, 0 if not run.offer_choices(offer).is_empty() else -1)
 						break
 				if not bought:
 					run.pass_opportunity()
@@ -162,7 +196,7 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 			RunState.Phase.SCONTRO_FANTASMA:
 				run.fight_ghost()
 	assert_true(run.is_over(), "La run termina.")
-	assert_lt(guard, 1000, "Nessun ciclo infinito.")
+	assert_lt(guard, 5000, "Nessun ciclo infinito.")
 	assert_ne(run.run_end, RunState.RunEnd.FINE_PROVA, "La run è completa: finisce con vittoria o sconfitta.")
 	assert_eq(run.history.size(), run.year, "Un riepilogo per ogni anno.")
 

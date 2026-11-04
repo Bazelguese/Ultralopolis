@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CouncillorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_3dw5t"]
+[ext_resource type="Script" path="res://scripts/sim/data/councillor_def.gd" id="2_ynivb"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_muk8a"]
+
+[resource]
+script = ExtResource("2_ynivb")
+id = &"generale"
+display_name = "Generale"
+description = "Consigliere comandante: caserme, fanti e tiratori."
+building_tags = Array[StringName]([&"Militare"])
+troop_tags = Array[StringName]([&"Fanteria", &"Tiratori"])

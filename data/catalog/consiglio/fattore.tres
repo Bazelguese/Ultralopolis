@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CouncillorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_6ukbk"]
+[ext_resource type="Script" path="res://scripts/sim/data/councillor_def.gd" id="2_htcyh"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_u4cr4"]
+
+[resource]
+script = ExtResource("2_htcyh")
+id = &"fattore"
+display_name = "Fattore"
+description = "Consigliere agricolo: campi, allevamenti e scorte."
+building_tags = Array[StringName]([&"Agricolo", &"Fauna"])
+troop_tags = Array[StringName]([&"Cavalleria"])

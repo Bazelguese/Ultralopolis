@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_84hvi"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_3i576"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_x8wb8"]
+
+[sub_resource type="Resource" id="Resource_84hvi"]
+script = ExtResource("1_84hvi")
+legno = 2
+
+[sub_resource type="Resource" id="Resource_3i576"]
+script = ExtResource("1_84hvi")
+cibo = 2
+fauna = 2
+
+[resource]
+script = ExtResource("3_x8wb8")
+id = &"scorte"
+display_name = "Scorte"
+description = "Paghi 2 Legno: ottieni subito 2 Cibo e 2 Fauna."
+councillor = &"fattore"
+cost_resources = SubResource("Resource_84hvi")
+gain_resources = SubResource("Resource_3i576")

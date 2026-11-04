@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_1ks2x"]
+
+[resource]
+script = ExtResource("1_1ks2x")
+id = &"razioni"
+display_name = "Razioni"
+description = "Per un anno le truppe mangiano la metà del Cibo."
+is_malus = false
+effect = 15
+amount = -50

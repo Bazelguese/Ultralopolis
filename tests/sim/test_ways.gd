@@ -42,9 +42,6 @@ func before_each() -> void:
 	exclusive_building.id = &"fondaco"
 	exclusive_building.era = 2
 	commerce.exclusive_buildings = [exclusive_building]
-	var opportunity: OpportunityDef = OpportunityDef.new()
-	opportunity.kind = OpportunityDef.Kind.COSTRUISCI_EDIFICIO
-	opportunity.phase = OpportunityDef.Phase.PRODUZIONE
 
 	era1 = EraDef.new()
 	era2 = EraDef.new()
@@ -57,12 +54,16 @@ func before_each() -> void:
 	common.id = &"comune"
 	common.era = 2
 	catalog.buildings = [common]
-	catalog.opportunities = [opportunity]
+	var builder: CouncillorDef = CouncillorDef.new()
+	builder.id = &"costruttore"
+	builder.buildings = [common, exclusive_building]
+	catalog.councillors = [builder]
 	rules = RunRules.new()
 	rules.starting_gold = 0
 	rules.prototype_years = 0
 	rules.starting_buildings = []
 	rules.starting_troops = []
+	rules.round_types = PackedInt32Array([1, 1, 1, 1, 1])
 
 
 func _run(run_seed: int = 1) -> RunState:
@@ -143,6 +144,7 @@ func test_esclusivi_della_via_solo_nella_loro_era_e_per_chi_ha_la_via() -> void:
 	run.advance_era()
 	run.way_choices[0] = commerce
 	run.choose_way(0)
+	assert_true(run.choose_councillor(0), "Nella nuova era il costruttore ha edifici da proporre.")
 	var seen: bool = false
 	for attempt: int in range(40):
 		for offer: Offer in run.offers:
@@ -155,6 +157,7 @@ func test_esclusivi_della_via_solo_nella_loro_era_e_per_chi_ha_la_via() -> void:
 	other.advance_era()
 	other.way_choices[0] = war
 	other.choose_way(0)
+	other.choose_councillor(0)
 	for attempt: int in range(40):
 		for offer: Offer in other.offers:
 			assert_ne(offer.building, exclusive_building)

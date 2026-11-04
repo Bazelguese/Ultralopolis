@@ -255,13 +255,20 @@ func test_una_alternativa_in_meno() -> void:
 		opportunity.id = StringName("scambio_%d" % i)
 		opportunity.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
 		opportunity.gain_gold = 1
+		opportunity.councillor = &"consigliere"
 		list.append(opportunity)
 	catalog.opportunities = list
+	var council: CouncillorDef = CouncillorDef.new()
+	council.id = &"consigliere"
+	catalog.councillors = [council]
+	run_rules.round_types = PackedInt32Array([0, 0, 0, 0, 0])
 	_set_ghosts([killer], [_modifier(&"meno_offerte", ModifierDef.Effect.ALTERNATIVE_OFFERTE, -1)])
 	var run: RunState = _new_run()
+	run.choose_councillor(0)
 	assert_eq(run.offers.size(), 3)
 	_play_year(run)
-	assert_eq(run.offers.size(), 2)
+	run.choose_councillor(0)
+	assert_eq(run.offers.size(), 2, "Il consigliere fa una proposta in meno.")
 
 
 # --- Bonus ------------------------------------------------------------------

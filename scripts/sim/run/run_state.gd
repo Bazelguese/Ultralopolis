@@ -6,9 +6,10 @@ extends RefCounted
 ## che controllano sempre se l'azione è permessa. Se un'azione non è permessa
 ## il metodo restituisce false e spiega il motivo in last_error.
 ##
-## Sequenza dell'anno (GDD §4.1):
-##   PRODUZIONE (3 opportunità) -> SCELTA_INCONTRO -> [RICOMPENSA_INCONTRO]
-##   -> PREPARAZIONE (3 opportunità) -> SCONTRO_FANTASMA -> anno successivo.
+## Sequenza dell'anno (GDD §3.2, §4.1):
+##   PRODUZIONE (5 round) -> SCELTA_INCONTRO -> [RICOMPENSA_INCONTRO]
+##   -> PREPARAZIONE (5 round) -> SCONTRO_FANTASMA -> anno successivo.
+## In ogni round si sceglie uno di 3 consiglieri e poi una delle sue proposte (GDD §4.2).
 
 enum Phase {
 	PRODUZIONE,
@@ -32,6 +33,24 @@ enum BattleKind {
 	INCONTRO,
 	FANTASMA,
 }
+
+## Tipo del round: decide che cosa propongono i consiglieri (GDD §4.2).
+enum RoundType {
+	AZIONI,   ## Solo azioni.
+	EDIFICI,  ## Solo edifici affini.
+	TRUPPE,   ## Solo truppe affini.
+	MISTO,    ## Azioni ed elementi.
+}
+
+const ROUND_TYPE_NAMES: Dictionary[RoundType, String] = {
+	RoundType.AZIONI: "Azioni",
+	RoundType.EDIFICI: "Edifici",
+	RoundType.TRUPPE: "Truppe",
+	RoundType.MISTO: "Misto",
+}
+
+## Colori del mana fra cui il Clown sceglie i suoi 4 elementi (GDD §4.2.2).
+const CLOWN_COLORS: Array[StringName] = [&"rosso", &"verde", &"blu", &"neutro"]
 
 const PHASE_NAMES: Dictionary[Phase, String] = {
 	Phase.PRODUZIONE: "Produzione",
@@ -79,10 +98,20 @@ var board: NationBoard = NationBoard.new()
 ## Malus e bonus attivi (GDD §8).
 var modifiers: Modifiers = Modifiers.new()
 
-## Numero dell'opportunità in corso nella macrofase (1, 2, 3).
-var opportunity_number: int = 0
-## Alternative dell'opportunità in corso.
+## Numero del round in corso nella metà dell'anno (1..5).
+var round_number: int = 0
+## Tipo del round in corso.
+var round_type: RoundType = RoundType.MISTO
+## Tipi dei round di questa metà, nell'ordine pescato.
+var _half_round_types: Array[int] = []
+## I consiglieri fra cui scegliere in questo round.
+var councillor_choices: Array[CouncillorDef] = []
+## Il consigliere scelto in questo round (null finché non si sceglie).
+var councillor: CouncillorDef
+## Proposte del consigliere scelto.
 var offers: Array[Offer] = []
+## Spionaggi comprati: valgono nel prossimo scontro con il fantasma (GDD §12).
+var spy_actions: Array[OpportunityDef] = []
 ## Aumento accumulato del costo di rinnovo (GDD §4.2).
 var reroll_extra: int = 0
 
@@ -329,6 +358,8 @@ func upgrade_building(index: int) -> bool:
 func _upgrade(piece: BoardPiece) -> bool:
 	if not _require_not_over():
 		return false
+	if piece.level >= run_rules.max_level:
+		return _fail("%s non si può potenziare oltre." % piece.display_name())
 	var cost: ResourceAmounts = upgrade_cost_of(piece)
 	if cost == null:
 		return _fail("%s non si può potenziare oltre." % piece.display_name())
@@ -413,6 +444,28 @@ func is_over() -> bool:
 	return phase == Phase.FINE_RUN
 
 
+## true se nel round in corso bisogna ancora scegliere il consigliere.
+func is_choosing_councillor() -> bool:
+	return is_shopping_phase() and councillor == null
+
+
+## Livello dei consiglieri: quello dell'era corrente (GDD §4.2.1).
+func councillor_tier() -> int:
+	return clampi(era, 1, maxi(run_rules.tier_names.size(), 1))
+
+
+## Nome del consigliere con il suo livello, es. "Tesoriere · Ministro".
+func councillor_title(def: CouncillorDef) -> String:
+	var tier: int = councillor_tier()
+	if tier - 1 < run_rules.tier_names.size():
+		return "%s · %s" % [def.display_name, run_rules.tier_names[tier - 1]]
+	return def.display_name
+
+
+func round_type_name() -> String:
+	return ROUND_TYPE_NAMES[round_type]
+
+
 ## true se l'offerta, per essere presa, richiede di sostituire un elemento.
 func offer_needs_replacement(offer: Offer) -> bool:
 	match offer.kind:
@@ -424,6 +477,7 @@ func offer_needs_replacement(offer: Offer) -> bool:
 
 
 ## true se il Magazzino basta a pagare l'offerta (senza contare rimborsi di sostituzione).
+## Le proposte di potenziamento e di incanto si pagano solo con il loro costo.
 func can_afford(offer: Offer) -> bool:
 	if offer.other_cost != null and not can_pay(offer.other_cost):
 		return false
@@ -447,7 +501,31 @@ func offer_choices(offer: Offer) -> Array[String]:
 			if malus.size() > 1:
 				for modifier: ActiveModifier in malus:
 					labels.append(modifier.describe())
+		OpportunityDef.Kind.POTENZIA_EDIFICIO, OpportunityDef.Kind.POTENZIA_TRUPPA, OpportunityDef.Kind.INCANTA:
+			var pieces: Array[BoardPiece] = _offer_targets(offer.kind)
+			if pieces.size() > 1:
+				for piece: BoardPiece in pieces:
+					labels.append("%s (livello %d)" % [piece.display_name(), piece.level])
 	return labels
+
+
+## Elementi su cui può agire una proposta di potenziamento o di incanto.
+func _offer_targets(kind: OpportunityDef.Kind) -> Array[BoardPiece]:
+	var pieces: Array[BoardPiece] = []
+	match kind:
+		OpportunityDef.Kind.POTENZIA_EDIFICIO:
+			for piece: BoardPiece in board.buildings:
+				if piece.level < run_rules.max_level:
+					pieces.append(piece)
+		OpportunityDef.Kind.POTENZIA_TRUPPA:
+			for piece: BoardPiece in board.troops:
+				if piece.level < run_rules.max_level:
+					pieces.append(piece)
+		OpportunityDef.Kind.INCANTA:
+			for piece: BoardPiece in board.troops:
+				if piece.enchantment == null:
+					pieces.append(piece)
+	return pieces
 
 
 func reward_needs_replacement(reward: RewardDef) -> bool:
@@ -494,19 +572,36 @@ func make_battle_replay() -> BattleSim:
 	return BattleSim.new(battle_rules, _last_setups[0], _last_setups[1], last_battle_seed)
 
 
-# --- Azioni delle opportunità -----------------------------------------------
+# --- Il Consiglio (GDD §4.2) ------------------------------------------------
 
-## Prende un'offerta pagando il suo prezzo e chiude l'opportunità.
-## choice dipende dal tipo di offerta:
+## Sceglie uno dei consiglieri del round; la scelta è definitiva (GDD §4.2).
+func choose_councillor(index: int) -> bool:
+	if not _require_shopping():
+		return false
+	if councillor != null:
+		return _fail("Hai già scelto un consigliere in questo round.")
+	if index < 0 or index >= councillor_choices.size():
+		return _fail("Consigliere non valido.")
+	councillor = councillor_choices[index]
+	_log("Round %d: ascolti %s." % [round_number, councillor_title(councillor)])
+	_draw_offers()
+	return true
+
+
+## Prende una proposta del consigliere pagando il suo prezzo e chiude il round.
+## choice dipende dal tipo di proposta:
 ##   - edificio o truppa con la plancia piena: l'elemento da sostituire (venduto con rimborso dimezzato);
-##   - modificatore a scelta o malus da accorciare: la voce scelta fra offer_choices().
+##   - modificatore a scelta o malus da accorciare: la voce scelta fra offer_choices();
+##   - potenziamento o incanto: l'elemento scelto fra offer_choices().
 func buy_offer(offer_index: int, choice: int = -1) -> bool:
 	if not _require_shopping():
 		return false
+	if councillor == null:
+		return _fail("Prima scegli un consigliere.")
 	if offer_index < 0 or offer_index >= offers.size():
 		return _fail("Offerta non valida.")
 	var offer: Offer = offers[offer_index]
-	var source: String = offer.opportunity.display_name
+	var source: String = offer.title()
 
 	match offer.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
@@ -532,9 +627,18 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 		OpportunityDef.Kind.SCAMBIO_RISORSE:
 			if not _pay(offer):
 				return false
+			var gains: PackedStringArray = PackedStringArray()
 			gold += offer.opportunity.gain_gold
+			if offer.opportunity.gain_gold > 0:
+				gains.append("%d Oro" % offer.opportunity.gain_gold)
 			research += offer.opportunity.gain_research
-			_log("%s: paghi %s, ricevi %d Oro e %d Ricerca." % [source, offer.cost_text(), offer.opportunity.gain_gold, offer.opportunity.gain_research])
+			if offer.opportunity.gain_research > 0:
+				gains.append("%d Ricerca" % offer.opportunity.gain_research)
+			if offer.opportunity.gain_resources != null and not offer.opportunity.gain_resources.is_empty():
+				for type: Res.Type in Res.NAMES:
+					stock[type] += offer.opportunity.gain_resources.internal(type)
+				gains.append(offer.opportunity.gain_resources.describe())
+			_log("%s: paghi %s, ricevi %s." % [source, offer.cost_text(), ", ".join(gains)])
 		OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
 			var choices: Array[Array] = _modifier_choices(offer)
 			if choices.is_empty():
@@ -559,23 +663,61 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			if not _pay(offer):
 				return false
 			_log("%s: %s" % [source, modifiers.shorten(malus[choice], offer.opportunity.shorten_years, year)])
-	_next_opportunity()
+		OpportunityDef.Kind.POTENZIA_EDIFICIO, OpportunityDef.Kind.POTENZIA_TRUPPA:
+			var targets: Array[BoardPiece] = _offer_targets(offer.kind)
+			if targets.is_empty():
+				return _fail("Non c'è nulla da potenziare.")
+			if targets.size() == 1:
+				choice = 0
+			if choice < 0 or choice >= targets.size():
+				return _fail("Scegli che cosa potenziare.")
+			if not _pay(offer):
+				return false
+			targets[choice].level += 1
+			_log("%s: %s sale al livello %d." % [source, targets[choice].display_name(), targets[choice].level])
+		OpportunityDef.Kind.INCANTA:
+			var troops_to_enchant: Array[BoardPiece] = _offer_targets(offer.kind)
+			if troops_to_enchant.is_empty():
+				return _fail("Non ci sono truppe da incantare.")
+			if troops_to_enchant.size() == 1:
+				choice = 0
+			if choice < 0 or choice >= troops_to_enchant.size():
+				return _fail("Scegli quale truppa incantare.")
+			if not _pay(offer):
+				return false
+			troops_to_enchant[choice].enchantment = offer.opportunity
+			_log("%s: %s è incantata." % [source, troops_to_enchant[choice].display_name()])
+		OpportunityDef.Kind.SPIONAGGIO:
+			if not _pay(offer):
+				return false
+			spy_actions.append(offer.opportunity)
+			_log("%s: agirà nello scontro con il fantasma." % source)
+		OpportunityDef.Kind.PERK:
+			if offer.perk == null or identity.has(offer.perk):
+				return _fail("Hai già questo perk.")
+			if not _pay(offer):
+				return false
+			_adopt_identity(offer.perk)
+			_log("%s: nuovo perk %s." % [source, offer.perk.display_name])
+	_next_round()
 	return true
 
 
-## Rinuncia all'opportunità in corso, senza ricevere nulla (GDD §4.2).
+## Lascia passare il round, prima o dopo aver scelto il consigliere, senza ricevere nulla (GDD §4.2).
 func pass_opportunity() -> bool:
 	if not _require_shopping():
 		return false
-	_log("Opportunità %d lasciata passare." % opportunity_number)
-	_next_opportunity()
+	_log("Round %d lasciato passare." % round_number)
+	_next_round()
 	return true
 
 
-## Rinnova le alternative pagando Oro; il costo cresce a ogni rinnovo (GDD §4.2).
+## Rinnova le proposte del consigliere scelto pagando Oro; il costo cresce a ogni rinnovo (GDD §4.2).
 func reroll_offers() -> bool:
 	if not _require_shopping():
 		return false
+	if councillor == null:
+		return _fail("Prima scegli un consigliere: si rinnovano le sue proposte.")
 	var cost: int = reroll_cost()
 	if gold < cost:
 		return _fail("Oro insufficiente per rinnovare (servono %d)." % cost)
@@ -606,8 +748,8 @@ func advance_era() -> bool:
 	if not way_choices.is_empty():
 		_log("Scegli la via della nazione per l'era %s." % next.display_name)
 	# Le offerte delle ere precedenti non restano disponibili (GDD §10.3):
-	# le alternative in corso vengono ripescate gratis dalla nuova era.
-	_draw_offers()
+	# le proposte in corso (o i consiglieri, se non è ancora stato scelto) vengono ripescate gratis.
+	_redraw_round()
 	return true
 
 
@@ -734,6 +876,7 @@ func fight_ghost() -> bool:
 	if current_ghost != null:
 		enemy = _ghost_setup()
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
+	spy_actions = []
 	for message: String in modifiers.on_ghost_fight_done():
 		_log(message)
 	if not history.is_empty():
@@ -810,10 +953,21 @@ func _start_year(new_year: int) -> void:
 func _enter_phase(new_phase: Phase) -> void:
 	phase = new_phase
 	offers = []
-	opportunity_number = 0
+	councillor = null
+	councillor_choices = []
+	round_number = 0
 	if is_shopping_phase():
 		_collect_production()
-		_next_opportunity()
+		# L'ordine dei tipi di round della metà si pesca con il seme della run (GDD §4.2).
+		_half_round_types = []
+		var types: Array[int] = []
+		for type: int in run_rules.round_types:
+			types.append(type)
+		while not types.is_empty():
+			var pick: int = _rng.randi_range(0, types.size() - 1)
+			_half_round_types.append(types[pick])
+			types.remove_at(pick)
+		_next_round()
 
 
 ## Ogni edificio presente deposita le sue risorse, una volta per macrofase (GDD §5.2).
@@ -827,18 +981,25 @@ func _collect_production() -> void:
 	_log("%s: gli edifici producono %s." % [phase_name(), ", ".join(parts) if not parts.is_empty() else "nulla"])
 
 
-func _next_opportunity() -> void:
-	opportunity_number += 1
-	if opportunity_number > run_rules.opportunities_per_phase:
+func _next_round() -> void:
+	round_number += 1
+	offers = []
+	councillor = null
+	councillor_choices = []
+	if round_number > run_rules.rounds_per_half:
 		_end_shopping_phase()
 		return
-	# A ogni nuova opportunità l'aumento accumulato del rinnovo si dimezza (GDD §4.2).
+	# A ogni nuovo round l'aumento accumulato del rinnovo si dimezza (GDD §4.2).
 	reroll_extra = half_down(reroll_extra)
-	_draw_offers()
+	var index: int = round_number - 1
+	round_type = _half_round_types[index] as RoundType if index < _half_round_types.size() else RoundType.MISTO
+	_draw_councillors()
 
 
 func _end_shopping_phase() -> void:
 	offers = []
+	councillor = null
+	councillor_choices = []
 	if phase == Phase.PRODUZIONE:
 		phase = Phase.SCELTA_INCONTRO
 		if encounter_choices.is_empty():
@@ -848,135 +1009,193 @@ func _end_shopping_phase() -> void:
 		phase = Phase.SCONTRO_FANTASMA
 
 
-## Pesca a caso le alternative (GDD §4.2): tipi di opportunità diversi fra loro, tutti con la
-## stessa probabilità; per costruttori e reclutatori si pesca poi l'elemento dell'era corrente.
-func _draw_offers() -> void:
-	if is_dedicated_opportunity() and _draw_dedicated_offers():
+## Ripesca il round in corso: i consiglieri se non è stato scelto, altrimenti le sue proposte.
+func _redraw_round() -> void:
+	if not is_shopping_phase():
 		return
-	var pool: Array[OpportunityDef] = _available_opportunities()
+	if councillor == null:
+		_draw_councillors()
+	else:
+		_draw_offers()
+
+
+## Pesca i consiglieri del round: diversi fra loro, solo quelli che hanno qualcosa da
+## proporre per il tipo del round, più probabili se l'identità li favorisce (GDD §4.2).
+func _draw_councillors() -> void:
+	councillor_choices = []
+	var pool: Array[CouncillorDef] = []
 	var weights: Array[int] = []
-	for opportunity: OpportunityDef in pool:
-		weights.append(_opportunity_weight(opportunity))
-	offers = []
-	var wanted: int = maxi(1, run_rules.alternatives_per_opportunity + modifiers.flat(ModifierDef.Effect.ALTERNATIVE_OFFERTE))
-	var count: int = mini(wanted, pool.size())
+	for def: CouncillorDef in catalog.councillors:
+		if not _candidate_offers(def).is_empty():
+			pool.append(def)
+			weights.append(_councillor_weight(def))
+	var count: int = mini(run_rules.councillors_per_round, pool.size())
 	for i: int in range(count):
-		var total: int = 0
-		for weight: int in weights:
-			total += weight
-		var roll: int = _rng.randi_range(0, total - 1)
-		var pick: int = 0
-		while roll >= weights[pick]:
-			roll -= weights[pick]
-			pick += 1
-		offers.append(_make_offer(pool[pick]))
+		var pick: int = _weighted_pick(weights)
+		councillor_choices.append(pool[pick])
 		pool.remove_at(pick)
 		weights.remove_at(pick)
 
 
-## true se l'opportunità in corso mostra solo elementi (edifici in Produzione, truppe in Preparazione).
-func is_dedicated_opportunity() -> bool:
-	return is_shopping_phase() and opportunity_number == run_rules.dedicated_opportunity
-
-
-## Tre elementi diversi dell'era corrente (esclusivi compresi), tutti dello stesso tipo.
-## Restituisce false se nel catalogo manca l'opportunità adatta: si pesca allora come al solito.
-func _draw_dedicated_offers() -> bool:
-	var wanted_kind: OpportunityDef.Kind = OpportunityDef.Kind.COSTRUISCI_EDIFICIO if phase == Phase.PRODUZIONE else OpportunityDef.Kind.RECLUTA_TRUPPA
-	var wanted_phase: OpportunityDef.Phase = OpportunityDef.Phase.PRODUZIONE if phase == Phase.PRODUZIONE else OpportunityDef.Phase.PREPARAZIONE
-	var source: OpportunityDef = null
-	for opportunity: OpportunityDef in catalog.opportunities:
-		if opportunity.kind == wanted_kind and opportunity.phase == wanted_phase:
-			source = opportunity
-			break
-	if source == null:
-		return false
-	var count: int = maxi(1, run_rules.alternatives_per_opportunity + modifiers.flat(ModifierDef.Effect.ALTERNATIVE_OFFERTE))
-	offers = []
-	if wanted_kind == OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
-		var pool: Array[BuildingDef] = _buildings_of_era()
-		for i: int in range(mini(count, pool.size())):
-			var pick: int = _rng.randi_range(0, pool.size() - 1)
-			var offer: Offer = Offer.new()
-			offer.opportunity = source
-			offer.building = pool[pick]
-			offer.price = offer.building.cost_gold
-			offers.append(offer)
-			pool.remove_at(pick)
-	else:
-		var pool: Array[TroopDef] = _troops_of_era()
-		for i: int in range(mini(count, pool.size())):
-			var pick: int = _rng.randi_range(0, pool.size() - 1)
-			var offer: Offer = Offer.new()
-			offer.opportunity = source
-			offer.troop = pool[pick]
-			offer.price = offer.troop.cost_gold
-			offers.append(offer)
-			pool.remove_at(pick)
-	return true
-
-
-## Peso di un tipo di opportunità: 1, più 1 per ogni elemento dell'identità che lo favorisce.
-func _opportunity_weight(opportunity: OpportunityDef) -> int:
+## Peso di un consigliere: 1, più 1 per ogni elemento dell'identità che lo favorisce
+## direttamente o che favorisce una delle sue azioni (§16.3).
+func _councillor_weight(def: CouncillorDef) -> int:
 	var weight: int = 1
-	for def: IdentityDef in identity:
-		if def.favored_opportunities.has(opportunity):
+	for element: IdentityDef in identity:
+		var favored: bool = element.favored_councillors.has(def)
+		for action: OpportunityDef in element.favored_opportunities:
+			if action.councillor == def.id:
+				favored = true
+		if favored:
 			weight += 1
 	return weight
 
 
-## Tipi di opportunità della fase corrente che hanno senso adesso
-## (es. niente Ambasciata se non ci sono malus, niente spazi oltre il massimo).
-func _available_opportunities() -> Array[OpportunityDef]:
-	var wanted_phase: OpportunityDef.Phase = OpportunityDef.Phase.PRODUZIONE if phase == Phase.PRODUZIONE else OpportunityDef.Phase.PREPARAZIONE
-	var pool: Array[OpportunityDef] = []
+## Posizione pescata a caso, con probabilità proporzionale ai pesi.
+func _weighted_pick(weights: Array[int]) -> int:
+	var total: int = 0
+	for weight: int in weights:
+		total += weight
+	var roll: int = _rng.randi_range(0, maxi(total, 1) - 1)
+	var pick: int = 0
+	while pick < weights.size() - 1 and roll >= weights[pick]:
+		roll -= weights[pick]
+		pick += 1
+	return pick
+
+
+## Pesca le proposte del consigliere scelto (GDD §4.2): 3 diverse fra quelle possibili;
+## il Clown ne propone 4, ciascuna di un mana diverso (§4.2.2).
+func _draw_offers() -> void:
+	offers = []
+	if councillor == null:
+		return
+	var candidates: Array[Offer] = _candidate_offers(councillor)
+	var extra: int = modifiers.flat(ModifierDef.Effect.ALTERNATIVE_OFFERTE)
+	if councillor.special == CouncillorDef.Special.CLOWN:
+		var wanted_clown: int = maxi(1, run_rules.clown_proposals + extra)
+		var colors: Array[StringName] = CLOWN_COLORS.duplicate()
+		while offers.size() < wanted_clown and not colors.is_empty():
+			var color: StringName = colors.pop_at(_rng.randi_range(0, colors.size() - 1))
+			var same_color: Array[Offer] = []
+			for candidate: Offer in candidates:
+				if _offer_mana(candidate) == color:
+					same_color.append(candidate)
+			if not same_color.is_empty():
+				offers.append(same_color[_rng.randi_range(0, same_color.size() - 1)])
+		return
+	var weights: Array[int] = []
+	for candidate: Offer in candidates:
+		weights.append(_offer_weight(candidate))
+	var wanted: int = maxi(1, run_rules.proposals_per_councillor + extra)
+	for i: int in range(mini(wanted, candidates.size())):
+		var pick: int = _weighted_pick(weights)
+		offers.append(candidates[pick])
+		candidates.remove_at(pick)
+		weights.remove_at(pick)
+
+
+## Peso di una proposta: le azioni favorite dall'identità sono più probabili (§16.3).
+func _offer_weight(offer: Offer) -> int:
+	var weight: int = 1
+	if offer.opportunity != null:
+		for element: IdentityDef in identity:
+			if element.favored_opportunities.has(offer.opportunity):
+				weight += 1
+	return weight
+
+
+## Colore del mana di un elemento proposto, per il Clown. Senza mana: "neutro".
+static func _offer_mana(offer: Offer) -> StringName:
+	if offer.building != null:
+		return offer.building.mana_type if offer.building.mana_amount > 0 else BattleSim.MANA_NEUTRO
+	if offer.troop != null:
+		return offer.troop.mana_type if offer.troop.mana_cost > 0 else BattleSim.MANA_NEUTRO
+	return &""
+
+
+## Tutte le proposte che un consigliere può fare adesso, secondo il tipo del round.
+func _candidate_offers(def: CouncillorDef) -> Array[Offer]:
+	var result: Array[Offer] = []
+	match def.special:
+		CouncillorDef.Special.CLOWN:
+			for building_def: BuildingDef in _buildings_of_era():
+				result.append(Offer.of_building(building_def, def))
+			for troop_def: TroopDef in _troops_of_era():
+				result.append(Offer.of_troop(troop_def, def))
+			return result
+		CouncillorDef.Special.ANZIANO:
+			for action: OpportunityDef in _councillor_actions(def):
+				if action.kind == OpportunityDef.Kind.PERK:
+					for perk: IdentityDef in _perks_to_offer():
+						var perk_offer: Offer = Offer.of_action(action, def)
+						perk_offer.perk = perk
+						result.append(perk_offer)
+				else:
+					result.append(Offer.of_action(action, def))
+			for building_def: BuildingDef in _buildings_of_era():
+				if building_def.mana_amount == 0:
+					result.append(Offer.of_building(building_def, def))
+			return result
+	if round_type == RoundType.AZIONI or round_type == RoundType.MISTO:
+		for action: OpportunityDef in _councillor_actions(def):
+			result.append(Offer.of_action(action, def))
+	if round_type == RoundType.EDIFICI or round_type == RoundType.MISTO:
+		for building_def: BuildingDef in _buildings_of_era():
+			if def.is_affine_building(building_def):
+				result.append(Offer.of_building(building_def, def))
+	if round_type == RoundType.TRUPPE or round_type == RoundType.MISTO:
+		for troop_def: TroopDef in _troops_of_era():
+			if def.is_affine_troop(troop_def):
+				result.append(Offer.of_troop(troop_def, def))
+	return result
+
+
+## Perk che l'Anziano può proporre: quelli del catalogo non ancora posseduti.
+func _perks_to_offer() -> Array[IdentityDef]:
+	var perks_found: Array[IdentityDef] = []
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == IdentityDef.Dimension.PERK and not identity.has(def):
+			perks_found.append(def)
+	return perks_found
+
+
+## Azioni del consigliere che hanno senso adesso, del suo livello, esclusive dell'identità comprese
+## (es. niente Ambasciata senza malus, niente spazi oltre il massimo).
+func _councillor_actions(def: CouncillorDef) -> Array[OpportunityDef]:
 	var candidates: Array[OpportunityDef] = catalog.opportunities.duplicate()
-	for def: IdentityDef in identity:
-		for opportunity: OpportunityDef in def.exclusive_opportunities:
-			if not candidates.has(opportunity):
-				candidates.append(opportunity)
-	for opportunity: OpportunityDef in candidates:
-		if opportunity.phase != wanted_phase:
+	for element: IdentityDef in identity:
+		for action: OpportunityDef in element.exclusive_opportunities:
+			if not candidates.has(action):
+				candidates.append(action)
+	var result: Array[OpportunityDef] = []
+	for action: OpportunityDef in candidates:
+		if action.councillor != def.id or action.min_tier > councillor_tier():
 			continue
-		match opportunity.kind:
-			OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
-				if _buildings_of_era().is_empty():
-					continue
-			OpportunityDef.Kind.RECLUTA_TRUPPA:
-				if _troops_of_era().is_empty():
-					continue
-			OpportunityDef.Kind.SPAZIO_EDIFICIO:
-				if board.building_capacity() >= board.max_building_slots:
-					continue
-			OpportunityDef.Kind.SPAZIO_TRUPPA:
-				if board.troop_capacity() >= board.max_troop_slots:
-					continue
-			OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
-				if _modifier_choices_for(opportunity).is_empty():
-					continue
-			OpportunityDef.Kind.ACCORCIA_MALUS:
-				if modifiers.year_malus().is_empty():
-					continue
-		pool.append(opportunity)
-	return pool
+		if _action_makes_sense(action):
+			result.append(action)
+	return result
 
 
-func _make_offer(opportunity: OpportunityDef) -> Offer:
-	var offer: Offer = Offer.new()
-	offer.opportunity = opportunity
-	offer.price = opportunity.cost_gold
-	offer.research_price = opportunity.cost_research
-	offer.other_cost = opportunity.cost_resources
-	match opportunity.kind:
-		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
-			var buildings: Array[BuildingDef] = _buildings_of_era()
-			offer.building = buildings[_rng.randi_range(0, buildings.size() - 1)]
-			offer.price = offer.building.cost_gold
-		OpportunityDef.Kind.RECLUTA_TRUPPA:
-			var troops: Array[TroopDef] = _troops_of_era()
-			offer.troop = troops[_rng.randi_range(0, troops.size() - 1)]
-			offer.price = offer.troop.cost_gold
-	return offer
+func _action_makes_sense(action: OpportunityDef) -> bool:
+	match action.kind:
+		OpportunityDef.Kind.COSTRUISCI_EDIFICIO, OpportunityDef.Kind.RECLUTA_TRUPPA:
+			return false  # Gli elementi arrivano direttamente dal consigliere.
+		OpportunityDef.Kind.SPAZIO_EDIFICIO:
+			return board.building_capacity() < board.max_building_slots
+		OpportunityDef.Kind.SPAZIO_TRUPPA:
+			return board.troop_capacity() < board.max_troop_slots
+		OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
+			return not _modifier_choices_for(action).is_empty()
+		OpportunityDef.Kind.ACCORCIA_MALUS:
+			return not modifiers.year_malus().is_empty()
+		OpportunityDef.Kind.POTENZIA_EDIFICIO, OpportunityDef.Kind.POTENZIA_TRUPPA, OpportunityDef.Kind.INCANTA:
+			return not _offer_targets(action.kind).is_empty()
+		OpportunityDef.Kind.SPIONAGGIO:
+			return current_ghost != null
+		OpportunityDef.Kind.PERK:
+			return not _perks_to_offer().is_empty()
+	return true
 
 
 ## Edifici offerti: solo quelli dell'era corrente (GDD §10.3).
@@ -1004,6 +1223,8 @@ func _troops_of_era() -> Array[TroopDef]:
 
 ## Voci fra cui scegliere per un'offerta di modificatori: [modificatore, elemento o null].
 func _modifier_choices(offer: Offer) -> Array[Array]:
+	if offer.opportunity == null:
+		return []
 	return _modifier_choices_for(offer.opportunity)
 
 
@@ -1192,6 +1413,9 @@ func _end_run(result: RunEnd) -> void:
 	_update_last_record()
 	phase = Phase.FINE_RUN
 	offers = []
+	councillor = null
+	councillor_choices = []
+	spy_actions = []
 	match result:
 		RunEnd.VITTORIA:
 			_log("La nazione ha raggiunto %d vittorie: run vinta!" % wins)
@@ -1218,8 +1442,8 @@ func choose_way(index: int) -> bool:
 	var way: IdentityDef = way_choices[index]
 	way_choices = []
 	_adopt_identity(way)
-	# Le offerte in corso tengono conto della via appena scelta.
-	_draw_offers()
+	# Le proposte in corso tengono conto della via appena scelta.
+	_redraw_round()
 	return true
 
 
@@ -1322,6 +1546,9 @@ func _ghost_setup() -> BattleSideSetup:
 		troops.append(ElementStats.troop(def, BoardPiece.of_troop(def, 0), ghost_modifiers, 1, run_rules))
 	var setup: BattleSideSetup = BattleSideSetup.new(buildings, troops, ghost_resistance())
 	_apply_start_values(setup, ghost_modifiers)
+	# Lo spionaggio del giocatore agisce sulla copia affrontata (GDD §11.1, §12).
+	for spy: OpportunityDef in spy_actions:
+		setup.start_timer_effects.append([spy.spy_sabotage, spy.spy_target, spy.spy_criterion, spy.spy_duration_ms])
 	return setup
 
 

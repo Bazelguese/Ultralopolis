@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_twhag"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_r1xxi"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_7dyi8"]
+
+[sub_resource type="Resource" id="Resource_twhag"]
+script = ExtResource("1_twhag")
+fede = 2
+
+[resource]
+script = ExtResource("3_7dyi8")
+id = &"incanto_del_gelo"
+display_name = "Incanto del gelo"
+description = "Paghi 2 Fede: una truppa a scelta ottiene rallenta una truppa nemica per 1,5 s a ogni attivazione e chiede 2 mana in più (verde se non usava mana)."
+kind = 9
+councillor = &"sacerdote"
+cost_resources = SubResource("Resource_twhag")
+enchant_effect = 4
+enchant_value = 1500
+enchant_mana_type = &"verde"

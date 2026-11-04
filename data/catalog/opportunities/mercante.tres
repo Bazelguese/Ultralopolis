@@ -8,6 +8,6 @@ script = ExtResource("2_8v834")
 id = &"mercante"
 display_name = "Mercante"
 description = "Scambi 2 Ricerca con 4 Oro."
-kind = 4
+councillor = &"tesoriere"
 cost_research = 2
 gain_gold = 4

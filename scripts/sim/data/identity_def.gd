@@ -52,10 +52,13 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export var extra_troops: Array[TroopDef] = []
 
 @export_group("Opportunità")
-## Tipi di opportunità che compaiono solo con questo elemento.
+## Azioni che compaiono solo con questo elemento (nel pool del loro consigliere).
 @export var exclusive_opportunities: Array[OpportunityDef] = []
 ## Tipi di opportunità che compaiono più spesso (peso +1 ciascuno).
 @export var favored_opportunities: Array[OpportunityDef] = []
+## Consiglieri che compaiono più spesso (peso +1 ciascuno). Un consigliere è favorito
+## anche quando l'elemento favorisce una delle sue azioni (GDD §4.2).
+@export var favored_councillors: Array[CouncillorDef] = []
 
 @export_group("Elementi esclusivi")
 ## Edifici offerti dai Costruttori solo a questa nazione (nella loro era).

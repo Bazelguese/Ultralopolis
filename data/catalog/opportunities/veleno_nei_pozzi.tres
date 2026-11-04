@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_iobof"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_0yk86"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_cstyr"]
+
+[sub_resource type="Resource" id="Resource_iobof"]
+script = ExtResource("1_iobof")
+influenza = 2
+
+[resource]
+script = ExtResource("3_cstyr")
+id = &"veleno_nei_pozzi"
+display_name = "Veleno nei pozzi"
+description = "Paghi 2 Influenza: all'inizio dello scontro con il fantasma, rallenta per 10 s la sua truppa più veloce."
+kind = 10
+councillor = &"maestro_spie"
+cost_resources = SubResource("Resource_iobof")
+spy_sabotage = false
+spy_duration_ms = 10000
+spy_criterion = 4

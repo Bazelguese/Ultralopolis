@@ -107,7 +107,7 @@ func test_mercato_a_tasso_fisso() -> void:
 	assert_eq(run.gold, 1 + 2, "1 Oro della Capitale + 2 dalla vendita.")
 	assert_false(run.sell_resource(Res.Type.FERRO, 2), "Ferro insufficiente.")
 	assert_false(run.sell_resource(Res.Type.ORO, 2), "L'Oro non si vende.")
-	assert_eq(run.opportunity_number, 1, "Il mercato non consuma l'opportunità.")
+	assert_eq(run.round_number, 1, "Il mercato non consuma il round.")
 
 
 func test_mercato_del_cibo_in_unita_intere() -> void:

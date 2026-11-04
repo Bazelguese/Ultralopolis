@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_l7y7f"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_rcqvj"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_dxs8h"]
+
+[sub_resource type="Resource" id="Resource_l7y7f"]
+script = ExtResource("1_l7y7f")
+influenza = 2
+
+[resource]
+script = ExtResource("3_dxs8h")
+id = &"infiltrati"
+display_name = "Infiltrati"
+description = "Paghi 2 Influenza: all'inizio dello scontro con il fantasma, sabota per 5 s un suo edificio a caso."
+kind = 10
+councillor = &"maestro_spie"
+cost_resources = SubResource("Resource_l7y7f")
+spy_target = 1

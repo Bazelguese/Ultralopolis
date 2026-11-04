@@ -13,6 +13,6 @@ script = ExtResource("2_1t2q7")
 id = &"studiosi"
 display_name = "Studiosi"
 description = "Paghi 3 Legno e ottieni subito 3 Ricerca."
-kind = 4
+councillor = &"studioso"
 cost_resources = SubResource("Resource_y4l4u")
 gain_research = 3

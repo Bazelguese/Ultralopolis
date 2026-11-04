@@ -44,17 +44,23 @@ extends Resource
 ## Unità in più, per ogni livello oltre il primo, di ogni risorsa che l'edificio produce.
 @export var building_production_per_level: int = 1
 
-@export_group("Opportunità")
-## Opportunità per macrofase (GDD §4.2: 2).
-@export var opportunities_per_phase: int = 2
-## Alternative mostrate in ogni opportunità (GDD §4.2: 3).
-@export var alternatives_per_opportunity: int = 3
-## Costo del primo rinnovo delle offerte.
+@export_group("Consiglio")
+## Round in ciascuna delle due metà dell'anno (GDD §3.2: 5).
+@export var rounds_per_half: int = 5
+## Consiglieri pescati in ogni round (GDD §4.2: 3).
+@export var councillors_per_round: int = 3
+## Proposte di un consigliere (GDD §4.2: 3).
+@export var proposals_per_councillor: int = 3
+## Proposte del Clown (GDD §4.2.2: 4).
+@export var clown_proposals: int = 4
+## Tipi dei round di una metà, mescolati con il seme della run all'inizio di ogni metà:
+## 0 Azioni, 1 Edifici, 2 Truppe, 3 Misto (GDD §4.2).
+@export var round_types: PackedInt32Array = PackedInt32Array([0, 1, 2, 3, 3])
+## Nomi dei livelli dei consiglieri, uno per era (GDD §4.2.1).
+@export var tier_names: PackedStringArray = PackedStringArray(["Funzionario", "Ministro", "Gran Consigliere"])
+## Costo del primo rinnovo delle proposte.
 @export var reroll_base_cost: int = 1
 ## Il rinnovo non costa mai meno di così, nemmeno con i bonus che lo riducono.
 @export var reroll_min_cost: int = 1
-## Opportunità della fase che mostra solo elementi: in Produzione 3 edifici,
-## in Preparazione 3 truppe (1 = la prima; 0 = nessuna).
-@export var dedicated_opportunity: int = 1
 ## Aumento del costo a ogni rinnovo.
 @export var reroll_cost_increase: int = 1

@@ -4,7 +4,8 @@
 [ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_yyspv"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_rdfd6"]
 [ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="4_6ngw0"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/reclutatori.tres" id="5_li0lq"]
+[ext_resource type="Script" path="res://scripts/sim/data/councillor_def.gd" id="5_rdfd6"]
+[ext_resource type="Resource" path="res://data/catalog/consiglio/generale.tres" id="6_6ngw0"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/addestramento.tres" id="6_c0ksy"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="7_16yuh"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="8_4vamm"]
@@ -18,5 +19,6 @@ description = "Ogni famiglia dà un combattente: parte con una Milizia in più; 
 dimension = 3
 resistance_bonus = 3
 extra_troops = Array[ExtResource("3_rdfd6")]([ExtResource("4_6ngw0")])
-favored_opportunities = Array[ExtResource("2_yyspv")]([ExtResource("5_li0lq"), ExtResource("6_c0ksy")])
+favored_opportunities = Array[ExtResource("2_yyspv")]([ExtResource("6_c0ksy")])
+favored_councillors = Array[ExtResource("5_rdfd6")]([ExtResource("6_6ngw0")])
 permanent_modifiers = Array[ExtResource("7_16yuh")]([ExtResource("8_yyspv")])

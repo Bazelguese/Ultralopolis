@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_h788n"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_5v7jo"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_xk8bh"]
+
+[sub_resource type="Resource" id="Resource_h788n"]
+script = ExtResource("1_h788n")
+legno = 4
+
+[resource]
+script = ExtResource("3_xk8bh")
+id = &"trattati"
+display_name = "Trattati"
+description = "Paghi 4 Legno: ottieni subito 5 Ricerca."
+councillor = &"studioso"
+min_tier = 2
+cost_resources = SubResource("Resource_h788n")
+gain_research = 5

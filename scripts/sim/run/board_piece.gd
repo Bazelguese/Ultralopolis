@@ -12,6 +12,8 @@ var paid: int = 0
 var level: int = 1
 ## true se la truppa non ha mangiato all'ultimo consumo di Cibo (GDD §5.4).
 var hungry: bool = false
+## Incanto della truppa (GDD §4.3): l'azione del Sacerdote che l'ha incantata, o null.
+var enchantment: OpportunityDef
 
 
 static func of_building(def: BuildingDef, p_paid: int) -> BoardPiece:

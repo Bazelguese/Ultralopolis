@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CouncillorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_tiwlh"]
+[ext_resource type="Script" path="res://scripts/sim/data/councillor_def.gd" id="2_j6m1i"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_gpn8o"]
+
+[resource]
+script = ExtResource("2_j6m1i")
+id = &"sacerdote"
+display_name = "Sacerdote"
+description = "Consigliere religioso: templi, fedeli e incanti."
+building_tags = Array[StringName]([&"Sacro"])
+troop_tags = Array[StringName]([&"Sacro"])

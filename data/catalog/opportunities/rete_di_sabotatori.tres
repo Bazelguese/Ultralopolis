@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_ww2b2"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_hpluu"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_q15c3"]
+
+[sub_resource type="Resource" id="Resource_ww2b2"]
+script = ExtResource("1_ww2b2")
+influenza = 3
+
+[resource]
+script = ExtResource("3_q15c3")
+id = &"rete_di_sabotatori"
+display_name = "Rete di sabotatori"
+description = "Paghi 3 Influenza: all'inizio dello scontro con il fantasma, sabota per 8 s il suo elemento più veloce."
+kind = 10
+councillor = &"maestro_spie"
+min_tier = 2
+cost_resources = SubResource("Resource_ww2b2")
+spy_duration_ms = 8000
+spy_target = 2
+spy_criterion = 4

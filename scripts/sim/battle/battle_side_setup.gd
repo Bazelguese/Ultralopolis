@@ -15,6 +15,9 @@ var start_shield: int = 0
 var start_corruption: int = 0
 ## Un edificio a caso parte sabotato per questi millisecondi (es. malus Rete compromessa).
 var start_building_sabotage_ms: int = 0
+## Effetti dello spionaggio avversario a inizio scontro (GDD §12):
+## [sabotaggio (true) o rallentamento (false), TimerTarget.Kind, TimerTarget.Criterion, millisecondi].
+var start_timer_effects: Array[Array] = []
 
 
 func _init(p_buildings: Array[BuildingDef] = [], p_troops: Array[TroopDef] = [], p_max_resistance: int = 0) -> void:

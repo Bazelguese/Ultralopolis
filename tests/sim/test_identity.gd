@@ -16,7 +16,8 @@ var perk_b: IdentityDef
 var perk_c: IdentityDef
 var builders: OpportunityDef
 var collectors: OpportunityDef
-var recruiters: OpportunityDef
+var treasurer: CouncillorDef
+var commander: CouncillorDef
 var secret: OpportunityDef
 
 
@@ -28,11 +29,11 @@ func _identity(id: StringName, dimension: IdentityDef.Dimension) -> IdentityDef:
 	return def
 
 
-func _opportunity(id: StringName, phase: OpportunityDef.Phase, kind: OpportunityDef.Kind) -> OpportunityDef:
+func _opportunity(id: StringName, kind: OpportunityDef.Kind) -> OpportunityDef:
 	var def: OpportunityDef = OpportunityDef.new()
 	def.id = id
 	def.display_name = String(id)
-	def.phase = phase
+	def.councillor = &"tesoriere"
 	def.kind = kind
 	def.gain_gold = 1
 	return def
@@ -63,10 +64,17 @@ func before_each() -> void:
 	exclusive_troop.display_name = "Esclusiva"
 	exclusive_troop.cooldown_ms = 1000
 
-	builders = _opportunity(&"costruttori", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
-	collectors = _opportunity(&"esattori", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
-	recruiters = _opportunity(&"reclutatori", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.RECLUTA_TRUPPA)
-	secret = _opportunity(&"segreta", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
+	builders = _opportunity(&"costruttori", OpportunityDef.Kind.SCAMBIO_RISORSE)
+	collectors = _opportunity(&"esattori", OpportunityDef.Kind.SCAMBIO_RISORSE)
+	secret = _opportunity(&"segreta", OpportunityDef.Kind.SCAMBIO_RISORSE)
+	# Il tesoriere propone le azioni; il comandante le truppe di Fanteria.
+	treasurer = CouncillorDef.new()
+	treasurer.id = &"tesoriere"
+	commander = CouncillorDef.new()
+	commander.id = &"comandante"
+	commander.troop_tags = [&"Fanteria"]
+	sword.tags = [&"Fanteria"]
+	exclusive_troop.tags = [&"Fanteria"]
 
 	people = _identity(&"popolo", IdentityDef.Dimension.POPOLO)
 	people.resistance_bonus = 5
@@ -92,12 +100,14 @@ func before_each() -> void:
 	catalog.buildings = [farm]
 	catalog.troops = [sword]
 	catalog.eras = [era1]
-	catalog.opportunities = [builders, collectors, recruiters]
+	catalog.opportunities = [builders, collectors]
+	catalog.councillors = [treasurer, commander]
 	catalog.identities = [people, government, creed, culture, perk_a, perk_b, perk_c]
 	run_rules = RunRules.new()
 	run_rules.starting_gold = 0
 	run_rules.starting_perks = 2
 	run_rules.prototype_years = 0
+	run_rules.round_types = PackedInt32Array([3, 3, 3, 3, 3])
 	run_rules.starting_buildings = [farm]
 	run_rules.starting_troops = []
 	resistance_rules = ResistanceRules.new()
@@ -203,11 +213,12 @@ func test_i_tratti_permanenti_non_si_accorciano() -> void:
 	assert_eq(run.modifiers.year_malus().size(), 0, "L'Ambasciata non li vede.")
 
 
-# --- Opportunità ed elementi esclusivi -----------------------------------------
+# --- Azioni, consiglieri ed elementi esclusivi -----------------------------------------
 
 func test_opportunita_esclusiva_solo_con_l_identita() -> void:
 	var with_identity: RunState = _new_run()
 	with_identity.found_nation("X", _full_choice())
+	_listen(with_identity, &"tesoriere")
 	var ids: Array[StringName] = []
 	for offer: Offer in with_identity.offers:
 		ids.append(offer.opportunity.id)
@@ -217,6 +228,7 @@ func test_opportunita_esclusiva_solo_con_l_identita() -> void:
 	catalog.identities.append(other_government)
 	var without: RunState = _new_run()
 	without.found_nation("X", [people, other_government, creed, culture, perk_a, perk_b])
+	_listen(without, &"tesoriere")
 	for attempt: int in range(30):
 		for offer: Offer in without.offers:
 			assert_ne(offer.opportunity.id, &"segreta")
@@ -225,10 +237,11 @@ func test_opportunita_esclusiva_solo_con_l_identita() -> void:
 
 
 func test_opportunita_favorita_compare_piu_spesso() -> void:
-	run_rules.alternatives_per_opportunity = 1
+	run_rules.proposals_per_councillor = 1
 	government.exclusive_opportunities = []
 	var run: RunState = _new_run(11)
 	run.found_nation("X", _full_choice())
+	_listen(run, &"tesoriere")
 	var counts: Dictionary[StringName, int] = {}
 	for attempt: int in range(600):
 		var id: StringName = run.offers[0].opportunity.id
@@ -242,8 +255,7 @@ func test_opportunita_favorita_compare_piu_spesso() -> void:
 func test_truppa_esclusiva_fra_i_reclutatori() -> void:
 	var run: RunState = _new_run()
 	run.found_nation("X", _full_choice())
-	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
+	_listen(run, &"comandante")
 	var seen: bool = false
 	for attempt: int in range(40):
 		for offer: Offer in run.offers:
@@ -252,6 +264,27 @@ func test_truppa_esclusiva_fra_i_reclutatori() -> void:
 		run.gold += run.reroll_cost()
 		run.reroll_offers()
 	assert_true(seen, "Il popolo può reclutare la sua truppa esclusiva.")
+
+
+func test_consigliere_favorito_compare_piu_spesso() -> void:
+	# La cultura favorisce gli Esattori, che sono del tesoriere: il tesoriere pesa 2, il comandante 1.
+	run_rules.councillors_per_round = 1
+	var counts: Dictionary[StringName, int] = {}
+	for run_seed: int in range(300):
+		var run: RunState = _new_run(run_seed)
+		run.found_nation("X", _full_choice())
+		var id: StringName = run.councillor_choices[0].id
+		counts[id] = counts.get(id, 0) + 1
+	assert_gt(counts.get(&"tesoriere", 0), counts.get(&"comandante", 0) * 3 / 2, "Il tesoriere favorito esce più spesso (circa 200 contro 100).")
+
+
+## Sceglie il consigliere indicato (nei test il Consiglio ha due consiglieri, sempre presenti).
+func _listen(run: RunState, councillor_id: StringName) -> void:
+	for i: int in range(run.councillor_choices.size()):
+		if run.councillor_choices[i].id == councillor_id:
+			assert_true(run.choose_councillor(i))
+			return
+	fail_test("Consigliere %s non presente." % councillor_id)
 
 
 # --- Perk come ricompensa -------------------------------------------------------
