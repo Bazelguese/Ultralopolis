@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.6
+## Game Design Document — v0.7
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.6 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.7 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -172,8 +172,10 @@ La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogn
 
 | Regola | Stato |
 |---|---|
-| **3 opportunità** per macrofase | Confermato |
+| **2 opportunità** per macrofase (come le due scelte prima e le due dopo lo scontro con i mostri in The Bazaar) | Confermato |
 | Ogni opportunità mostra **3 alternative** | Confermato |
+| Ogni alternativa è un **singolo acquisto**: prenderne una chiude l’opportunità | Confermato |
+| Produzione è la fase di **costruzione** (offerte di edifici); Preparazione è la fase di **disposizione** (offerte di truppe) | Confermato |
 | Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
 | Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
 | Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo e continua a crescere fra un’opportunità e l’altra | Confermato; valori placeholder |
@@ -246,15 +248,17 @@ Sono ammesse **copie multiple** dello stesso edificio o della stessa truppa — 
 
 Quantità, nomi e statistiche sono placeholder. Eventuali varianti per popolo restano una proposta.
 
-### 6.3 Espansione della plancia — Confermato nel meccanismo, valori placeholder
+### 6.3 Espansione della plancia — Da definire
 
-Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) rende l’espansione uno degli assi principali di progressione della run. Il meccanismo è una **combinazione** di tre vie:
+Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) rende l’espansione uno degli assi principali di progressione della run. Che cosa concede gli spazi non è ancora stabilito. Ipotesi:
 
 - ricompense legate all’ingresso nelle ere;
 - edifici che concedono spazi, ad esempio una caserma che aggiunge spazi truppa;
 - acquisto di spazi con l’Oro, come opportunità.
 
-Gli edifici che concedono spazi occupano a loro volta uno spazio edificio, quindi entrano nella stessa scelta della doppia funzione. Quanti spazi dà ogni via e a che prezzo resta placeholder.
+Un edificio che concede spazi occuperebbe a sua volta uno spazio edificio, quindi entrerebbe nella stessa scelta della doppia funzione.
+
+Il prototipo usa provvisoriamente tutte e tre le vie, per poter provare una plancia che cresce (§16.3). Non è una regola.
 
 ### 6.4 Vendita e sostituzione — Confermato
 
@@ -262,7 +266,9 @@ Il principio P1 funziona solo se il giocatore, colpito da un malus, ha davvero a
 
 - Un elemento si può **vendere in qualunque momento fuori dal combattimento**, anche senza sostituirlo.
 - Il rimborso è **metà del prezzo pagato**, arrotondato per difetto.
-- La sostituzione equivale a vendere l’elemento presente e costruire il nuovo.
+- La sostituzione equivale a vendere l’elemento presente e costruire il nuovo: il rimborso conta già per pagare il nuovo elemento, e una truppa nuova prende il posto di quella sostituita.
+- Un elemento della dotazione iniziale non rimborsa nulla. Un elemento ottenuto come ricompensa rimborsa metà del suo prezzo di catalogo, come se fosse stato comprato.
+- Un edificio che concede spazi si può vendere o sostituire solo se nessun elemento resta senza spazio.
 
 **Da definire:** riserva fuori plancia, fusioni e potenziamento degli elementi.
 
@@ -561,7 +567,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run di prova di 3 anni completi (§16.3).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Due macrofasi con raccolta automatica all’ingresso e 3 opportunità ciascuna.
+- Due macrofasi con raccolta automatica all’ingresso e 2 opportunità ciascuna, da 3 alternative.
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
 - Riordino delle truppe fuori dal combattimento.
@@ -615,6 +621,11 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Convenzione | Stato |
 |---|---|
 | Run di prova di 3 anni completi | Limite del prototipo; la run completa resta di 10 vittorie (§3.4). |
+| Spazi della plancia da tre vie insieme: ingresso nelle ere, edifici che concedono spazi (es. Caserma), acquisto di spazi come offerta | Provvisoria finché §6.3 non è definito. |
+| Entrando in una nuova era, le alternative dell’opportunità in corso vengono ripescate gratis dalla nuova era | Accettata dal creatore. |
+| Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
+| Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
+| Se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
 | Pool di offerte basato solo sull’era (l’identità non esiste ancora) | Semplificazione del prototipo. |
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
 | Tre ere e relativo catalogo | Base di prova; nomi, costi e statistiche placeholder. |
@@ -669,7 +680,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Priorità | Questione |
 |---|---|
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
-| Prima di ampliare la plancia | Quantità e prezzi di ciascuna via di espansione (§6.3); layout. |
+| Prima di ampliare la plancia | Che cosa concede gli spazi (§6.3), quantità e prezzi; layout. |
 | Prima di ampliare la ricerca | Numero e identità definitive delle ere; costo del passaggio. |
 | Prima di più tipi di mana | Colori, temi e vincoli di compatibilità (§5.3). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
@@ -706,6 +717,13 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.7 — 4 novembre 2026**
+- Corretto un fraintendimento: le opportunità sono **2 per fase**, ognuna con 3 alternative; ogni alternativa è un singolo acquisto (§4.2).
+- Produzione = costruzione (edifici), Preparazione = disposizione (truppe) (§4.2).
+- Espansione della plancia riportata a “Da definire”; il prototipo usa le tre vie solo in via provvisoria (§6.3, §16.3).
+- Vendita: le ricompense rimborsano metà del prezzo di catalogo; dettagli della sostituzione e degli edifici che concedono spazi (§6.4).
+- Aggiunte le convenzioni accettate dal creatore (§16.3).
 
 **v0.6 — 4 novembre 2026**
 - Pareggio confermato: conta come vittoria, ma applica i malus del fantasma (§3.4).
