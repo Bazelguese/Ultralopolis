@@ -175,16 +175,12 @@ func ghost_resistance() -> int:
 
 ## Elementi disponibili per una dimensione dell'identità (tutti, come in un GDR).
 func identity_options(dimension: IdentityDef.Dimension) -> Array[IdentityDef]:
-	var found: Array[IdentityDef] = []
-	for def: IdentityDef in catalog.identities:
-		if def.dimension == dimension:
-			found.append(def)
-	return found
+	return IdentityRules.options(catalog, dimension)
 
 
 ## Quanti perk si scelgono alla creazione (non più di quelli disponibili).
 func starting_perk_count() -> int:
-	return mini(run_rules.starting_perks, identity_options(IdentityDef.Dimension.PERK).size())
+	return IdentityRules.starting_perk_count(catalog, run_rules)
 
 
 ## Crea la nazione: un elemento per ogni dimensione che ha opzioni, più i perk iniziali.
@@ -192,23 +188,9 @@ func starting_perk_count() -> int:
 func found_nation(p_name: String, choices: Array[IdentityDef]) -> bool:
 	if phase != Phase.CREAZIONE_NAZIONE:
 		return _fail("La nazione è già stata creata.")
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
-		var wanted: int = 1
-		if dimension == IdentityDef.Dimension.PERK:
-			wanted = starting_perk_count()
-		elif identity_options(dimension).is_empty():
-			wanted = 0
-		var chosen: int = 0
-		for def: IdentityDef in choices:
-			if def.dimension == dimension:
-				chosen += 1
-		if chosen != wanted:
-			return _fail("Scegli %d × %s." % [wanted, IdentityDef.DIMENSION_NAMES[dimension]])
-	for def: IdentityDef in choices:
-		if not catalog.identities.has(def):
-			return _fail("Elemento dell'identità non valido.")
-		if choices.count(def) > 1:
-			return _fail("Ogni elemento si sceglie una volta sola.")
+	var problem: String = IdentityRules.validate(catalog, run_rules, choices)
+	if problem != "":
+		return _fail(problem)
 	nation_name = p_name.strip_edges() if not p_name.strip_edges().is_empty() else "La tua nazione"
 	_log("Nasce %s (seme %d)." % [nation_name, run_seed])
 	for def: IdentityDef in choices:

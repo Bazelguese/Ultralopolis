@@ -81,3 +81,56 @@ static func building_details(def: BuildingDef) -> String:
 static func troop_details(def: TroopDef) -> String:
 	var cost: String = "senza mana" if def.mana_cost == 0 else "%d mana" % def.mana_cost
 	return "Danno %d, %s\nRicarica %s" % [def.damage, cost, seconds(def.cooldown_ms)]
+
+
+## Riassunto dell'identità: "Popolo · Governo · ..." e i perk su una seconda riga.
+static func identity_text(defs: Array[IdentityDef]) -> String:
+	var main: PackedStringArray = PackedStringArray()
+	var perks: PackedStringArray = PackedStringArray()
+	for def: IdentityDef in defs:
+		if def.dimension == IdentityDef.Dimension.PERK:
+			perks.append(def.display_name)
+		else:
+			main.append(def.display_name)
+	return "%s\nPerk: %s" % [" · ".join(main), ", ".join(perks) if not perks.is_empty() else "nessuno"]
+
+
+## Sfondo a tutto schermo e margini standard; restituisce il contenitore in cui costruire.
+static func screen(root: Control) -> MarginContainer:
+	var ui_theme: Theme = Theme.new()
+	ui_theme.default_font_size = 18
+	root.theme = ui_theme
+	var background: ColorRect = ColorRect.new()
+	background.color = Color(0.09, 0.09, 0.11)
+	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_child(background)
+	var margin: MarginContainer = MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	for side: String in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 24)
+	root.add_child(margin)
+	return margin
+
+
+## Pulsante grande per menu e schermate principali.
+static func big_button(text: String, callback: Callable, enabled: bool = true) -> Button:
+	var result: Button = button(text, callback, enabled)
+	result.custom_minimum_size = Vector2(420, 64)
+	result.add_theme_font_size_override("font_size", 26)
+	var states: Dictionary[String, Color] = {
+		"normal": Color(0.2, 0.24, 0.32),
+		"hover": Color(0.28, 0.34, 0.46),
+		"pressed": Color(0.16, 0.2, 0.27),
+		"disabled": Color(0.15, 0.15, 0.17),
+		"focus": Color(0.28, 0.34, 0.46),
+	}
+	for state: String in states:
+		var style: StyleBoxFlat = StyleBoxFlat.new()
+		style.bg_color = states[state]
+		style.set_corner_radius_all(8)
+		style.border_color = Color(0.95, 0.85, 0.55, 0.6 if state != "disabled" else 0.15)
+		style.set_border_width_all(2)
+		if state == "focus":
+			style.draw_center = false
+		result.add_theme_stylebox_override(state, style)
+	return result

@@ -2,11 +2,6 @@ extends Control
 ## Interfaccia provvisoria della run (GDD §14.3, §15.2).
 ## Legge lo stato di RunState e chiama le sue azioni: nessuna regola di gioco qui.
 
-const CATALOG_PATH: String = "res://data/catalog/catalog.tres"
-const RUN_RULES_PATH: String = "res://data/rules/run_rules.tres"
-const BATTLE_RULES_PATH: String = "res://data/rules/battle_rules.tres"
-const RESISTANCE_RULES_PATH: String = "res://data/rules/resistance_rules.tres"
-
 ## OFFERTA/RICOMPENSA: si sceglie cosa sostituire; SCELTA_OFFERTA: si sceglie una voce interna.
 enum PendingKind { NESSUNA, OFFERTA, RICOMPENSA, SCELTA_OFFERTA }
 
@@ -30,11 +25,6 @@ var _pending_index: int = -1
 var _shown_chronicle: int = 0
 var _board_title: Label
 var _identity_label: Label
-
-## Scelte in corso nella creazione della nazione.
-var _creation_name: String = ""
-var _creation_choice: Dictionary[IdentityDef.Dimension, IdentityDef] = {}
-var _creation_perks: Array[IdentityDef] = []
 
 
 func _ready() -> void:
@@ -69,7 +59,8 @@ func _build_layout() -> void:
 	_status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(_status_label)
 	top.add_child(UiKit.label("PROTOTIPO — grafica provvisoria", 14, UiKit.COLOR_WARNING))
-	top.add_child(UiKit.button("Nuova run", _new_run))
+	top.add_child(UiKit.button("Ricomincia", _new_run))
+	top.add_child(UiKit.button("Menu principale", _on_menu))
 
 	var middle: HBoxContainer = HBoxContainer.new()
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -142,22 +133,39 @@ func _wrapping_row(parent: Control) -> HBoxContainer:
 
 # --- Aggiornamento ----------------------------------------------------------
 
+## Nuova run con la nazione scelta nel menu (o con una nazione di prova se si avvia
+## questa scena da sola in Godot).
 func _new_run() -> void:
-	var catalog: CatalogDef = load(CATALOG_PATH) as CatalogDef
-	var run_rules: RunRules = load(RUN_RULES_PATH) as RunRules
-	var battle_rules: BattleRules = load(BATTLE_RULES_PATH) as BattleRules
-	var resistance_rules: ResistanceRules = load(RESISTANCE_RULES_PATH) as ResistanceRules
+	var catalog: CatalogDef = GameSession.catalog()
+	var run_rules: RunRules = GameSession.run_rules()
+	var nation: NationTemplate = GameSession.selected_nation
+	if nation == null or nation.problem(catalog, run_rules) != "":
+		nation = _test_nation(catalog, run_rules)
 	# Il seme sceglie le offerte; viene registrato nella run.
 	var run_seed: int = randi()
-	run = RunState.new(catalog, run_rules, battle_rules, resistance_rules, run_seed)
+	run = RunState.new(catalog, run_rules, GameSession.battle_rules(), GameSession.resistance_rules(), run_seed)
+	if run.phase == RunState.Phase.CREAZIONE_NAZIONE:
+		run.found_nation(nation.nation_name, nation.resolve(catalog))
 	_shown_chronicle = 0
 	_chronicle.clear()
-	_creation_name = ""
-	_creation_choice = {}
-	_creation_perks = []
 	_cancel_pending()
 	_message_label.text = ""
 	_refresh()
+
+
+## Nazione di prova: il primo elemento di ogni dimensione e i primi perk.
+func _test_nation(catalog: CatalogDef, run_rules: RunRules) -> NationTemplate:
+	var choices: Array[IdentityDef] = []
+	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+		var options: Array[IdentityDef] = IdentityRules.options(catalog, dimension)
+		var count: int = IdentityRules.starting_perk_count(catalog, run_rules) if dimension == IdentityDef.Dimension.PERK else mini(1, options.size())
+		for i: int in range(count):
+			choices.append(options[i])
+	return NationTemplate.from_choices("prova", "Nazione di prova", choices)
+
+
+func _on_menu() -> void:
+	GameSession.go(GameSession.MENU_SCENE)
 
 
 func _refresh() -> void:
@@ -270,9 +278,6 @@ func _empty_slot() -> Control:
 
 func _refresh_actions() -> void:
 	UiKit.clear(_action_box)
-	if run.phase == RunState.Phase.CREAZIONE_NAZIONE:
-		_show_creation()
-		return
 	if _pending_kind == PendingKind.SCELTA_OFFERTA:
 		_show_offer_choices()
 		return
@@ -401,7 +406,8 @@ func _show_end() -> void:
 			text = "Fine della run di prova (%d anni)." % run.year
 	_action_box.add_child(UiKit.wrapped(text, 28, UiKit.COLOR_WARNING))
 	_action_box.add_child(UiKit.wrapped("Vittorie: %d · Prestigio: %d · Seme della run: %d" % [run.wins, run.prestige, run.run_seed], 18))
-	_action_box.add_child(UiKit.button("Nuova run", _new_run))
+	_action_box.add_child(UiKit.button("Nuova run con la stessa nazione", _new_run))
+	_action_box.add_child(UiKit.button("Menu principale", _on_menu))
 
 
 func _refresh_chronicle() -> void:
@@ -448,78 +454,6 @@ func _on_replace(replace_index: int) -> void:
 		_act(run.buy_offer(index, replace_index))
 	elif kind == PendingKind.RICOMPENSA:
 		_act(run.take_reward(index, replace_index))
-
-
-# --- Creazione della nazione ---------------------------------------------------
-
-func _show_creation() -> void:
-	_action_box.add_child(UiKit.wrapped("Crea la tua nazione", 26))
-	_action_box.add_child(UiKit.wrapped("Come in un gioco di ruolo: scegli nome, popolo, governo, credo, cultura e i perk iniziali. Tutte le opzioni sono disponibili.", 16))
-
-	var name_edit: LineEdit = LineEdit.new()
-	name_edit.placeholder_text = "Nome della nazione"
-	name_edit.text = _creation_name
-	name_edit.text_changed.connect(_on_creation_name_changed)
-	_action_box.add_child(name_edit)
-
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
-		var options: Array[IdentityDef] = run.identity_options(dimension)
-		if options.is_empty():
-			continue
-		var is_perk: bool = dimension == IdentityDef.Dimension.PERK
-		var title: String = IdentityDef.DIMENSION_NAMES[dimension]
-		if is_perk:
-			title = "Perk (scegline %d — scelti %d)" % [run.starting_perk_count(), _creation_perks.size()]
-		_action_box.add_child(UiKit.wrapped(title, 22, UiKit.COLOR_WARNING))
-		for def: IdentityDef in options:
-			var selected: bool = _creation_perks.has(def) if is_perk else _creation_choice.get(dimension) == def
-			var card: PanelContainer = UiKit.panel(Color(0.22, 0.3, 0.22) if selected else UiKit.COLOR_OFFER)
-			var box: VBoxContainer = VBoxContainer.new()
-			card.add_child(box)
-			var heading: String = ("✔ " if selected else "") + def.display_name
-			if def.resistance_bonus != 0:
-				heading += "  (Resistenza %+d)" % def.resistance_bonus
-			box.add_child(UiKit.wrapped(heading, 18))
-			box.add_child(UiKit.wrapped(def.description, 14))
-			box.add_child(UiKit.button("Togli" if selected else "Scegli", _on_creation_pick.bind(def)))
-			_action_box.add_child(card)
-
-	var ready: bool = _creation_complete()
-	_action_box.add_child(UiKit.button("Crea la nazione", _on_found_nation, ready))
-
-
-func _creation_complete() -> bool:
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
-		if dimension == IdentityDef.Dimension.PERK:
-			continue
-		if not run.identity_options(dimension).is_empty() and not _creation_choice.has(dimension):
-			return false
-	return _creation_perks.size() == run.starting_perk_count()
-
-
-func _on_creation_name_changed(new_text: String) -> void:
-	_creation_name = new_text
-
-
-func _on_creation_pick(def: IdentityDef) -> void:
-	if def.dimension == IdentityDef.Dimension.PERK:
-		if _creation_perks.has(def):
-			_creation_perks.erase(def)
-		elif _creation_perks.size() < run.starting_perk_count():
-			_creation_perks.append(def)
-	elif _creation_choice.get(def.dimension) == def:
-		_creation_choice.erase(def.dimension)
-	else:
-		_creation_choice[def.dimension] = def
-	_refresh()
-
-
-func _on_found_nation() -> void:
-	var choices: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in _creation_choice:
-		choices.append(_creation_choice[dimension])
-	choices.append_array(_creation_perks)
-	_act(run.found_nation(_creation_name, choices))
 
 
 ## Seconda scelta di un'offerta (quale bonus, quale truppa, quale malus).
