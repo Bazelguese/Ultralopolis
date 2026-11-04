@@ -1,5 +1,5 @@
 extends Node3D
-## Prova visiva della plancia 3D in stile Cronaca miniata (GDD §14.2).
+## Prova visiva della plancia 3D in stile fantasy moderno (GDD §14.2).
 ## Mostra come potrebbe apparire la partita: il tavolo, la plancia, le offerte e la battaglia.
 ## IMPORTANTE: quello che si muove segue un copione dimostrativo con numeri di esempio.
 ## Non è la simulazione del gioco e non contiene regole: la battaglia vera userà BattleSim.
@@ -84,29 +84,37 @@ func _crea_ambiente() -> void:
 	var mondo: WorldEnvironment = WorldEnvironment.new()
 	var ambiente: Environment = Environment.new()
 	ambiente.background_mode = Environment.BG_COLOR
-	ambiente.background_color = Color("120b07")
+	ambiente.background_color = StileVisivo.NOTTE
 	ambiente.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	ambiente.ambient_light_color = Color("7a5a40")
-	ambiente.ambient_light_energy = 0.35
-	ambiente.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	ambiente.ambient_light_color = Color("4a5a80")
+	ambiente.ambient_light_energy = 0.45
+	ambiente.tonemap_mode = Environment.TONE_MAPPER_ACES
 	ambiente.glow_enabled = true
-	ambiente.glow_intensity = 0.5
-	ambiente.glow_hdr_threshold = 1.1
+	ambiente.glow_intensity = 0.55
+	ambiente.glow_bloom = 0.0
+	ambiente.glow_hdr_threshold = 1.2
 	mondo.environment = ambiente
 	add_child(mondo)
 
 	var sole: DirectionalLight3D = DirectionalLight3D.new()
-	sole.light_color = Color("ffe2b8")
-	sole.light_energy = 0.95
+	sole.light_color = Color("fff0d8")
+	sole.light_energy = 0.9
 	sole.shadow_enabled = true
-	sole.rotation_degrees = Vector3(-58.0, -28.0, 0.0)
+	sole.rotation_degrees = Vector3(-60.0, -25.0, 0.0)
 	add_child(sole)
 
+	var controluce: DirectionalLight3D = DirectionalLight3D.new()
+	controluce.light_color = Color("6a8cff")
+	controluce.light_energy = 0.35
+	controluce.rotation_degrees = Vector3(-30.0, 155.0, 0.0)
+	add_child(controluce)
+
+	## Luce d'atmosfera che pulsa piano (solo effetto visivo).
 	_candela = OmniLight3D.new()
-	_candela.light_color = Color("ff9a45")
+	_candela.light_color = Color("8a5cff")
 	_candela.light_energy = 1.6
-	_candela.omni_range = 18.0
-	_candela.position = Vector3(-13.0, 4.0, -5.0)
+	_candela.omni_range = 22.0
+	_candela.position = Vector3(-15.0, 5.0, -8.0)
 	add_child(_candela)
 
 	_camera = Camera3D.new()
@@ -116,26 +124,25 @@ func _crea_ambiente() -> void:
 
 
 func _crea_tavolo() -> void:
-	var tavolo: MeshInstance3D = MeshInstance3D.new()
+	var terreno: MeshInstance3D = MeshInstance3D.new()
 	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(40.0, 0.5, 28.0)
-	tavolo.mesh = forma
-	tavolo.material_override = StileCronaca.materiale_legno()
-	tavolo.position.y = -0.25
-	add_child(tavolo)
+	forma.size = Vector3(70.0, 0.5, 50.0)
+	terreno.mesh = forma
+	terreno.material_override = StileVisivo.materiale_pietra(StileVisivo.PIETRA_SCURA.darkened(0.2), 3.0)
+	terreno.position.y = -0.45
+	add_child(terreno)
 
 
 # --- Plance --------------------------------------------------------------------
 
-## La plancia di un lato: foglio di pergamena, spazi, edifici, truppe, medaglione e riserva di mana.
+## La plancia di un lato: lastra di pietra con il bordo illuminato, spazi, edifici, truppe, stemma e mana.
 ## Il fantasma sta dall'altra parte del tavolo: stesse file, specchiate (truppe verso il centro).
 func _crea_plancia(lato: Lato) -> Node3D:
 	var radice: Node3D = Node3D.new()
 	add_child(radice)
 	var segno: float = 1.0 if lato == Lato.GIOCATORE else -1.0
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5 * segno
-	var colore: Color = StileCronaca.FOGLIO_GIOCATORE if lato == Lato.GIOCATORE else StileCronaca.FOGLIO_FANTASMA
-	_crea_foglio(radice, Vector3(-0.43, 0.0, z_centro), Vector2(24.35, 5.0), colore)
+	_crea_lastra(radice, Vector3(-0.43, 0.0, z_centro), Vector2(24.35, 5.0), _colore_lato(lato))
 
 	var truppe: Array[DatiEsempioPlancia.Pezzo] = DatiEsempioPlancia.truppe_giocatore() if lato == Lato.GIOCATORE else DatiEsempioPlancia.truppe_fantasma()
 	var edifici: Array[DatiEsempioPlancia.Pezzo] = DatiEsempioPlancia.edifici_giocatore() if lato == Lato.GIOCATORE else DatiEsempioPlancia.edifici_fantasma()
@@ -150,19 +157,19 @@ func _crea_plancia(lato: Lato) -> Node3D:
 			_ricarica_truppe[lato].append(0.0)
 			_lampo_truppe[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
-			_crea_spazio(radice, posizione, MISURA_TRUPPA, i < capacita_truppe)
+			_crea_spazio(radice, posizione, MISURA_TRUPPA, i < capacita_truppe, _colore_lato(lato))
 	for i: int in range(SPAZI_EDIFICI):
 		var posizione: Vector3 = Vector3(X_SPAZI + (i - (SPAZI_EDIFICI - 1) * 0.5) * PASSO_EDIFICI, 0.02, Z_EDIFICI * segno)
 		if i < edifici.size():
 			_edifici[lato].append(_crea_tessera(radice, edifici[i], MISURA_EDIFICIO, posizione))
 			_ricarica_edifici[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
-			var spazio: Node3D = _crea_spazio(radice, posizione, MISURA_EDIFICIO, i < capacita_edifici)
+			var spazio: Node3D = _crea_spazio(radice, posizione, MISURA_EDIFICIO, i < capacita_edifici, _colore_lato(lato))
 			if lato == Lato.GIOCATORE and i < capacita_edifici and _spazio_libero == null:
 				_spazio_libero = spazio
 
 	if lato == Lato.GIOCATORE:
-		var nota: Label3D = StileCronaca.scritta("le truppe agiscono da destra verso sinistra  ←", StileCronaca.FONT_TESTO, 64, Color("d9c79f"))
+		var nota: Label3D = StileVisivo.scritta("LE TRUPPE AGISCONO DA DESTRA VERSO SINISTRA  ←", StileVisivo.FONT_TESTO_FORTE, 50, StileVisivo.TESTO_TENUE)
 		nota.position = Vector3(7.0, 0.02, 0.0)
 		radice.add_child(nota)
 
@@ -171,21 +178,32 @@ func _crea_plancia(lato: Lato) -> Node3D:
 	return radice
 
 
-func _crea_foglio(radice: Node3D, centro: Vector3, misura: Vector2, colore: Color) -> void:
-	var cornice: MeshInstance3D = MeshInstance3D.new()
-	var forma_cornice: BoxMesh = BoxMesh.new()
-	forma_cornice.size = Vector3(misura.x + 0.3, 0.02, misura.y + 0.3)
-	cornice.mesh = forma_cornice
-	cornice.material_override = StileCronaca.materiale_oro()
-	cornice.position = centro + Vector3(0.0, 0.005, 0.0)
-	radice.add_child(cornice)
-	var foglio: MeshInstance3D = MeshInstance3D.new()
+func _colore_lato(lato: int) -> Color:
+	return StileVisivo.COLORE_GIOCATORE if lato == Lato.GIOCATORE else StileVisivo.COLORE_FANTASMA
+
+
+## Lastra di pietra con un bordo luminoso del colore del lato.
+func _crea_lastra(radice: Node3D, centro: Vector3, misura: Vector2, colore: Color) -> void:
+	var lastra: MeshInstance3D = MeshInstance3D.new()
 	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(misura.x, 0.03, misura.y)
-	foglio.mesh = forma
-	foglio.material_override = StileCronaca.materiale_pergamena(colore)
-	foglio.position = centro + Vector3(0.0, 0.012, 0.0)
-	radice.add_child(foglio)
+	forma.size = Vector3(misura.x, 0.4, misura.y)
+	lastra.mesh = forma
+	lastra.material_override = StileVisivo.materiale_pietra(StileVisivo.PIETRA, 2.5)
+	lastra.position = centro + Vector3(0.0, -0.18, 0.0)
+	radice.add_child(lastra)
+	var luce: StandardMaterial3D = StileVisivo.materiale_luminoso(colore, 1.3)
+	var lati: Array[Vector3] = [
+		Vector3(0.0, 0.0, -misura.y * 0.5), Vector3(0.0, 0.0, misura.y * 0.5),
+		Vector3(-misura.x * 0.5, 0.0, 0.0), Vector3(misura.x * 0.5, 0.0, 0.0),
+	]
+	for i: int in range(lati.size()):
+		var bordo: MeshInstance3D = MeshInstance3D.new()
+		var forma_bordo: BoxMesh = BoxMesh.new()
+		forma_bordo.size = Vector3(misura.x + 0.1, 0.07, 0.07) if i < 2 else Vector3(0.07, 0.07, misura.y + 0.1)
+		bordo.mesh = forma_bordo
+		bordo.material_override = luce
+		bordo.position = centro + lati[i] + Vector3(0.0, 0.035, 0.0)
+		radice.add_child(bordo)
 
 
 func _crea_tessera(radice: Node3D, dati: DatiEsempioPlancia.Pezzo, misura: Vector2, posizione: Vector3) -> Tessera3D:
@@ -196,18 +214,18 @@ func _crea_tessera(radice: Node3D, dati: DatiEsempioPlancia.Pezzo, misura: Vecto
 	return tessera
 
 
-## Spazio vuoto: segnato in oro se è disponibile, appena accennato se va ancora conquistato.
-func _crea_spazio(radice: Node3D, posizione: Vector3, misura: Vector2, disponibile: bool) -> Node3D:
+## Spazio vuoto: velato del colore del lato se è disponibile, scuro se va ancora conquistato.
+func _crea_spazio(radice: Node3D, posizione: Vector3, misura: Vector2, disponibile: bool, colore_lato: Color) -> Node3D:
 	var spazio: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
 	forma.size = misura
 	spazio.mesh = forma
-	var colore: Color = Color(StileCronaca.ORO_SCURO, 0.3) if disponibile else Color(StileCronaca.INCHIOSTRO, 0.07)
-	spazio.material_override = StileCronaca.materiale_velo(colore)
+	var colore: Color = Color(colore_lato, 0.16) if disponibile else Color(0.0, 0.0, 0.0, 0.28)
+	spazio.material_override = StileVisivo.materiale_velo(colore)
 	spazio.position = posizione + Vector3(0.0, 0.012, 0.0)
 	radice.add_child(spazio)
 	if disponibile:
-		var scritta: Label3D = StileCronaca.scritta("Spazio libero", StileCronaca.FONT_TESTO, 44, StileCronaca.INCHIOSTRO_TENUE)
+		var scritta: Label3D = StileVisivo.scritta("LIBERO", StileVisivo.FONT_TITOLI, 46, Color(colore_lato, 0.85), 0.0, 6)
 		scritta.position = Vector3(0.0, 0.004, 0.0)
 		spazio.add_child(scritta)
 	return spazio
@@ -215,46 +233,46 @@ func _crea_spazio(radice: Node3D, posizione: Vector3, misura: Vector2, disponibi
 
 ## Colonna a sinistra della plancia: stemma con la Resistenza, nome, barra e riserva di mana.
 func _crea_medaglione(radice: Node3D, lato: Lato, z_centro: float) -> void:
+	var colore: Color = _colore_lato(lato)
 	var centro_stemma: Vector3 = Vector3(X_MEDAGLIONE, 0.0, z_centro - 1.15)
 	var bordo: MeshInstance3D = MeshInstance3D.new()
 	var forma_bordo: CylinderMesh = CylinderMesh.new()
 	forma_bordo.top_radius = 0.95
 	forma_bordo.bottom_radius = 1.0
-	forma_bordo.height = 0.12
+	forma_bordo.height = 0.16
 	bordo.mesh = forma_bordo
-	bordo.material_override = StileCronaca.materiale_oro()
-	bordo.position = centro_stemma + Vector3(0.0, 0.06, 0.0)
+	bordo.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
+	bordo.position = centro_stemma + Vector3(0.0, 0.08, 0.0)
 	radice.add_child(bordo)
 	var disco: MeshInstance3D = MeshInstance3D.new()
 	var forma_disco: CylinderMesh = CylinderMesh.new()
-	forma_disco.top_radius = 0.82
-	forma_disco.bottom_radius = 0.82
-	forma_disco.height = 0.14
+	forma_disco.top_radius = 0.8
+	forma_disco.bottom_radius = 0.8
+	forma_disco.height = 0.18
 	disco.mesh = forma_disco
-	var colore_stemma: Color = StileCronaca.COLORI_MANA[StileCronaca.Mana.BLU] if lato == Lato.GIOCATORE else Color("5e4b7a")
-	disco.material_override = StileCronaca.materiale(colore_stemma, 0.6)
-	disco.position = centro_stemma + Vector3(0.0, 0.07, 0.0)
+	disco.material_override = StileVisivo.materiale(colore.darkened(0.55), 0.5)
+	disco.position = centro_stemma + Vector3(0.0, 0.09, 0.0)
 	radice.add_child(disco)
-	var numero: Label3D = StileCronaca.scritta(str(_resistenza[lato]), StileCronaca.FONT_TITOLI, 130, StileCronaca.PERGAMENA_CHIARA)
-	numero.position = centro_stemma + Vector3(0.0, 0.15, 0.0)
+	var numero: Label3D = StileVisivo.scritta(str(_resistenza[lato]), StileVisivo.FONT_TITOLI, 140, Color.WHITE, 0.0, 18)
+	numero.position = centro_stemma + Vector3(0.0, 0.2, 0.0)
 	radice.add_child(numero)
 	_scritte_resistenza[lato] = numero
-	var nome: String = "Valfiume" if lato == Lato.GIOCATORE else "Regno di Altamura"
-	var titolo: Label3D = StileCronaca.scritta(nome, StileCronaca.FONT_TITOLI, 46, StileCronaca.INCHIOSTRO)
+	var nome: String = "VALFIUME" if lato == Lato.GIOCATORE else "REGNO DI ALTAMURA"
+	var titolo: Label3D = StileVisivo.scritta(nome, StileVisivo.FONT_TITOLI, 44, StileVisivo.TESTO, 0.0, 8)
 	titolo.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.0)
 	radice.add_child(titolo)
 	var fondo_barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_fondo: BoxMesh = BoxMesh.new()
-	forma_fondo.size = Vector3(1.9, 0.04, 0.18)
+	forma_fondo.size = Vector3(1.9, 0.04, 0.2)
 	fondo_barra.mesh = forma_fondo
-	fondo_barra.material_override = StileCronaca.materiale(Color("3a281a"), 0.9)
+	fondo_barra.material_override = StileVisivo.materiale(StileVisivo.NOTTE, 0.9)
 	fondo_barra.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.36)
 	radice.add_child(fondo_barra)
 	var barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_barra: BoxMesh = BoxMesh.new()
-	forma_barra.size = Vector3(1.9, 0.05, 0.13)
+	forma_barra.size = Vector3(1.9, 0.05, 0.14)
 	barra.mesh = forma_barra
-	barra.material_override = StileCronaca.materiale(StileCronaca.SIENA, 0.7)
+	barra.material_override = StileVisivo.materiale_luminoso(colore, 0.9)
 	barra.position = fondo_barra.position + Vector3(0.0, 0.01, 0.0)
 	radice.add_child(barra)
 	_barre_resistenza[lato] = barra
@@ -266,22 +284,22 @@ func _crea_riserva(radice: Node3D, lato: Lato, z_centro: float) -> void:
 	nodo.position = Vector3(X_MEDAGLIONE, 0.0, z_centro + 1.05)
 	radice.add_child(nodo)
 	_nodo_riserva[lato] = nodo
-	var colori: Array[int] = [StileCronaca.Mana.ROSSO, StileCronaca.Mana.VERDE, StileCronaca.Mana.BLU, StileCronaca.Mana.ENERGETICO]
+	var colori: Array[int] = [StileVisivo.Mana.ROSSO, StileVisivo.Mana.VERDE, StileVisivo.Mana.BLU, StileVisivo.Mana.ENERGETICO]
 	for i: int in range(colori.size()):
 		var mana: int = colori[i]
 		var x: float = (i - 1.5) * 0.55
 		var gemma: MeshInstance3D = MeshInstance3D.new()
 		var forma: CylinderMesh = CylinderMesh.new()
-		forma.top_radius = 0.2
-		forma.bottom_radius = 0.22
-		forma.height = 0.1
-		forma.radial_segments = 8
+		forma.top_radius = 0.19
+		forma.bottom_radius = 0.23
+		forma.height = 0.12
+		forma.radial_segments = 6
 		gemma.mesh = forma
-		gemma.material_override = StileCronaca.materiale_gemma(mana)
-		gemma.position = Vector3(x, 0.07, 0.0)
+		gemma.material_override = StileVisivo.materiale_gemma(mana)
+		gemma.position = Vector3(x, 0.08, 0.0)
 		nodo.add_child(gemma)
-		var conteggio: Label3D = StileCronaca.scritta("0", StileCronaca.FONT_NUMERI, 60, StileCronaca.INCHIOSTRO)
-		conteggio.position = Vector3(x, 0.04, 0.48)
+		var conteggio: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 64, Color.WHITE, 0.0, 10)
+		conteggio.position = Vector3(x, 0.04, 0.5)
 		nodo.add_child(conteggio)
 		_riserva[lato][mana] = 0
 		_scritte_riserva[lato][mana] = conteggio
@@ -297,11 +315,11 @@ func _crea_offerte() -> void:
 		var tessera: Tessera3D = Tessera3D.new()
 		add_child(tessera)
 		tessera.costruisci(dati[i], MISURA_EDIFICIO.x, MISURA_EDIFICIO.y)
-		var tipo: Label3D = StileCronaca.scritta(dati[i].tipo_offerta, StileCronaca.FONT_TITOLI, 40, StileCronaca.PERGAMENA_CHIARA)
+		var tipo: Label3D = StileVisivo.scritta(dati[i].tipo_offerta.to_upper(), StileVisivo.FONT_TITOLI, 44, StileVisivo.TESTO, 0.0, 10)
 		tipo.position = Vector3(0.0, 0.02, -MISURA_EDIFICIO.y * 0.5 - 0.22)
 		tipo.set_meta("solo_offerta", true)
 		tessera.add_child(tipo)
-		var costo: Label3D = StileCronaca.scritta(dati[i].costo, StileCronaca.FONT_TITOLI, 46, StileCronaca.ORO_LUCE)
+		var costo: Label3D = StileVisivo.scritta(dati[i].costo, StileVisivo.FONT_TITOLI, 54, StileVisivo.ORO_LUCE, 0.0, 12)
 		costo.position = Vector3(0.0, 0.02, MISURA_EDIFICIO.y * 0.5 + 0.25)
 		costo.set_meta("solo_offerta", true)
 		tessera.add_child(costo)
@@ -478,19 +496,19 @@ func _avanza_truppe(lato: int, passo: float) -> void:
 		tessera.imposta_ricarica(_ricarica_truppe[lato][i])
 		if _ricarica_truppe[lato][i] < 1.0:
 			if _lampo_truppe[lato][i] <= 0.0:
-				tessera.imposta_stato("", StileCronaca.PERGAMENA)
+				tessera.imposta_stato("", StileVisivo.NOTTE)
 			continue
 		if pezzo.copione == DatiEsempioPlancia.Copione.ASPETTA_MANA:
-			var nome_mana: String = StileCronaca.NOMI_MANA[pezzo.mana]
-			var disponibile: int = int(_riserva[lato].get(pezzo.mana, 0)) + int(_riserva[lato].get(StileCronaca.Mana.ENERGETICO, 0))
-			tessera.imposta_stato("In attesa: servono %d %s, %s %d" % [pezzo.mana_numero, nome_mana, "ne hai" if lato == Lato.GIOCATORE else "ne ha", mini(disponibile, pezzo.mana_numero - 1)], StileCronaca.VERMIGLIO_SCURO)
+			var nome_mana: String = StileVisivo.NOMI_MANA[pezzo.mana]
+			var disponibile: int = int(_riserva[lato].get(pezzo.mana, 0)) + int(_riserva[lato].get(StileVisivo.Mana.ENERGETICO, 0))
+			tessera.imposta_stato("In attesa: servono %d %s, %s %d" % [pezzo.mana_numero, nome_mana, "ne hai" if lato == Lato.GIOCATORE else "ne ha", mini(disponibile, pezzo.mana_numero - 1)], StileVisivo.PERICOLO)
 			continue
 		_ricarica_truppe[lato][i] = 0.0
 		_lampo_truppe[lato][i] = 0.6
 		tessera.attiva(verso)
-		var spesa: String = "senza mana" if pezzo.mana == StileCronaca.Mana.NESSUNO else "−%d %s" % [pezzo.mana_numero, StileCronaca.NOMI_MANA[pezzo.mana]]
-		tessera.imposta_stato("Si attiva · %s" % spesa, StileCronaca.ORO_LUCE)
-		if pezzo.mana != StileCronaca.Mana.NESSUNO:
+		var spesa: String = "senza mana" if pezzo.mana == StileVisivo.Mana.NESSUNO else "−%d %s" % [pezzo.mana_numero, StileVisivo.NOMI_MANA[pezzo.mana]]
+		tessera.imposta_stato("Si attiva · %s" % spesa, StileVisivo.ORO_LUCE)
+		if pezzo.mana != StileVisivo.Mana.NESSUNO:
 			_togli_mana(lato, pezzo.mana, pezzo.mana_numero)
 		_infliggi(1 - lato, pezzo.danno)
 
@@ -502,7 +520,7 @@ func _aggiorna_stati_fermi() -> void:
 	for lato: int in [Lato.GIOCATORE, Lato.FANTASMA]:
 		for tessera: Tessera3D in _truppe[lato]:
 			tessera.imposta_ricarica(1.0)
-			tessera.imposta_stato("", StileCronaca.PERGAMENA)
+			tessera.imposta_stato("", StileVisivo.NOTTE)
 
 
 ## Una gemma vola dall'edificio alla riserva di mana del suo lato.
@@ -512,7 +530,7 @@ func _lancia_mana(lato: int, edificio: Tessera3D) -> void:
 	forma.radius = 0.16
 	forma.height = 0.32
 	gemma.mesh = forma
-	gemma.material_override = StileCronaca.materiale_gemma(edificio.pezzo.mana)
+	gemma.material_override = StileVisivo.materiale_gemma(edificio.pezzo.mana)
 	add_child(gemma)
 	var partenza: Vector3 = edificio.punto_gemma()
 	var destinazione: Node3D = _posizioni_riserva[lato][edificio.pezzo.mana]
@@ -542,7 +560,7 @@ func _togli_mana(lato: int, mana: int, quanto: int) -> void:
 	_aggiorna_riserva(lato, mana)
 	var resto: int = quanto - dal_colore
 	if resto > 0:
-		var energetico: int = StileCronaca.Mana.ENERGETICO
+		var energetico: int = StileVisivo.Mana.ENERGETICO
 		_riserva[lato][energetico] = maxi(0, int(_riserva[lato].get(energetico, 0)) - resto)
 		_aggiorna_riserva(lato, energetico)
 
@@ -555,9 +573,8 @@ func _aggiorna_riserva(lato: int, mana: int) -> void:
 func _infliggi(lato: int, danno: int) -> void:
 	_resistenza[lato] = maxi(0, _resistenza[lato] - danno)
 	_aggiorna_resistenza(lato)
-	var colpo: Label3D = StileCronaca.scritta("−%d" % danno, StileCronaca.FONT_TITOLI, 120, StileCronaca.ORO_LUCE)
-	colpo.outline_size = 18
-	colpo.outline_modulate = Color(0.1, 0.05, 0.02)
+	var colpo: Label3D = StileVisivo.scritta("−%d" % danno, StileVisivo.FONT_TITOLI, 140, Color.WHITE, 0.0, 22)
+	colpo.outline_modulate = StileVisivo.PERICOLO.darkened(0.35)
 	colpo.no_depth_test = true
 	add_child(colpo)
 	var segno: float = 1.0 if lato == Lato.GIOCATORE else -1.0

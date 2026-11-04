@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://b47h3aak63bt2"
-path="res://.godot/imported/Alegreya-Variable.ttf-1b2acbd08e66a8c79c2e8a8e61e4cd9f.fontdata"
+uid="uid://jdrvyekkqcac"
+path="res://.godot/imported/Barlow-SemiBold.ttf-ffc1670babb729243472f3abaa74e35c.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/Alegreya-Variable.ttf"
-dest_files=["res://.godot/imported/Alegreya-Variable.ttf-1b2acbd08e66a8c79c2e8a8e61e4cd9f.fontdata"]
+source_file="res://assets/fonts/Barlow-SemiBold.ttf"
+dest_files=["res://.godot/imported/Barlow-SemiBold.ttf-ffc1670babb729243472f3abaa74e35c.fontdata"]
 
 [params]
 

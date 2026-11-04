@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://cr20wc7uipo00"
-path="res://.godot/imported/IMFellEnglishSC-Regular.ttf-ebc04104741601da5803e009b756fda4.fontdata"
+uid="uid://dp2al6q28pfgj"
+path="res://.godot/imported/BarlowSemiCondensed-Bold.ttf-e78b886af166e871ad44dbd47c1e0c7f.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/IMFellEnglishSC-Regular.ttf"
-dest_files=["res://.godot/imported/IMFellEnglishSC-Regular.ttf-ebc04104741601da5803e009b756fda4.fontdata"]
+source_file="res://assets/fonts/BarlowSemiCondensed-Bold.ttf"
+dest_files=["res://.godot/imported/BarlowSemiCondensed-Bold.ttf-e78b886af166e871ad44dbd47c1e0c7f.fontdata"]
 
 [params]
 

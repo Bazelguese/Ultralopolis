@@ -29,7 +29,7 @@ var _animazione_messaggio: Tween
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	theme = StileCronaca.tema_interfaccia()
+	theme = StileVisivo.tema_interfaccia()
 	_crea_nazione()
 	_crea_fase()
 	_crea_run()
@@ -58,8 +58,8 @@ func _crea_nazione() -> void:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 0)
 	riquadro.add_child(colonna)
-	colonna.add_child(StileCronaca.etichetta("Valfiume", StileCronaca.FONT_TITOLI, 32))
-	colonna.add_child(StileCronaca.etichetta("Popolo del delta · Repubblica", StileCronaca.FONT_PICCOLO, 16, StileCronaca.INCHIOSTRO_TENUE))
+	colonna.add_child(StileVisivo.etichetta("VALFIUME", StileVisivo.FONT_TITOLI, 34))
+	colonna.add_child(StileVisivo.etichetta("Popolo del delta · Repubblica", StileVisivo.FONT_TESTO_FORTE, 16, StileVisivo.TESTO_TENUE))
 
 
 func _crea_fase() -> void:
@@ -72,10 +72,10 @@ func _crea_fase() -> void:
 	colonna.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	var riquadro: PanelContainer = PanelContainer.new()
 	colonna.add_child(riquadro)
-	_fase = StileCronaca.etichetta("", StileCronaca.FONT_TITOLI, 30)
+	_fase = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30)
 	_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	riquadro.add_child(_fase)
-	var avviso: Label = StileCronaca.etichetta("Prova visiva · grafica segnaposto · numeri di esempio", StileCronaca.FONT_PICCOLO, 15, Color("d9c79f"))
+	var avviso: Label = StileVisivo.etichetta("Prova visiva · grafica segnaposto · numeri di esempio", StileVisivo.FONT_TESTO_FORTE, 15, StileVisivo.TESTO_TENUE)
 	avviso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	colonna.add_child(avviso)
 
@@ -86,15 +86,15 @@ func _crea_run() -> void:
 	var riga: HBoxContainer = HBoxContainer.new()
 	riga.add_theme_constant_override("separation", 26)
 	riquadro.add_child(riga)
-	riga.add_child(_valore("Prestigio", "18"))
-	riga.add_child(_valore("Vittorie", "1 di 10"))
+	riga.add_child(_valore("Prestigio", "18", StileVisivo.ORO_LUCE))
+	riga.add_child(_valore("Vittorie", "1/10"))
 
 
-func _valore(nome: String, valore: String) -> VBoxContainer:
+func _valore(nome: String, valore: String, colore: Color = StileVisivo.TESTO) -> VBoxContainer:
 	var colonna: VBoxContainer = VBoxContainer.new()
-	colonna.add_theme_constant_override("separation", -4)
-	colonna.add_child(StileCronaca.etichetta(nome.to_upper(), StileCronaca.FONT_PICCOLO, 14, StileCronaca.INCHIOSTRO_TENUE))
-	colonna.add_child(StileCronaca.etichetta(valore, StileCronaca.FONT_TITOLI, 30))
+	colonna.add_theme_constant_override("separation", -6)
+	colonna.add_child(StileVisivo.etichetta(nome.to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+	colonna.add_child(StileVisivo.etichetta(valore, StileVisivo.FONT_TITOLI, 34, colore))
 	return colonna
 
 
@@ -104,9 +104,9 @@ func _crea_risorse() -> void:
 	var riga: HBoxContainer = HBoxContainer.new()
 	riga.add_theme_constant_override("separation", 22)
 	riquadro.add_child(riga)
-	riga.add_child(_valore("Oro", "9"))
-	riga.add_child(_valore("Ricerca", "7 / 8"))
-	riga.add_child(_valore("Cibo", "6"))
+	riga.add_child(_valore("Oro", "9", StileVisivo.ORO_LUCE))
+	riga.add_child(_valore("Ricerca", "7/8", Color("7fb4ff")))
+	riga.add_child(_valore("Cibo", "6", Color("8fe08a")))
 	var pulsante: Button = Button.new()
 	pulsante.text = "Magazzino"
 	pulsante.pressed.connect(_on_magazzino)
@@ -146,7 +146,7 @@ func _crea_comandi_battaglia() -> void:
 	var riga: HBoxContainer = HBoxContainer.new()
 	riga.add_theme_constant_override("separation", 10)
 	riquadro.add_child(riga)
-	_tempo = StileCronaca.etichetta("0,0 s", StileCronaca.FONT_TITOLI, 30)
+	_tempo = StileVisivo.etichetta("0,0 s", StileVisivo.FONT_TITOLI, 30)
 	_tempo.custom_minimum_size = Vector2(110, 0)
 	riga.add_child(_tempo)
 	_pulsante_pausa = Button.new()
@@ -177,17 +177,8 @@ func _crea_pulsanti_destra() -> void:
 	ricomincia.pressed.connect(func() -> void: ricomincia_premuto.emit())
 	colonna.add_child(ricomincia)
 	_pulsante_vista = Button.new()
-	_pulsante_vista.custom_minimum_size = Vector2(280, 60)
-	_pulsante_vista.add_theme_font_override("font", StileCronaca.FONT_TITOLI)
-	_pulsante_vista.add_theme_font_size_override("font_size", 28)
-	var stile: StyleBoxFlat = StileCronaca.riquadro(StileCronaca.INCHIOSTRO)
-	var stile_sopra: StyleBoxFlat = StileCronaca.riquadro(Color("3d2a1c"))
-	stile_sopra.border_color = StileCronaca.ORO_LUCE
-	_pulsante_vista.add_theme_stylebox_override("normal", stile)
-	_pulsante_vista.add_theme_stylebox_override("hover", stile_sopra)
-	_pulsante_vista.add_theme_stylebox_override("pressed", stile)
-	for colore: String in ["font_color", "font_hover_color", "font_pressed_color"]:
-		_pulsante_vista.add_theme_color_override(colore, StileCronaca.ORO_LUCE)
+	_pulsante_vista.custom_minimum_size = Vector2(300, 68)
+	StileVisivo.rendi_principale(_pulsante_vista)
 	_pulsante_vista.pressed.connect(func() -> void: cambia_vista_premuto.emit())
 	colonna.add_child(_pulsante_vista)
 
@@ -200,7 +191,7 @@ func _crea_magazzino() -> void:
 	_magazzino.position += Vector2(24, -120)
 	var colonna: VBoxContainer = VBoxContainer.new()
 	_magazzino.add_child(colonna)
-	colonna.add_child(StileCronaca.etichetta("Magazzino", StileCronaca.FONT_TITOLI, 28, StileCronaca.VERMIGLIO_SCURO))
+	colonna.add_child(StileVisivo.etichetta("Magazzino", StileVisivo.FONT_TITOLI, 28, StileVisivo.ORO))
 	var griglia: GridContainer = GridContainer.new()
 	griglia.columns = 3
 	griglia.add_theme_constant_override("h_separation", 28)
@@ -208,7 +199,7 @@ func _crea_magazzino() -> void:
 	colonna.add_child(griglia)
 	var risorse: Array[String] = ["Oro 9 (+5)", "Ricerca 7 (+3)", "Cibo 6 (+3)", "Legno 3 (+1)", "Pietra 2 (+1)", "Ferro 2 (+1)", "Fauna 1 (+1)", "Fede 1 (+1)", "Influenza 1 (+1)"]
 	for voce: String in risorse:
-		griglia.add_child(StileCronaca.etichetta(voce, StileCronaca.FONT_TESTO, 20))
+		griglia.add_child(StileVisivo.etichetta(voce, StileVisivo.FONT_TESTO, 20))
 	var vendi: Button = Button.new()
 	vendi.text = "Vendi risorse · 2 → 1 Oro"
 	colonna.add_child(vendi)
@@ -223,9 +214,9 @@ func _crea_suggerimento() -> void:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 4)
 	_suggerimento.add_child(colonna)
-	_titolo_suggerimento = StileCronaca.etichetta("", StileCronaca.FONT_TITOLI, 28)
+	_titolo_suggerimento = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 28)
 	colonna.add_child(_titolo_suggerimento)
-	_testo_suggerimento = StileCronaca.etichetta("", StileCronaca.FONT_TESTO, 19)
+	_testo_suggerimento = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 19)
 	_testo_suggerimento.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_testo_suggerimento.custom_minimum_size = Vector2(340, 0)
 	colonna.add_child(_testo_suggerimento)
@@ -233,8 +224,8 @@ func _crea_suggerimento() -> void:
 
 
 func _crea_messaggio() -> void:
-	_messaggio = StileCronaca.etichetta("", StileCronaca.FONT_TITOLI, 40, StileCronaca.ORO_LUCE)
-	_messaggio.add_theme_color_override("font_outline_color", Color(0.08, 0.05, 0.03))
+	_messaggio = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 56, StileVisivo.ORO_LUCE)
+	_messaggio.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
 	_messaggio.add_theme_constant_override("outline_size", 10)
 	_messaggio.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_messaggio)

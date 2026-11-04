@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://cfkectnncjbq5"
-path="res://.godot/imported/AlegreyaSans-Regular.ttf-9e563a1e934f53ac91a9db41ed3e52ed.fontdata"
+uid="uid://cwiyg7ioe40da"
+path="res://.godot/imported/BarlowSemiCondensed-ExtraBold.ttf-3b759dc9e4f1b28447d2b1a642c9ce07.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/AlegreyaSans-Regular.ttf"
-dest_files=["res://.godot/imported/AlegreyaSans-Regular.ttf-9e563a1e934f53ac91a9db41ed3e52ed.fontdata"]
+source_file="res://assets/fonts/BarlowSemiCondensed-ExtraBold.ttf"
+dest_files=["res://.godot/imported/BarlowSemiCondensed-ExtraBold.ttf-3b759dc9e4f1b28447d2b1a642c9ce07.fontdata"]
 
 [params]
 
