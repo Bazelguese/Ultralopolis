@@ -1,0 +1,16 @@
+{
+	"files.eol": "\n",
+	"files.encoding": "utf8",
+	"[gdscript]": {
+		"editor.insertSpaces": false,
+		"editor.tabSize": 4,
+		"editor.detectIndentation": false
+	},
+	"files.exclude": {
+		".godot": true
+	},
+	"search.exclude": {
+		".godot": true,
+		"addons/gut": true
+	}
+}
