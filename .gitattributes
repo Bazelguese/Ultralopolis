@@ -1,0 +1,8 @@
+# Fine riga uniforme fra Windows e Linux
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ttf binary
+*.otf binary
+*.ogg binary
+*.wav binary

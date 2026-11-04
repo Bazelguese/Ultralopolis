@@ -1,0 +1,8 @@
+# Cartelle generate da Godot
+.godot/
+/android/
+
+# File temporanei
+*.tmp
+.DS_Store
+Thumbs.db
