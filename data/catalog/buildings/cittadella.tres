@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_jt1v3"]
+
+[resource]
+script = ExtResource("1_jt1v3")
+id = &"cittadella"
+display_name = "Cittadella"
+era = 3
+cost_gold = 12
+gold_per_phase = 2
+mana_amount = 2
+mana_interval_ms = 2500
+extra_troop_slots = 2

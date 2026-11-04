@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_j0hio"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_j0y18"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/tempio.tres" id="3_tpxpb"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/santuario.tres" id="4_e5438"]
+[ext_resource type="Script" path="res://scripts/sim/data/reward_def.gd" id="5_nk24i"]
+[ext_resource type="Resource" path="res://data/catalog/troops/cavalieri.tres" id="6_70svf"]
+[ext_resource type="Script" path="res://scripts/sim/data/encounter_def.gd" id="7_7fg3g"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="8_ycbgm"]
+[ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="9_uwm4n"]
+[ext_resource type="Resource" path="res://data/catalog/troops/frombolieri.tres" id="10_un1m8"]
+[ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="11_ie42h"]
+
+[sub_resource type="Resource" id="Resource_mxc2f"]
+script = ExtResource("5_nk24i")
+amount = 12
+
+[sub_resource type="Resource" id="Resource_5g25q"]
+script = ExtResource("5_nk24i")
+kind = 2
+building = ExtResource("3_tpxpb")
+
+[sub_resource type="Resource" id="Resource_638si"]
+script = ExtResource("5_nk24i")
+kind = 3
+troop = ExtResource("6_70svf")
+
+[resource]
+script = ExtResource("7_7fg3g")
+display_name = "Armata del mare"
+description = "Una grande armata sbarca sulle spiagge."
+year = 3
+difficulty_label = "Difficile"
+resistance = 65
+buildings = Array[ExtResource("1_j0hio")]([ExtResource("2_j0y18"), ExtResource("3_tpxpb"), ExtResource("4_e5438")])
+troops = Array[ExtResource("8_ycbgm")]([ExtResource("6_70svf"), ExtResource("9_uwm4n"), ExtResource("10_un1m8"), ExtResource("11_ie42h")])
+rewards = Array[ExtResource("5_nk24i")]([SubResource("Resource_mxc2f"), SubResource("Resource_5g25q"), SubResource("Resource_638si")])

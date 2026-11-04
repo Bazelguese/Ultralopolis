@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_0rm6a"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_7h1at"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/santuario.tres" id="3_10mf2"]
+[ext_resource type="Script" path="res://scripts/sim/data/reward_def.gd" id="4_05v6i"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/biblioteca.tres" id="5_1yt4f"]
+[ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="6_b7bux"]
+[ext_resource type="Script" path="res://scripts/sim/data/encounter_def.gd" id="7_7mb41"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="8_e8q4i"]
+[ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="9_owdlo"]
+[ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="10_0rw48"]
+
+[sub_resource type="Resource" id="Resource_xf4fr"]
+script = ExtResource("4_05v6i")
+amount = 6
+
+[sub_resource type="Resource" id="Resource_wd220"]
+script = ExtResource("4_05v6i")
+kind = 2
+building = ExtResource("5_1yt4f")
+
+[sub_resource type="Resource" id="Resource_emf6g"]
+script = ExtResource("4_05v6i")
+kind = 3
+troop = ExtResource("6_b7bux")
+
+[resource]
+script = ExtResource("7_7mb41")
+display_name = "Orda barbarica"
+description = "Un'orda intera si muove verso i confini."
+year = 2
+difficulty_label = "Media"
+resistance = 35
+buildings = Array[ExtResource("1_0rm6a")]([ExtResource("2_7h1at"), ExtResource("3_10mf2")])
+troops = Array[ExtResource("8_e8q4i")]([ExtResource("9_owdlo"), ExtResource("10_0rw48")])
+rewards = Array[ExtResource("4_05v6i")]([SubResource("Resource_xf4fr"), SubResource("Resource_wd220"), SubResource("Resource_emf6g")])

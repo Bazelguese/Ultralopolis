@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_y0m8x"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_1c2ng"]
+[ext_resource type="Script" path="res://scripts/sim/data/reward_def.gd" id="3_ocnqj"]
+[ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="4_vgkth"]
+[ext_resource type="Script" path="res://scripts/sim/data/encounter_def.gd" id="5_2ng4v"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="6_0hgod"]
+[ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="7_1j5dp"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esploratori.tres" id="8_t8asg"]
+
+[sub_resource type="Resource" id="Resource_lodmd"]
+script = ExtResource("3_ocnqj")
+amount = 5
+
+[sub_resource type="Resource" id="Resource_ta7t4"]
+script = ExtResource("3_ocnqj")
+kind = 1
+amount = 3
+
+[sub_resource type="Resource" id="Resource_gfl1x"]
+script = ExtResource("3_ocnqj")
+kind = 3
+troop = ExtResource("4_vgkth")
+
+[resource]
+script = ExtResource("5_2ng4v")
+display_name = "Barbari"
+description = "Un clan barbaro scende dalle colline."
+difficulty_label = "Media"
+resistance = 22
+buildings = Array[ExtResource("1_y0m8x")]([ExtResource("2_1c2ng")])
+troops = Array[ExtResource("6_0hgod")]([ExtResource("7_1j5dp"), ExtResource("8_t8asg")])
+rewards = Array[ExtResource("3_ocnqj")]([SubResource("Resource_lodmd"), SubResource("Resource_ta7t4"), SubResource("Resource_gfl1x")])

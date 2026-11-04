@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_5jrdc"]
+
+[resource]
+script = ExtResource("1_5jrdc")
+id = &"catapulte"
+display_name = "Catapulte"
+era = 3
+cost_gold = 10
+mana_cost = 6
+cooldown_ms = 3500
+damage = 24

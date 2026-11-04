@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="GhostDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_0lsv0"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_q2ukg"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/santuario.tres" id="3_nwifq"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/tempio.tres" id="4_dvitb"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/bottega.tres" id="5_8h7ni"]
+[ext_resource type="Script" path="res://scripts/sim/data/ghost_def.gd" id="6_jal01"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="7_1qkeg"]
+[ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="8_nut7c"]
+[ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="9_1r0ae"]
+[ext_resource type="Resource" path="res://data/catalog/troops/cavalieri.tres" id="10_lneyy"]
+
+[resource]
+script = ExtResource("6_jal01")
+display_name = "Fantasma: Regno di Altamura"
+year = 3
+era = 2
+buildings = Array[ExtResource("1_0lsv0")]([ExtResource("2_q2ukg"), ExtResource("3_nwifq"), ExtResource("4_dvitb"), ExtResource("5_8h7ni")])
+troops = Array[ExtResource("7_1qkeg")]([ExtResource("8_nut7c"), ExtResource("9_1r0ae"), ExtResource("10_lneyy")])

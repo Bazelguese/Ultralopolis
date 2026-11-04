@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_ddwnk"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_s2yb8"]
+[ext_resource type="Script" path="res://scripts/sim/data/reward_def.gd" id="3_ukc2w"]
+[ext_resource type="Script" path="res://scripts/sim/data/encounter_def.gd" id="4_lpbfr"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="5_f08qk"]
+[ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="6_uua6v"]
+[ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="7_8edkk"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esploratori.tres" id="8_pegu0"]
+
+[sub_resource type="Resource" id="Resource_qu0pl"]
+script = ExtResource("3_ukc2w")
+amount = 6
+
+[sub_resource type="Resource" id="Resource_of6se"]
+script = ExtResource("3_ukc2w")
+kind = 1
+amount = 4
+
+[resource]
+script = ExtResource("4_lpbfr")
+display_name = "Ribelli"
+description = "Una provincia si ribella."
+year = 3
+difficulty_label = "Facile"
+resistance = 35
+buildings = Array[ExtResource("1_ddwnk")]([ExtResource("2_s2yb8")])
+troops = Array[ExtResource("5_f08qk")]([ExtResource("6_uua6v"), ExtResource("7_8edkk"), ExtResource("8_pegu0")])
+rewards = Array[ExtResource("3_ukc2w")]([SubResource("Resource_qu0pl"), SubResource("Resource_of6se")])

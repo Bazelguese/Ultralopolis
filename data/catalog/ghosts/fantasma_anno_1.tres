@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="GhostDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_dufbo"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_tsfh8"]
+[ext_resource type="Script" path="res://scripts/sim/data/ghost_def.gd" id="3_ifdnr"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_768ef"]
+[ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="5_64yty"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esploratori.tres" id="6_ddsax"]
+
+[resource]
+script = ExtResource("3_ifdnr")
+display_name = "Fantasma: Borgo di Valdacqua"
+buildings = Array[ExtResource("1_dufbo")]([ExtResource("2_tsfh8")])
+troops = Array[ExtResource("4_768ef")]([ExtResource("5_64yty"), ExtResource("6_ddsax")])

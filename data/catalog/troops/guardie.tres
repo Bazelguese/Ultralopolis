@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_7y4mc"]
+
+[resource]
+script = ExtResource("1_7y4mc")
+id = &"guardie"
+display_name = "Guardie"
+era = 2
+cost_gold = 6
+cooldown_ms = 2500
+damage = 6

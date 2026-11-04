@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_c7cdr"]
+[ext_resource type="Script" path="res://scripts/sim/data/reward_def.gd" id="2_hmclc"]
+[ext_resource type="Script" path="res://scripts/sim/data/encounter_def.gd" id="3_t2vvx"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_8slrt"]
+[ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="5_l245r"]
+[ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="6_xn28m"]
+
+[sub_resource type="Resource" id="Resource_7ngeb"]
+script = ExtResource("2_hmclc")
+amount = 4
+
+[sub_resource type="Resource" id="Resource_4v76j"]
+script = ExtResource("2_hmclc")
+kind = 1
+amount = 3
+
+[resource]
+script = ExtResource("3_t2vvx")
+display_name = "Predoni"
+description = "Predoni a cavallo saccheggiano i villaggi."
+year = 2
+difficulty_label = "Facile"
+resistance = 25
+troops = Array[ExtResource("4_8slrt")]([ExtResource("5_l245r"), ExtResource("6_xn28m")])
+rewards = Array[ExtResource("2_hmclc")]([SubResource("Resource_7ngeb"), SubResource("Resource_4v76j")])

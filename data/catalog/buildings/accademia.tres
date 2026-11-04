@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_nwp2e"]
+
+[resource]
+script = ExtResource("1_nwp2e")
+id = &"accademia"
+display_name = "Accademia"
+era = 2
+cost_gold = 7
+research_per_phase = 4
+mana_amount = 1
+mana_interval_ms = 2500

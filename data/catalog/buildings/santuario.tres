@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_0vs48"]
+
+[resource]
+script = ExtResource("1_0vs48")
+id = &"santuario"
+display_name = "Santuario"
+cost_gold = 5
+mana_amount = 2
+mana_interval_ms = 2000

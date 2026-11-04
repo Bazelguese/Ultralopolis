@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RunRules" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/run_rules.gd" id="1_usmqx"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="2_nlgyk"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="3_0gqc3"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_dc03y"]
+[ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="5_hw03f"]
+
+[resource]
+script = ExtResource("1_usmqx")
+starting_gold = 7
+starting_buildings = Array[ExtResource("2_nlgyk")]([ExtResource("3_0gqc3")])
+starting_troops = Array[ExtResource("4_dc03y")]([ExtResource("5_hw03f")])

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EraDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/era_def.gd" id="1_8fyso"]
+
+[resource]
+script = ExtResource("1_8fyso")
+display_name = "Sviluppo"
+research_cost = 8
+bonus_building_slots = 1
+bonus_troop_slots = 1

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="EraDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/era_def.gd" id="1_o0djl"]
+
+[resource]
+script = ExtResource("1_o0djl")
+display_name = "Fondazione"
