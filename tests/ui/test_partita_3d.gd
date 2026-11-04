@@ -90,17 +90,21 @@ func test_le_carte_corrispondono_alla_plancia_e_alle_offerte() -> void:
 	assert_eq(_carte("_truppe", 0).size(), run.board.troops.size(), "Una carta per ogni truppa.")
 	assert_eq(_carte("_edifici", 0).size(), run.board.buildings.size(), "Una carta per ogni edificio.")
 	var scelte: Array = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.offers.size(), "Una carta per ogni offerta.")
+	assert_eq(scelte.size(), run.councillor_choices.size(), "Prima una carta per ogni consigliere.")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_not_null(run.councillor, "Cliccando la carta si sceglie il consigliere.")
+	scelte = _scena.get("_scelte")
+	assert_eq(scelte.size(), run.offers.size(), "Poi una carta per ogni sua proposta.")
 
 
 func test_passare_l_opportunita_aggiorna_le_carte() -> void:
 	var run: RunState = _run()
-	var numero: int = run.opportunity_number
+	var numero: int = run.round_number
 	var hud: HudPlancia = _scena.get("_hud")
 	hud.passa.emit()
-	assert_ne(run.opportunity_number, numero, "Si passa all'opportunità successiva.")
+	assert_ne(run.round_number, numero, "Si passa al round successivo.")
 	var scelte: Array = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.offers.size())
+	assert_eq(scelte.size(), run.councillor_choices.size())
 
 
 func test_uno_scontro_si_rigioca_fino_all_esito() -> void:
@@ -137,7 +141,7 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
 	scelte = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.offers.size(), "Dopo la via tornano le offerte.")
+	assert_eq(scelte.size(), run.councillor_choices.size(), "Dopo la via tornano i consiglieri.")
 
 
 ## Cambiare qualcosa sulla plancia non rifà le offerte: restano le stesse carte, senza nuova entrata.

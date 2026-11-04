@@ -494,9 +494,9 @@ func aggiorna_partita(run: RunState) -> void:
 	var comprando: bool = run.is_shopping_phase()
 	_fase.text = "Anno %d · %s" % [run.year, run.phase_name()]
 	if comprando:
-		_fase.text += " · opportunità %d di %d" % [run.opportunity_number, run.run_rules.opportunities_per_phase]
-		if run.is_dedicated_opportunity():
-			_fase.text += " · solo edifici" if run.phase == RunState.Phase.PRODUZIONE else " · solo truppe"
+		_fase.text += " · round %d di %d · %s" % [run.round_number, run.run_rules.rounds_per_half, run.round_type_name()]
+		if run.councillor != null:
+			_fase.text += " · %s" % run.councillor.display_name
 	_sotto_fase.text = "Resistenza nel prossimo scontro: %d" % run.player_resistance()
 	_prestigio.text = str(run.prestige)
 	_vittorie.text = "%d/%d" % [run.wins, run.run_rules.wins_needed]
@@ -537,17 +537,18 @@ func aggiorna_partita(run: RunState) -> void:
 	_testo_cronaca.text = "\n".join(ultime)
 
 	var scelta_via: bool = not run.way_choices.is_empty()
-	_pulsante_rinnova.visible = comprando and not scelta_via
+	_pulsante_rinnova.visible = comprando and not scelta_via and run.councillor != null
 	_pulsante_passa.visible = comprando and not scelta_via
-	_pulsante_rinnova.text = "Rinnova le offerte · %d Oro" % run.reroll_cost()
+	_pulsante_rinnova.text = "Rinnova le proposte · %d Oro" % run.reroll_cost()
 	_pulsante_rinnova.disabled = run.gold < run.reroll_cost()
 	_pulsante_nessuna.visible = run.phase == RunState.Phase.RICOMPENSA_INCONTRO
 	_principale.visible = run.phase in [RunState.Phase.SCONTRO_FANTASMA, RunState.Phase.FINE_RUN]
 	match run.phase:
-		RunState.Phase.PRODUZIONE:
-			_suggerimento_fase.text = "Si costruisce: scegli un'offerta. Passa il mouse sulle carte per i dettagli."
-		RunState.Phase.PREPARAZIONE:
-			_suggerimento_fase.text = "Si dispone l'esercito: scegli un'offerta. Clicca una tua carta per venderla, potenziarla o spostarla."
+		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
+			if run.councillor == null:
+				_suggerimento_fase.text = "Round %s: scegli quale consigliere ascoltare. Passa il mouse sulle carte per i dettagli." % run.round_type_name()
+			else:
+				_suggerimento_fase.text = "%s: prendi una proposta, rinnovale o passa. Clicca una tua carta per venderla, potenziarla o spostarla." % run.councillor_title(run.councillor)
 		RunState.Phase.SCELTA_INCONTRO:
 			_suggerimento_fase.text = "Incontro del mondo: scegli quale minaccia affrontare. Se perdi, l'Oro si dimezza."
 		RunState.Phase.RICOMPENSA_INCONTRO:

@@ -7,7 +7,7 @@ extends Node3D
 
 enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
-enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA }
+enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE }
 
 const PASSO_TRUPPE: float = 1.75
 const PASSO_EDIFICI: float = 2.1
@@ -121,8 +121,8 @@ func _ready() -> void:
 
 func _collega_hud() -> void:
 	_hud.azione_principale.connect(_on_azione_principale)
-	_hud.rinnova.connect(func() -> void: _esegui(run.reroll_offers(), "Offerte rinnovate"))
-	_hud.passa.connect(func() -> void: _esegui(run.pass_opportunity(), "Opportunità passata"))
+	_hud.rinnova.connect(func() -> void: _esegui(run.reroll_offers(), "Proposte rinnovate"))
+	_hud.passa.connect(func() -> void: _esegui(run.pass_opportunity(), "Round passato"))
 	_hud.nessuna_ricompensa.connect(func() -> void: _esegui(run.skip_reward()))
 	_hud.avanza_era.connect(_on_avanza_era)
 	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.run_rules.market_units_per_gold)))
@@ -565,10 +565,16 @@ func _costruisci_scelte() -> void:
 		fase = -1
 	match fase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-			tipo = TipoScelta.OFFERTA
-			for offerta: Offer in run.offers:
-				schede.append(SchedaCarta.da_offerta(run, offerta))
-				origini.append(offerta)
+			if run.is_choosing_councillor():
+				tipo = TipoScelta.CONSIGLIERE
+				for consigliere: CouncillorDef in run.councillor_choices:
+					schede.append(SchedaCarta.da_consigliere(run, consigliere))
+					origini.append(consigliere)
+			else:
+				tipo = TipoScelta.OFFERTA
+				for offerta: Offer in run.offers:
+					schede.append(SchedaCarta.da_offerta(run, offerta))
+					origini.append(offerta)
 		RunState.Phase.SCELTA_INCONTRO:
 			tipo = TipoScelta.INCONTRO
 			for incontro: EncounterDef in run.encounter_choices:
@@ -584,7 +590,7 @@ func _costruisci_scelte() -> void:
 				tipo = TipoScelta.FANTASMA
 				schede.append(SchedaCarta.da_fantasma(run, run.current_ghost))
 				origini.append(run.current_ghost)
-	var firma: String = "%d|%d|%d|%d" % [tipo, run.year, run.phase, run.opportunity_number]
+	var firma: String = "%d|%d|%d|%d|%d" % [tipo, run.year, run.phase, run.round_number, run.era]
 	for origine: Object in origini:
 		firma += "|%d" % origine.get_instance_id()
 	if firma == _firma_scelte and _scelte.size() == schede.size():
@@ -716,13 +722,16 @@ func _clic_scelta(tessera: Tessera3D) -> void:
 			var offerta: Offer = run.offers[i]
 			var voci: Array[String] = run.offer_choices(offerta)
 			if not voci.is_empty():
-				_hud.mostra_scelte(offerta.describe(), offerta.opportunity.description, voci, func(voce: int) -> void: _esegui(run.buy_offer(i, voce)))
+				_hud.mostra_scelte(offerta.describe(), offerta.description(), voci, func(voce: int) -> void: _esegui(run.buy_offer(i, voce)))
 			elif run.offer_needs_replacement(offerta):
 				var truppa: bool = offerta.kind == OpportunityDef.Kind.RECLUTA_TRUPPA
 				var testo: String = "Plancia piena: clicca %s da sostituire con %s." % ["la truppa" if truppa else "l'edificio", tessera.scheda.titolo]
 				_inizia_sostituzione(truppa, testo, func(sostituita: int) -> bool: return run.buy_offer(i, sostituita))
 			else:
 				_vola_e_esegui(tessera, func() -> bool: return run.buy_offer(i))
+		TipoScelta.CONSIGLIERE:
+			var consigliere: String = run.councillor_choices[i].display_name
+			_esegui(run.choose_councillor(i), "Ascolti: %s" % consigliere)
 		TipoScelta.INCONTRO:
 			var nome: String = run.encounter_choices[i].display_name
 			var prima: Dictionary = _istantanea()
