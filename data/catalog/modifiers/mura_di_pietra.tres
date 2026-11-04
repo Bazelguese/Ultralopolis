@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_yb33b"]
+
+[resource]
+script = ExtResource("1_yb33b")
+id = &"mura_di_pietra"
+display_name = "Mura di pietra"
+description = "Scudo +1 per gli edifici Difensivi."
+is_malus = false
+effect = 11
+target_tag = &"Difensivo"
+battle_value = 1
+amount = 1
+duration_kind = 2
+stacking = 1

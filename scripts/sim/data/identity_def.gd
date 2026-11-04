@@ -64,10 +64,13 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export var exclusive_troops: Array[TroopDef] = []
 
 @export_group("Solo per le vie")
+## Nota tecnica: questi due elenchi contengono elementi dell'identità (IdentityDef), ma sono
+## dichiarati come Resource perché un modello che elenca sé stesso crea in Godot un riferimento
+## circolare che non viene liberato alla chiusura.
 ## Se non è vuoto, la via compare solo a chi ha almeno uno di questi elementi (via esclusiva).
-@export var requires_any: Array[IdentityDef] = []
+@export var requires_any: Array[Resource] = []
 ## Elementi dell'identità o vie precedenti che rendono la via più probabile (peso +1 ciascuno).
-@export var favored_by: Array[IdentityDef] = []
+@export var favored_by: Array[Resource] = []
 
 @export_group("Tratto permanente")
 ## Modificatori che valgono per tutta la run.

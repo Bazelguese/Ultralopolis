@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_j14t8"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_a0ond"]
+
+[sub_resource type="Resource" id="Resource_j14t8"]
+script = ExtResource("2_a0ond")
+fede = 2
+
+[sub_resource type="Resource" id="Resource_a0ond"]
+script = ExtResource("2_a0ond")
+fede = 3
+
+[resource]
+script = ExtResource("1_j14t8")
+id = &"erboristi"
+display_name = "Erboristi"
+cost_gold = 4
+tags = Array[StringName]([&"Sacro"])
+mana_type = &"blu"
+mana_cost = 2
+cooldown_ms = 2000
+heal = 5
+upgrade_costs = Array[ExtResource("2_a0ond")]([SubResource("Resource_j14t8"), SubResource("Resource_a0ond")])

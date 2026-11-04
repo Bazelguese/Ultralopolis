@@ -7,18 +7,24 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/truppa_provata.tres" id="5_riy0j"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/mercati_diffidenti.tres" id="6_57m3e"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/mercanti_in_fuga.tres" id="7_m2w7m"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/mura_incrinate.tres" id="8_m2w7m"]
 [ext_resource type="Script" path="res://scripts/sim/data/generator_rules.gd" id="8_v2ls4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/ferite_infette.tres" id="9_v2ls4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/semi_del_dissenso.tres" id="10_bbq7h"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/rete_compromessa.tres" id="11_om2pw"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/scorte_avariate.tres" id="12_3o0lc"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/diserzioni.tres" id="13_k27ct"]
 
 [resource]
 script = ExtResource("8_v2ls4")
 ghost_buildings_per_year_tenths = 6
 ghost_troops_per_year_tenths = 8
 ghost_level_every_years = 4
-encounter_resistance_per_year = 8
-ghost_malus_pool = Array[ExtResource("1_wyxn6")]([ExtResource("2_t5ona"), ExtResource("3_rpau7"), ExtResource("4_e0ut5"), ExtResource("5_riy0j"), ExtResource("6_57m3e"), ExtResource("7_m2w7m")])
+ghost_malus_pool = Array[ExtResource("1_wyxn6")]([ExtResource("2_t5ona"), ExtResource("3_rpau7"), ExtResource("4_e0ut5"), ExtResource("5_riy0j"), ExtResource("6_57m3e"), ExtResource("7_m2w7m"), ExtResource("8_m2w7m"), ExtResource("9_v2ls4"), ExtResource("10_bbq7h"), ExtResource("11_om2pw"), ExtResource("12_3o0lc"), ExtResource("13_k27ct")])
 nation_name_prefixes = PackedStringArray("Regno", "Ducato", "Contea", "Principato", "Marca", "Lega", "Signoria", "Impero", "Repubblica", "Confederazione")
 nation_name_places = PackedStringArray("di Pietrabianca", "di Valfonda", "di Torrealta", "di Acquasparta", "di Montescuro", "di Lagonero", "di Campoverde", "di Rivarossa", "di Selvacupa", "di Portoserra", "delle Sette Colline", "del Passo Gelido", "delle Paludi", "del Sole Calante")
 encounter_names = PackedStringArray("Briganti", "Barbari", "Pirati", "Predoni", "Ribelli", "Mercenari", "Orda nomade", "Corsari", "Banditi delle colline", "Esercito invasore", "Rivolta contadina", "Flotta nemica")
 encounter_descriptions = PackedStringArray("Una banda di briganti assalta le carovane.", "Un clan barbaro scende dalle colline.", "Navi pirata minacciano la costa.", "Predoni a cavallo saccheggiano i villaggi.", "Una provincia si ribella al governo.", "Una compagnia di mercenari senza paga cerca bottino.", "Un\'orda nomade attraversa i confini.", "Corsari bloccano le rotte commerciali.", "Banditi si nascondono tra le alture.", "Un esercito straniero varca il confine.", "I contadini insorgono contro le tasse.", "Una flotta nemica si avvicina al porto.")
 difficulty_labels = PackedStringArray("Facile", "Media", "Difficile")
 difficulty_percents = PackedInt32Array(70, 100, 135)
+encounter_resistance_per_year = 8

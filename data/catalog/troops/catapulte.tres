@@ -3,15 +3,13 @@
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_5jrdc"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_7j53h"]
 
+[sub_resource type="Resource" id="Resource_7j53h"]
+script = ExtResource("2_7j53h")
+ferro = 6
+
 [sub_resource type="Resource" id="Resource_vhh4l"]
 script = ExtResource("2_7j53h")
-legno = 3
-pietra = 2
-
-[sub_resource type="Resource" id="Resource_j5i16"]
-script = ExtResource("2_7j53h")
-legno = 4
-pietra = 3
+ferro = 9
 
 [resource]
 script = ExtResource("1_5jrdc")
@@ -23,5 +21,6 @@ tags = Array[StringName]([&"Assedio"])
 food_tenths = 10
 mana_cost = 6
 cooldown_ms = 3500
-damage = 24
-upgrade_costs = Array[ExtResource("2_7j53h")]([SubResource("Resource_vhh4l"), SubResource("Resource_j5i16")])
+damage = 17
+siege_damage = 16
+upgrade_costs = Array[ExtResource("2_7j53h")]([SubResource("Resource_7j53h"), SubResource("Resource_vhh4l")])

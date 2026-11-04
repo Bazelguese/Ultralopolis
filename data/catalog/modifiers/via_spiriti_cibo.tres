@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_8s7yx"]
+
+[resource]
+script = ExtResource("1_8s7yx")
+id = &"via_spiriti_cibo"
+display_name = "Via degli Spiriti"
+description = "+1 Cibo per fase da ogni edificio Fauna o Agricolo."
+is_malus = false
+effect = 8
+target_tags_any = Array[StringName]([&"Fauna", &"Agricolo"])
+resource = 2
+amount = 1
+duration_kind = 2
+stacking = 1

@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_qcsre"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/monastero.tres" id="2_x1kqd"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_7bx52"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_vbxca"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/crociati.tres" id="5_uaykm"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="6_whn32"]
+[ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="7_yxujh"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="8_kvynt"]
+[ext_resource type="Resource" path="res://data/catalog/identita/antichi_spiriti.tres" id="9_cxq6c"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/ambasciata.tres" id="10_3whfx"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/fortificazioni.tres" id="11_vjkgo"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="12_yykii"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/via_fede_sacri.tres" id="13_anhjq"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="14_ug0ki"]
+
+[sub_resource type="Resource" id="Resource_y3npq"]
+script = ExtResource("6_whn32")
+fede = 4
+
+[resource]
+script = ExtResource("14_ug0ki")
+id = &"via_della_fede"
+display_name = "Via della Fede"
+description = "+1 Fede per fase da ogni edificio Sacro; Ambasciata e Fortificazioni più frequenti. Bonus: +4 Fede."
+dimension = 5
+extra_resources = SubResource("Resource_y3npq")
+favored_opportunities = Array[ExtResource("3_7bx52")]([ExtResource("10_3whfx"), ExtResource("11_vjkgo")])
+exclusive_buildings = Array[ExtResource("1_qcsre")]([ExtResource("2_x1kqd")])
+exclusive_troops = Array[ExtResource("4_vbxca")]([ExtResource("5_uaykm")])
+favored_by = Array[Resource]([ExtResource("7_yxujh"), ExtResource("8_kvynt"), ExtResource("9_cxq6c")])
+permanent_modifiers = Array[ExtResource("12_yykii")]([ExtResource("13_anhjq")])

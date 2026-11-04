@@ -1167,7 +1167,7 @@ func _draw_ways(era_def: EraDef) -> Array[IdentityDef]:
 			continue
 		if not way.requires_any.is_empty():
 			var allowed: bool = false
-			for needed: IdentityDef in way.requires_any:
+			for needed: Resource in way.requires_any:
 				if identity.has(needed):
 					allowed = true
 			if not allowed:

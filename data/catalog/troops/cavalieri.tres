@@ -3,25 +3,24 @@
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_18pbt"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_axl6g"]
 
+[sub_resource type="Resource" id="Resource_axl6g"]
+script = ExtResource("2_axl6g")
+fauna = 4
+
 [sub_resource type="Resource" id="Resource_j7rf3"]
 script = ExtResource("2_axl6g")
-ferro = 1
-fauna = 2
-
-[sub_resource type="Resource" id="Resource_e8hrw"]
-script = ExtResource("2_axl6g")
-ferro = 2
-fauna = 3
+fauna = 6
 
 [resource]
 script = ExtResource("1_18pbt")
 id = &"cavalieri"
 display_name = "Cavalieri"
 era = 2
-cost_gold = 7
+cost_gold = 8
 tags = Array[StringName]([&"Cavalleria", &"Fauna"])
 food_tenths = 10
+mana_type = &"verde"
 mana_cost = 3
 cooldown_ms = 2000
-damage = 9
-upgrade_costs = Array[ExtResource("2_axl6g")]([SubResource("Resource_j7rf3"), SubResource("Resource_e8hrw")])
+damage = 10
+upgrade_costs = Array[ExtResource("2_axl6g")]([SubResource("Resource_axl6g"), SubResource("Resource_j7rf3")])

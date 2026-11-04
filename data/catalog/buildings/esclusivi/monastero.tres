@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_5n0ou"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ltpkq"]
+
+[sub_resource type="Resource" id="Resource_5n0ou"]
+script = ExtResource("2_ltpkq")
+legno = 4
+
+[sub_resource type="Resource" id="Resource_ltpkq"]
+script = ExtResource("2_ltpkq")
+legno = 6
+
+[resource]
+script = ExtResource("1_5n0ou")
+id = &"monastero"
+display_name = "Monastero"
+era = 2
+cost_gold = 7
+tags = Array[StringName]([&"Sacro"])
+research_per_phase = 1
+faith_per_phase = 2
+mana_type = &"blu"
+mana_amount = 1
+mana_interval_ms = 2000
+heal = 2
+upgrade_costs = Array[ExtResource("2_ltpkq")]([SubResource("Resource_5n0ou"), SubResource("Resource_ltpkq")])

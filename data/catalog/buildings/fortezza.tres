@@ -3,11 +3,11 @@
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_ehap7"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_hwl0x"]
 
-[sub_resource type="Resource" id="Resource_jjpba"]
+[sub_resource type="Resource" id="Resource_hwl0x"]
 script = ExtResource("2_hwl0x")
 pietra = 4
 
-[sub_resource type="Resource" id="Resource_qfsjl"]
+[sub_resource type="Resource" id="Resource_jjpba"]
 script = ExtResource("2_hwl0x")
 pietra = 6
 
@@ -16,12 +16,12 @@ script = ExtResource("1_ehap7")
 id = &"fortezza"
 display_name = "Fortezza"
 era = 2
-cost_gold = 8
+cost_gold = 7
 tags = Array[StringName]([&"Difensivo", &"Militare"])
-gold_per_phase = 1
 stone_per_phase = 1
 mana_type = &"rosso"
 mana_amount = 1
 mana_interval_ms = 3000
+shield = 2
 extra_troop_slots = 1
-upgrade_costs = Array[ExtResource("2_hwl0x")]([SubResource("Resource_jjpba"), SubResource("Resource_qfsjl")])
+upgrade_costs = Array[ExtResource("2_hwl0x")]([SubResource("Resource_hwl0x"), SubResource("Resource_jjpba")])

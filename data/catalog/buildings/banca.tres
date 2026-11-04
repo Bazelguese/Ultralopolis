@@ -3,14 +3,13 @@
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_02spw"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_b8q8a"]
 
+[sub_resource type="Resource" id="Resource_b8q8a"]
+script = ExtResource("2_b8q8a")
+legno = 6
+
 [sub_resource type="Resource" id="Resource_dcc7v"]
 script = ExtResource("2_b8q8a")
-pietra = 4
-
-[sub_resource type="Resource" id="Resource_g3rmb"]
-script = ExtResource("2_b8q8a")
-pietra = 6
-ferro = 2
+legno = 9
 
 [resource]
 script = ExtResource("1_02spw")
@@ -19,9 +18,9 @@ display_name = "Banca"
 era = 3
 cost_gold = 11
 tags = Array[StringName]([&"Commerciale"])
-gold_per_phase = 8
+gold_per_phase = 6
 influence_per_phase = 1
 mana_type = &"verde"
 mana_amount = 1
-mana_interval_ms = 2000
-upgrade_costs = Array[ExtResource("2_b8q8a")]([SubResource("Resource_dcc7v"), SubResource("Resource_g3rmb")])
+mana_interval_ms = 1500
+upgrade_costs = Array[ExtResource("2_b8q8a")]([SubResource("Resource_b8q8a"), SubResource("Resource_dcc7v")])

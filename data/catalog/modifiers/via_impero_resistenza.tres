@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_txf2b"]
+
+[resource]
+script = ExtResource("1_txf2b")
+id = &"via_impero_resistenza"
+display_name = "Via dell'Impero"
+description = "+10 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 10
+duration_kind = 2
+stacking = 1

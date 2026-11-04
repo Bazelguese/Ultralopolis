@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_p21mb"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_svg4i"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_8xu84"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_b3o6a"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/genio_militare.tres" id="5_y661w"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_cf3y8"]
+
+[resource]
+script = ExtResource("6_cf3y8")
+id = &"genio_militare"
+display_name = "Genio militare"
+description = "Le truppe Assedio fanno il 25% di danno agli scudi in più."
+dimension = 4
+permanent_modifiers = Array[ExtResource("4_b3o6a")]([ExtResource("5_y661w")])

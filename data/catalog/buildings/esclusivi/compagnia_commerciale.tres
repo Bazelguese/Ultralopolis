@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_b0n5y"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_wruwn"]
+
+[sub_resource type="Resource" id="Resource_b0n5y"]
+script = ExtResource("2_wruwn")
+legno = 6
+
+[sub_resource type="Resource" id="Resource_wruwn"]
+script = ExtResource("2_wruwn")
+legno = 9
+
+[resource]
+script = ExtResource("1_b0n5y")
+id = &"compagnia_commerciale"
+display_name = "Compagnia commerciale"
+era = 3
+cost_gold = 10
+tags = Array[StringName]([&"Commerciale"])
+gold_per_phase = 5
+mana_type = &"verde"
+mana_amount = 2
+mana_interval_ms = 2000
+upgrade_costs = Array[ExtResource("2_wruwn")]([SubResource("Resource_b0n5y"), SubResource("Resource_wruwn")])

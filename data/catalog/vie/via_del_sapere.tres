@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_oje80"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/osservatorio.tres" id="2_75bnx"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_cebbi"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_1fc32"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/ingegneri_militari.tres" id="5_f1vi2"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="6_7ywfp"]
+[ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="7_yl74c"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/studiosi.tres" id="8_37dqk"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="9_hmfog"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/via_sapere_ricerca.tres" id="10_1an0x"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="11_7fj4r"]
+
+[resource]
+script = ExtResource("11_7fj4r")
+id = &"via_del_sapere"
+display_name = "Via del Sapere"
+description = "+1 Ricerca per fase da ogni edificio Sapere; Studiosi più frequenti. Bonus: +5 Ricerca."
+dimension = 5
+extra_research = 5
+favored_opportunities = Array[ExtResource("3_cebbi")]([ExtResource("8_37dqk")])
+exclusive_buildings = Array[ExtResource("1_oje80")]([ExtResource("2_75bnx")])
+exclusive_troops = Array[ExtResource("4_1fc32")]([ExtResource("5_f1vi2")])
+favored_by = Array[Resource]([ExtResource("6_7ywfp"), ExtResource("7_yl74c")])
+permanent_modifiers = Array[ExtResource("9_hmfog")]([ExtResource("10_1an0x")])

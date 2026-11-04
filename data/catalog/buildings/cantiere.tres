@@ -3,26 +3,25 @@
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_kpuwf"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ta307"]
 
-[sub_resource type="Resource" id="Resource_pdtyv"]
-script = ExtResource("2_ta307")
-legno = 3
-
-[sub_resource type="Resource" id="Resource_ns5hc"]
+[sub_resource type="Resource" id="Resource_ta307"]
 script = ExtResource("2_ta307")
 legno = 4
-ferro = 1
+
+[sub_resource type="Resource" id="Resource_pdtyv"]
+script = ExtResource("2_ta307")
+legno = 6
 
 [resource]
 script = ExtResource("1_kpuwf")
 id = &"cantiere"
 display_name = "Cantiere"
 era = 2
-cost_gold = 8
+cost_gold = 7
 tags = Array[StringName]([&"Estrattivo"])
-gold_per_phase = 2
 wood_per_phase = 2
+stone_per_phase = 2
 mana_type = &"verde"
 mana_amount = 1
-mana_interval_ms = 3000
+mana_interval_ms = 2000
 extra_building_slots = 1
-upgrade_costs = Array[ExtResource("2_ta307")]([SubResource("Resource_pdtyv"), SubResource("Resource_ns5hc")])
+upgrade_costs = Array[ExtResource("2_ta307")]([SubResource("Resource_ta307"), SubResource("Resource_pdtyv")])

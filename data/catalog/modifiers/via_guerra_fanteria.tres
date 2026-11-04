@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_6ecmj"]
+
+[resource]
+script = ExtResource("1_6ecmj")
+id = &"via_guerra_fanteria"
+display_name = "Via della Guerra"
+description = "Le truppe Fanteria ricaricano il 10% più in fretta."
+is_malus = false
+effect = 3
+target_tag = &"Fanteria"
+amount = -10
+duration_kind = 2
+stacking = 1

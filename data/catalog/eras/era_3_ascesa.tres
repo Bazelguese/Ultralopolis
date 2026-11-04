@@ -1,6 +1,12 @@
 [gd_resource type="Resource" script_class="EraDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/era_def.gd" id="1_pvj5x"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="2_m8wts"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_impero.tres" id="3_xqiv8"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_oro.tres" id="4_qymsg"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_della_rivelazione.tres" id="5_3lm4h"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_ombra.tres" id="6_yo0fk"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_degli_spiriti.tres" id="7_vhfqc"]
 
 [resource]
 script = ExtResource("1_pvj5x")
@@ -8,3 +14,4 @@ display_name = "Ascesa"
 research_cost = 16
 bonus_building_slots = 1
 bonus_troop_slots = 2
+ways = Array[ExtResource("2_m8wts")]([ExtResource("3_xqiv8"), ExtResource("4_qymsg"), ExtResource("5_3lm4h"), ExtResource("6_yo0fk"), ExtResource("7_vhfqc")])

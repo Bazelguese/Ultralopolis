@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_c72gj"]
+
+[resource]
+script = ExtResource("1_c72gj")
+id = &"diserzioni"
+display_name = "Diserzioni"
+description = "Una truppa a caso consuma il doppio del Cibo."
+effect = 15
+target = 2
+amount = 100

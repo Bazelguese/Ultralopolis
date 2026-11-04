@@ -152,15 +152,23 @@ func production_percent(type: Res.Type) -> int:
 
 ## true se il modificatore non ha etichetta, o se l'elemento la possiede.
 static func _tag_matches(def: ModifierDef, piece: BoardPiece) -> bool:
-	if def.target_tag == &"":
+	if def.target_tag == &"" and def.target_tags_any.is_empty():
 		return true
 	if piece == null:
 		return false
+	var tags: Array[StringName] = []
 	if piece.building != null:
-		return piece.building.tags.has(def.target_tag)
-	if piece.troop != null:
-		return piece.troop.tags.has(def.target_tag)
-	return false
+		tags = piece.building.tags
+	elif piece.troop != null:
+		tags = piece.troop.tags
+	if def.target_tag != &"" and not tags.has(def.target_tag):
+		return false
+	if not def.target_tags_any.is_empty():
+		for tag: StringName in def.target_tags_any:
+			if tags.has(tag):
+				return true
+		return false
+	return true
 
 
 ## Somma degli effetti a numero intero (costo di rinnovo, alternative).

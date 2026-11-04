@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_vvtgb"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_168pq"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_fgomo"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_1wypb"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/veleni_sottili.tres" id="5_cfedr"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_1wmat"]
+
+[resource]
+script = ExtResource("6_1wmat")
+id = &"veleni_sottili"
+display_name = "Veleni sottili"
+description = "Gli elementi che infliggono Corruzione ne infliggono 1 in più."
+dimension = 4
+permanent_modifiers = Array[ExtResource("4_1wypb")]([ExtResource("5_cfedr")])

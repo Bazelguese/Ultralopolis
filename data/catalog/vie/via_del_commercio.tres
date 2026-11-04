@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_xm7k1"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/fondaco.tres" id="2_gq2ts"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/compagnia_commerciale.tres" id="3_c86x7"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="4_mkm4t"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="5_g0tv7"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_mercantile.tres" id="6_kp1h6"]
+[ext_resource type="Resource" path="res://data/catalog/identita/popolo_del_delta.tres" id="7_k2cpf"]
+[ext_resource type="Resource" path="res://data/catalog/identita/repubblica.tres" id="8_iu28t"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/costruttori.tres" id="9_t5u3e"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/mercante.tres" id="10_cg87v"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="11_0jwc7"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/via_commercio_oro.tres" id="12_3ir5u"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="13_c7dkq"]
+
+[resource]
+script = ExtResource("13_c7dkq")
+id = &"via_del_commercio"
+display_name = "Via del Commercio"
+description = "+1 Oro per fase da ogni edificio Commerciale; Costruttori e Mercante più frequenti. Bonus: +6 Oro."
+dimension = 5
+extra_gold = 6
+favored_opportunities = Array[ExtResource("4_mkm4t")]([ExtResource("9_t5u3e"), ExtResource("10_cg87v")])
+exclusive_buildings = Array[ExtResource("1_xm7k1")]([ExtResource("2_gq2ts"), ExtResource("3_c86x7")])
+favored_by = Array[Resource]([ExtResource("6_kp1h6"), ExtResource("7_k2cpf"), ExtResource("8_iu28t")])
+permanent_modifiers = Array[ExtResource("11_0jwc7")]([ExtResource("12_3ir5u")])

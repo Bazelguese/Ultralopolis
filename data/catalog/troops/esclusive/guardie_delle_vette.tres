@@ -3,22 +3,21 @@
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_c0ife"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_mpgcl"]
 
+[sub_resource type="Resource" id="Resource_mpgcl"]
+script = ExtResource("2_mpgcl")
+ferro = 2
+
 [sub_resource type="Resource" id="Resource_b7exs"]
 script = ExtResource("2_mpgcl")
-pietra = 1
-ferro = 1
-
-[sub_resource type="Resource" id="Resource_3ouip"]
-script = ExtResource("2_mpgcl")
-pietra = 2
-ferro = 2
+ferro = 3
 
 [resource]
 script = ExtResource("1_c0ife")
 id = &"guardie_delle_vette"
 display_name = "Guardie delle vette"
-cost_gold = 5
+cost_gold = 4
 tags = Array[StringName]([&"Fanteria"])
 cooldown_ms = 3000
-damage = 6
-upgrade_costs = Array[ExtResource("2_mpgcl")]([SubResource("Resource_b7exs"), SubResource("Resource_3ouip")])
+damage = 2
+shield = 2
+upgrade_costs = Array[ExtResource("2_mpgcl")]([SubResource("Resource_mpgcl"), SubResource("Resource_b7exs")])

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_ctou2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_eskv1"]
+
+[sub_resource type="Resource" id="Resource_ctou2"]
+script = ExtResource("2_eskv1")
+fauna = 6
+
+[sub_resource type="Resource" id="Resource_eskv1"]
+script = ExtResource("2_eskv1")
+fauna = 9
+
+[resource]
+script = ExtResource("1_ctou2")
+id = &"corazzieri"
+display_name = "Corazzieri"
+era = 3
+cost_gold = 10
+tags = Array[StringName]([&"Cavalleria", &"Fauna"])
+food_tenths = 10
+mana_type = &"verde"
+mana_cost = 4
+cooldown_ms = 2500
+damage = 12
+shield = 5
+upgrade_costs = Array[ExtResource("2_eskv1")]([SubResource("Resource_ctou2"), SubResource("Resource_eskv1")])

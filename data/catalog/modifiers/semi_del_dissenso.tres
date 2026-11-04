@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_rx5w0"]
+
+[resource]
+script = ExtResource("1_rx5w0")
+id = &"semi_del_dissenso"
+display_name = "Semi del dissenso"
+description = "Ogni scontro inizia con 5 Corruzione."
+effect = 13
+amount = 5

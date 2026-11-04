@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_5kmy6"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_fidwm"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_bsbpn"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/veterani.tres" id="4_d4vqu"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/guardia_d_elite.tres" id="5_xoo1y"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_guerriera.tres" id="6_ine2h"]
+[ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="7_18q52"]
+[ext_resource type="Resource" path="res://data/catalog/identita/monarchia.tres" id="8_ma60e"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/reclutatori.tres" id="9_v2brq"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/addestramento.tres" id="10_4q663"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="11_sk6kw"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/via_guerra_fanteria.tres" id="12_e8xyd"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="13_clnc3"]
+
+[resource]
+script = ExtResource("13_clnc3")
+id = &"via_della_guerra"
+display_name = "Via della Guerra"
+description = "Le truppe Fanteria ricaricano il 10% più in fretta; Reclutatori e Addestramento più frequenti. Bonus: +1 spazio truppa."
+dimension = 5
+extra_troop_slots = 1
+favored_opportunities = Array[ExtResource("2_fidwm")]([ExtResource("9_v2brq"), ExtResource("10_4q663")])
+exclusive_troops = Array[ExtResource("3_bsbpn")]([ExtResource("4_d4vqu"), ExtResource("5_xoo1y")])
+favored_by = Array[Resource]([ExtResource("6_ine2h"), ExtResource("7_18q52"), ExtResource("8_ma60e")])
+permanent_modifiers = Array[ExtResource("11_sk6kw")]([ExtResource("12_e8xyd")])

@@ -3,24 +3,23 @@
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_tbktx"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_8hvo4"]
 
+[sub_resource type="Resource" id="Resource_8hvo4"]
+script = ExtResource("2_8hvo4")
+legno = 6
+
 [sub_resource type="Resource" id="Resource_fu1f1"]
 script = ExtResource("2_8hvo4")
-pietra = 4
-
-[sub_resource type="Resource" id="Resource_7nm82"]
-script = ExtResource("2_8hvo4")
-legno = 2
-pietra = 6
+legno = 9
 
 [resource]
 script = ExtResource("1_tbktx")
 id = &"universita"
 display_name = "Università"
 era = 3
-cost_gold = 11
+cost_gold = 10
 tags = Array[StringName]([&"Sapere"])
 research_per_phase = 6
 mana_type = &"blu"
 mana_amount = 1
 mana_interval_ms = 2000
-upgrade_costs = Array[ExtResource("2_8hvo4")]([SubResource("Resource_fu1f1"), SubResource("Resource_7nm82")])
+upgrade_costs = Array[ExtResource("2_8hvo4")]([SubResource("Resource_8hvo4"), SubResource("Resource_fu1f1")])

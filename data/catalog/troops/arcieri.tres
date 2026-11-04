@@ -3,15 +3,13 @@
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_td1rv"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_v4wds"]
 
+[sub_resource type="Resource" id="Resource_v4wds"]
+script = ExtResource("2_v4wds")
+ferro = 2
+
 [sub_resource type="Resource" id="Resource_4apj7"]
 script = ExtResource("2_v4wds")
-legno = 1
-ferro = 1
-
-[sub_resource type="Resource" id="Resource_st48x"]
-script = ExtResource("2_v4wds")
-legno = 1
-ferro = 2
+ferro = 3
 
 [resource]
 script = ExtResource("1_td1rv")
@@ -22,4 +20,4 @@ tags = Array[StringName]([&"Tiratori"])
 mana_cost = 2
 cooldown_ms = 1500
 damage = 4
-upgrade_costs = Array[ExtResource("2_v4wds")]([SubResource("Resource_4apj7"), SubResource("Resource_st48x")])
+upgrade_costs = Array[ExtResource("2_v4wds")]([SubResource("Resource_v4wds"), SubResource("Resource_4apj7")])

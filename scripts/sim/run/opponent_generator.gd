@@ -63,7 +63,7 @@ static func generate_ghost(catalog: CatalogDef, rules: GeneratorRules, run_rules
 			if way.requires_any.is_empty():
 				ways.append(way)
 			else:
-				for needed: IdentityDef in way.requires_any:
+				for needed: Resource in way.requires_any:
 					if identity.has(needed) and not ways.has(way):
 						ways.append(way)
 		if not ways.is_empty():
