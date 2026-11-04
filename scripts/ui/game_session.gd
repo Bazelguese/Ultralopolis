@@ -7,6 +7,8 @@ const MENU_SCENE: String = "res://scenes/main_menu.tscn"
 const SELECT_SCENE: String = "res://scenes/nation_select.tscn"
 const CREATOR_SCENE: String = "res://scenes/nation_creator.tscn"
 const GAME_SCENE: String = "res://scenes/main.tscn"
+## Partita sulla plancia 3D, nel nuovo stile (GDD §14.2).
+const GAME_SCENE_3D: String = "res://scenes/partita_3d.tscn"
 
 const CATALOG_PATH: String = "res://data/catalog/catalog.tres"
 const RUN_RULES_PATH: String = "res://data/rules/run_rules.tres"
@@ -25,6 +27,8 @@ var creator_return_scene: String = MENU_SCENE
 var navigation_enabled: bool = true
 ## Ultima schermata richiesta (utile ai test).
 var last_scene_request: String = ""
+## Schermata della partita scelta dal menu: plancia 3D oppure interfaccia provvisoria.
+var game_scene: String = GAME_SCENE
 
 
 func catalog() -> CatalogDef:
@@ -69,7 +73,7 @@ func open_creator(nation: NationTemplate, return_scene: String) -> void:
 
 func start_game(nation: NationTemplate) -> void:
 	selected_nation = nation
-	go(GAME_SCENE)
+	go(game_scene)
 
 
 ## Identificativo nuovo per una nazione.
