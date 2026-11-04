@@ -9,5 +9,7 @@
 [resource]
 script = ExtResource("1_usmqx")
 starting_gold = 7
+opportunities_per_phase = 2
+alternatives_per_opportunity = 3
 starting_buildings = Array[ExtResource("2_nlgyk")]([ExtResource("3_0gqc3")])
 starting_troops = Array[ExtResource("4_dc03y")]([ExtResource("5_hw03f")])

@@ -221,10 +221,10 @@ func buy_offer(offer_index: int, replace_index: int = -1) -> bool:
 
 	match offer.kind:
 		Offer.Kind.EDIFICIO:
-			if not _place_building(offer.building, offer.price, replace_index):
+			if not _place_building(offer.building, offer.price, offer.price, replace_index):
 				return false
 		Offer.Kind.TRUPPA:
-			if not _place_troop(offer.troop, offer.price, replace_index):
+			if not _place_troop(offer.troop, offer.price, offer.price, replace_index):
 				return false
 		Offer.Kind.SPAZIO_EDIFICIO:
 			if board.building_capacity() >= board.max_building_slots:
@@ -367,10 +367,11 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 		RewardDef.Kind.RICERCA:
 			research += reward.amount
 		RewardDef.Kind.EDIFICIO:
-			if not _place_building(reward.building, 0, replace_index):
+			# Gratis, ma vale come il prezzo di catalogo quando si vende (GDD §6.4).
+			if not _place_building(reward.building, 0, reward.building.cost_gold, replace_index):
 				return false
 		RewardDef.Kind.TRUPPA:
-			if not _place_troop(reward.troop, 0, replace_index):
+			if not _place_troop(reward.troop, 0, reward.troop.cost_gold, replace_index):
 				return false
 	_log("Ricompensa presa: %s." % reward.describe())
 	won_encounter = null
@@ -522,13 +523,14 @@ func _offer_pool() -> Array[Offer]:
 
 
 ## Mette un edificio sulla plancia, in uno spazio libero o al posto di un altro.
+## price: Oro da pagare adesso. value: valore su cui si calcolerà il rimborso della vendita.
 ## La sostituzione equivale a vendere e costruire (GDD §6.4): il rimborso conta per il pagamento.
-func _place_building(def: BuildingDef, price: int, replace_index: int) -> bool:
+func _place_building(def: BuildingDef, price: int, value: int, replace_index: int) -> bool:
 	if board.can_add_building(def) and replace_index < 0:
 		if gold < price:
 			return _fail("Oro insufficiente.")
 		gold -= price
-		board.buildings.append(BoardPiece.of_building(def, price))
+		board.buildings.append(BoardPiece.of_building(def, value))
 		_log("Costruito: %s." % def.display_name)
 		return true
 	if replace_index < 0:
@@ -540,17 +542,17 @@ func _place_building(def: BuildingDef, price: int, replace_index: int) -> bool:
 	if gold + refund < price:
 		return _fail("Oro insufficiente.")
 	gold += refund - price
-	board.buildings[replace_index] = BoardPiece.of_building(def, price)
+	board.buildings[replace_index] = BoardPiece.of_building(def, value)
 	_log("%s sostituisce %s (rimborso %d Oro)." % [def.display_name, old_piece.display_name(), refund])
 	return true
 
 
-func _place_troop(def: TroopDef, price: int, replace_index: int) -> bool:
+func _place_troop(def: TroopDef, price: int, value: int, replace_index: int) -> bool:
 	if board.has_free_troop_slot() and replace_index < 0:
 		if gold < price:
 			return _fail("Oro insufficiente.")
 		gold -= price
-		board.troops.append(BoardPiece.of_troop(def, price))
+		board.troops.append(BoardPiece.of_troop(def, value))
 		_log("Reclutato: %s." % def.display_name)
 		return true
 	if replace_index < 0:
@@ -562,7 +564,7 @@ func _place_troop(def: TroopDef, price: int, replace_index: int) -> bool:
 	if gold + refund < price:
 		return _fail("Oro insufficiente.")
 	gold += refund - price
-	board.troops[replace_index] = BoardPiece.of_troop(def, price)
+	board.troops[replace_index] = BoardPiece.of_troop(def, value)
 	_log("%s sostituisce %s (rimborso %d Oro)." % [def.display_name, old_piece.display_name(), refund])
 	return true
 

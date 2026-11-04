@@ -27,7 +27,7 @@ func test_regole_confermate_nel_gdd() -> void:
 	assert_eq(rules.starting_troop_slots, 3, "GDD §6.1")
 	assert_eq(rules.max_building_slots, 10, "GDD §6.1")
 	assert_eq(rules.max_troop_slots, 12, "GDD §6.1")
-	assert_eq(rules.opportunities_per_phase, 3, "GDD §4.2")
+	assert_eq(rules.opportunities_per_phase, 2, "GDD §4.2")
 	assert_eq(rules.alternatives_per_opportunity, 3, "GDD §4.2")
 	assert_eq(rules.starting_research, 0, "GDD §6.2")
 	assert_eq(rules.starting_buildings.size(), 1, "GDD §6.2: un edificio di base")

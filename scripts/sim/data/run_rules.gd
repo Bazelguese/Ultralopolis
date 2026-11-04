@@ -28,8 +28,8 @@ extends Resource
 @export var troop_slot_price: int = 5
 
 @export_group("Opportunità")
-## Opportunità per macrofase (GDD §4.2: 3).
-@export var opportunities_per_phase: int = 3
+## Opportunità per macrofase (GDD §4.2: 2).
+@export var opportunities_per_phase: int = 2
 ## Alternative mostrate in ogni opportunità (GDD §4.2: 3).
 @export var alternatives_per_opportunity: int = 3
 ## Costo del primo rinnovo delle offerte.

@@ -161,6 +161,12 @@ func _to_preparation(run: RunState) -> void:
 		run.skip_reward()
 
 
+## Completa l'anno in corso dalla Preparazione in poi.
+func _play_year_rest(run: RunState) -> void:
+	_pass_all(run)
+	run.fight_ghost()
+
+
 ## Fa un anno intero passando tutte le opportunità e combattendo il fantasma.
 func _play_year(run: RunState) -> void:
 	_to_preparation(run)
@@ -229,13 +235,14 @@ func test_risorse_conservate_fra_fasi_e_anni() -> void:
 
 # --- Opportunità e offerte (GDD §4.2) ---------------------------------------
 
-func test_tre_opportunita_con_tre_alternative() -> void:
+func test_due_opportunita_con_tre_alternative() -> void:
+	run_rules.opportunities_per_phase = 2
 	var run: RunState = _new_run()
-	for n: int in range(1, 4):
+	for n: int in range(1, 3):
 		assert_eq(run.opportunity_number, n)
 		assert_eq(run.offers.size(), 3, "Tre alternative per opportunità.")
 		run.pass_opportunity()
-	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO, "Dopo 3 opportunità arriva l'incontro.")
+	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO, "Dopo 2 opportunità arriva l'incontro.")
 
 
 func test_offerte_della_fase_e_dell_era() -> void:
@@ -283,10 +290,11 @@ func test_rinnovo_costo_crescente_e_dimezzamento() -> void:
 	assert_eq(run.gold, 90)
 	run.pass_opportunity()
 	assert_eq(run.reroll_cost(), 3, "Nuova opportunità: l'aumento +4 diventa +2.")
-	run.pass_opportunity()
-	assert_eq(run.reroll_cost(), 2, "+2 diventa +1.")
-	run.pass_opportunity()
 	_to_preparation(run)
+	assert_eq(run.reroll_cost(), 2, "Il costo continua fra le fasi: +2 diventa +1.")
+	run.pass_opportunity()
+	assert_eq(run.reroll_cost(), 1, "+1 diventa +0: costo iniziale.")
+	_play_year_rest(run)
 	assert_eq(run.reroll_cost(), 1, "Mai sotto il costo iniziale.")
 
 
@@ -313,6 +321,23 @@ func test_vendita_rimborsa_meta_del_prezzo() -> void:
 	assert_eq(run.gold, 0)
 	assert_true(run.sell_building(1))
 	assert_eq(run.gold, 2, "Metà di 5, per difetto.")
+
+
+func test_ricompensa_venduta_rende_meta_del_prezzo_di_catalogo() -> void:
+	var reward: RewardDef = RewardDef.new()
+	reward.kind = RewardDef.Kind.EDIFICIO
+	reward.building = market
+	var list: Array[EncounterDef] = [_encounter(1, [], 1, [reward])]
+	catalog.encounters = list
+	var run: RunState = _new_run()
+	_pass_all(run)
+	run.choose_encounter(0)
+	var gold_before: int = run.gold
+	assert_true(run.take_reward(0))
+	assert_eq(run.gold, gold_before + 5, "La ricompensa è gratis; in Preparazione producono fattoria (2) e mercato (3).")
+	var gold_after_reward: int = run.gold
+	assert_true(run.sell_building(1))
+	assert_eq(run.gold, gold_after_reward + 2, "Vale metà dei 5 Oro di catalogo.")
 
 
 func test_dotazione_iniziale_non_rimborsa() -> void:

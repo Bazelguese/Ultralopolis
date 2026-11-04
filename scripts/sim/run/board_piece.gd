@@ -1,11 +1,12 @@
 class_name BoardPiece
 extends RefCounted
 ## Un elemento posseduto sulla plancia: un edificio oppure una truppa,
-## con il prezzo pagato (serve per il rimborso della vendita, GDD §6.4).
+## con il suo valore per il rimborso della vendita (GDD §6.4).
 
 var building: BuildingDef
 var troop: TroopDef
-## Oro pagato per ottenerlo. 0 per la dotazione iniziale e le ricompense.
+## Valore per il rimborso: il prezzo pagato; per le ricompense il prezzo di catalogo;
+## 0 per la dotazione iniziale. La vendita rimborsa metà di questo valore.
 var paid: int = 0
 
 
