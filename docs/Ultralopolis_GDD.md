@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.8
+## Game Design Document — v0.9
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.8 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.9 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -174,14 +174,33 @@ La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogn
 |---|---|
 | **2 opportunità** per macrofase (come le due scelte prima e le due dopo lo scontro con i mostri in The Bazaar) | Confermato |
 | Ogni opportunità mostra **3 alternative** | Confermato |
-| Ogni alternativa è un **singolo acquisto**: prenderne una chiude l’opportunità | Confermato |
+| Ogni alternativa è un **singolo acquisto o una singola scelta**: prenderne una chiude l’opportunità. Alcune alternative chiedono una seconda scelta interna (quale bonus, quale truppa, quale malus) | Confermato |
+| Le 3 alternative sono **tipi di opportunità diversi**, pescati a caso con la stessa probabilità; per costruttori e reclutatori si pesca poi l’edificio o la truppa dell’era corrente | Confermato |
 | Produzione è la fase di **costruzione** (offerte di edifici); Preparazione è la fase di **disposizione** (offerte di truppe) | Confermato |
 | Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
 | Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
 | Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo e continua a crescere fra un’opportunità e l’altra | Confermato; valori placeholder |
 | A ogni nuova opportunità si dimezza l’**aumento accumulato** del costo di rinnovo (arrotondato per difetto); il costo non scende mai sotto quello iniziale. Esempio: costo iniziale 1, +1 a rinnovo; dopo 4 rinnovi il costo è 5 (aumento +4); all’opportunità successiva l’aumento diventa +2 e il costo 3 | Confermato |
 
-**Da definire:** contenuto dei negozi, frequenza degli eventi.
+**Tipi di opportunità del prototipo — provvisori** (valori placeholder):
+
+| Fase | Opportunità | Effetto |
+|---|---|---|
+| Produzione | Costruttori | Costruisci un edificio. |
+| Produzione | Architetti | Compri uno spazio edificio. |
+| Produzione | Studiosi | Paghi Oro, ottieni subito Ricerca. |
+| Produzione | Esattori | Ottieni subito Oro. |
+| Produzione | Mercante | Scambi Ricerca con Oro. |
+| Produzione | Assemblea | Per un anno, a scelta: +50% Oro oppure +50% Ricerca. |
+| Preparazione | Reclutatori | Recluti una truppa. |
+| Preparazione | Quartiermastro | Compri uno spazio truppa. |
+| Preparazione | Addestramento | Per un anno, una truppa a scelta ha la ricarica più corta. |
+| Preparazione | Fortificazioni | Resistenza in più nel prossimo scontro con il fantasma (bersaglio Resistenza, §8.2). |
+| Preparazione | Ambasciata | Accorcia di un anno un malus attivo a scelta; se si azzera, sparisce (rimozione anticipata, §13.2). |
+
+Un tipo che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, Addestramento senza truppe, spazi oltre il massimo).
+
+**Da definire:** catalogo definitivo delle opportunità, frequenza degli eventi.
 
 ## 5. Economia
 
@@ -506,7 +525,7 @@ Gli incontri del mondo (§3.3) sono la prima forma concreta di evento: inizialme
 
 Un effetto avversario o un evento può lasciare un modificatore per uno o più anni. Le conseguenze seguono P1: cambiano il modo di giocare per un periodo, senza debilitare pesantemente.
 
-Durata, origine e cumulabilità dei malus del prototipo sono fissate in §8.2.1. Intensità definitive, rimozione anticipata e rapporto con le opportunità annuali restano da definire. È stata proposta una gestione che offra una decisione (ricostruire, accettare un costo temporaneo, scegliere una risposta politica): direzione di design, non catalogo approvato.
+Durata, origine e cumulabilità dei malus del prototipo sono fissate in §8.2.1. Nel prototipo un malus si può accorciare con l’Ambasciata (§4.2, provvisorio). Intensità definitive e altre forme di rimozione restano da definire. È stata proposta una gestione che offra una decisione (ricostruire, accettare un costo temporaneo, scegliere una risposta politica): direzione di design, non catalogo approvato.
 
 ### 13.3 Corruzione e diplomazia
 
@@ -747,6 +766,11 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.9 — 4 novembre 2026**
+- Le 3 alternative sono tipi di opportunità diversi, pescati con la stessa probabilità; alcune hanno una scelta interna (§4.2).
+- Primo elenco provvisorio di undici tipi di opportunità, fra cui Assemblea, Addestramento, Fortificazioni e Ambasciata (§4.2).
+- I modificatori possono colpire la Resistenza e durare fino al prossimo scontro con il fantasma; i malus si possono accorciare con l’Ambasciata (§8, §13.2).
 
 **v0.8 — 4 novembre 2026**
 - Regole dei modificatori: malus e bonus nello stesso sistema, durata in anni dal successivo, stesso malus allunga la durata, malus dei fantasmi su sconfitta o pareggio, incontri solo Oro dimezzato (§8.2.1).
