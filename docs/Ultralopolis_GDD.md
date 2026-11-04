@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.18
+## Game Design Document — v0.19
 
 **Data:** 4 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -786,7 +786,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Menu principale | Gioca, Crea nazione, Esci dal gioco. |
 | Gioca | Se esistono nazioni create, si sceglie con quale giocare; altrimenti si va alla creazione. |
 | Crea nazione | Schermata a parte (§9.1). Creata dal menu, si torna al menu principale. |
-| Partita | Plancia, opportunità, incontri e battaglie; si può tornare al menu o ricominciare con la stessa nazione. | Il primo prototipo parte con un’**interfaccia semplice e provvisoria** per provare le regole; la plancia 3D arriva in un secondo momento.
+| Partita | Si gioca sulla **plancia 3D** (§14.2): plancia, opportunità, incontri e battaglie; si può tornare al menu o ricominciare con la stessa nazione. |
 
 ---
 
@@ -829,7 +829,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Produzione di mana e attivazioni automatiche.
 - Resistenza, esito e progressione della run.
 - Incontri del mondo come scontri automatici contro plance generate (scelta fra 3), con Oro dimezzato in caso di sconfitta e ricompense a scelta in caso di vittoria.
-- Interfaccia provvisoria leggibile, con il motivo dell’attesa delle truppe, pausa, velocità e salto della visualizzazione.
+- Interfaccia leggibile sulla plancia 3D, con il motivo dell’attesa delle truppe, pausa, velocità e salto della visualizzazione.
 - Valori separati dal codice della simulazione.
 
 ### 15.3 Sistemi successivi
@@ -892,7 +892,6 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Limite tecnico di sicurezza: uno scontro che supera un’ora simulata viene interrotto (solo con dati sbagliati; con il logoramento non accade) | Protezione tecnica, non regola di gioco. |
 | Costo del rinnovo delle offerte e suo aumento | Placeholder. |
 | Avversari locali determinati dall’anno | Sostituto del futuro servizio di fantasmi. |
-| Interfaccia semplice e provvisoria al posto della plancia 3D | Fase iniziale del prototipo (§14.3). |
 | Intensità dei malus: Oro e Ricerca −50%, intervallo di mana e ricarica +50%, rinnovo +2 Oro, −1 alternativa | Placeholder. |
 | Il bersaglio a caso di un malus (edificio o truppa) si sceglie quando il malus arriva, con il seme della run | Provvisoria. |
 | Se l’elemento colpito viene venduto o sostituito, il malus finisce | Provvisoria. |
@@ -1020,6 +1019,9 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.19 — 4 novembre 2026**
+- La partita si gioca solo sulla plancia 3D; l’interfaccia provvisoria è stata tolta (§14.3, §15.2, §16.3).
 
 **v0.18 — 4 novembre 2026** (implementazione)
 - Nel prototipo: scudo, cura, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio con seme casuale (§7.6, §7.7); valori di partenza dello scontro (§8.2); potenziamenti su tutti i valori d’effetto (§6.5); ere con le vie (§10.4); edifici neutri (§5.3).
