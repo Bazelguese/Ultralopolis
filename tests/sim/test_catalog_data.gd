@@ -73,7 +73,7 @@ func test_identita_complete() -> void:
 	var counts: Dictionary[IdentityDef.Dimension, int] = {}
 	for def: IdentityDef in catalog.identities:
 		counts[def.dimension] = counts.get(def.dimension, 0) + 1
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		assert_gt(counts.get(dimension, 0), 0, "Opzioni per %s" % IdentityDef.DIMENSION_NAMES[dimension])
 	assert_gte(counts.get(IdentityDef.Dimension.PERK, 0), rules.starting_perks, "Abbastanza perk iniziali")
 	for ghost: GhostDef in catalog.ghosts:
@@ -118,7 +118,7 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 	var run: RunState = RunState.new(_catalog(), load(RUN_RULES_PATH) as RunRules,
 			load(BATTLE_RULES_PATH) as BattleRules, load(RESISTANCE_RULES_PATH) as ResistanceRules, 7)
 	var choices: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = run.identity_options(dimension)
 		var count: int = run.starting_perk_count() if dimension == IdentityDef.Dimension.PERK else mini(1, options.size())
 		for i: int in range(count):

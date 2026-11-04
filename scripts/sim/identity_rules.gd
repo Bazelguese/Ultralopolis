@@ -25,7 +25,7 @@ static func validate(catalog: CatalogDef, rules: RunRules, choices: Array[Identi
 			return "Un elemento dell'identità non esiste più nel catalogo."
 		if choices.count(def) > 1:
 			return "Ogni elemento si sceglie una volta sola."
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var wanted: int = 1
 		if dimension == IdentityDef.Dimension.PERK:
 			wanted = starting_perk_count(catalog, rules)

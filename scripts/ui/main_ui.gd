@@ -159,7 +159,7 @@ func _new_run() -> void:
 ## Nazione di prova: il primo elemento di ogni dimensione e i primi perk.
 func _test_nation(catalog: CatalogDef, run_rules: RunRules) -> NationTemplate:
 	var choices: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = IdentityRules.options(catalog, dimension)
 		var count: int = IdentityRules.starting_perk_count(catalog, run_rules) if dimension == IdentityDef.Dimension.PERK else mini(1, options.size())
 		for i: int in range(count):
@@ -342,6 +342,9 @@ func _refresh_actions() -> void:
 	if _pending_kind != PendingKind.NESSUNA:
 		_action_box.add_child(UiKit.wrapped("Plancia piena: clicca «Sostituisci» sull'elemento da rimpiazzare.\nRiceverai metà del prezzo che avevi pagato.", 20, UiKit.COLOR_WARNING))
 		_action_box.add_child(UiKit.button("Annulla", _on_cancel_pending))
+		return
+	if not run.way_choices.is_empty():
+		_show_ways()
 		return
 	match run.phase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
@@ -538,6 +541,25 @@ func _on_replace(replace_index: int) -> void:
 		_act(run.buy_offer(index, replace_index))
 	elif kind == PendingKind.RICOMPENSA:
 		_act(run.take_reward(index, replace_index))
+
+
+## Scelta della via entrando in una nuova era (GDD §10.4).
+func _show_ways() -> void:
+	_action_box.add_child(UiKit.wrapped("Nuova era: %s — scegli la via della nazione" % run.era_name(), 24))
+	_action_box.add_child(UiKit.wrapped("La via diventa parte della tua identità: offerte, elementi esclusivi, un tratto permanente e un bonus immediato.", 16))
+	for i: int in range(run.way_choices.size()):
+		var way: IdentityDef = run.way_choices[i]
+		var card: PanelContainer = UiKit.panel(UiKit.COLOR_ENCOUNTER)
+		var box: VBoxContainer = VBoxContainer.new()
+		card.add_child(box)
+		box.add_child(UiKit.wrapped(way.display_name, 20))
+		box.add_child(UiKit.wrapped(way.description, 15))
+		box.add_child(UiKit.button("Scegli questa via", _on_choose_way.bind(i)))
+		_action_box.add_child(card)
+
+
+func _on_choose_way(index: int) -> void:
+	_act(run.choose_way(index))
 
 
 ## Seconda scelta di un'offerta (quale bonus, quale truppa, quale malus).

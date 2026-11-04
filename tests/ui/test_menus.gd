@@ -31,7 +31,7 @@ func _open(scene_path: String) -> Control:
 func _fill_creator(creator: Control) -> void:
 	var catalog: CatalogDef = GameSession.catalog()
 	var rules: RunRules = GameSession.run_rules()
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = IdentityRules.options(catalog, dimension)
 		var count: int = IdentityRules.starting_perk_count(catalog, rules) if dimension == IdentityDef.Dimension.PERK else 1
 		for i: int in range(count):

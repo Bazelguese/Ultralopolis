@@ -123,8 +123,10 @@ var last_error: String = ""
 
 ## Nome scelto dal giocatore per la sua nazione.
 var nation_name: String = "La tua nazione"
-## Identità adottata: popolo, governo, credo, cultura e perk (GDD §9).
+## Identità adottata: popolo, governo, credo, cultura, perk e vie (GDD §9, §10.4).
 var identity: Array[IdentityDef] = []
+## Vie proposte entrando nell'era: finché non se ne sceglie una, le altre azioni aspettano.
+var way_choices: Array[IdentityDef] = []
 
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
@@ -597,6 +599,10 @@ func advance_era() -> bool:
 	board.base_building_slots += next.bonus_building_slots
 	board.base_troop_slots += next.bonus_troop_slots
 	_log("La nazione entra nell'era %s (%d Ricerca)." % [next.display_name, cost])
+	# Dalla seconda era si sceglie una via fra 3 (GDD §10.4).
+	way_choices = _draw_ways(next)
+	if not way_choices.is_empty():
+		_log("Scegli la via della nazione per l'era %s." % next.display_name)
 	# Le offerte delle ere precedenti non restano disponibili (GDD §10.3):
 	# le alternative in corso vengono ripescate gratis dalla nuova era.
 	_draw_offers()
@@ -1133,7 +1139,59 @@ func _end_run(result: RunEnd) -> void:
 func _require_shopping() -> bool:
 	if not is_shopping_phase():
 		return _fail("Questa azione è possibile solo in Produzione o Preparazione.")
+	if not way_choices.is_empty():
+		return _fail("Prima scegli la via della nazione.")
 	return true
+
+
+# --- Vie delle ere (GDD §10.4) -----------------------------------------------------
+
+## Sceglie una delle vie proposte: diventa parte dell'identità, con il suo bonus immediato.
+func choose_way(index: int) -> bool:
+	if index < 0 or index >= way_choices.size():
+		return _fail("Via non valida.")
+	var way: IdentityDef = way_choices[index]
+	way_choices = []
+	_adopt_identity(way)
+	# Le offerte in corso tengono conto della via appena scelta.
+	_draw_offers()
+	return true
+
+
+## Tre vie pescate dal pool dell'era, pesate da identità e vie già scelte (§16.3).
+func _draw_ways(era_def: EraDef) -> Array[IdentityDef]:
+	var pool: Array[IdentityDef] = []
+	var weights: Array[int] = []
+	for way: IdentityDef in era_def.ways:
+		if identity.has(way):
+			continue
+		if not way.requires_any.is_empty():
+			var allowed: bool = false
+			for needed: IdentityDef in way.requires_any:
+				if identity.has(needed):
+					allowed = true
+			if not allowed:
+				continue
+		var weight: int = 1
+		for element: IdentityDef in identity:
+			if way.favored_by.has(element):
+				weight += 1
+		pool.append(way)
+		weights.append(weight)
+	var picked: Array[IdentityDef] = []
+	for i: int in range(mini(3, pool.size())):
+		var total: int = 0
+		for weight: int in weights:
+			total += weight
+		var roll: int = _rng.randi_range(0, total - 1)
+		var pick: int = 0
+		while roll >= weights[pick]:
+			roll -= weights[pick]
+			pick += 1
+		picked.append(pool[pick])
+		pool.remove_at(pick)
+		weights.remove_at(pick)
+	return picked
 
 
 func _require_not_over() -> bool:
@@ -1151,6 +1209,11 @@ func _adopt_identity(def: IdentityDef) -> void:
 	_log("%s: %s." % [IdentityDef.DIMENSION_NAMES[def.dimension], def.display_name])
 	gold += def.extra_gold
 	research += def.extra_research
+	if def.extra_resources != null:
+		for type: Res.Type in Res.NAMES:
+			stock[type] += def.extra_resources.internal(type)
+	board.base_building_slots += def.extra_building_slots
+	board.base_troop_slots += def.extra_troop_slots
 	for building: BuildingDef in def.extra_buildings:
 		if board.can_add_building(building):
 			board.buildings.append(BoardPiece.of_building(building, 0))

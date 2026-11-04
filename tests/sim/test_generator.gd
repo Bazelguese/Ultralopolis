@@ -117,7 +117,7 @@ func test_riepilogo_anno_per_anno() -> void:
 
 func _choices(run: RunState) -> Array[IdentityDef]:
 	var choices: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = run.identity_options(dimension)
 		var count: int = run.starting_perk_count() if dimension == IdentityDef.Dimension.PERK else 1
 		for i: int in range(count):

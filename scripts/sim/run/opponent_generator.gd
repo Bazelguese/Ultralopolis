@@ -49,13 +49,25 @@ static func generate_ghost(catalog: CatalogDef, rules: GeneratorRules, run_rules
 	ghost.buildings = buildings
 
 	var identity: Array[IdentityDef] = []
-	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var options: Array[IdentityDef] = IdentityRules.options(catalog, dimension)
 		var wanted: int = rules.ghost_perks if dimension == IdentityDef.Dimension.PERK else 1
 		for i: int in range(mini(wanted, options.size())):
 			var pick: int = rng.randi_range(0, options.size() - 1)
 			identity.append(options[pick])
 			options.remove_at(pick)
+	# Una via per ogni era raggiunta dalla seconda in poi (GDD §10.4).
+	for era_index: int in range(1, mini(ghost.era, catalog.eras.size())):
+		var ways: Array[IdentityDef] = []
+		for way: IdentityDef in catalog.eras[era_index].ways:
+			if way.requires_any.is_empty():
+				ways.append(way)
+			else:
+				for needed: IdentityDef in way.requires_any:
+					if identity.has(needed) and not ways.has(way):
+						ways.append(way)
+		if not ways.is_empty():
+			identity.append(ways[rng.randi_range(0, ways.size() - 1)])
 	ghost.identity = identity
 
 	if not rules.ghost_malus_pool.is_empty():
