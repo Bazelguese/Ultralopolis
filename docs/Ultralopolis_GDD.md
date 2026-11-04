@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.14
+## Game Design Document — v0.15
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.14 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.15 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -81,7 +81,7 @@ Questi principi valgono per tutto il contenuto futuro. Un nuovo elemento che li 
 |---|---|---|
 | P1 | **Le conseguenze negative deviano, non debilitano.** Un malus deve spingere il giocatore a ragionare in modo diverso per un periodo, non indebolirlo pesantemente. Esempio: produzione di Ricerca dimezzata per un anno, durante il quale il giocatore può orientarsi su altro. | Confermato |
 | P2 | **La potenza segue il progresso.** Effetti molto forti non devono essere disponibili dall’inizio della run. | Direzione |
-| P2a | Il meccanismo naturale per farlo sono le ere: gli effetti più forti vengono sbloccati da ere avanzate. | Proposta |
+| P2a | Il meccanismo naturale per farlo sono le ere: gli effetti più forti vengono sbloccati da ere avanzate. | Confermato (v0.15) |
 | P3 | **Gli edifici si distinguono per il rapporto fra le due funzioni.** La doppia funzione crea scelte solo se edifici diversi bilanciano diversamente produzione economica e mana (es. molta Ricerca e poco mana, poco Oro e molto mana). Se un edificio fosse migliore su entrambi i fronti, la scelta sparirebbe. | Proposta |
 | P4 | **La battaglia deve spiegarsi da sola.** Il giocatore deve poter capire perché una truppa non si è attivata (mana insufficiente, cooldown, effetto avversario). Con la priorità da destra verso sinistra, la leggibilità fa parte della meccanica. | Proposta |
 | P5 | **Il contenuto si esprime con il linguaggio del nucleo.** Nuovi edifici, truppe, eventi e malus vanno descritti con risorse, slot, cooldown, mana, Resistenza e modificatori già esistenti (§8). Ciò che richiede una nuova famiglia di effetti o una nuova risorsa è una modifica del nucleo. | Proposta |
@@ -294,17 +294,19 @@ Sono ammesse **copie multiple** dello stesso edificio o della stessa truppa — 
 
 Quantità, nomi e statistiche sono placeholder. Eventuali varianti per popolo restano una proposta.
 
-### 6.3 Espansione della plancia — Da definire
+### 6.3 Espansione della plancia — Confermato nelle fonti (modifica del nucleo, v0.15); quantità e prezzi placeholder
 
-Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) rende l’espansione uno degli assi principali di progressione della run. Che cosa concede gli spazi non è ancora stabilito. Ipotesi:
+Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) rende l’espansione uno degli assi principali di progressione della run. Gli spazi arrivano da **tre fonti insieme**:
 
-- ricompense legate all’ingresso nelle ere;
-- edifici che concedono spazi, ad esempio una caserma che aggiunge spazi truppa;
-- acquisto di spazi con l’Oro, come opportunità.
+- l’**ingresso nelle ere**: ogni era indica nei dati quanti spazi edificio e truppa concede (§10);
+- **edifici che concedono spazi**, ad esempio una caserma che aggiunge spazi truppa;
+- l’**acquisto di spazi con l’Oro**, come opportunità (Architetti, Quartiermastro, §4.2).
 
-Un edificio che concede spazi occuperebbe a sua volta uno spazio edificio, quindi entrerebbe nella stessa scelta della doppia funzione.
+Un edificio che concede spazi occupa a sua volta uno spazio edificio, quindi entra nella stessa scelta della doppia funzione.
 
-Il prototipo usa provvisoriamente tutte e tre le vie, per poter provare una plancia che cresce (§16.3). Non è una regola.
+Anche il bonus immediato di una via (§10.4) può concedere spazi, se i suoi dati lo prevedono.
+
+**Da definire:** quantità e prezzi di ciascuna fonte; layout della plancia.
 
 ### 6.4 Vendita e sostituzione — Confermato
 
@@ -588,7 +590,7 @@ Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzio
 |---|---|
 | Tutte e cinque le dimensioni sono presenti fin da subito | Confermato |
 | La nazione si crea **come in un GDR**: prima dell’anno 1 il giocatore vede tutte le opzioni e sceglie nome, un popolo, un governo, un credo, una cultura e alcuni perk iniziali; poi la run procede | Confermato |
-| Per ora l’identità resta fissa durante la run; il cambiamento (riforme, conversioni, trasformazioni culturali) arriverà più avanti | Confermato / Direzione |
+| Per ora popolo, governo, credo e cultura restano fissi durante la run; il loro cambiamento (riforme, conversioni, trasformazioni culturali) arriverà più avanti. L’identità però **cresce** con le vie scelte entrando nelle ere (§10.4) | Confermato / Direzione |
 | Anche i fantasmi hanno un’identità, che vale per la loro Resistenza e per i loro tratti in battaglia | Confermato |
 | Le nazioni create **restano salvate** sul PC; si possono **modificare** o **eliminare** (con conferma). Da una nazione salvata si possono giocare più run | Confermato |
 
@@ -612,7 +614,7 @@ Catalogo del prototipo (placeholder): 3 popoli (Montanari, Popolo del delta, Pop
 
 **Da definire:** incompatibilità fra elementi, livelli o rarità dei perk, altre fonti di perk.
 
-L’identità dovrebbe influenzare opportunità, risposte agli eventi, strategie disponibili e, in futuro, abilità speciali (ad esempio i malus con nome, Parte III). Il modo in cui può cambiare durante la partita resta da progettare: riforme politiche, conversioni religiose e trasformazioni culturali sono possibilità, non regole.
+L’identità dovrebbe influenzare opportunità, risposte agli eventi, strategie disponibili e, in futuro, abilità speciali (ad esempio i malus con nome, Parte III). Il modo in cui può cambiare durante la partita resta da progettare: riforme politiche, conversioni religiose e trasformazioni culturali sono possibilità, non regole. Le **vie delle ere** (§10.4) sono il primo modo confermato in cui l’identità cresce durante la run: usano la stessa scheda di §9.2 e si aggiungono agli elementi scelti alla creazione, senza sostituirli.
 
 **Proposta non adottata:** partire con un’identità ridotta e far emergere cultura e credo attraverso gli eventi. Il creatore ha scelto tutte le dimensioni fin dalla fondazione; l’idea resta fra gli spunti (Parte III).
 
@@ -626,25 +628,55 @@ Le ere dipendono dall’investimento in Ricerca, non da un calendario uguale per
 
 La **Ricerca si conserva e viene spesa** per avanzare quando il giocatore può pagare il costo. Il passaggio non avviene automaticamente al raggiungimento di una soglia.
 
-### 10.2 Base di lavoro — Proposta
+### 10.2 Che cosa fa un’era — Confermato (v0.15)
 
-Tre ere iniziali, con nomi di lavoro “Fondazione”, “Sviluppo” e “Ascesa” (placeholder). Costi placeholder.
+| Effetto dell’ingresso in un’era | Riferimento |
+|---|---|
+| Sblocca il catalogo di offerte dell’era; quelle delle ere precedenti non restano disponibili | §10.3 |
+| Concede spazi edificio e truppa, nella quantità indicata nei dati dell’era | §6.3 |
+| Alza la quota di Resistenza dovuta all’era | §7.1.1 |
+| Dalla seconda era in poi, chiede di **scegliere una via** | §10.4 |
+| Rende disponibili gli effetti più forti (P2a) | §2 |
 
-Una nuova era sblocca offerte e possibilità di miglioramento. Gli elementi posseduti restano utilizzabili e non migliorano automaticamente: il vantaggio tecnologico richiede anche la capacità economica di acquistare ciò che viene sbloccato.
+Gli elementi posseduti restano utilizzabili e non migliorano automaticamente: il vantaggio tecnologico richiede anche la capacità economica di acquistare ciò che viene sbloccato.
 
-Le ere sono anche il veicolo proposto per P2a (effetti forti solo in ere avanzate) e una delle ipotesi per l’espansione della plancia (§6.3).
+La struttura è **lineare**: ere in sequenza, senza albero tecnologico. La scelta e la specializzazione passano per le vie (§10.4). La Ricerca serve, per ora, solo a passare d’era.
 
-### 10.3 Questioni aperte
+**Costo — Confermato nella forma:** ogni era costa più Ricerca della precedente, senza meccanismi di recupero per chi è rimasto indietro. Valori placeholder.
 
-**Confermato:** l’avanzamento si può pagare in entrambe le macrofasi e non consuma un’opportunità. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+**Numero di ere — Da definire:** il prototipo ne usa 3 (“Fondazione”, “Sviluppo”, “Ascesa”, nomi placeholder); il numero della run completa si decide dopo i playtest. Ogni era in più richiede un catalogo base e nuove vie con i loro esclusivi (§10.4).
+
+### 10.3 Regole del passaggio — Confermato
+
+L’avanzamento si può pagare in entrambe le macrofasi e non consuma un’opportunità. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+
+### 10.4 Le vie — Confermato (v0.15)
+
+Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una direzione di sviluppo che diventa parte della sua identità (es. Via del Commercio, Via della Guerra, Via della Fede; nomi placeholder). Ogni era diventa così un capitolo della storia della nazione.
+
+| Regola | Stato |
+|---|---|
+| La scelta è **obbligatoria**, al momento dell’ingresso nell’era | Confermato |
+| Si sceglie **fra 3 vie** | Confermato |
+| Ogni era ha un **pool di vie**. Le 3 proposte sono pescate dal pool, con più probabilità per le vie coerenti con l’identità e con le vie già scelte; alcune vie possono essere esclusive di certe identità o di certe vie precedenti | Confermato |
+| Una via usa la **stessa scheda degli elementi dell’identità** (§9.2) | Confermato |
+| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi; dare un tratto permanente (§8); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
+| Gli effetti sono **liberi**: possono riferirsi a etichette o a elementi specifici, caso per caso nel catalogo | Confermato |
+| Gli **elementi esclusivi** di una via sono **diversi per ogni era**: una via scelta nell’era 2 ha esclusivi propri per l’era 2, per l’era 3 e per le successive. Gli esclusivi di un’era passata spariscono come le altre offerte | Confermato |
+| Le vie si accumulano: nessuna sostituisce le precedenti o gli elementi scelti alla creazione | Confermato |
+
+Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un’etichetta continua a contare.
+
+Quando introdurre le vie nel prototipo è da decidere.
+
+### 10.5 Questioni aperte
 
 **Da definire:**
 
-- Costo definitivo delle ere e andamento fra un’era e la successiva.
-- Tecnologie individuali, albero di ricerca o specializzazioni.
-- Rapporto fra ricerca e identità della civiltà.
-
-Per la prima prova è prevista la sola progressione delle ere, senza albero tecnologico.
+- Costi definitivi delle ere e andamento fra un’era e la successiva.
+- Numero definitivo di ere (§10.2).
+- Catalogo delle vie e dei loro esclusivi.
+- Altri usi della Ricerca oltre al passaggio d’era (ad esempio tecnologie come offerte), se serviranno.
 
 ## 11. Fantasmi e asincronia
 
@@ -658,7 +690,7 @@ Un’arma del fantasma può lasciare una conseguenza nella run del giocatore att
 
 L’avversario viene fissato prima delle occasioni di spionaggio e rimane lo stesso fino allo scontro.
 
-**Proposta:** abbinare nazioni dello stesso anno senza obbligare alla stessa era, così l’investimento tecnologico conserva valore. I criteri definitivi di matchmaking non sono approvati.
+**Confermato (v0.15):** l’avversario è un fantasma dello **stesso anno**, anche se di un’era diversa, così l’investimento tecnologico conserva valore. Gli altri criteri di matchmaking restano da definire.
 
 ### 11.3 Popolamento iniziale — Confermato
 
@@ -840,7 +872,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Convenzione | Stato |
 |---|---|
 | Run di prova di 3 anni completi | Limite del prototipo; la run completa resta di 10 vittorie (§3.4). |
-| Spazi della plancia da tre vie insieme: ingresso nelle ere, edifici che concedono spazi (es. Caserma), acquisto di spazi come offerta | Provvisoria finché §6.3 non è definito. |
+| Quantità di spazi concessi da ere, edifici e acquisti, e loro prezzi | Placeholder (le tre fonti sono confermate, §6.3). |
+| Pescata delle 3 vie: peso base 1, +1 per ogni elemento dell’identità o via già scelta che la favorisce; se il pool ha meno di 3 vie valide, si mostrano tutte | Provvisoria, come per le opportunità. |
 | Entrando in una nuova era, le alternative dell’opportunità in corso vengono ripescate gratis dalla nuova era | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
 | Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
@@ -892,6 +925,10 @@ Criteri di accettazione proposti per il prototipo:
 | Costruzione durante Produzione | Nessuna raccolta retroattiva; prima produzione in Preparazione. |
 | Risorse non spese | Conservate al cambio fase e al cambio anno. |
 | Passaggio di era | Ricerca pagata una volta; resto conservato; offerte coerenti con l’era. |
+| Ingresso in un’era | Spazi e quota di Resistenza dell’era concessi; dalla seconda era, scelta obbligatoria fra 3 vie. |
+| Vie | Le 3 proposte vengono dal pool dell’era, pesate da identità e vie precedenti; la via scelta applica bonus immediato e tratto permanente. |
+| Esclusivi delle vie | Compaiono fra le offerte solo nell’era a cui appartengono e solo per chi ha la via. |
+| Abbinamento dei fantasmi | Stesso anno, era qualsiasi. |
 | Truppa pronta senza mana | In attesa, senza consumi né cooldown aggiuntivo; il motivo è visibile. |
 | Più truppe pronte | Valutazione da destra a sinistra. |
 | Prima truppa troppo costosa | Saltata; la successiva può usare il mana disponibile. |
@@ -936,8 +973,8 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Priorità | Questione |
 |---|---|
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
-| Prima di ampliare la plancia | Che cosa concede gli spazi (§6.3), quantità e prezzi; layout. |
-| Prima di ampliare la ricerca | Numero e identità definitive delle ere; costo del passaggio. |
+| Prima di ampliare la plancia | Quantità e prezzi degli spazi (§6.3); layout. |
+| Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
 | Per lo spionaggio | Informazioni visibili, costi, bersagli, effetti, contromisure. |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
@@ -976,6 +1013,14 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.15 — 4 novembre 2026** (modifica del nucleo per gli spazi della plancia)
+- Ere lineari con scelta obbligatoria di una via fra 3 dalla seconda era; le vie usano la scheda dell’identità, compaiono da un pool pesato e hanno esclusivi diversi per ogni era (§10.2, §10.4).
+- Costo delle ere crescente, senza recupero; numero di ere da definire dopo i playtest, 3 nel prototipo (§10.2).
+- Spazi della plancia da tre fonti insieme: ere, edifici, acquisto con Oro (§6.3).
+- P2a confermato: gli effetti più forti si sbloccano nelle ere avanzate (§2).
+- Fantasmi dello stesso anno, anche di era diversa (§11.2).
+- L’identità cresce con le vie (§9); aggiornati convenzioni, criteri di verifica e decisioni aperte (§16.3, §17, §18).
 
 **v0.14 — 4 novembre 2026** (modifica del nucleo)
 - Casualità ammessa in battaglia, sempre con seme registrato; sostituisce “nessuna casualità” (§7.5, §11.4).
