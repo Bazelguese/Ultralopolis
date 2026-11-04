@@ -110,7 +110,7 @@ In ogni round il giocatore ascolta uno dei consiglieri della nazione (§4.2). Ed
 | 5 round, scontro di mezzo, 5 round, scontro con il fantasma | Confermato (v0.21) |
 | Edifici e truppe disponibili in entrambe le metà | Confermato (v0.21) |
 | La produzione resta all’inizio delle due metà (§5.2); l’economia non cambia | Confermato (v0.21) |
-| Le due metà mantengono i nomi Produzione e Preparazione | Proposta: i nomi vanno rivisti, ora che le metà non si distinguono per contenuto |
+| Le due metà mantengono i nomi Produzione e Preparazione | Confermato (v0.21) per ora; i nomi si possono rivedere |
 
 La durata in minuti della run non è ancora fissata.
 
@@ -187,10 +187,10 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 | Il giocatore ne sceglie **uno**; la scelta è definitiva per il round | Confermato |
 | Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato |
 | Ogni round ha un **tipo**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
-| In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tipo è visibile prima di scegliere il consigliere | Proposta |
-| Un consigliere che non ha niente da proporre per il tipo del round non viene pescato in quel round | Proposta |
-| Si può **passare**: senza scegliere un consigliere, oppure dopo averlo scelto senza prendere nulla. Passare non dà nulla | Passare: Confermato; dopo la scelta del consigliere: Proposta |
-| Il **rinnovo** a pagamento ripesca le proposte del consigliere scelto | Proposta |
+| In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tipo è visibile prima di scegliere il consigliere | Confermato (v0.21) |
+| Un consigliere che non ha niente da proporre per il tipo del round non viene pescato in quel round | Confermato (v0.21) |
+| Si può **passare**: senza scegliere un consigliere, oppure dopo averlo scelto senza prendere nulla. Passare non dà nulla | Confermato (v0.21) |
+| Il **rinnovo** a pagamento ripesca le proposte del consigliere scelto | Confermato (v0.21) |
 | Il rinnovo costa Oro, almeno 1; il costo aumenta a ogni rinnovo e a ogni nuovo round si dimezza l’aumento accumulato (arrotondato per difetto), senza scendere sotto il costo iniziale | Confermato |
 | Le azioni **non costano Oro**, ma altre risorse coerenti con il tema; edifici, truppe e spazi si pagano in Oro | Confermato (v0.20) |
 | L’**identità** della nazione (popolo, governo, credo, cultura, vie) rende più frequenti alcuni consiglieri, già nel prototipo | Confermato |
@@ -201,18 +201,18 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 
 I consiglieri hanno **3 livelli**, legati all’**era**: Funzionari, Ministri e Gran Consiglieri (nomi placeholder). Un livello più alto ha un pool più ricco e proposte più forti.
 
-- **Proposta:** il livello è quello dell’era corrente; entrando in una nuova era tutto il Consiglio sale di livello.
+- **Confermato (v0.21):** il livello è quello dell’era corrente; entrando in una nuova era tutto il Consiglio sale di livello.
 - **Da definire con il bilanciamento:** se le proposte migliori costano di più o lo stesso.
 
 #### 4.2.2 Consiglieri speciali — Confermato (v0.21)
 
-- **Clown:** propone **4 elementi**, edifici e truppe mescolati, ciascuno con un mana diverso. Proposta: i quattro mana sono rosso, verde, blu e neutro (un edificio neutro).
-- **Anziano:** propone **perk** ed **elementi neutrali**. Proposta: gli elementi neutrali sono gli edifici neutri, perché non esistono truppe neutre.
-- **Proposta:** Clown e Anziano ignorano il tipo del round.
+- **Clown:** propone **4 elementi**, edifici e truppe mescolati, ciascuno con un mana diverso. I quattro mana sono rosso, verde, blu e neutro (un edificio neutro o una truppa che non usa mana).
+- **Anziano:** propone **perk** ed **elementi neutrali**. Gli elementi neutrali sono gli edifici neutri, perché non esistono truppe neutre.
+- Clown e Anziano ignorano il tipo del round.
 
-#### 4.2.3 Consiglio del prototipo — Proposta
+#### 4.2.3 Consiglio del prototipo — Confermato come punto di partenza (v0.21)
 
-Nomi, pool e costi placeholder. Le azioni riprendono le opportunità del prototipo precedente. L’affinità di un elemento si legge dalle sue etichette (§6.6), con eccezioni per singoli elementi nei dati.
+Nomi, pool e costi placeholder; Studioso e Diplomatico vanno arricchiti. Le azioni riprendono le opportunità del prototipo precedente. L’affinità di un elemento si legge dalle sue etichette (§6.6), con eccezioni per singoli elementi nei dati.
 
 | Consigliere | Azioni | Elementi affini | Paga le azioni con |
 |---|---|---|---|
@@ -241,9 +241,9 @@ Il Sacerdote può **incantare** una truppa: le aggiunge un effetto in battaglia 
 | Solo le truppe si possono incantare, non gli edifici | Confermato |
 | Una truppa che non usava mana, dopo l’incanto ne richiede | Confermato |
 | Ogni truppa si può incantare **una sola volta** | Confermato |
-| Il mana richiesto è del colore della truppa; se la truppa non usava mana, è del colore dell’incanto. Costo in più: 2 mana | Proposta |
-| Valore dell’effetto: circa metà del danno di una truppa dell’era; cresce con i potenziamenti come gli altri valori (§6.5) | Proposta |
-| L’incanto resta sulla truppa per tutta la run e si perde se la truppa viene venduta o sostituita | Proposta |
+| Il mana richiesto è del colore della truppa; se la truppa non usava mana, è del colore dell’incanto. Costo in più: 2 mana | Confermato (v0.21); valori placeholder |
+| Valore dell’effetto: circa metà del danno di una truppa dell’era; cresce con i potenziamenti come gli altri valori (§6.5) | Confermato (v0.21); valori placeholder |
+| L’incanto resta sulla truppa per tutta la run e si perde se la truppa viene venduta o sostituita | Confermato (v0.21) |
 
 Nel linguaggio degli effetti (§8) un incanto è un modificatore permanente sulla truppa, con l’incanto come origine. A differenza delle aggiunte fisse dei modificatori, che valgono solo per chi ha già quel valore (§16.3), l’incanto **aggiunge un effetto che la truppa non aveva**.
 
@@ -764,10 +764,10 @@ Ottenere informazioni sull’avversario prima dello scontro e poter intervenire 
 | Ogni proposta fa partire lo scontro con un elemento nemico **sabotato** o **rallentato** per alcuni secondi | Confermato |
 | Il bersaglio dipende dalla proposta: **a caso**, a un’**estremità** della fila, il **più lento** o il **più veloce** (§7.7.1) | Confermato |
 | Il Maestro delle spie propone anche edifici e truppe che rallentano o sabotano | Confermato |
-| Vale per lo scontro con il fantasma dell’anno, anche se comprato nella prima metà | Proposta |
-| Durate: 5 s di Sabotaggio, 10 s di Inefficienza; si paga in Influenza | Proposta (placeholder) |
-| Una proposta indica se colpisce truppe, edifici o qualsiasi elemento | Proposta |
-| Il fantasma non spia il giocatore: è una registrazione (§11.1) | Proposta |
+| Vale per lo scontro con il fantasma dell’anno, anche se comprato nella prima metà | Confermato (v0.21) |
+| Durate: 5 s di Sabotaggio, 10 s di Inefficienza; si paga in Influenza | Confermato (v0.21); valori placeholder |
+| Una proposta indica se colpisce truppe, edifici o qualsiasi elemento | Confermato (v0.21) |
+| Il fantasma non spia il giocatore: è una registrazione (§11.1) | Confermato (v0.21) |
 
 **Da definire:** informazioni visibili sulla plancia del fantasma, una statistica di spionaggio, contromisure.
 
@@ -875,7 +875,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Due macrofasi con raccolta automatica all’ingresso e 2 opportunità ciascuna, da 3 alternative. In sviluppo (v0.21): 5 round per metà con il Consiglio (§4.2).
+- Due metà con raccolta automatica all’ingresso, 5 round ciascuna con il Consiglio (§4.2): 3 consiglieri, 3 proposte (4 dal Clown), incanto (§4.3) e spionaggio (§12).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
 - Riordino delle truppe fuori dal combattimento.
@@ -955,6 +955,10 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Influenza; Processione 2 Fede. Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
 | Bottino dei nemici sconfitti: fantasma 3 Oro e 2 Ricerca; incontri facile 2 Oro e 1 Ricerca, media 3 e 2, difficile 4 e 3 | Placeholder (v0.21). |
+| Consiglio: le identità che favorivano Costruttori e Reclutatori ora favoriscono Architetto e Generale; un consigliere è favorito anche da chi favorisce una sua azione | Provvisoria (v0.21). |
+| Livelli del Consiglio: un livello più alto aggiunge azioni (es. Grandi esattori, Trattati, Rete di sabotatori dal livello 2); gli incanti hanno ancora un solo livello | Provvisoria (v0.21). |
+| Valori di incanti e spionaggio: incanti +2 Danno, Scudo o Cura, +1 Corruzione o rallentamento di 1,5 s, 2 mana in più, 2 Fede; spionaggio 5 s di Sabotaggio o 10 s di Inefficienza (8 s la Rete di sabotatori), 2-3 Influenza; perk dell’Anziano 2 Fede e 2 Influenza | Placeholder (v0.21). |
+| Spionaggio con criterio “più lento” o “più veloce”: per le truppe conta la ricarica, per gli edifici l’intervallo; a parità vince la posizione più a destra e le truppe stanno a destra degli edifici | Provvisoria (v0.21). |
 | Un consigliere o una proposta favoriti da un elemento dell’identità hanno peso +1 per ogni elemento che li favorisce (peso base 1) | Provvisoria (estesa ai consiglieri, v0.21). |
 | Edifici e truppe della dotazione dell’identità entrano solo se c’è spazio, e come la dotazione iniziale non rimborsano nulla | Provvisoria. |
 | I tratti permanenti non si possono accorciare con l’Ambasciata | Provvisoria. |
@@ -1084,7 +1088,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 **v0.21 — 4 novembre 2026** (dopo le partite di Davide)
 - L’anno ha 5 round, l’incontro del mondo, altri 5 round e il fantasma; edifici e truppe si ottengono in entrambe le metà (§3.2, §4.1). L’economia non cambia.
-- Il **Consiglio** sostituisce le opportunità: 3 consiglieri a caso per round, se ne sceglie uno, si prende una delle sue 3 proposte; tipi di round, livelli legati all’era, Clown e Anziano (§4.2). Pool del prototipo in Proposta.
+- Il **Consiglio** sostituisce le opportunità: 3 consiglieri a caso per round, se ne sceglie uno, si prende una delle sue 3 proposte; tipi di round, livelli legati all’era, Clown e Anziano (§4.2). Approvato dal creatore e nel prototipo, con il pool di §4.2.3.
 - **Incanto** delle truppe (§4.3).
 - **Spionaggio** con il Maestro delle spie: sabotaggio o rallentamento all’inizio dello scontro con il fantasma, con criterio di bersaglio (§7.7.1, §12).
 - **Bottino** fisso di Oro e Ricerca per i nemici sconfitti (§3.3, §3.4, §16.3); già nel prototipo.
