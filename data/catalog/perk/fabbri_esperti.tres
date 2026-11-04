@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_ghhi5"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_fu1gq"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_kcy3b"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_aslu1"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/armi_affilate.tres" id="5_tc823"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_i3vf1"]
+
+[resource]
+script = ExtResource("6_i3vf1")
+id = &"fabbri_esperti"
+display_name = "Fabbri esperti"
+description = "Tutte le truppe ricaricano del 10% più in fretta."
+dimension = 4
+permanent_modifiers = Array[ExtResource("4_aslu1")]([ExtResource("5_tc823")])

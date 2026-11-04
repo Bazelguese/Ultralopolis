@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_bynin"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_qmst2"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_tr8yj"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_ygfsi"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/trattativa.tres" id="5_g55bk"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_6mtc2"]
+
+[resource]
+script = ExtResource("6_6mtc2")
+id = &"contrattatori"
+display_name = "Contrattatori"
+description = "Rinnovare le offerte costa 1 Oro in meno."
+dimension = 4
+permanent_modifiers = Array[ExtResource("4_ygfsi")]([ExtResource("5_g55bk")])

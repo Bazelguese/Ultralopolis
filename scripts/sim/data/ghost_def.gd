@@ -14,3 +14,5 @@ extends Resource
 @export var troops: Array[TroopDef] = []
 ## Malus che il fantasma lascia se il giocatore perde o pareggia (GDD §3.4, §11.1).
 @export var malus: Array[ModifierDef] = []
+## Identità della nazione copiata: popolo, governo, credo, cultura e perk (GDD §11.4).
+@export var identity: Array[IdentityDef] = []

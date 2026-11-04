@@ -17,6 +17,7 @@ enum Phase {
 	PREPARAZIONE,
 	SCONTRO_FANTASMA,
 	FINE_RUN,
+	CREAZIONE_NAZIONE,  ## Prima dell'anno 1: si sceglie l'identità (GDD §9).
 }
 
 enum RunEnd {
@@ -39,6 +40,7 @@ const PHASE_NAMES: Dictionary[Phase, String] = {
 	Phase.PREPARAZIONE: "Preparazione",
 	Phase.SCONTRO_FANTASMA: "Scontro con il fantasma",
 	Phase.FINE_RUN: "Fine della run",
+	Phase.CREAZIONE_NAZIONE: "Creazione della nazione",
 }
 
 var catalog: CatalogDef
@@ -91,6 +93,11 @@ var chronicle: Array[String] = []
 ## Motivo dell'ultima azione rifiutata.
 var last_error: String = ""
 
+## Nome scelto dal giocatore per la sua nazione.
+var nation_name: String = "La tua nazione"
+## Identità adottata: popolo, governo, credo, cultura e perk (GDD §9).
+var identity: Array[IdentityDef] = []
+
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
 		p_resistance_rules: ResistanceRules, p_seed: int) -> void:
@@ -114,8 +121,12 @@ func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleR
 	for def: TroopDef in run_rules.starting_troops:
 		board.troops.append(BoardPiece.of_troop(def, 0))
 
-	_log("Nasce una nuova nazione (seme %d)." % run_seed)
-	_start_year(1)
+	# Se il catalogo ha un'identità da scegliere, la run parte dalla creazione della nazione.
+	if catalog.identities.is_empty():
+		_log("Nasce una nuova nazione (seme %d)." % run_seed)
+		_start_year(1)
+	else:
+		phase = Phase.CREAZIONE_NAZIONE
 
 
 # --- Informazioni ------------------------------------------------------------
@@ -144,7 +155,8 @@ func reroll_cost() -> int:
 
 ## Resistenza con cui la nazione del giocatore inizia uno scontro (GDD §7.1.1).
 func player_resistance() -> int:
-	var base: int = ResistanceCalc.compute(resistance_rules, era, year, board.buildings.size(), board.troops.size())
+	var base: int = ResistanceCalc.compute(resistance_rules, era, year, board.buildings.size(),
+			board.troops.size(), _identity_resistance(identity))
 	return maxi(1, base + modifiers.flat(ModifierDef.Effect.RESISTENZA))
 
 
@@ -152,8 +164,74 @@ func player_resistance() -> int:
 func ghost_resistance() -> int:
 	if current_ghost == null:
 		return 0
-	return ResistanceCalc.compute(resistance_rules, current_ghost.era, year,
-			current_ghost.buildings.size(), current_ghost.troops.size())
+	var identity_bonus: int = _identity_resistance(current_ghost.identity)
+	var ghost_modifiers: Modifiers = _identity_modifiers(current_ghost.identity)
+	var base: int = ResistanceCalc.compute(resistance_rules, current_ghost.era, year,
+			current_ghost.buildings.size(), current_ghost.troops.size(), identity_bonus)
+	return maxi(1, base + ghost_modifiers.flat(ModifierDef.Effect.RESISTENZA))
+
+
+# --- Creazione della nazione (GDD §9) -------------------------------------------
+
+## Elementi disponibili per una dimensione dell'identità (tutti, come in un GDR).
+func identity_options(dimension: IdentityDef.Dimension) -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == dimension:
+			found.append(def)
+	return found
+
+
+## Quanti perk si scelgono alla creazione (non più di quelli disponibili).
+func starting_perk_count() -> int:
+	return mini(run_rules.starting_perks, identity_options(IdentityDef.Dimension.PERK).size())
+
+
+## Crea la nazione: un elemento per ogni dimensione che ha opzioni, più i perk iniziali.
+## Poi comincia l'anno 1.
+func found_nation(p_name: String, choices: Array[IdentityDef]) -> bool:
+	if phase != Phase.CREAZIONE_NAZIONE:
+		return _fail("La nazione è già stata creata.")
+	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+		var wanted: int = 1
+		if dimension == IdentityDef.Dimension.PERK:
+			wanted = starting_perk_count()
+		elif identity_options(dimension).is_empty():
+			wanted = 0
+		var chosen: int = 0
+		for def: IdentityDef in choices:
+			if def.dimension == dimension:
+				chosen += 1
+		if chosen != wanted:
+			return _fail("Scegli %d × %s." % [wanted, IdentityDef.DIMENSION_NAMES[dimension]])
+	for def: IdentityDef in choices:
+		if not catalog.identities.has(def):
+			return _fail("Elemento dell'identità non valido.")
+		if choices.count(def) > 1:
+			return _fail("Ogni elemento si sceglie una volta sola.")
+	nation_name = p_name.strip_edges() if not p_name.strip_edges().is_empty() else "La tua nazione"
+	_log("Nasce %s (seme %d)." % [nation_name, run_seed])
+	for def: IdentityDef in choices:
+		_adopt_identity(def)
+	_start_year(1)
+	return true
+
+
+## Testo breve dell'identità, es. "Montanari · Monarchia · ...".
+func identity_summary() -> String:
+	var names: PackedStringArray = PackedStringArray()
+	for def: IdentityDef in identity:
+		if def.dimension != IdentityDef.Dimension.PERK:
+			names.append(def.display_name)
+	return " · ".join(names)
+
+
+func perks() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.PERK:
+			found.append(def)
+	return found
 
 
 ## Oro e Ricerca che gli edifici depositeranno all'inizio della prossima macrofase.
@@ -458,6 +536,10 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 		RewardDef.Kind.TRUPPA:
 			if not _place_troop(reward.troop, 0, reward.troop.cost_gold, replace_index):
 				return false
+		RewardDef.Kind.PERK:
+			if identity.has(reward.perk):
+				return _fail("Hai già questo perk.")
+			_adopt_identity(reward.perk)
 	_log("Ricompensa presa: %s." % reward.describe())
 	won_encounter = null
 	_enter_phase(Phase.PREPARAZIONE)
@@ -482,7 +564,7 @@ func fight_ghost() -> bool:
 	var ghost_name: String = current_ghost.display_name if current_ghost != null else "Fantasma"
 	var enemy: BattleSideSetup = BattleSideSetup.new([], [], 0)
 	if current_ghost != null:
-		enemy = BattleSideSetup.new(current_ghost.buildings, current_ghost.troops, ghost_resistance())
+		enemy = _ghost_setup()
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
 	for message: String in modifiers.on_ghost_fight_done():
 		_log(message)
@@ -572,13 +654,33 @@ func _end_shopping_phase() -> void:
 ## stessa probabilità; per costruttori e reclutatori si pesca poi l'elemento dell'era corrente.
 func _draw_offers() -> void:
 	var pool: Array[OpportunityDef] = _available_opportunities()
+	var weights: Array[int] = []
+	for opportunity: OpportunityDef in pool:
+		weights.append(_opportunity_weight(opportunity))
 	offers = []
 	var wanted: int = maxi(1, run_rules.alternatives_per_opportunity + modifiers.flat(ModifierDef.Effect.ALTERNATIVE_OFFERTE))
 	var count: int = mini(wanted, pool.size())
 	for i: int in range(count):
-		var pick: int = _rng.randi_range(0, pool.size() - 1)
+		var total: int = 0
+		for weight: int in weights:
+			total += weight
+		var roll: int = _rng.randi_range(0, total - 1)
+		var pick: int = 0
+		while roll >= weights[pick]:
+			roll -= weights[pick]
+			pick += 1
 		offers.append(_make_offer(pool[pick]))
 		pool.remove_at(pick)
+		weights.remove_at(pick)
+
+
+## Peso di un tipo di opportunità: 1, più 1 per ogni elemento dell'identità che lo favorisce.
+func _opportunity_weight(opportunity: OpportunityDef) -> int:
+	var weight: int = 1
+	for def: IdentityDef in identity:
+		if def.favored_opportunities.has(opportunity):
+			weight += 1
+	return weight
 
 
 ## Tipi di opportunità della fase corrente che hanno senso adesso
@@ -586,7 +688,12 @@ func _draw_offers() -> void:
 func _available_opportunities() -> Array[OpportunityDef]:
 	var wanted_phase: OpportunityDef.Phase = OpportunityDef.Phase.PRODUZIONE if phase == Phase.PRODUZIONE else OpportunityDef.Phase.PREPARAZIONE
 	var pool: Array[OpportunityDef] = []
-	for opportunity: OpportunityDef in catalog.opportunities:
+	var candidates: Array[OpportunityDef] = catalog.opportunities.duplicate()
+	for def: IdentityDef in identity:
+		for opportunity: OpportunityDef in def.exclusive_opportunities:
+			if not candidates.has(opportunity):
+				candidates.append(opportunity)
+	for opportunity: OpportunityDef in candidates:
 		if opportunity.phase != wanted_phase:
 			continue
 		match opportunity.kind:
@@ -631,17 +738,23 @@ func _make_offer(opportunity: OpportunityDef) -> Offer:
 
 ## Edifici offerti: solo quelli dell'era corrente (GDD §10.3).
 func _buildings_of_era() -> Array[BuildingDef]:
+	var candidates: Array[BuildingDef] = catalog.buildings.duplicate()
+	for identity_def: IdentityDef in identity:
+		candidates.append_array(identity_def.exclusive_buildings)
 	var found: Array[BuildingDef] = []
-	for def: BuildingDef in catalog.buildings:
-		if def.era == era:
+	for def: BuildingDef in candidates:
+		if def.era == era and not found.has(def):
 			found.append(def)
 	return found
 
 
 func _troops_of_era() -> Array[TroopDef]:
+	var candidates: Array[TroopDef] = catalog.troops.duplicate()
+	for identity_def: IdentityDef in identity:
+		candidates.append_array(identity_def.exclusive_troops)
 	var found: Array[TroopDef] = []
-	for def: TroopDef in catalog.troops:
-		if def.era == era:
+	for def: TroopDef in candidates:
+		if def.era == era and not found.has(def):
 			found.append(def)
 	return found
 
@@ -819,7 +932,70 @@ func _require_shopping() -> bool:
 func _require_not_over() -> bool:
 	if is_over():
 		return _fail("La run è finita.")
+	if phase == Phase.CREAZIONE_NAZIONE:
+		return _fail("Prima crea la nazione.")
 	return true
+
+
+## Adotta un elemento dell'identità: dotazione, tratto permanente e, implicitamente,
+## Resistenza, opportunità ed elementi esclusivi (letti da identity quando servono).
+func _adopt_identity(def: IdentityDef) -> void:
+	identity.append(def)
+	_log("%s: %s." % [IdentityDef.DIMENSION_NAMES[def.dimension], def.display_name])
+	gold += def.extra_gold
+	research += def.extra_research
+	for building: BuildingDef in def.extra_buildings:
+		if board.can_add_building(building):
+			board.buildings.append(BoardPiece.of_building(building, 0))
+		else:
+			_log("Nessuno spazio per %s." % building.display_name)
+	for troop: TroopDef in def.extra_troops:
+		if board.has_free_troop_slot():
+			board.troops.append(BoardPiece.of_troop(troop, 0))
+		else:
+			_log("Nessuno spazio per %s." % troop.display_name)
+	for modifier: ModifierDef in def.permanent_modifiers:
+		_log(modifiers.apply(modifier, ActiveModifier.OriginKind.IDENTITA, def.display_name, year, board, _rng))
+
+
+static func _identity_resistance(elements: Array[IdentityDef]) -> int:
+	var total: int = 0
+	for def: IdentityDef in elements:
+		total += def.resistance_bonus
+	return total
+
+
+## Modificatori permanenti di un'identità, per una nazione che non è il giocatore (es. un fantasma).
+func _identity_modifiers(elements: Array[IdentityDef]) -> Modifiers:
+	var result: Modifiers = Modifiers.new()
+	var empty_board: NationBoard = NationBoard.new()
+	for def: IdentityDef in elements:
+		for modifier: ModifierDef in def.permanent_modifiers:
+			if modifier.target == ModifierDef.Target.NAZIONE:
+				result.apply(modifier, ActiveModifier.OriginKind.IDENTITA, def.display_name, year, empty_board, _rng)
+	return result
+
+
+## Il fantasma come entra in battaglia: con la Resistenza e i tratti della sua identità.
+func _ghost_setup() -> BattleSideSetup:
+	var ghost_modifiers: Modifiers = _identity_modifiers(current_ghost.identity)
+	var buildings: Array[BuildingDef] = []
+	var interval_change: int = ghost_modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA)
+	for def: BuildingDef in current_ghost.buildings:
+		var copy: BuildingDef = def
+		if interval_change != 0:
+			copy = def.duplicate() as BuildingDef
+			copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(def.mana_interval_ms, interval_change))
+		buildings.append(copy)
+	var troops: Array[TroopDef] = []
+	var cooldown_change: int = ghost_modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA)
+	for def: TroopDef in current_ghost.troops:
+		var copy: TroopDef = def
+		if cooldown_change != 0:
+			copy = def.duplicate() as TroopDef
+			copy.cooldown_ms = maxi(1, Modifiers.apply_percent(def.cooldown_ms, cooldown_change))
+		troops.append(copy)
+	return BattleSideSetup.new(buildings, troops, ghost_resistance())
 
 
 ## Metà di un numero intero, arrotondata per difetto (per numeri non negativi).

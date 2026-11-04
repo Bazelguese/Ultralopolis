@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_pxl2s"]
+
+[resource]
+script = ExtResource("1_pxl2s")
+id = &"archivi"
+display_name = "Archivi"
+description = "+25% Ricerca prodotta a ogni fase."
+is_malus = false
+amount = 25
+duration_kind = 2
+stacking = 2

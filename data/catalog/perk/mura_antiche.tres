@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_4m7m7"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_3di7a"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_nfe30"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_6r7vc"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="5_b5ogg"]
+
+[resource]
+script = ExtResource("5_b5ogg")
+id = &"mura_antiche"
+display_name = "Mura antiche"
+description = "+6 Resistenza in ogni scontro."
+dimension = 4
+resistance_bonus = 6

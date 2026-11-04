@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_xg0na"]
+
+[resource]
+script = ExtResource("1_xg0na")
+id = &"benedizione_del_sole"
+display_name = "Benedizione del Sole"
+description = "+20% Oro prodotto a ogni fase."
+is_malus = false
+effect = 0
+amount = 20
+duration_kind = 2
+stacking = 2

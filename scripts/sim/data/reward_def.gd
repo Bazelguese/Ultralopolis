@@ -7,6 +7,7 @@ enum Kind {
 	RICERCA,
 	EDIFICIO,
 	TRUPPA,
+	PERK,
 }
 
 @export var kind: Kind = Kind.ORO
@@ -16,6 +17,8 @@ enum Kind {
 @export var building: BuildingDef
 ## Truppa regalata (per TRUPPA).
 @export var troop: TroopDef
+## Perk ottenuto (per PERK).
+@export var perk: IdentityDef
 
 
 func describe() -> String:
@@ -28,4 +31,6 @@ func describe() -> String:
 			return "Edificio: %s" % (building.display_name if building != null else "?")
 		Kind.TRUPPA:
 			return "Truppa: %s" % (troop.display_name if troop != null else "?")
+		Kind.PERK:
+			return "Perk: %s" % (perk.display_name if perk != null else "?")
 	return "?"

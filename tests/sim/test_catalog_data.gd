@@ -50,6 +50,19 @@ func test_identificativi_unici_e_valori_validi() -> void:
 		assert_between(def.era, 1, catalog.eras.size(), "Era di %s" % def.id)
 
 
+func test_identita_complete() -> void:
+	var catalog: CatalogDef = _catalog()
+	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
+	var counts: Dictionary[IdentityDef.Dimension, int] = {}
+	for def: IdentityDef in catalog.identities:
+		counts[def.dimension] = counts.get(def.dimension, 0) + 1
+	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+		assert_gt(counts.get(dimension, 0), 0, "Opzioni per %s" % IdentityDef.DIMENSION_NAMES[dimension])
+	assert_gte(counts.get(IdentityDef.Dimension.PERK, 0), rules.starting_perks, "Abbastanza perk iniziali")
+	for ghost: GhostDef in catalog.ghosts:
+		assert_false(ghost.identity.is_empty(), "Identità del fantasma %s" % ghost.display_name)
+
+
 func test_ogni_fase_ha_almeno_tre_tipi_di_opportunita() -> void:
 	var catalog: CatalogDef = _catalog()
 	var production: int = 0
@@ -87,6 +100,13 @@ func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
 func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 	var run: RunState = RunState.new(_catalog(), load(RUN_RULES_PATH) as RunRules,
 			load(BATTLE_RULES_PATH) as BattleRules, load(RESISTANCE_RULES_PATH) as ResistanceRules, 7)
+	var choices: Array[IdentityDef] = []
+	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+		var options: Array[IdentityDef] = run.identity_options(dimension)
+		var count: int = run.starting_perk_count() if dimension == IdentityDef.Dimension.PERK else mini(1, options.size())
+		for i: int in range(count):
+			choices.append(options[i])
+	assert_true(run.found_nation("Prova", choices), "La nazione si crea con i dati veri.")
 	var guard: int = 0
 	while not run.is_over() and guard < 1000:
 		guard += 1

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_5dtau"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/fervore.tres" id="2_ro0g5"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_dcvvf"]
+
+[resource]
+script = ExtResource("3_dcvvf")
+id = &"processione"
+display_name = "Processione"
+description = "Paghi 2 Oro: +15 Resistenza nel prossimo scontro con il fantasma."
+phase = 1
+kind = 5
+cost_gold = 2
+modifiers = Array[ExtResource("1_5dtau")]([ExtResource("2_ro0g5")])

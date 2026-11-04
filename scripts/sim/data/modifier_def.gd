@@ -25,6 +25,7 @@ enum Target {
 enum Duration {
 	ANNI,                       ## Anni interi (vedi duration_years).
 	PROSSIMO_SCONTRO_FANTASMA,  ## Finisce dopo il prossimo scontro con il fantasma.
+	PERMANENTE,                 ## Dura tutta la run (es. tratti dell'identità e perk).
 }
 
 ## Che cosa succede se lo stesso modificatore arriva di nuovo (GDD §8.2).

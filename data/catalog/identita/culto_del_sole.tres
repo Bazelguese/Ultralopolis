@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_xx52c"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_uh4qo"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_jlcpc"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_f64qn"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/benedizione_del_sole.tres" id="5_y1ii3"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_o1tc3"]
+
+[resource]
+script = ExtResource("6_o1tc3")
+id = &"culto_del_sole"
+display_name = "Culto del Sole"
+description = "Il sole benedice i raccolti: +20% Oro prodotto."
+dimension = 2
+resistance_bonus = 2
+permanent_modifiers = Array[ExtResource("4_f64qn")]([ExtResource("5_y1ii3")])

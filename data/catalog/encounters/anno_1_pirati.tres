@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://data/catalog/buildings/santuario.tres" id="3_bjwqd"]
 [ext_resource type="Script" path="res://scripts/sim/data/reward_def.gd" id="4_vi85k"]
 [ext_resource type="Resource" path="res://data/catalog/troops/frombolieri.tres" id="5_2mxnm"]
+[ext_resource type="Resource" path="res://data/catalog/perk/fabbri_esperti.tres" id="6_pg0dh"]
 [ext_resource type="Script" path="res://scripts/sim/data/encounter_def.gd" id="6_wpla6"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="7_cmw2c"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="8_a2tuv"]
@@ -24,6 +25,11 @@ script = ExtResource("4_vi85k")
 kind = 3
 troop = ExtResource("5_2mxnm")
 
+[sub_resource type="Resource" id="Resource_bjwqd"]
+script = ExtResource("4_vi85k")
+kind = 4
+perk = ExtResource("6_pg0dh")
+
 [resource]
 script = ExtResource("6_wpla6")
 display_name = "Pirati"
@@ -32,4 +38,4 @@ difficulty_label = "Difficile"
 resistance = 30
 buildings = Array[ExtResource("1_lgech")]([ExtResource("2_pg0dh"), ExtResource("3_bjwqd")])
 troops = Array[ExtResource("7_cmw2c")]([ExtResource("8_a2tuv"), ExtResource("9_0g5of")])
-rewards = Array[ExtResource("4_vi85k")]([SubResource("Resource_23vf4"), SubResource("Resource_nft0m"), SubResource("Resource_igvem")])
+rewards = Array[ExtResource("4_vi85k")]([SubResource("Resource_23vf4"), SubResource("Resource_nft0m"), SubResource("Resource_igvem"), SubResource("Resource_bjwqd")])

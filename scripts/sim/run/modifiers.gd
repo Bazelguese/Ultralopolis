@@ -47,6 +47,8 @@ func apply(def: ModifierDef, origin_kind: ActiveModifier.OriginKind, origin_name
 func on_new_year(year: int) -> Array[String]:
 	var messages: Array[String] = []
 	for modifier: ActiveModifier in active.duplicate():
+		if modifier.def.duration_kind != ModifierDef.Duration.ANNI:
+			continue
 		if year >= modifier.expires_at_year:
 			active.erase(modifier)
 			messages.append("Finisce l'effetto: %s." % modifier.def.display_name)

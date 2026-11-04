@@ -10,3 +10,5 @@ extends Resource
 @export var encounters: Array[EncounterDef] = []
 ## Tipi di opportunità che possono comparire fra le alternative (GDD §4.2).
 @export var opportunities: Array[OpportunityDef] = []
+## Popoli, governi, credi, culture e perk fra cui scegliere (GDD §9).
+@export var identities: Array[IdentityDef] = []

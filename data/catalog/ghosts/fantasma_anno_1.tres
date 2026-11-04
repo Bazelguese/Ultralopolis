@@ -3,11 +3,17 @@
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_dufbo"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_tsfh8"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="3_768ef"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="3_anmme"]
 [ext_resource type="Script" path="res://scripts/sim/data/ghost_def.gd" id="3_ifdnr"]
+[ext_resource type="Resource" path="res://data/catalog/identita/popolo_del_delta.tres" id="4_1s1sp"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/ricerca_dimezzata.tres" id="4_64yty"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_768ef"]
 [ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="5_64yty"]
+[ext_resource type="Resource" path="res://data/catalog/identita/repubblica.tres" id="5_bro8v"]
 [ext_resource type="Resource" path="res://data/catalog/troops/esploratori.tres" id="6_ddsax"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="6_s4buw"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_mercantile.tres" id="7_q5yrr"]
+[ext_resource type="Resource" path="res://data/catalog/perk/contrattatori.tres" id="8_yqagc"]
 
 [resource]
 script = ExtResource("3_ifdnr")
@@ -15,3 +21,4 @@ display_name = "Fantasma: Borgo di Valdacqua"
 buildings = Array[ExtResource("1_dufbo")]([ExtResource("2_tsfh8")])
 troops = Array[ExtResource("4_768ef")]([ExtResource("5_64yty"), ExtResource("6_ddsax")])
 malus = Array[ExtResource("3_768ef")]([ExtResource("4_64yty")])
+identity = Array[ExtResource("3_anmme")]([ExtResource("4_1s1sp"), ExtResource("5_bro8v"), ExtResource("6_s4buw"), ExtResource("7_q5yrr"), ExtResource("8_yqagc")])

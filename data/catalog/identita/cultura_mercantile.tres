@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_any5m"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_7crgb"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_2rx3e"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/costruttori.tres" id="4_e605m"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="5_osjtt"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_0qo2s"]
+
+[resource]
+script = ExtResource("6_0qo2s")
+id = &"cultura_mercantile"
+display_name = "Cultura mercantile"
+description = "Si costruisce per commerciare: +4 Oro iniziale, Costruttori più frequenti."
+dimension = 3
+extra_gold = 4
+favored_opportunities = Array[ExtResource("2_7crgb")]([ExtResource("4_e605m")])

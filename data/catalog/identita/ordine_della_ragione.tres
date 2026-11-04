@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_x18as"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_vrhu6"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_qkqya"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/studiosi.tres" id="4_ebhct"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="5_lexka"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/metodo.tres" id="6_vfw4u"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_m5nlb"]
+
+[resource]
+script = ExtResource("7_m5nlb")
+id = &"ordine_della_ragione"
+display_name = "Ordine della Ragione"
+description = "Il culto del sapere: +25% Ricerca prodotta, Studiosi più frequenti."
+dimension = 2
+resistance_bonus = 1
+favored_opportunities = Array[ExtResource("2_vrhu6")]([ExtResource("4_ebhct")])
+permanent_modifiers = Array[ExtResource("5_lexka")]([ExtResource("6_vfw4u")])

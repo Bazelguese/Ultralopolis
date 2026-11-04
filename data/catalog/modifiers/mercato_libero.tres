@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_cba2x"]
+
+[resource]
+script = ExtResource("1_cba2x")
+id = &"mercato_libero"
+display_name = "Mercato libero"
+description = "Rinnovare le offerte costa 1 Oro in meno."
+is_malus = false
+effect = 4
+amount = -1
+duration_kind = 2
+stacking = 2

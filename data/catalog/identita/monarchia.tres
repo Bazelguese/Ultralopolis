@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_uilto"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_urday"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/tributi_feudali.tres" id="3_yjl7w"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_08n7s"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/fortificazioni.tres" id="5_7k12g"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="6_w7vpt"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_swsbc"]
+
+[resource]
+script = ExtResource("7_swsbc")
+id = &"monarchia"
+display_name = "Monarchia"
+description = "Un sovrano e i suoi feudatari. Fortificazioni più frequenti e Tributi feudali esclusivi."
+dimension = 1
+resistance_bonus = 6
+exclusive_opportunities = Array[ExtResource("2_urday")]([ExtResource("3_yjl7w")])
+favored_opportunities = Array[ExtResource("2_urday")]([ExtResource("5_7k12g")])

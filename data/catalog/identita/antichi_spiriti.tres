@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_oan5y"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_o30xu"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_li16q"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_q5i43"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/favore_degli_spiriti.tres" id="5_56okw"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_ub52b"]
+
+[resource]
+script = ExtResource("6_ub52b")
+id = &"antichi_spiriti"
+display_name = "Antichi spiriti"
+description = "Gli spiriti dei luoghi aiutano gli edifici: mana prodotto il 10% più in fretta."
+dimension = 2
+resistance_bonus = 2
+permanent_modifiers = Array[ExtResource("4_q5i43")]([ExtResource("5_56okw")])

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_4hn83"]
+
+[resource]
+script = ExtResource("1_4hn83")
+id = &"favore_degli_spiriti"
+display_name = "Favore degli spiriti"
+description = "Tutti gli edifici producono mana il 10% più in fretta."
+is_malus = false
+effect = 2
+amount = -10
+duration_kind = 2
+stacking = 2

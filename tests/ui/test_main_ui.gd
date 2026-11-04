@@ -8,7 +8,16 @@ func test_la_schermata_si_apre_e_attraversa_un_anno() -> void:
 	await wait_physics_frames(2)
 	var run: RunState = main.get("run")
 	assert_not_null(run, "La run parte all'apertura.")
+	assert_eq(run.phase, RunState.Phase.CREAZIONE_NAZIONE, "Si comincia creando la nazione.")
+	for dimension: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+		var options: Array[IdentityDef] = run.identity_options(dimension)
+		var count: int = run.starting_perk_count() if dimension == IdentityDef.Dimension.PERK else 1
+		for i: int in range(count):
+			main.call("_on_creation_pick", options[i])
+	main.call("_on_creation_name_changed", "Regno di Prova")
+	main.call("_on_found_nation")
 	assert_eq(run.phase, RunState.Phase.PRODUZIONE)
+	assert_eq(run.nation_name, "Regno di Prova")
 
 	while run.is_shopping_phase():
 		main.call("_on_pass")

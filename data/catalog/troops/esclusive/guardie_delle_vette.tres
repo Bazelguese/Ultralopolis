@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_c0ife"]
+
+[resource]
+script = ExtResource("1_c0ife")
+id = &"guardie_delle_vette"
+display_name = "Guardie delle vette"
+cost_gold = 5
+cooldown_ms = 3000
+damage = 6

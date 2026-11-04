@@ -4,13 +4,19 @@
 [ext_resource type="Resource" path="res://data/catalog/buildings/fattoria.tres" id="2_h8na3"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/santuario.tres" id="3_has84"]
 [ext_resource type="Resource" path="res://data/catalog/buildings/mercato.tres" id="4_tewop"]
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="5_c5gbu"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="5_has84"]
 [ext_resource type="Script" path="res://scripts/sim/data/ghost_def.gd" id="5_u1opf"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="6_5v8ac"]
+[ext_resource type="Resource" path="res://data/catalog/identita/popolo_delle_foreste.tres" id="6_au7om"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/inefficienza.tres" id="6_tewop"]
+[ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="7_1trn2"]
 [ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="7_3onjo"]
+[ext_resource type="Resource" path="res://data/catalog/identita/antichi_spiriti.tres" id="8_b3bfv"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="8_sphtm"]
 [ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="9_c5gbu"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="9_w6x1l"]
+[ext_resource type="Resource" path="res://data/catalog/perk/fabbri_esperti.tres" id="10_o6vlv"]
 
 [resource]
 script = ExtResource("5_u1opf")
@@ -19,3 +25,4 @@ year = 2
 buildings = Array[ExtResource("1_wxxeq")]([ExtResource("2_h8na3"), ExtResource("3_has84"), ExtResource("4_tewop")])
 troops = Array[ExtResource("6_5v8ac")]([ExtResource("7_3onjo"), ExtResource("8_sphtm"), ExtResource("9_c5gbu")])
 malus = Array[ExtResource("5_has84")]([ExtResource("6_tewop")])
+identity = Array[ExtResource("5_c5gbu")]([ExtResource("6_au7om"), ExtResource("7_1trn2"), ExtResource("8_b3bfv"), ExtResource("9_w6x1l"), ExtResource("10_o6vlv")])

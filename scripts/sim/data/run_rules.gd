@@ -15,6 +15,8 @@ extends Resource
 @export var starting_research: int = 0
 @export var starting_buildings: Array[BuildingDef] = []
 @export var starting_troops: Array[TroopDef] = []
+## Perk scelti alla creazione della nazione (placeholder).
+@export var starting_perks: int = 2
 
 @export_group("Plancia")
 ## Spazi iniziali (GDD §6.1: 4 edifici, 3 truppe).
