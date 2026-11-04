@@ -63,6 +63,8 @@ var gold: int = 0
 var research: int = 0
 
 var board: NationBoard = NationBoard.new()
+## Malus e bonus attivi (GDD §8).
+var modifiers: Modifiers = Modifiers.new()
 
 ## Numero dell'opportunità in corso nella macrofase (1, 2, 3).
 var opportunity_number: int = 0
@@ -137,7 +139,7 @@ func next_era_cost() -> int:
 
 
 func reroll_cost() -> int:
-	return run_rules.reroll_base_cost + reroll_extra
+	return maxi(0, run_rules.reroll_base_cost + reroll_extra + modifiers.flat(ModifierDef.Effect.COSTO_RINNOVO))
 
 
 ## Resistenza con cui la nazione del giocatore inizia uno scontro (GDD §7.1.1).
@@ -154,11 +156,14 @@ func ghost_resistance() -> int:
 
 
 ## Oro e Ricerca che gli edifici depositeranno all'inizio della prossima macrofase.
+## Tiene conto dei modificatori attivi (es. Ricerca dimezzata).
 func production_preview() -> Vector2i:
 	var preview: Vector2i = Vector2i.ZERO
 	for piece: BoardPiece in board.buildings:
 		preview.x += piece.building.gold_per_phase
 		preview.y += piece.building.research_per_phase
+	preview.x = Modifiers.apply_percent(preview.x, modifiers.percent(ModifierDef.Effect.PRODUZIONE_ORO))
+	preview.y = Modifiers.apply_percent(preview.y, modifiers.percent(ModifierDef.Effect.PRODUZIONE_RICERCA))
 	return preview
 
 
@@ -302,6 +307,7 @@ func sell_building(index: int) -> bool:
 	var piece: BoardPiece = board.buildings[index]
 	board.buildings.remove_at(index)
 	_refund(piece)
+	_prune_modifiers()
 	return true
 
 
@@ -313,6 +319,7 @@ func sell_troop(index: int) -> bool:
 	var piece: BoardPiece = board.troops[index]
 	board.troops.remove_at(index)
 	_refund(piece)
+	_prune_modifiers()
 	return true
 
 
@@ -403,9 +410,9 @@ func fight_ghost() -> bool:
 	if _player_won_or_drew(outcome):
 		wins += 1
 		if outcome == BattleSim.Outcome.PAREGGIO:
-			# Il pareggio applicherebbe i malus del fantasma (GDD §3.4):
-			# i fantasmi di prova non ne hanno.
+			# Il pareggio conta come vittoria ma applica i malus del fantasma (GDD §3.4).
 			_log("Pareggio contro %s: conta come vittoria (%d)." % [ghost_name, wins])
+			_apply_ghost_malus(ghost_name)
 		else:
 			_log("Vittoria contro %s (%d)." % [ghost_name, wins])
 		if wins >= run_rules.wins_needed:
@@ -418,6 +425,7 @@ func fight_ghost() -> bool:
 			return true
 		prestige -= year
 		_log("Sconfitta contro %s: perso %d Prestigio." % [ghost_name, year])
+		_apply_ghost_malus(ghost_name)
 		if prestige <= 0:
 			prestige = 0
 			last_chance = true
@@ -434,6 +442,8 @@ func fight_ghost() -> bool:
 
 func _start_year(new_year: int) -> void:
 	year = new_year
+	for message: String in modifiers.on_new_year(year):
+		_log(message)
 	current_ghost = _ghost_for_year(year)
 	encounter_choices = _encounters_for_year(year)
 	_log("— Anno %d —" % year)
@@ -482,7 +492,8 @@ func _end_shopping_phase() -> void:
 func _draw_offers() -> void:
 	var pool: Array[Offer] = _offer_pool()
 	offers = []
-	var count: int = mini(run_rules.alternatives_per_opportunity, pool.size())
+	var wanted: int = maxi(1, run_rules.alternatives_per_opportunity + modifiers.flat(ModifierDef.Effect.ALTERNATIVE_OFFERTE))
+	var count: int = mini(wanted, pool.size())
 	for i: int in range(count):
 		var pick: int = _rng.randi_range(0, pool.size() - 1)
 		offers.append(pool[pick])
@@ -543,6 +554,7 @@ func _place_building(def: BuildingDef, price: int, value: int, replace_index: in
 		return _fail("Oro insufficiente.")
 	gold += refund - price
 	board.buildings[replace_index] = BoardPiece.of_building(def, value)
+	_prune_modifiers()
 	_log("%s sostituisce %s (rimborso %d Oro)." % [def.display_name, old_piece.display_name(), refund])
 	return true
 
@@ -565,6 +577,7 @@ func _place_troop(def: TroopDef, price: int, value: int, replace_index: int) -> 
 		return _fail("Oro insufficiente.")
 	gold += refund - price
 	board.troops[replace_index] = BoardPiece.of_troop(def, value)
+	_prune_modifiers()
 	_log("%s sostituisce %s (rimborso %d Oro)." % [def.display_name, old_piece.display_name(), refund])
 	return true
 
@@ -577,7 +590,7 @@ func _refund(piece: BoardPiece) -> void:
 
 
 func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> BattleSim.Outcome:
-	var player: BattleSideSetup = BattleSideSetup.new(board.building_defs(), board.troop_defs(), player_resistance())
+	var player: BattleSideSetup = BattleSideSetup.new(_battle_buildings(), _battle_troops(), player_resistance())
 	_last_setups = [player, enemy]
 	last_battle = BattleSim.new(battle_rules, player, enemy)
 	last_battle_kind = kind
@@ -586,6 +599,49 @@ func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> 
 	if outcome == BattleSim.Outcome.INTERROTTA:
 		push_warning("RunState: scontro interrotto per il limite di sicurezza, trattato come pareggio.")
 	return outcome
+
+
+## Malus del fantasma dopo una sconfitta o un pareggio (GDD §11.1), con il suo nome come origine.
+func _apply_ghost_malus(ghost_name: String) -> void:
+	if current_ghost == null:
+		return
+	for def: ModifierDef in current_ghost.malus:
+		_log(modifiers.apply(def, ActiveModifier.OriginKind.FANTASMA, ghost_name, year, board, _rng))
+
+
+## Toglie i modificatori di elementi che non sono più sulla plancia.
+func _prune_modifiers() -> void:
+	for message: String in modifiers.prune(board):
+		_log(message)
+
+
+## Edifici come entrano in battaglia: copie con i modificatori applicati (es. Inefficienza).
+## Le schede del catalogo non vengono mai toccate.
+func _battle_buildings() -> Array[BuildingDef]:
+	var defs: Array[BuildingDef] = []
+	for piece: BoardPiece in board.buildings:
+		var change: int = modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA, piece)
+		if change == 0:
+			defs.append(piece.building)
+			continue
+		var copy: BuildingDef = piece.building.duplicate() as BuildingDef
+		copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(copy.mana_interval_ms, change))
+		defs.append(copy)
+	return defs
+
+
+## Truppe come entrano in battaglia: copie con i modificatori applicati (es. ricarica più lunga).
+func _battle_troops() -> Array[TroopDef]:
+	var defs: Array[TroopDef] = []
+	for piece: BoardPiece in board.troops:
+		var change: int = modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
+		if change == 0:
+			defs.append(piece.troop)
+			continue
+		var copy: TroopDef = piece.troop.duplicate() as TroopDef
+		copy.cooldown_ms = maxi(1, Modifiers.apply_percent(copy.cooldown_ms, change))
+		defs.append(copy)
+	return defs
 
 
 func _player_won_or_drew(outcome: BattleSim.Outcome) -> bool:

@@ -12,3 +12,5 @@ extends Resource
 @export var buildings: Array[BuildingDef] = []
 ## Truppe da sinistra a destra.
 @export var troops: Array[TroopDef] = []
+## Malus che il fantasma lascia se il giocatore perde o pareggia (GDD §3.4, §11.1).
+@export var malus: Array[ModifierDef] = []

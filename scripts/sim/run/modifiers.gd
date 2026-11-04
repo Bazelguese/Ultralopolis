@@ -1,0 +1,106 @@
+class_name Modifiers
+extends RefCounted
+## Componente Modificatori (GDD §8, §16.2): il punto in cui si innestano malus,
+## perk ed effetti nel tempo. Logica pura: tiene i modificatori attivi e risponde
+## a domande del tipo "di quanto cambia la Ricerca prodotta?".
+
+var active: Array[ActiveModifier] = []
+
+
+## Applica un modificatore. Restituisce una frase per la cronaca della run.
+## current_year: anno in cui arriva; resta attivo per duration_years anni interi successivi.
+func apply(def: ModifierDef, origin_kind: ActiveModifier.OriginKind, origin_name: String,
+		current_year: int, board: NationBoard, rng: RandomNumberGenerator) -> String:
+	var existing: ActiveModifier = _find(def)
+	if existing != null:
+		match def.stacking:
+			ModifierDef.Stacking.ALLUNGA_DURATA:
+				existing.expires_at_year += def.duration_years
+				return "%s si allunga fino alla fine dell'anno %d." % [def.display_name, existing.expires_at_year - 1]
+			ModifierDef.Stacking.NESSUN_EFFETTO:
+				return "%s è già attivo: nessun effetto." % def.display_name
+
+	var modifier: ActiveModifier = ActiveModifier.new()
+	modifier.def = def
+	modifier.origin_kind = origin_kind
+	modifier.origin_name = origin_name
+	modifier.expires_at_year = current_year + 1 + def.duration_years
+	match def.target:
+		ModifierDef.Target.EDIFICIO_A_CASO:
+			if board.buildings.is_empty():
+				return "%s non ha effetto: nessun edificio da colpire." % def.display_name
+			modifier.target_piece = board.buildings[rng.randi_range(0, board.buildings.size() - 1)]
+		ModifierDef.Target.TRUPPA_A_CASO:
+			if board.troops.is_empty():
+				return "%s non ha effetto: nessuna truppa da colpire." % def.display_name
+			modifier.target_piece = board.troops[rng.randi_range(0, board.troops.size() - 1)]
+	active.append(modifier)
+	return "Nuovo effetto. %s" % modifier.describe()
+
+
+## Toglie i modificatori scaduti all'inizio di un nuovo anno. Restituisce le frasi per la cronaca.
+func on_new_year(year: int) -> Array[String]:
+	var messages: Array[String] = []
+	for modifier: ActiveModifier in active.duplicate():
+		if year >= modifier.expires_at_year:
+			active.erase(modifier)
+			messages.append("Finisce l'effetto: %s." % modifier.def.display_name)
+	return messages
+
+
+## Toglie i modificatori il cui bersaglio non è più sulla plancia (venduto o sostituito).
+func prune(board: NationBoard) -> Array[String]:
+	var messages: Array[String] = []
+	for modifier: ActiveModifier in active.duplicate():
+		if modifier.target_piece == null:
+			continue
+		if board.buildings.has(modifier.target_piece) or board.troops.has(modifier.target_piece):
+			continue
+		active.erase(modifier)
+		messages.append("Finisce l'effetto %s: %s non è più sulla plancia." % [modifier.def.display_name, modifier.target_piece.display_name()])
+	return messages
+
+
+## Somma degli effetti in percentuale (per la nazione o per un elemento preciso).
+func percent(effect: ModifierDef.Effect, piece: BoardPiece = null) -> int:
+	var total: int = 0
+	for modifier: ActiveModifier in active:
+		if modifier.def.effect != effect:
+			continue
+		if modifier.target_piece != null and modifier.target_piece != piece:
+			continue
+		total += modifier.def.amount
+	return total
+
+
+## Somma degli effetti a numero intero (costo di rinnovo, alternative).
+func flat(effect: ModifierDef.Effect) -> int:
+	var total: int = 0
+	for modifier: ActiveModifier in active:
+		if modifier.def.effect == effect and modifier.target_piece == null:
+			total += modifier.def.amount
+	return total
+
+
+## Modificatori che colpiscono un elemento preciso della plancia.
+func for_piece(piece: BoardPiece) -> Array[ActiveModifier]:
+	var found: Array[ActiveModifier] = []
+	for modifier: ActiveModifier in active:
+		if modifier.target_piece == piece:
+			found.append(modifier)
+	return found
+
+
+## Applica una percentuale a un numero intero, arrotondando per difetto e senza scendere sotto zero.
+## Esempio: 7 con -50 diventa 3; 1000 con +50 diventa 1500.
+@warning_ignore("integer_division")
+static func apply_percent(value: int, percent_change: int) -> int:
+	var factor: int = maxi(100 + percent_change, 0)
+	return value * factor / 100
+
+
+func _find(def: ModifierDef) -> ActiveModifier:
+	for modifier: ActiveModifier in active:
+		if modifier.def == def or (def.id != &"" and modifier.def.id == def.id):
+			return modifier
+	return null

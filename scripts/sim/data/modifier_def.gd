@@ -1,0 +1,40 @@
+class_name ModifierDef
+extends Resource
+## Scheda di un modificatore (GDD §8.2): bersaglio, effetto, durata e cumulabilità.
+## L'origine (chi l'ha inflitto) si aggiunge quando il modificatore viene applicato.
+## Lo stesso sistema serve per i malus e per i bonus (perk, ricompense durature).
+
+enum Effect {
+	PRODUZIONE_ORO,       ## Percentuale sull'Oro prodotto a ogni fase (-50 = dimezzato).
+	PRODUZIONE_RICERCA,   ## Percentuale sulla Ricerca prodotta a ogni fase.
+	INTERVALLO_MANA,      ## Percentuale sull'intervallo di produzione di mana di un edificio (+50 = più lento).
+	RICARICA_TRUPPA,      ## Percentuale sulla ricarica di una truppa (+50 = più lenta).
+	COSTO_RINNOVO,        ## Oro in più (o in meno) per rinnovare le offerte.
+	ALTERNATIVE_OFFERTE,  ## Alternative in più (o in meno) in ogni opportunità.
+}
+
+enum Target {
+	NAZIONE,          ## Tutta la nazione.
+	EDIFICIO_A_CASO,  ## Un edificio scelto a caso quando il modificatore viene applicato.
+	TRUPPA_A_CASO,    ## Una truppa scelta a caso quando il modificatore viene applicato.
+}
+
+## Che cosa succede se lo stesso modificatore arriva di nuovo (GDD §8.2).
+enum Stacking {
+	ALLUNGA_DURATA,  ## Si allunga solo la durata (scelta di Davide per i malus).
+	SOMMA_EFFETTI,   ## Si aggiunge una seconda copia: gli effetti si sommano.
+	NESSUN_EFFETTO,  ## Il secondo non ha effetto.
+}
+
+@export var id: StringName = &""
+@export var display_name: String = ""
+@export_multiline var description: String = ""
+## true = malus, false = bonus. Serve solo per mostrarlo al giocatore.
+@export var is_malus: bool = true
+@export var effect: Effect = Effect.PRODUZIONE_RICERCA
+@export var target: Target = Target.NAZIONE
+## Percentuale per gli effetti in percentuale, numero intero per gli altri.
+@export var amount: int = 0
+## Anni interi in cui resta attivo, a partire dall'anno successivo a quello in cui arriva.
+@export var duration_years: int = 1
+@export var stacking: Stacking = Stacking.ALLUNGA_DURATA
