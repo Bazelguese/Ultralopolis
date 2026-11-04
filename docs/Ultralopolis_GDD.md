@@ -253,7 +253,7 @@ Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; l
 | Energetico | Vale come mana di qualsiasi colore |
 
 - Un edificio che produce mana ha un colore, che indica anche la sua famiglia.
-- Un edificio **senza mana** è **neutro**. Gli edifici neutri normalmente **non compaiono fra le offerte**: vi si accede solo attraverso caratteristiche della nazione, cioè elementi esclusivi dell’identità o delle vie (§9.2, §10.4) — Confermato (modifica del nucleo, v0.16).
+- Un edificio **senza mana** è **neutro**: non ha colore. Come ogni altro edificio, può essere disponibile a tutti oppure peculiare di certe nazioni, come esclusivo dell’identità o di una via (§9.2, §10.4) — Confermato (modifica del nucleo, v0.16).
 - Ogni truppa chiede mana di un colore, oppure nessuno.
 - Una truppa paga **prima con il proprio colore e poi con l’energetico**.
 
@@ -1017,7 +1017,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ## Registro delle versioni
 
 **v0.16 — 4 novembre 2026** (modifica del nucleo per gli edifici neutri)
-- Edifici senza mana: neutri, accessibili solo tramite esclusivi dell’identità o delle vie (§5.3).
+- Edifici senza mana: neutri, senza colore; possono essere comuni o esclusivi di certe nazioni (§5.3).
 - I modificatori possono cambiare i valori di partenza dello scontro: scudo, Corruzione, elementi rallentati o sabotati (§7.6, §7.7, §8.2).
 - Potenziamenti: ogni livello aumenta tutti i valori d’effetto (§6.5, §16.3).
 - Il catalogo placeholder dei contenuti è in `docs/Catalogo.md`.
