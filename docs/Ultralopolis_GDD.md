@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.9
+## Game Design Document — v0.10
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.9 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.10 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -429,7 +429,7 @@ Il rapporto fra Corruzione come erosione e Diplomazia come sistema di accordi o 
 
 # PARTE II — SISTEMI
 
-## 9. Identità della civiltà — Direzione
+## 9. Identità della civiltà — Confermato nella struttura, contenuti placeholder
 
 | Elemento | Ruolo previsto |
 |---|---|
@@ -439,11 +439,38 @@ Il rapporto fra Corruzione come erosione e Diplomazia come sistema di accordi o 
 | Credo religioso | Identità spirituale e rapporto con eventi o scelte. |
 | Cultura | Identità sociale e sviluppo della civiltà. |
 
-Queste dimensioni fanno parte della visione. Non sono ancora definiti catalogo, bonus, incompatibilità o numero di scelte iniziali.
+### 9.1 Creazione della nazione — Confermato
+
+| Regola | Stato |
+|---|---|
+| Tutte e cinque le dimensioni sono presenti fin da subito | Confermato |
+| La nazione si crea **come in un GDR**: prima dell’anno 1 il giocatore vede tutte le opzioni e sceglie nome, un popolo, un governo, un credo, una cultura e alcuni perk iniziali; poi la run procede | Confermato |
+| Per ora l’identità resta fissa durante la run; il cambiamento (riforme, conversioni, trasformazioni culturali) arriverà più avanti | Confermato / Direzione |
+| Anche i fantasmi hanno un’identità, che vale per la loro Resistenza e per i loro tratti in battaglia | Confermato |
+
+### 9.2 Che cosa fa un elemento dell’identità — Confermato, elenco aperto
+
+Popoli, governi, credi, culture e perk usano la stessa scheda. Ogni elemento può:
+
+- dare una **quota di Resistenza** (§7.1.1);
+- cambiare la **dotazione iniziale** (Oro, Ricerca, edifici, truppe);
+- rendere alcune **opportunità esclusive o più frequenti** (§4.2);
+- concedere **edifici o truppe esclusivi**;
+- dare un **tratto permanente**, cioè un modificatore che dura tutta la run (§8).
+
+Altri effetti verranno aggiunti man mano che le meccaniche si ampliano.
+
+### 9.3 Perk — Confermato
+
+I perk funzionano come le abilità di The Bazaar: bonus passivi. Alcuni si scelgono alla creazione della nazione, altri si ottengono durante la run (per ora come ricompense degli incontri del mondo, §3.3). Numero dei perk iniziali: placeholder (§16.3).
+
+Catalogo del prototipo (placeholder): 3 popoli (Montanari, Popolo del delta, Popolo delle foreste), 3 governi (Monarchia, Repubblica, Teocrazia), 3 credi (Culto del Sole, Antichi spiriti, Ordine della Ragione), 3 culture (guerriera, mercantile, erudita), 6 perk.
+
+**Da definire:** incompatibilità fra elementi, livelli o rarità dei perk, altre fonti di perk.
 
 L’identità dovrebbe influenzare opportunità, risposte agli eventi, strategie disponibili e, in futuro, abilità speciali (ad esempio i malus con nome, Parte III). Il modo in cui può cambiare durante la partita resta da progettare: riforme politiche, conversioni religiose e trasformazioni culturali sono possibilità, non regole.
 
-**Proposta, non confermata:** partire con un’identità ridotta e far emergere cultura e credo attraverso gli eventi. Non sostituisce la scelta delle caratteristiche alla fondazione.
+**Proposta non adottata:** partire con un’identità ridotta e far emergere cultura e credo attraverso gli eventi. Il creatore ha scelto tutte le dimensioni fin dalla fondazione; l’idea resta fra gli spunti (Parte III).
 
 **Nota di portata:** cinque assi combinati moltiplicano il lavoro di contenuto e bilanciamento. È proposto di introdurli gradualmente, privilegiando assi che cambiano quali offerte e quali eventi compaiono, più che bonus percentuali.
 
@@ -684,6 +711,12 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
 | Almeno 1 alternativa per opportunità; costo di rinnovo mai sotto 0 | Provvisoria. |
+| Perk scelti alla creazione: 2 | Placeholder. |
+| Un’opportunità favorita da un elemento dell’identità ha peso +1 per ogni elemento che la favorisce (peso base 1) | Provvisoria. |
+| Edifici e truppe della dotazione dell’identità entrano solo se c’è spazio, e come la dotazione iniziale non rimborsano nulla | Provvisoria. |
+| I tratti permanenti non si possono accorciare con l’Ambasciata | Provvisoria. |
+| Un perk già posseduto non si può prendere di nuovo come ricompensa | Provvisoria. |
+| Dei tratti di un fantasma valgono in battaglia solo quelli su tutta la nazione | Provvisoria. |
 | Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
@@ -766,6 +799,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.10 — 4 novembre 2026**
+- Identità della civiltà: creazione della nazione come in un GDR con tutte e cinque le dimensioni; effetti possibili di ogni elemento; perk come abilità passive, alcune iniziali e altre come ricompense; identità anche per i fantasmi (§9).
+- Contenuti placeholder dell’identità e nuove convenzioni provvisorie (§9.3, §16.3).
 
 **v0.9 — 4 novembre 2026**
 - Le 3 alternative sono tipi di opportunità diversi, pescati con la stessa probabilità; alcune hanno una scelta interna (§4.2).
