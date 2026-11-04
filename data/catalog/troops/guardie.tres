@@ -1,6 +1,15 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_7y4mc"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_b7hih"]
+
+[sub_resource type="Resource" id="Resource_467a4"]
+script = ExtResource("2_b7hih")
+ferro = 2
+
+[sub_resource type="Resource" id="Resource_sjqw5"]
+script = ExtResource("2_b7hih")
+ferro = 3
 
 [resource]
 script = ExtResource("1_7y4mc")
@@ -8,5 +17,7 @@ id = &"guardie"
 display_name = "Guardie"
 era = 2
 cost_gold = 6
+tags = Array[StringName]([&"Fanteria"])
 cooldown_ms = 2500
 damage = 6
+upgrade_costs = Array[ExtResource("2_b7hih")]([SubResource("Resource_467a4"), SubResource("Resource_sjqw5")])

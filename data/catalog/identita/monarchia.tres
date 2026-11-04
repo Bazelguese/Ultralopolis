@@ -7,13 +7,15 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/fortificazioni.tres" id="5_7k12g"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="6_w7vpt"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_swsbc"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_monarchia_pietra.tres" id="7_urday"]
 
 [resource]
 script = ExtResource("7_swsbc")
 id = &"monarchia"
 display_name = "Monarchia"
-description = "Un sovrano e i suoi feudatari. Fortificazioni più frequenti e Tributi feudali esclusivi."
+description = "Un sovrano e i suoi feudatari. Fortificazioni più frequenti e Tributi feudali esclusivi. Capitale: +1 Pietra."
 dimension = 1
 resistance_bonus = 6
 exclusive_opportunities = Array[ExtResource("2_urday")]([ExtResource("3_yjl7w")])
 favored_opportunities = Array[ExtResource("2_urday")]([ExtResource("5_7k12g")])
+permanent_modifiers = Array[ExtResource("6_w7vpt")]([ExtResource("7_urday")])

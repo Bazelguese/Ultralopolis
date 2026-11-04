@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_gtl3d"]
+
+[resource]
+script = ExtResource("1_gtl3d")
+id = &"capitale_antichi_spiriti_fauna"
+display_name = "Capitale: +1 Fauna"
+description = "La Capitale produce 1 Fauna in più a ogni fase."
+is_malus = false
+effect = 8
+target_tag = &"Capitale"
+resource = 6
+amount = 1
+duration_kind = 2
+stacking = 1

@@ -7,13 +7,14 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="5_lexka"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/metodo.tres" id="6_vfw4u"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_m5nlb"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_ordine_della_ragione_ricerca.tres" id="7_vrhu6"]
 
 [resource]
 script = ExtResource("7_m5nlb")
 id = &"ordine_della_ragione"
 display_name = "Ordine della Ragione"
-description = "Il culto del sapere: +25% Ricerca prodotta, Studiosi più frequenti."
+description = "Il culto del sapere: +25% Ricerca prodotta, Studiosi più frequenti. Capitale: +1 Ricerca."
 dimension = 2
 resistance_bonus = 1
 favored_opportunities = Array[ExtResource("2_vrhu6")]([ExtResource("4_ebhct")])
-permanent_modifiers = Array[ExtResource("5_lexka")]([ExtResource("6_vfw4u")])
+permanent_modifiers = Array[ExtResource("5_lexka")]([ExtResource("6_vfw4u"), ExtResource("7_vrhu6")])

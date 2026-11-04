@@ -1,6 +1,17 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_olw14"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_nlhcs"]
+
+[sub_resource type="Resource" id="Resource_7grba"]
+script = ExtResource("2_nlhcs")
+pietra = 2
+ferro = 3
+
+[sub_resource type="Resource" id="Resource_sjs67"]
+script = ExtResource("2_nlhcs")
+pietra = 3
+ferro = 4
 
 [resource]
 script = ExtResource("1_olw14")
@@ -8,6 +19,9 @@ id = &"bombarde"
 display_name = "Bombarde"
 era = 3
 cost_gold = 12
+tags = Array[StringName]([&"Assedio"])
+food_tenths = 10
 mana_cost = 8
 cooldown_ms = 4000
 damage = 34
+upgrade_costs = Array[ExtResource("2_nlhcs")]([SubResource("Resource_7grba"), SubResource("Resource_sjs67")])

@@ -1,6 +1,16 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_miy2n"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ep4p4"]
+
+[sub_resource type="Resource" id="Resource_ahnhi"]
+script = ExtResource("2_ep4p4")
+pietra = 5
+
+[sub_resource type="Resource" id="Resource_s1lsk"]
+script = ExtResource("2_ep4p4")
+pietra = 6
+fede = 3
 
 [resource]
 script = ExtResource("1_miy2n")
@@ -8,6 +18,10 @@ id = &"cattedrale"
 display_name = "Cattedrale"
 era = 3
 cost_gold = 12
+tags = Array[StringName]([&"Sacro"])
 gold_per_phase = 1
+faith_per_phase = 4
+mana_type = &"blu"
 mana_amount = 5
 mana_interval_ms = 2000
+upgrade_costs = Array[ExtResource("2_ep4p4")]([SubResource("Resource_ahnhi"), SubResource("Resource_s1lsk")])

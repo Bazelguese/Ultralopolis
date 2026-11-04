@@ -6,12 +6,14 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/costruttori.tres" id="4_e605m"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="5_osjtt"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_0qo2s"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_cultura_mercantile_oro.tres" id="6_7crgb"]
 
 [resource]
 script = ExtResource("6_0qo2s")
 id = &"cultura_mercantile"
 display_name = "Cultura mercantile"
-description = "Si costruisce per commerciare: +4 Oro iniziale, Costruttori più frequenti."
+description = "Si costruisce per commerciare: +4 Oro iniziale, Costruttori più frequenti. Capitale: +1 Oro."
 dimension = 3
 extra_gold = 4
 favored_opportunities = Array[ExtResource("2_7crgb")]([ExtResource("4_e605m")])
+permanent_modifiers = Array[ExtResource("5_osjtt")]([ExtResource("6_7crgb")])

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_yedmw"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_qmdfp"]
+
+[sub_resource type="Resource" id="Resource_wuywg"]
+script = ExtResource("2_qmdfp")
+legno = 2
+
+[sub_resource type="Resource" id="Resource_6hq3f"]
+script = ExtResource("2_qmdfp")
+legno = 2
+fauna = 1
+
+[resource]
+script = ExtResource("1_yedmw")
+id = &"stalle"
+display_name = "Stalle"
+cost_gold = 5
+tags = Array[StringName]([&"Fauna", &"Agricolo"])
+food_per_phase = 1
+fauna_per_phase = 2
+mana_type = &"verde"
+mana_amount = 1
+mana_interval_ms = 3000
+upgrade_costs = Array[ExtResource("2_qmdfp")]([SubResource("Resource_wuywg"), SubResource("Resource_6hq3f")])

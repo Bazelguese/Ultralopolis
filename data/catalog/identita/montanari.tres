@@ -6,13 +6,16 @@
 [ext_resource type="Resource" path="res://data/catalog/troops/esclusive/guardie_delle_vette.tres" id="4_3in3d"]
 [ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="5_81tll"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="6_8ka3u"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_montanari_pietra.tres" id="7_b3i3h"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_we84j"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_montanari_ferro.tres" id="8_3in3d"]
 
 [resource]
 script = ExtResource("7_we84j")
 id = &"montanari"
 display_name = "Montanari"
-description = "Gente delle vette, dura a cedere. Parte con i Lancieri e può reclutare le Guardie delle vette."
+description = "Gente delle vette, dura a cedere. Parte con i Lancieri e può reclutare le Guardie delle vette. Capitale: +1 Pietra, +1 Ferro."
 resistance_bonus = 8
 extra_troops = Array[ExtResource("3_b3i3h")]([ExtResource("5_81tll")])
 exclusive_troops = Array[ExtResource("3_b3i3h")]([ExtResource("4_3in3d")])
+permanent_modifiers = Array[ExtResource("6_8ka3u")]([ExtResource("7_b3i3h"), ExtResource("8_3in3d")])

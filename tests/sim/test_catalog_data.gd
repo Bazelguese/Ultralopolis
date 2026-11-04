@@ -50,6 +50,23 @@ func test_identificativi_unici_e_valori_validi() -> void:
 		assert_between(def.era, 1, catalog.eras.size(), "Era di %s" % def.id)
 
 
+func test_colori_etichette_e_capitale() -> void:
+	var catalog: CatalogDef = _catalog()
+	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
+	for def: BuildingDef in catalog.buildings:
+		assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
+		assert_false(def.tags.is_empty(), "Etichette di %s" % def.id)
+		assert_false(def.is_capital, "La Capitale non è fra le offerte (%s)" % def.id)
+	for def: TroopDef in catalog.troops:
+		assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
+		assert_false(def.tags.is_empty(), "Etichette di %s" % def.id)
+		assert_eq(def.upgrade_costs.size(), rules.max_level - 1, "Costi di potenziamento di %s" % def.id)
+	assert_eq(rules.starting_buildings.size(), 1)
+	assert_true(rules.starting_buildings[0].is_capital, "Si parte dalla Capitale.")
+	for type: Res.Type in Res.NAMES:
+		assert_gt(rules.starting_buildings[0].production(type), 0, "La Capitale produce %s" % Res.NAMES[type])
+
+
 func test_identita_complete() -> void:
 	var catalog: CatalogDef = _catalog()
 	var rules: RunRules = load(RUN_RULES_PATH) as RunRules

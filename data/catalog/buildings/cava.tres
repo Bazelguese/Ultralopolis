@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_ovonn"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_f4bmc"]
+
+[sub_resource type="Resource" id="Resource_2af7d"]
+script = ExtResource("2_f4bmc")
+legno = 2
+
+[sub_resource type="Resource" id="Resource_6457y"]
+script = ExtResource("2_f4bmc")
+legno = 2
+ferro = 1
+
+[resource]
+script = ExtResource("1_ovonn")
+id = &"cava"
+display_name = "Cava"
+cost_gold = 4
+tags = Array[StringName]([&"Estrattivo"])
+stone_per_phase = 3
+mana_type = &"rosso"
+mana_amount = 1
+mana_interval_ms = 3000
+upgrade_costs = Array[ExtResource("2_f4bmc")]([SubResource("Resource_2af7d"), SubResource("Resource_6457y")])

@@ -1,12 +1,25 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_fdccq"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_35jor"]
+
+[sub_resource type="Resource" id="Resource_s78j5"]
+script = ExtResource("2_35jor")
+legno = 1
+
+[sub_resource type="Resource" id="Resource_ib0h0"]
+script = ExtResource("2_35jor")
+legno = 2
 
 [resource]
 script = ExtResource("1_fdccq")
 id = &"fattoria"
 display_name = "Fattoria"
 cost_gold = 3
-gold_per_phase = 3
+tags = Array[StringName]([&"Agricolo"])
+gold_per_phase = 1
+food_per_phase = 3
+mana_type = &"verde"
 mana_amount = 1
 mana_interval_ms = 2000
+upgrade_costs = Array[ExtResource("2_35jor")]([SubResource("Resource_s78j5"), SubResource("Resource_ib0h0")])

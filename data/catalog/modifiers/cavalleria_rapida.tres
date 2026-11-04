@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_f8u0n"]
+
+[resource]
+script = ExtResource("1_f8u0n")
+id = &"cavalleria_rapida"
+display_name = "Cavalleria rapida"
+description = "Le truppe Cavalleria ricaricano del 15% più in fretta."
+is_malus = false
+effect = 3
+target_tag = &"Cavalleria"
+amount = -15
+duration_kind = 2
+stacking = 2

@@ -1,6 +1,16 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_hdib2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_dy6w8"]
+
+[sub_resource type="Resource" id="Resource_gj0vo"]
+script = ExtResource("2_dy6w8")
+ferro = 2
+
+[sub_resource type="Resource" id="Resource_7hhsr"]
+script = ExtResource("2_dy6w8")
+pietra = 1
+ferro = 3
 
 [resource]
 script = ExtResource("1_hdib2")
@@ -8,5 +18,7 @@ id = &"moschettieri"
 display_name = "Moschettieri"
 era = 3
 cost_gold = 9
+tags = Array[StringName]([&"Tiratori"])
 cooldown_ms = 2500
 damage = 10
+upgrade_costs = Array[ExtResource("2_dy6w8")]([SubResource("Resource_gj0vo"), SubResource("Resource_7hhsr")])

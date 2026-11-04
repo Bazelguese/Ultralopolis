@@ -6,12 +6,13 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="4_f64qn"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/benedizione_del_sole.tres" id="5_y1ii3"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_o1tc3"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_culto_del_sole_fede.tres" id="6_uh4qo"]
 
 [resource]
 script = ExtResource("6_o1tc3")
 id = &"culto_del_sole"
 display_name = "Culto del Sole"
-description = "Il sole benedice i raccolti: +20% Oro prodotto."
+description = "Il sole benedice i raccolti: +20% Oro prodotto. Capitale: +1 Fede."
 dimension = 2
 resistance_bonus = 2
-permanent_modifiers = Array[ExtResource("4_f64qn")]([ExtResource("5_y1ii3")])
+permanent_modifiers = Array[ExtResource("4_f64qn")]([ExtResource("5_y1ii3"), ExtResource("6_uh4qo")])

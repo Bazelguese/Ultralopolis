@@ -7,14 +7,16 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/mercante.tres" id="5_0apkw"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/esattori.tres" id="6_g4qfk"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="7_ciscd"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_popolo_del_delta_oro.tres" id="8_baitr"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="8_fa5q6"]
 
 [resource]
 script = ExtResource("8_fa5q6")
 id = &"popolo_del_delta"
 display_name = "Popolo del delta"
-description = "Barcaioli e mercanti lungo i fiumi. +3 Oro iniziale, Mercante ed Esattori più frequenti, può costruire il Porto fluviale."
+description = "Barcaioli e mercanti lungo i fiumi. +3 Oro iniziale, Mercante ed Esattori più frequenti, può costruire il Porto fluviale. Capitale: +1 Oro."
 resistance_bonus = 2
 extra_gold = 3
 favored_opportunities = Array[ExtResource("3_1wpo0")]([ExtResource("5_0apkw"), ExtResource("6_g4qfk")])
 exclusive_buildings = Array[ExtResource("1_gwmlo")]([ExtResource("2_baitr")])
+permanent_modifiers = Array[ExtResource("7_ciscd")]([ExtResource("8_baitr")])

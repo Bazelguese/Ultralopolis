@@ -1,11 +1,25 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_0vs48"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_c3mkk"]
+
+[sub_resource type="Resource" id="Resource_l6i82"]
+script = ExtResource("2_c3mkk")
+pietra = 2
+
+[sub_resource type="Resource" id="Resource_sm2r1"]
+script = ExtResource("2_c3mkk")
+pietra = 3
+fede = 1
 
 [resource]
 script = ExtResource("1_0vs48")
 id = &"santuario"
 display_name = "Santuario"
 cost_gold = 5
+tags = Array[StringName]([&"Sacro"])
+faith_per_phase = 2
+mana_type = &"blu"
 mana_amount = 2
 mana_interval_ms = 2000
+upgrade_costs = Array[ExtResource("2_c3mkk")]([SubResource("Resource_l6i82"), SubResource("Resource_sm2r1")])
