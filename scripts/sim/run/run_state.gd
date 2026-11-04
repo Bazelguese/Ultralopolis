@@ -180,7 +180,7 @@ func next_era_cost() -> int:
 
 
 func reroll_cost() -> int:
-	return maxi(0, run_rules.reroll_base_cost + reroll_extra + modifiers.flat(ModifierDef.Effect.COSTO_RINNOVO))
+	return maxi(run_rules.reroll_min_cost, run_rules.reroll_base_cost + reroll_extra + modifiers.flat(ModifierDef.Effect.COSTO_RINNOVO))
 
 
 ## Resistenza con cui la nazione del giocatore inizia uno scontro (GDD §7.1.1).
@@ -425,6 +425,8 @@ func offer_needs_replacement(offer: Offer) -> bool:
 
 ## true se il Magazzino basta a pagare l'offerta (senza contare rimborsi di sostituzione).
 func can_afford(offer: Offer) -> bool:
+	if offer.other_cost != null and not can_pay(offer.other_cost):
+		return false
 	return gold >= offer.price and research >= offer.research_price
 
 
@@ -834,6 +836,8 @@ func _end_shopping_phase() -> void:
 ## Pesca a caso le alternative (GDD §4.2): tipi di opportunità diversi fra loro, tutti con la
 ## stessa probabilità; per costruttori e reclutatori si pesca poi l'elemento dell'era corrente.
 func _draw_offers() -> void:
+	if is_dedicated_opportunity() and _draw_dedicated_offers():
+		return
 	var pool: Array[OpportunityDef] = _available_opportunities()
 	var weights: Array[int] = []
 	for opportunity: OpportunityDef in pool:
@@ -853,6 +857,48 @@ func _draw_offers() -> void:
 		offers.append(_make_offer(pool[pick]))
 		pool.remove_at(pick)
 		weights.remove_at(pick)
+
+
+## true se l'opportunità in corso mostra solo elementi (edifici in Produzione, truppe in Preparazione).
+func is_dedicated_opportunity() -> bool:
+	return is_shopping_phase() and opportunity_number == run_rules.dedicated_opportunity
+
+
+## Tre elementi diversi dell'era corrente (esclusivi compresi), tutti dello stesso tipo.
+## Restituisce false se nel catalogo manca l'opportunità adatta: si pesca allora come al solito.
+func _draw_dedicated_offers() -> bool:
+	var wanted_kind: OpportunityDef.Kind = OpportunityDef.Kind.COSTRUISCI_EDIFICIO if phase == Phase.PRODUZIONE else OpportunityDef.Kind.RECLUTA_TRUPPA
+	var wanted_phase: OpportunityDef.Phase = OpportunityDef.Phase.PRODUZIONE if phase == Phase.PRODUZIONE else OpportunityDef.Phase.PREPARAZIONE
+	var source: OpportunityDef = null
+	for opportunity: OpportunityDef in catalog.opportunities:
+		if opportunity.kind == wanted_kind and opportunity.phase == wanted_phase:
+			source = opportunity
+			break
+	if source == null:
+		return false
+	var count: int = maxi(1, run_rules.alternatives_per_opportunity + modifiers.flat(ModifierDef.Effect.ALTERNATIVE_OFFERTE))
+	offers = []
+	if wanted_kind == OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
+		var pool: Array[BuildingDef] = _buildings_of_era()
+		for i: int in range(mini(count, pool.size())):
+			var pick: int = _rng.randi_range(0, pool.size() - 1)
+			var offer: Offer = Offer.new()
+			offer.opportunity = source
+			offer.building = pool[pick]
+			offer.price = offer.building.cost_gold
+			offers.append(offer)
+			pool.remove_at(pick)
+	else:
+		var pool: Array[TroopDef] = _troops_of_era()
+		for i: int in range(mini(count, pool.size())):
+			var pick: int = _rng.randi_range(0, pool.size() - 1)
+			var offer: Offer = Offer.new()
+			offer.opportunity = source
+			offer.troop = pool[pick]
+			offer.price = offer.troop.cost_gold
+			offers.append(offer)
+			pool.remove_at(pick)
+	return true
 
 
 ## Peso di un tipo di opportunità: 1, più 1 per ogni elemento dell'identità che lo favorisce.
@@ -905,6 +951,7 @@ func _make_offer(opportunity: OpportunityDef) -> Offer:
 	offer.opportunity = opportunity
 	offer.price = opportunity.cost_gold
 	offer.research_price = opportunity.cost_research
+	offer.other_cost = opportunity.cost_resources
 	match opportunity.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
 			var buildings: Array[BuildingDef] = _buildings_of_era()
@@ -966,6 +1013,9 @@ func _pay(offer: Offer) -> bool:
 		return _fail("Risorse insufficienti (servono %s)." % offer.cost_text())
 	gold -= offer.price
 	research -= offer.research_price
+	if offer.other_cost != null:
+		for type: Res.Type in Res.NAMES:
+			stock[type] -= offer.other_cost.internal(type)
 	return true
 
 

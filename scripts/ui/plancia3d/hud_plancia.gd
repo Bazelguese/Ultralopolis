@@ -450,6 +450,8 @@ func aggiorna_partita(run: RunState) -> void:
 	_fase.text = "Anno %d · %s" % [run.year, run.phase_name()]
 	if comprando:
 		_fase.text += " · opportunità %d di %d" % [run.opportunity_number, run.run_rules.opportunities_per_phase]
+		if run.is_dedicated_opportunity():
+			_fase.text += " · solo edifici" if run.phase == RunState.Phase.PRODUZIONE else " · solo truppe"
 	_sotto_fase.text = "Resistenza nel prossimo scontro: %d" % run.player_resistance()
 	_prestigio.text = str(run.prestige)
 	_vittorie.text = "%d/%d" % [run.wins, run.run_rules.wins_needed]

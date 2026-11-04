@@ -1,13 +1,18 @@
 [gd_resource type="Resource" script_class="OpportunityDef" format=3]
 
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_jjuhv"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_wj15o"]
 [ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_jjuhv"]
+
+[sub_resource type="Resource" id="Resource_463n5"]
+script = ExtResource("1_jjuhv")
+influenza = 2
 
 [resource]
 script = ExtResource("2_jjuhv")
 id = &"ambasciata"
 display_name = "Ambasciata"
-description = "Accorcia di 1 anno un malus attivo; se si azzera, sparisce."
+description = "Paghi 2 Influenza: accorcia di 1 anno un malus attivo; se si azzera, sparisce."
 phase = 1
 kind = 6
-cost_gold = 4
+cost_resources = SubResource("Resource_463n5")
