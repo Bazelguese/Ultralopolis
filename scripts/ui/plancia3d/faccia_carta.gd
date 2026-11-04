@@ -77,8 +77,42 @@ func _calcola_misure() -> void:
 		var meta: float = (_area_basso.size.x - lato * 0.04) * 0.5
 		_pastiglie.append(Rect2(_area_basso.position, Vector2(meta, _area_basso.size.y)))
 		_pastiglie.append(Rect2(_area_basso.position + Vector2(meta + lato * 0.04, 0.0), Vector2(meta, _area_basso.size.y)))
-	elif scheda.genere == SchedaCarta.Genere.EDIFICIO and scheda.mana != &"":
+	elif scheda.genere == SchedaCarta.Genere.EDIFICIO and (scheda.mana != &"" or _effetto_principale() != ""):
 		_pastiglie.append(_area_basso)
+
+
+## L'effetto più importante da mostrare nella prima pastiglia: danno, poi scudo, cura, Corruzione, assedio.
+func _effetto_principale() -> String:
+	if scheda.danno > 0:
+		return "spada"
+	if scheda.scudo > 0:
+		return "scudo"
+	if scheda.cura > 0:
+		return "cura"
+	if scheda.corruzione > 0:
+		return "corruzione"
+	if scheda.assedio > 0:
+		return "assedio"
+	return ""
+
+
+func _valore_effetto(effetto: String) -> int:
+	match effetto:
+		"spada": return scheda.danno
+		"scudo": return scheda.scudo
+		"cura": return scheda.cura
+		"corruzione": return scheda.corruzione
+		"assedio": return scheda.assedio
+	return 0
+
+
+func _colore_effetto(effetto: String) -> Color:
+	match effetto:
+		"scudo": return Color("2f6fd0")
+		"cura": return Color("2f9e57")
+		"corruzione": return Color("8b3fc9")
+		"assedio": return Color("7a6a55")
+	return StileVisivo.PERICOLO.darkened(0.1)
 
 
 # --- Disegno -------------------------------------------------------------------
@@ -115,10 +149,15 @@ func _disegna_sopra() -> void:
 
 	# Pastiglie con icone.
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
-		_pastiglia(_pastiglie[0], StileVisivo.PERICOLO.darkened(0.1), "spada")
+		var effetto: String = _effetto_principale()
+		_pastiglia(_pastiglie[0], _colore_effetto(effetto), effetto if effetto != "" else "spada")
 		_pastiglia(_pastiglie[1], Color("33415e"), "clessidra")
 	elif _pastiglie.size() == 1:
-		_pastiglia(_pastiglie[0], StileVisivo.colore_mana_nome(scheda.mana).darkened(0.35), "gemma")
+		if scheda.mana != &"":
+			_pastiglia(_pastiglie[0], StileVisivo.colore_mana_nome(scheda.mana).darkened(0.35), "gemma")
+		else:
+			var effetto_edificio: String = _effetto_principale()
+			_pastiglia(_pastiglie[0], _colore_effetto(effetto_edificio), effetto_edificio)
 
 	# Gemma del mana nell'angolo.
 	if scheda.mana != &"":
@@ -176,6 +215,16 @@ func _pastiglia(area: Rect2, colore: Color, icona: String) -> void:
 			_sopra.draw_colored_polygon(PackedVector2Array([centro, centro + Vector2(l * 0.7, l), centro + Vector2(-l * 0.7, l)]), Color.WHITE)
 		"gemma":
 			_esagono(centro, lato_icona * 0.42, StileVisivo.colore_mana_nome(scheda.mana).lightened(0.3))
+		"scudo", "assedio":
+			var l: float = lato_icona * 0.45
+			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(-l * 0.8, -l), centro + Vector2(l * 0.8, -l), centro + Vector2(l * 0.8, 0.0), centro + Vector2(0.0, l), centro + Vector2(-l * 0.8, 0.0)]), Color.WHITE)
+		"cura":
+			var l: float = lato_icona * 0.45
+			_sopra.draw_rect(Rect2(centro + Vector2(-l * 0.25, -l), Vector2(l * 0.5, l * 2.0)), Color.WHITE)
+			_sopra.draw_rect(Rect2(centro + Vector2(-l, -l * 0.25), Vector2(l * 2.0, l * 0.5)), Color.WHITE)
+		"corruzione":
+			var l: float = lato_icona * 0.45
+			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(0.0, -l), centro + Vector2(l * 0.7, l * 0.2), centro + Vector2(0.0, l), centro + Vector2(-l * 0.7, l * 0.2)]), Color.WHITE)
 
 
 func _esagono(centro: Vector2, raggio: float, colore: Color) -> void:
@@ -214,6 +263,8 @@ func _crea_arte() -> void:
 	var colore: Color = StileVisivo.colore_mana_nome(scheda.mana) if scheda.mana != &"" else StileVisivo.PIETRA_CHIARA
 	if scheda.genere == SchedaCarta.Genere.AZIONE:
 		colore = StileVisivo.CORNICE_AZIONE.darkened(0.2)
+	elif scheda.genere == SchedaCarta.Genere.VIA:
+		colore = StileVisivo.ORO.darkened(0.15)
 	elif scheda.genere in [SchedaCarta.Genere.INCONTRO, SchedaCarta.Genere.FANTASMA]:
 		colore = StileVisivo.CORNICE_MINACCIA.darkened(0.25)
 	var sfumatura: Gradient = Gradient.new()
@@ -227,7 +278,9 @@ func _crea_arte() -> void:
 	trama.width = 128
 	trama.height = 128
 	_arte.texture = trama
-	_iniziale = _etichetta(scheda.titolo.substr(0, 1).to_upper(), StileVisivo.FONT_TITOLI, int(_area_arte.size.y * 0.72), Color(1.0, 1.0, 1.0, 0.9), 12)
+	var parole: PackedStringArray = scheda.titolo.split(" ", false)
+	var parola: String = parole[parole.size() - 1] if scheda.genere == SchedaCarta.Genere.VIA and not parole.is_empty() else scheda.titolo
+	_iniziale = _etichetta(parola.substr(0, 1).to_upper(), StileVisivo.FONT_TITOLI, int(_area_arte.size.y * 0.72), Color(1.0, 1.0, 1.0, 0.9), 12)
 	_iniziale.position = _area_arte.position
 	_iniziale.size = _area_arte.size
 	_iniziale.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -256,10 +309,12 @@ func _crea_scritte() -> void:
 	add_child(_nome)
 
 	var testi: Array[String] = []
+	var ritmo: String = SchedaCarta.secondi(scheda.ritmo_ms).replace(" ", "")
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
-		testi = [str(scheda.danno), SchedaCarta.secondi(scheda.ritmo_ms).replace(" ", "")]
+		testi = [str(_valore_effetto(_effetto_principale())), ritmo]
 	elif _pastiglie.size() == 1:
-		testi = ["+%d · %s" % [scheda.mana_numero, SchedaCarta.secondi(scheda.ritmo_ms).replace(" ", "")]]
+		var quanto: int = scheda.mana_numero if scheda.mana != &"" else _valore_effetto(_effetto_principale())
+		testi = ["+%d · %s" % [quanto, ritmo]]
 	for i: int in range(testi.size()):
 		var area: Rect2 = _pastiglie[i]
 		var testo: Label = _etichetta(testi[i], StileVisivo.FONT_TITOLI, int(area.size.y * 0.62), Color.WHITE, 6)

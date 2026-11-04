@@ -488,8 +488,9 @@ func aggiorna_partita(run: RunState) -> void:
 	ultime.reverse()
 	_testo_cronaca.text = "\n".join(ultime)
 
-	_pulsante_rinnova.visible = comprando
-	_pulsante_passa.visible = comprando
+	var scelta_via: bool = not run.way_choices.is_empty()
+	_pulsante_rinnova.visible = comprando and not scelta_via
+	_pulsante_passa.visible = comprando and not scelta_via
 	_pulsante_rinnova.text = "Rinnova le offerte · %d Oro" % run.reroll_cost()
 	_pulsante_rinnova.disabled = run.gold < run.reroll_cost()
 	_pulsante_nessuna.visible = run.phase == RunState.Phase.RICOMPENSA_INCONTRO
@@ -511,6 +512,8 @@ func aggiorna_partita(run: RunState) -> void:
 			_principale.text = "Nuova partita"
 		_:
 			_suggerimento_fase.text = ""
+	if scelta_via:
+		_suggerimento_fase.text = "Nuova era: scegli la via della nazione. Diventa parte della tua identità."
 
 
 func _testo_fine(run: RunState) -> String:

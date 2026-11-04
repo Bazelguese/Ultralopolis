@@ -4,7 +4,7 @@ extends RefCounted
 ## Si costruisce dai dati veri del gioco (catalogo, plancia, offerte, incontri).
 ## Solo presentazione: legge i dati, non contiene regole di gioco.
 
-enum Genere { EDIFICIO, TRUPPA, AZIONE, INCONTRO, FANTASMA }
+enum Genere { EDIFICIO, TRUPPA, AZIONE, INCONTRO, FANTASMA, VIA }
 
 ## Le illustrazioni si cercano qui, con il nome dell'identificativo:
 ## edifici/<id>.png, truppe/<id>.png, azioni/<id>.png. Se mancano si usa il segnaposto.
@@ -21,6 +21,11 @@ var mana: StringName = &""
 ## Costo in mana (truppe) oppure mana prodotto (edifici).
 var mana_numero: int = 0
 var danno: int = 0
+## Altri effetti in battaglia (GDD §7.6): scudo, cura, Corruzione, attacco d'assedio.
+var scudo: int = 0
+var cura: int = 0
+var corruzione: int = 0
+var assedio: int = 0
 ## Ricarica (truppe) o intervallo di produzione (edifici), in millisecondi.
 var ritmo_ms: int = 0
 var livello: int = 1
@@ -41,6 +46,8 @@ func colore_cornice() -> Color:
 	match genere:
 		Genere.AZIONE:
 			return StileVisivo.CORNICE_AZIONE
+		Genere.VIA:
+			return StileVisivo.ORO_LUCE
 		Genere.INCONTRO, Genere.FANTASMA:
 			return StileVisivo.CORNICE_MINACCIA
 	return StileVisivo.colore_cornice(era)
@@ -59,6 +66,9 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 	scheda.ritmo_ms = def.mana_interval_ms
 	scheda.livello = p_livello
 	scheda.malus = p_malus
+	scheda.scudo = def.shield
+	scheda.cura = def.heal
+	scheda.corruzione = def.corruption
 	scheda.illustrazione = _carica("edifici/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
 	var produzione: PackedStringArray = PackedStringArray()
@@ -66,9 +76,13 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 		var quanto: int = def.production(tipo)
 		if quanto != 0:
 			produzione.append("+%d %s" % [quanto, Res.NAMES[tipo]])
+	scheda.riga = " · ".join(produzione.slice(0, 2))
 	righe.append("A ogni fase: %s." % (", ".join(produzione) if not produzione.is_empty() else "nessuna risorsa"))
 	if def.mana_amount > 0:
 		righe.append("In battaglia: %d %s ogni %s." % [def.mana_amount, def.mana_type, secondi(def.mana_interval_ms)])
+	else:
+		righe.append("Edificio neutro: non produce mana.")
+	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, 0, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, "ogni %s" % secondi(def.mana_interval_ms)))
 	if def.extra_building_slots > 0:
 		righe.append("+%d spazio edificio." % def.extra_building_slots)
 	if def.extra_troop_slots > 0:
@@ -91,6 +105,10 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 	scheda.mana = def.mana_type if def.mana_cost > 0 else &""
 	scheda.mana_numero = def.mana_cost
 	scheda.danno = def.damage
+	scheda.scudo = def.shield
+	scheda.cura = def.heal
+	scheda.corruzione = def.corruption
+	scheda.assedio = def.siege_damage
 	scheda.ritmo_ms = def.cooldown_ms
 	scheda.livello = p_livello
 	scheda.malus = p_malus
@@ -101,7 +119,11 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 		righe.append("Costa %d mana %s (se manca, usa l'energetico)." % [def.mana_cost, def.mana_type])
 	else:
 		righe.append("Senza mana: agisce appena finisce la ricarica.")
-	righe.append("%d danni · ricarica %s." % [def.damage, secondi(def.cooldown_ms)])
+	if def.damage > 0:
+		righe.append("%d danni (prima allo scudo, poi alla Resistenza) · ricarica %s." % [def.damage, secondi(def.cooldown_ms)])
+	else:
+		righe.append("Ricarica %s." % secondi(def.cooldown_ms))
+	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, def.siege_damage, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, "a ogni attivazione"))
 	righe.append("Mangia %s Cibo a inizio anno." % Res.format(Res.Type.CIBO, def.food_tenths))
 	if p_affamata:
 		righe.append("Affamata: ricarica più lenta fino al prossimo pasto.")
@@ -181,6 +203,18 @@ static func da_ricompensa(ricompensa: RewardDef) -> SchedaCarta:
 	return scheda
 
 
+static func da_via(via: IdentityDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.VIA
+	scheda.id = via.id
+	scheda.titolo = via.display_name
+	scheda.sopratitolo = "Via"
+	scheda.riga = "Scegli questa via"
+	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: offerte, elementi esclusivi, un tratto permanente e un bonus immediato."
+	scheda.illustrazione = _carica("vie/%s.png" % via.id)
+	return scheda
+
+
 static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.FANTASMA
@@ -213,6 +247,24 @@ static func _carica(percorso: String) -> Texture2D:
 	if ResourceLoader.exists(completo):
 		return load(completo) as Texture2D
 	return null
+
+
+## Righe del riquadro dei dettagli per gli effetti di battaglia oltre al danno (GDD §7.6, §7.7).
+static func _righe_effetti(scudo_v: int, cura_v: int, corruzione_v: int, assedio_v: int, inefficienza_ms: int, bersaglio_inefficienza: TimerTarget.Kind, sabotaggio_ms: int, bersaglio_sabotaggio: TimerTarget.Kind, quando: String) -> PackedStringArray:
+	var righe: PackedStringArray = PackedStringArray()
+	if scudo_v > 0:
+		righe.append("+%d scudo %s." % [scudo_v, quando])
+	if cura_v > 0:
+		righe.append("Cura %d Resistenza %s." % [cura_v, quando])
+	if corruzione_v > 0:
+		righe.append("%d Corruzione all'avversario %s." % [corruzione_v, quando])
+	if assedio_v > 0:
+		righe.append("Assedio: toglie %d scudo all'avversario." % assedio_v)
+	if inefficienza_ms > 0:
+		righe.append("Rallenta %s avversari di %s." % [TimerTarget.NAMES[bersaglio_inefficienza], secondi(inefficienza_ms)])
+	if sabotaggio_ms > 0:
+		righe.append("Sabota %s avversari per %s." % [TimerTarget.NAMES[bersaglio_sabotaggio], secondi(sabotaggio_ms)])
+	return righe
 
 
 static func _riga_etichette(etichette: Array[StringName], p_livello: int) -> String:

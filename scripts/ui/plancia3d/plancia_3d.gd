@@ -7,7 +7,7 @@ extends Node3D
 
 enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
-enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA }
+enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA }
 
 const PASSO_TRUPPE: float = 1.75
 const PASSO_EDIFICI: float = 2.1
@@ -45,6 +45,11 @@ var _materiali_bordo: Array[StandardMaterial3D] = []
 var _medaglioni: Array[Node3D] = [null, null]
 var _scritte_resistenza: Array[Label3D] = [null, null]
 var _barre_resistenza: Array[MeshInstance3D] = [null, null]
+## Scudo e Corruzione accanto allo stemma (GDD §7.6), visibili solo se non sono zero.
+var _segnalini_scudo: Array[Node3D] = [null, null]
+var _scritte_scudo: Array[Label3D] = [null, null]
+var _segnalini_corruzione: Array[Node3D] = [null, null]
+var _scritte_corruzione: Array[Label3D] = [null, null]
 var _nomi_lato: Array[Label3D] = [null, null]
 var _riserve: Array[Node3D] = [null, null]
 var _scritte_riserva: Array[Dictionary] = [{}, {}]
@@ -68,6 +73,8 @@ var _prima: Dictionary = {}
 var _esito_programmato: bool = false
 var _lampi: Array[Array] = [[], []]
 var _gemme_in_volo: int = 0
+## Conta le scritte uscite da ogni stemma, per non sovrapporle.
+var _scritte_uscite: Array[int] = [0, 0]
 
 
 func _ready() -> void:
@@ -119,7 +126,7 @@ func _nuova_run() -> void:
 
 func _nazione_di_prova(catalogo: CatalogDef, regole_run: RunRules) -> NationTemplate:
 	var scelte: Array[IdentityDef] = []
-	for dimensione: IdentityDef.Dimension in IdentityDef.DIMENSION_NAMES:
+	for dimensione: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var opzioni: Array[IdentityDef] = IdentityRules.options(catalogo, dimensione)
 		var quante: int = IdentityRules.starting_perk_count(catalogo, regole_run) if dimensione == IdentityDef.Dimension.PERK else mini(1, opzioni.size())
 		for i: int in range(quante):
@@ -305,6 +312,34 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	barra.position = fondo_barra.position + Vector3(0.0, 0.01, 0.0)
 	radice.add_child(barra)
 	_barre_resistenza[lato] = barra
+	var scudo: Array = _crea_segnalino(medaglione, Vector3(1.0, 0.0, -0.55), Color("2f6fd0"))
+	_segnalini_scudo[lato] = scudo[0]
+	_scritte_scudo[lato] = scudo[1]
+	var corruzione: Array = _crea_segnalino(medaglione, Vector3(1.0, 0.0, 0.55), Color("8b3fc9"))
+	_segnalini_corruzione[lato] = corruzione[0]
+	_scritte_corruzione[lato] = corruzione[1]
+
+
+## Piccolo disco con un numero accanto allo stemma. Restituisce [nodo, scritta].
+func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color) -> Array:
+	var nodo: Node3D = Node3D.new()
+	nodo.position = posizione
+	genitore.add_child(nodo)
+	var disco: MeshInstance3D = MeshInstance3D.new()
+	var forma: CylinderMesh = CylinderMesh.new()
+	forma.top_radius = 0.36
+	forma.bottom_radius = 0.38
+	forma.height = 0.1
+	forma.radial_segments = 6
+	disco.mesh = forma
+	disco.material_override = StileVisivo.materiale_luminoso(colore, 0.5)
+	disco.position.y = 0.05
+	nodo.add_child(disco)
+	var scritta: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 64, Color.WHITE, 0.0, 10)
+	scritta.position.y = 0.12
+	nodo.add_child(scritta)
+	nodo.visible = false
+	return [nodo, scritta]
 
 
 func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
@@ -423,7 +458,13 @@ func _costruisci_scelte() -> void:
 	_scelte = []
 	var schede: Array[SchedaCarta] = []
 	_tipo_scelta = TipoScelta.NESSUNA
-	match run.phase:
+	var fase: int = run.phase
+	if not run.way_choices.is_empty():
+		_tipo_scelta = TipoScelta.VIA
+		for via: IdentityDef in run.way_choices:
+			schede.append(SchedaCarta.da_via(via))
+		fase = -1
+	match fase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
 			_tipo_scelta = TipoScelta.OFFERTA
 			for offerta: Offer in run.offers:
@@ -573,6 +614,9 @@ func _clic_scelta(tessera: Tessera3D) -> void:
 				_vola_e_esegui(tessera, func() -> bool: return run.take_reward(i))
 		TipoScelta.FANTASMA:
 			_affronta_fantasma()
+		TipoScelta.VIA:
+			var nome_via: String = run.way_choices[i].display_name
+			_esegui(run.choose_way(i), "Via scelta: %s" % nome_via)
 
 
 ## Edificio o truppa presi: la carta vola nello spazio libero, poi si esegue l'azione.
@@ -786,12 +830,48 @@ func _mostra_eventi() -> void:
 				_colpo(1 - evento.side, evento.amount, "")
 			BattleEvent.Kind.LOGORAMENTO:
 				_colpo(evento.side, evento.amount, "logoramento")
+			BattleEvent.Kind.SCUDO:
+				_scritta_volante(evento.side, "+%d scudo" % evento.amount, Color("2f6fd0"))
+			BattleEvent.Kind.CURA:
+				_scritta_volante(evento.side, "+%d" % evento.amount, Color("2f9e57"))
+			BattleEvent.Kind.CORRUZIONE:
+				_scritta_volante(evento.side, "+%d Corruzione" % evento.amount, Color("8b3fc9"))
+			BattleEvent.Kind.ASSEDIO:
+				_scritta_volante(evento.side, "−%d scudo" % evento.amount, Color("7a6a55"))
+			BattleEvent.Kind.RALLENTATO, BattleEvent.Kind.SABOTATO:
+				var colpita: Tessera3D = _elemento_da_indice(evento.side, evento.index)
+				if colpita != null:
+					colpita.scintille(Color("ff9a3d") if evento.kind == BattleEvent.Kind.RALLENTATO else Color("b36bff"), Vector3(0.0, 0.3, 0.0), 14)
+
+
+## Negli eventi di rallentamento e sabotaggio l'indice vale 0+ per gli edifici, 1000+ per le truppe.
+func _elemento_da_indice(lato: int, indice: int) -> Tessera3D:
+	if indice >= 1000:
+		var truppa: int = indice - 1000
+		return _truppe[lato][truppa] if truppa < _truppe[lato].size() else null
+	if indice >= 0 and indice < _edifici[lato].size():
+		return _edifici[lato][indice]
+	return null
 
 
 func _aggiorna_visuale_scontro() -> void:
 	_hud.imposta_tempo(_sim.elapsed_ms)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_aggiorna_medaglione(lato, _sim.get_resistance(lato), _sim.get_max_resistance(lato))
+		var scudo: int = _sim.get_shield(lato)
+		_segnalini_scudo[lato].visible = scudo > 0
+		_scritte_scudo[lato].text = str(scudo)
+		var corruzione: int = _sim.get_corruption(lato)
+		_segnalini_corruzione[lato].visible = corruzione > 0
+		_scritte_corruzione[lato].text = str(corruzione)
+		for i: int in range(_edifici[lato].size()):
+			var edificio: Tessera3D = _edifici[lato][i]
+			if _sim.get_building_sabotage_ms(lato, i) > 0:
+				edificio.imposta_stato("Sabotato", Color("8b3fc9"))
+			elif _sim.get_building_slow_ms(lato, i) > 0:
+				edificio.imposta_stato("Rallentato", Color("e08a2e"))
+			else:
+				edificio.imposta_stato("", StileVisivo.NOTTE)
 		for mana: StringName in COLORI_RISERVA:
 			var scritta: Label3D = _scritte_riserva[lato][mana]
 			scritta.text = str(_sim.get_mana(lato, mana))
@@ -799,7 +879,11 @@ func _aggiorna_visuale_scontro() -> void:
 			var tessera: Tessera3D = _truppe[lato][i]
 			var def: TroopDef = _setups[lato].troops[i]
 			var rimasto: int = _sim.get_troop_cooldown_left_ms(lato, i)
-			if _sim.get_troop_state(lato, i) == BattleSim.TroopState.IN_ATTESA_DI_MANA:
+			var stato: BattleSim.TroopState = _sim.get_troop_state(lato, i)
+			if stato == BattleSim.TroopState.SABOTATA:
+				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
+				tessera.imposta_stato("Sabotata: non può attivarsi", Color("8b3fc9"))
+			elif stato == BattleSim.TroopState.IN_ATTESA_DI_MANA:
 				tessera.imposta_ricarica(1.0)
 				var disponibile: int = _sim.get_mana(lato, def.mana_type) + _sim.get_mana(lato, BattleSim.MANA_ENERGETICO)
 				tessera.imposta_stato("In attesa: servono %d %s, %s %d" % [def.mana_cost, def.mana_type, "ne hai" if lato == Lato.GIOCATORE else "ne ha", disponibile], StileVisivo.PERICOLO)
@@ -807,6 +891,8 @@ func _aggiorna_visuale_scontro() -> void:
 				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
 				if float(_lampi[lato][i]) > 0.0:
 					tessera.imposta_stato("Si attiva!", StileVisivo.ORO_LUCE)
+				elif _sim.get_troop_slow_ms(lato, i) > 0:
+					tessera.imposta_stato("Rallentata", Color("e08a2e"))
 				else:
 					tessera.imposta_stato("", StileVisivo.NOTTE)
 
@@ -863,19 +949,21 @@ func _gemma_arrivata(gemma: MeshInstance3D, destinazione: Node3D) -> void:
 
 ## Colpo sulla Resistenza di un lato: numero che salta fuori e stemma che trema.
 func _colpo(lato: int, danno: int, nota: String) -> void:
+	if danno <= 0:
+		return
 	var medaglione: Node3D = _medaglioni[lato]
 	var testo: String = "−%d" % danno if nota == "" else "−%d %s" % [danno, nota]
 	var numero: Label3D = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, 140 if nota == "" else 70, Color.WHITE, 0.0, 22)
 	numero.outline_modulate = StileVisivo.PERICOLO.darkened(0.35)
 	numero.no_depth_test = true
 	add_child(numero)
-	var base: Vector3 = medaglione.global_position + Vector3(1.4, 0.6, 0.0)
+	var base: Vector3 = _punto_scritta(lato)
 	numero.global_position = base
 	numero.scale = Vector3.ONE * 0.6
 	var salto: Tween = create_tween()
 	salto.set_parallel(true)
 	salto.tween_property(numero, "scale", Vector3.ONE, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	salto.tween_property(numero, "global_position", base + Vector3(0.4, 0.9, -0.3), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	salto.tween_property(numero, "global_position", base + Vector3(0.0, 1.2, 0.0), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	salto.tween_property(numero, "modulate:a", 0.0, 0.5).set_delay(0.35)
 	salto.chain().tween_callback(numero.queue_free)
 	var centro: Vector3 = Vector3(X_MEDAGLIONE, 0.0, medaglione.position.z)
@@ -884,6 +972,28 @@ func _colpo(lato: int, danno: int, nota: String) -> void:
 		var spostamento: Vector3 = Vector3(randf_range(-0.12, 0.12), 0.0, randf_range(-0.08, 0.08))
 		scossa.tween_property(medaglione, "position", centro + spostamento, 0.035)
 	scossa.tween_property(medaglione, "position", centro, 0.05)
+
+
+## Punto di partenza delle scritte sopra lo stemma: si alternano su tre posizioni.
+func _punto_scritta(lato: int) -> Vector3:
+	_scritte_uscite[lato] += 1
+	var turno: int = _scritte_uscite[lato] % 3
+	return _medaglioni[lato].global_position + Vector3(-0.7 + turno * 0.7, 1.6 + turno * 0.25, 0.1)
+
+
+## Scritta che sale dallo stemma di un lato (scudo, cura, Corruzione, assedio).
+func _scritta_volante(lato: int, testo: String, colore: Color) -> void:
+	var scritta: Label3D = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, 80, Color.WHITE, 0.0, 18)
+	scritta.outline_modulate = colore.darkened(0.3)
+	scritta.no_depth_test = true
+	add_child(scritta)
+	var base: Vector3 = _punto_scritta(lato)
+	scritta.global_position = base
+	var salto: Tween = create_tween()
+	salto.set_parallel(true)
+	salto.tween_property(scritta, "global_position", base + Vector3(0.0, 1.0, 0.0), 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	salto.tween_property(scritta, "modulate:a", 0.0, 0.5).set_delay(0.4)
+	salto.chain().tween_callback(scritta.queue_free)
 
 
 func _mostra_esito() -> void:

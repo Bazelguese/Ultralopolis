@@ -63,3 +63,19 @@ func test_uno_scontro_si_rigioca_fino_all_esito() -> void:
 	assert_true(hud.esito_visibile(), "L'esito viene mostrato.")
 	hud.call("_on_continua_esito")
 	assert_eq(_scena.get("_modo"), 0, "Dopo l'esito si torna alla partita.")
+
+
+func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
+	var run: RunState = _run()
+	run.stock[Res.Type.RICERCA] += run.next_era_cost()
+	assert_true(run.advance_era(), "Si può avanzare di era.")
+	_scena.call("_aggiorna_tutto")
+	if run.way_choices.is_empty():
+		pass_test("Questa era non propone vie.")
+		return
+	var scelte: Array = _scena.get("_scelte")
+	assert_eq(scelte.size(), run.way_choices.size(), "Una carta per ogni via.")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
+	scelte = _scena.get("_scelte")
+	assert_eq(scelte.size(), run.offers.size(), "Dopo la via tornano le offerte.")
