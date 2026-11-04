@@ -25,3 +25,9 @@ extends Resource
 @export var mana_amount: int = 0
 ## Intervallo di produzione in millisecondi. Parte pieno a inizio battaglia.
 @export var mana_interval_ms: int = 1000
+
+@export_group("Spazi concessi")
+## Spazi edificio aggiunti alla plancia finché l'edificio è costruito (GDD §6.3).
+@export var extra_building_slots: int = 0
+## Spazi truppa aggiunti alla plancia finché l'edificio è costruito (GDD §6.3).
+@export var extra_troop_slots: int = 0
