@@ -1,9 +1,9 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.5
+## Game Design Document — v0.6
 
 **Data:** 4 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo
-**Motore scelto:** Godot (GDScript, esportazione nativa per PC)
+**Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
 ---
@@ -39,7 +39,7 @@ Uno spunto non è un obbligo: non deve essere soddisfatto dalla base, ma la base
 
 I numeri di economia, mana, cooldown, danni, Resistenza e ricerca sono placeholder e non costituiscono bilanciamento approvato. Fanno eccezione i valori esplicitamente adottati per la struttura della run e della plancia iniziale.
 
-La bozza di codice già preparata è un esperimento e non una fonte normativa: le convenzioni che introduce senza approvazione restano provvisorie (elenco in §16.3). Il documento non certifica che il codice sia stato eseguito o verificato in Godot.
+Le versioni precedenti citavano una bozza di codice: quella bozza non è nel repository e il codice del prototipo parte da zero. Le convenzioni provvisorie necessarie a far funzionare il codice sono elencate in §16.3 e restano modificabili. Il documento non certifica che il codice sia stato eseguito o verificato in Godot.
 
 ---
 
@@ -116,12 +116,14 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | In futuro, misto di scontri automatici ed eventi a scelta (testo e opzioni) | Direzione |
 | Lo scontro usa la stessa simulazione del combattimento contro i fantasmi; la plancia generata ha la stessa struttura di una plancia giocatore | Proposta |
 | Le 10 vittorie della run restano legate agli scontri contro i fantasmi; gli incontri del mondo non le modificano | Proposta |
-| Numero di incontri per anno e loro posizione (in quale macrofase, se come opportunità o come momento fisso) | Da definire |
+| Un incontro per anno, in un **momento fisso** fra Produzione e Preparazione (struttura ispirata allo scontro con i mostri a metà giornata di The Bazaar) | Confermato come base provvisoria |
+| Il giocatore sceglie **fra 3 incontri** diversi (es. tre minacce di difficoltà e ricompensa diverse) | Confermato |
 | Presenza nel primo prototipo | Confermato |
-| La sconfitta ha **conseguenze leggere**, dello stesso tipo della sconfitta contro un fantasma ma di entità inferiore | Confermato |
-| Forma ed entità esatta della conseguenza (es. una frazione della perdita di Prestigio prevista per l’anno) | Proposta, da tarare nel playtest |
-| Effetto di una sconfitta durante l’ultima possibilità (può terminare la run oppure no) | Da definire |
-| Ricompense per la vittoria | Da definire |
+| La sconfitta ha **conseguenze leggere** | Confermato |
+| Conseguenza della sconfitta: l’**Oro del Magazzino viene dimezzato** (arrotondato per difetto); **nessuna perdita di Prestigio** | Confermato; entità da tarare nel playtest |
+| Una sconfitta durante l’ultima possibilità **termina la run** | Confermato |
+| Ricompense per la vittoria: edifici, truppe, perk o risorse. Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (i perk entrano quando esisteranno, §9) |
+| Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
 
 ### 3.4 Vittoria e fine della run — Base adottata
 
@@ -140,7 +142,7 @@ Esempio: perdere nell’anno 3 costa 3 Prestigio; perdere nell’anno 8 costa 8.
 
 Non sono previste per ora regole per recuperare Prestigio o ricompense speciali all’attivazione dell’ultima possibilità.
 
-**Pareggio — Da definire.** Il prototipo usa una regola provvisoria (§16.3). Come riferimento: in The Bazaar non esistono pareggi, e il doppio azzeramento conta come vittoria del giocatore attivo.
+**Pareggio — Confermato.** Il pareggio (doppio azzeramento della Resistenza nello stesso istante, §7.5) conta come **vittoria**: aggiunge una vittoria e non fa perdere Prestigio. Il giocatore però subisce, come in una sconfitta, i **malus che il fantasma infligge** (le conseguenze lasciate dalle armi avversarie, §11.1 e §13.2). Durante l’ultima possibilità un pareggio quindi non termina la run. Nel primo prototipo i fantasmi non infliggono malus, perciò il pareggio equivale a una vittoria.
 
 **Da definire:** conseguenze di abbandono e trattamento dei combattimenti che non terminano.
 
@@ -154,9 +156,9 @@ Non sono previste per ora regole per recuperare Prestigio o ricompense speciali 
 | Selezione del fantasma | L’avversario dell’anno viene fissato. |
 | Inizio Produzione | Tutti gli edifici già costruiti producono le rispettive risorse. |
 | Scelte di Produzione | Opportunità di costruzione e sviluppo. |
+| Incontro del mondo | Scelta fra 3 incontri e scontro automatico contro una plancia generata (§3.3). |
 | Inizio Preparazione | Tutti gli edifici già costruiti producono di nuovo. |
 | Scelte di Preparazione | Reclutamento, organizzazione della plancia e, in futuro, spionaggio e operazioni militari. |
-| Incontri del mondo | Posizione nell’anno da definire (§3.3). |
 | Combattimento contro il fantasma | Produzione di mana e attivazione automatica delle truppe. |
 | Esito | Vittoria o sconfitta, aggiornamento della run ed eventuali conseguenze. |
 
@@ -168,7 +170,14 @@ Le macrofasi non rappresentano un unico acquisto: contengono più occasioni nell
 
 La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogni opportunità interna.
 
-**Da definire:** numero di momenti per fase, numero di alternative mostrate, contenuto dei negozi, costo degli incontri, frequenza degli eventi, possibilità di passare o aggiornare le offerte.
+| Regola | Stato |
+|---|---|
+| **3 opportunità** per macrofase | Confermato |
+| Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
+| Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
+| Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo | Confermato; valori placeholder |
+
+**Da definire:** numero di alternative mostrate in ogni opportunità, contenuto dei negozi, frequenza degli eventi, se il costo del rinnovo si azzera a ogni opportunità.
 
 ## 5. Economia
 
@@ -201,7 +210,9 @@ Oro e Ricerca sono conservati nel **Magazzino**: le risorse non spese restano di
 
 Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia.
 
-**Proposta tecnica del prototipo:** mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
+**Confermato:** mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
+
+**Tipi di mana — Direzione.** Il prototipo usa un solo tipo di mana. In futuro sono previsti più tipi, distinti per colore e tema (esempi del creatore: rosso = guerra, blu = diplomazia, verde = ricchezza). I dati del prototipo devono già poter indicare il tipo di mana prodotto e richiesto. Introdurre i nuovi tipi resta una modifica del nucleo (P5).
 
 Altre risorse, materiali e mantenimento non sono definiti. L’introduzione di una nuova risorsa è una modifica del nucleo (P5).
 
@@ -218,7 +229,9 @@ I valori iniziali sono confermati. I massimi sono un’indicazione del creatore 
 
 La base usa due file separate. Un elemento occupa uno spazio. Gli spazi sono capacità disponibili, non elementi automaticamente posseduti.
 
-Le truppe possono essere riordinate prima della battaglia; la loro posizione determina la priorità nell’uso del mana. Durante il combattimento la disposizione resta fissa.
+Le truppe possono essere riordinate **in qualunque momento fuori dal combattimento**; la loro posizione determina la priorità nell’uso del mana. Durante il combattimento la disposizione resta fissa.
+
+Sono ammesse **copie multiple** dello stesso edificio o della stessa truppa — Confermato.
 
 ### 6.2 Dotazione iniziale — Base approvata
 
@@ -231,20 +244,25 @@ Le truppe possono essere riordinate prima della battaglia; la loro posizione det
 
 Quantità, nomi e statistiche sono placeholder. Eventuali varianti per popolo restano una proposta.
 
-### 6.3 Espansione della plancia — Da definire
+### 6.3 Espansione della plancia — Confermato nel meccanismo, valori placeholder
 
-Il passaggio da 3 a fino a 12 spazi truppa rende l’espansione uno degli assi principali di progressione della run. Il meccanismo non è ancora fissato. Ipotesi indicate dal creatore:
+Il passaggio da 3 a fino a 12 spazi truppa (e da 4 a fino a 10 spazi edificio) rende l’espansione uno degli assi principali di progressione della run. Il meccanismo è una **combinazione** di tre vie:
 
 - ricompense legate all’ingresso nelle ere;
-- edifici che concedono spazi, ad esempio una caserma che aggiunge spazi truppa.
+- edifici che concedono spazi, ad esempio una caserma che aggiunge spazi truppa;
+- acquisto di spazi con l’Oro, come opportunità.
 
-La seconda ipotesi ha una conseguenza da valutare: un edificio che concede spazi occupa a sua volta uno spazio edificio, quindi entra nella stessa scelta della doppia funzione.
+Gli edifici che concedono spazi occupano a loro volta uno spazio edificio, quindi entrano nella stessa scelta della doppia funzione. Quanti spazi dà ogni via e a che prezzo resta placeholder.
 
-### 6.4 Vendita e sostituzione — Da definire, priorità alta
+### 6.4 Vendita e sostituzione — Confermato
 
-Il principio P1 funziona solo se il giocatore, colpito da un malus, ha davvero alternative da perseguire. A plancia piena, “costruire altro” significa sostituire un elemento: le regole di vendita, sostituzione e rimborso determinano quindi quanto un malus devia o punisce. Vanno fissate prima di sviluppare i malus.
+Il principio P1 funziona solo se il giocatore, colpito da un malus, ha davvero alternative da perseguire. A plancia piena, “costruire altro” significa sostituire un elemento: le regole di vendita, sostituzione e rimborso determinano quindi quanto un malus devia o punisce.
 
-**Da definire anche:** riserva fuori plancia, copie multiple, fusioni e potenziamento degli elementi.
+- Un elemento si può **vendere in qualunque momento fuori dal combattimento**, anche senza sostituirlo.
+- Il rimborso è **metà del prezzo pagato**, arrotondato per difetto.
+- La sostituzione equivale a vendere l’elemento presente e costruire il nuovo.
+
+**Da definire:** riserva fuori plancia, fusioni e potenziamento degli elementi.
 
 Una mappa a distretti con adiacenze era stata discussa come alternativa precedente: **non fa parte della plancia concordata.**
 
@@ -259,6 +277,20 @@ Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza av
 Truppe ed edifici non hanno punti vita individuali e non vengono eliminati durante la battaglia nella base.
 
 Resistenza e Prestigio sono separati: la prima riguarda il singolo scontro, il secondo la sopravvivenza della run. La Resistenza viene ripristinata prima dello scontro successivo.
+
+### 7.1.1 Calcolo della Resistenza — Confermato nella struttura, valori placeholder
+
+La Resistenza massima di una nazione si calcola all’inizio di ogni scontro come somma di:
+
+| Componente | Contributo |
+|---|---|
+| Era | Una quota per l’era raggiunta; più alta l’era, più alta la quota. |
+| Identità | Una quota per governo, credo religioso e razza (§9). |
+| Anni | +X per ogni anno trascorso: la Resistenza cresce di anno in anno. |
+| Edifici | Una quota minore per ogni edificio costruito; può essere influenzata dai perk. |
+| Truppe | Una quota minore per ogni truppa posizionata; può essere influenzata dai perk. |
+
+Nel primo prototipo l’identità non esiste ancora e contribuisce 0. Le plance generate degli incontri del mondo usano invece una Resistenza fissata nei dati (§3.3).
 
 ### 7.2 Attivazione delle truppe — Confermato
 
@@ -287,19 +319,24 @@ Le truppe in attesa vengono verificate di nuovo quando il mana torna disponibile
 
 ### 7.4 Produzione durante lo scontro
 
-Gli edifici producono mana durante il combattimento in una **riserva condivisa** (base del primo prototipo). Ritmi individuali di produzione sono la soluzione operativa proposta; quantità e tempi restano configurabili.
+Gli edifici producono mana durante il combattimento in una **riserva condivisa** (base del primo prototipo).
 
-**Da definire:** uno o più tipi di mana, vincoli di compatibilità, produzione iniziale, capienza e interazioni che alterano la riserva.
+**Confermato:** ogni edificio produce con un **ritmo individuale**, esattamente come il cooldown di una truppa (una quantità di mana ogni intervallo). Come le truppe, gli edifici iniziano lo scontro con l’intervallo pieno: il primo mana arriva allo scadere del primo intervallo. Quantità e tempi restano configurabili.
 
-### 7.5 Tempistiche e casi limite — Da definire
+**Da definire:** vincoli di compatibilità fra tipi di mana (§5.3), capienza e interazioni che alterano la riserva.
 
-- Cooldown inizialmente pieno oppure unità pronte a inizio battaglia.
-- Ordine di risoluzione fra produzione, attacchi ed effetti simultanei.
-- Risoluzione simultanea e doppio azzeramento della Resistenza (legato al pareggio, §3.4).
-- Durata massima della battaglia e regola contro gli stalli.
-- Pausa, velocità e possibilità di saltare la visualizzazione.
+### 7.5 Tempistiche e casi limite
 
-La simulazione non deve dipendere dalla velocità grafica del dispositivo, per ottenere scontri riproducibili (requisito tecnico proposto).
+| Regola | Stato |
+|---|---|
+| Truppe ed edifici iniziano la battaglia con cooldown e intervallo di produzione **pieni** | Confermato |
+| Nello stesso istante si risolve **prima la produzione di mana**, poi l’attivazione delle truppe | Confermato |
+| Le due nazioni agiscono **in contemporanea**; se entrambe arrivano a Resistenza zero nello stesso istante, lo scontro è un pareggio (§3.4) | Confermato |
+| **Logoramento** contro gli stalli: dopo **45 secondi** di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo (ispirato alla tempesta di sabbia di The Bazaar) | Confermato; forma del danno placeholder (§16.3) |
+| **Nessuna casualità** nella battaglia | Confermato |
+| Pausa, cambio di velocità e possibilità di saltare la visualizzazione | Confermato, presenti nel prototipo |
+
+La simulazione non deve dipendere dalla velocità grafica del dispositivo, per ottenere scontri riproducibili.
 
 ## 8. Linguaggio degli effetti e modificatori — Proposta
 
@@ -336,6 +373,8 @@ I nomi tematici sono suggeriti dal creatore al posto dei termini generici del ge
 | Disattivazione | **Sabotaggio** (al posto di Distruggi) | Impedisce o ritarda l’attivazione di un elemento, senza eliminarlo. | Proposta |
 | Eliminazione | **Uccidi** | Rimuove un elemento dallo scontro. | Spunto: oggi gli elementi non vengono eliminati in battaglia (§7.1), quindi richiede una modifica del nucleo. |
 
+Il primo prototipo usa **solo la famiglia Danno**; le altre famiglie verranno valutate in seguito.
+
 Il rapporto fra Corruzione come erosione e Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
 
 ---
@@ -370,7 +409,7 @@ La **Ricerca si conserva e viene spesa** per avanzare quando il giocatore può p
 
 ### 10.2 Base di lavoro — Proposta
 
-Tre ere iniziali, con nomi di lavoro “Fondazione”, “Sviluppo” e “Ascesa”.
+Tre ere iniziali, con nomi di lavoro “Fondazione”, “Sviluppo” e “Ascesa” (placeholder). Costi placeholder.
 
 Una nuova era sblocca offerte e possibilità di miglioramento. Gli elementi posseduti restano utilizzabili e non migliorano automaticamente: il vantaggio tecnologico richiede anche la capacità economica di acquistare ciò che viene sbloccato.
 
@@ -378,12 +417,13 @@ Le ere sono anche il veicolo proposto per P2a (effetti forti solo in ere avanzat
 
 ### 10.3 Questioni aperte
 
-- Costo delle ere e andamento fra un’era e la successiva.
-- Momento preciso in cui è possibile pagare l’avanzamento.
-- Eventuale consumo di un’opportunità per avanzare.
+**Confermato:** l’avanzamento si può pagare in entrambe le macrofasi e non consuma un’opportunità. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+
+**Da definire:**
+
+- Costo definitivo delle ere e andamento fra un’era e la successiva.
 - Tecnologie individuali, albero di ricerca o specializzazioni.
 - Rapporto fra ricerca e identità della civiltà.
-- Persistenza delle offerte delle ere precedenti.
 
 Per la prima prova è prevista la sola progressione delle ere, senza albero tecnologico.
 
@@ -405,7 +445,7 @@ L’avversario viene fissato prima delle occasioni di spionaggio e rimane lo ste
 
 La scarsità di avversari nei primi tempi non è considerata un problema: il creatore popolerà il gioco con fantasmi ricavati dalle proprie partite sulla versione definitiva. I playtest diventano così avversari utili.
 
-Per il primo prototipo si usano avversari locali di prova (§16.3); non costituiscono multiplayer online.
+Per il primo prototipo si usano avversari locali di prova (§16.3); non costituiscono multiplayer online. Il salvataggio della propria nazione come fantasma è rimandato a dopo il prototipo.
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
@@ -483,6 +523,8 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 
 **Piattaforma — Confermato:** PC. Una fila fino a 12 truppe e una fino a 10 edifici condizionano comunque inquadratura e layout.
 
+**Confermato:** risoluzione di riferimento 1920×1080; interfaccia in italiano. Il primo prototipo parte con un’**interfaccia semplice e provvisoria** per provare le regole; la plancia 3D arriva in un secondo momento.
+
 ---
 
 # PARTE III — RISERVA DI SPUNTI
@@ -495,8 +537,7 @@ Idee annotate per il futuro. Non vanno implementate nella base; la base non deve
 | Malus che porta il nome della nazione che lo ha inflitto | Creatore | Non sempre presente: effetto speciale di certi perk o abilità legati a razza e identità. Usa il campo Origine (§8.2). |
 | Eventi a scelta con testo e opzioni | Creatore | Seconda forma degli incontri del mondo, dopo gli scontri automatici. |
 | Diplomazia come accordi o diserzioni | Creatore | Vedi §13.3. |
-| Edificio che concede spazi (es. caserma per le truppe) | Creatore | Ipotesi per §6.3. |
-| Ricompense di era che espandono la plancia | Creatore | Ipotesi per §6.3. |
+| Più tipi di mana per colore e tema (rosso guerra, blu diplomazia, verde ricchezza) | Creatore | Direzione in §5.3; modifica del nucleo quando introdotti. |
 | Identità emergente (cultura e credo dagli eventi) | Proposta precedente | Non confermata; vedi §9. |
 | Nemesi: ritrovare più avanti una copia dello stesso giocatore che ci ha sconfitto | Proposta di Claude | Non discussa. Dà continuità narrativa agli avversari in un contesto asincrono. |
 | Scudo, cura e riduzione del danno | Proposta precedente | Non confermati e non richiesti dalla prima simulazione. |
@@ -516,21 +557,22 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 ### 15.2 Funzioni da includere
 
 - Nuova run con dotazione iniziale comune.
-- Quattro spazi edificio e tre spazi truppa.
-- Due macrofasi con raccolta automatica all’ingresso.
-- Magazzino persistente e acquisti.
+- Run di prova di 3 anni completi (§16.3).
+- Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
+- Due macrofasi con raccolta automatica all’ingresso e 3 opportunità ciascuna.
+- Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
-- Riordino delle truppe prima dello scontro.
+- Riordino delle truppe fuori dal combattimento.
 - Fantasma locale fissato per l’anno.
 - Produzione di mana e attivazioni automatiche.
 - Resistenza, esito e progressione della run.
-- Incontri del mondo come scontri automatici contro plance generate, con conseguenze leggere in caso di sconfitta.
-- Interfaccia di controllo leggibile, con il motivo dell’attesa delle truppe.
+- Incontri del mondo come scontri automatici contro plance generate (scelta fra 3), con Oro dimezzato in caso di sconfitta e ricompense a scelta in caso di vittoria.
+- Interfaccia provvisoria leggibile, con il motivo dell’attesa delle truppe, pausa, velocità e salto della visualizzazione.
 - Valori separati dal codice della simulazione.
 
 ### 15.3 Sistemi successivi
 
-Proposta di ordine: vendita e sostituzione, espansione della plancia, modificatori pluriennali, opportunità alternative complete, identità della civiltà, eventi a scelta, spionaggio e sabotaggi, salvataggi, fantasmi online.
+Proposta di ordine: modificatori pluriennali, opportunità alternative complete, identità della civiltà, eventi a scelta, spionaggio e sabotaggi, salvataggi, fantasmi online.
 
 Rimandare un sistema non significa rimuoverlo dal gioco finale.
 
@@ -538,14 +580,15 @@ Rimandare un sistema non significa rimuoverlo dal gioco finale.
 
 ### 16.1 Scelte operative
 
-- Motore: Godot.
+- Motore: Godot 4.7 (versione di riferimento 4.7.2).
 - Piattaforma di pubblicazione: PC.
 - Linguaggio: GDScript, con tipi statici e sintassi di Godot 4 (niente sintassi di Godot 3) — Confermato.
 - Il codice è scritto da Claude Code; editor esterno: Cursor collegato a Godot con l’estensione Godot Tools.
 - Simulazione a tick fissi e con valori interi (mana, cooldown in millisecondi, Resistenza), per scontri identici su ogni macchina: Proposta tecnica.
-- Sviluppo e test principali: altro PC del creatore.
+- Sviluppo e test principali: nuovo PC Windows del creatore, con Godot 4.7 e Cursor collegato tramite Godot Tools.
+- Claude Code verifica script e test con Godot 4.7.2 nel proprio ambiente di lavoro.
+- Test automatici delle regole con **GUT** (Godot Unit Test), dipendenza approvata dal creatore. Ogni nuova dipendenza va chiesta prima.
 - Collaborazione e modifiche: repository GitHub separato da Satze, `Bazelguese/Ultralopolis`.
-- Non è necessario installare Godot su questo PC per preparare o modificare i sorgenti.
 
 Questo documento non comporta caricamenti sul repository né modifiche della sua visibilità.
 
@@ -565,21 +608,22 @@ Questo documento non comporta caricamenti sul repository né modifiche della sua
 
 La separazione fra simulazione e presentazione permette di verificare le regole anche quando la grafica cambia. Il componente Modificatori è il punto in cui si innestano malus, perk ed effetti futuri senza modificare la simulazione.
 
-### 16.3 Convenzioni della bozza di codice, non approvate
+### 16.3 Convenzioni provvisorie del prototipo, non approvate
 
 | Convenzione | Stato |
 |---|---|
-| Due opportunità per macrofase | Placeholder per rendere navigabile il ciclo. |
-| Acquisti da catalogo fisso | Semplificazione; non rappresenta le opportunità alternative finali. |
-| Sostituzione senza rimborso | Temporanea; da rivedere con priorità (§6.4). |
-| Avanzamento di era nelle due fasi, senza consumare opportunità | Temporanea. |
-| Tre ere e relativo catalogo | Base di prova. |
-| Tick di 100 ms e cooldown inizialmente pieni | Convenzione della simulazione. |
-| Logoramento dopo 60 secondi | Misura temporanea contro gli stalli. |
-| Pareggio senza vittorie né perdita di Prestigio | Provvisoria; il pareggio resta da definire. |
+| Run di prova di 3 anni completi | Limite del prototipo; la run completa resta di 10 vittorie (§3.4). |
+| Pool di offerte basato solo sull’era (l’identità non esiste ancora) | Semplificazione del prototipo. |
+| Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
+| Tre ere e relativo catalogo | Base di prova; nomi, costi e statistiche placeholder. |
+| Tick di 100 ms | Convenzione della simulazione. |
+| Danno del logoramento: a partire da 45 secondi, danno a entrambe le nazioni che cresce a ogni secondo (1, 2, 3…) | Placeholder. |
+| Valori della Resistenza (era, anni, edifici, truppe) e Resistenza fissa delle plance generate | Placeholder. |
+| Costo del rinnovo delle offerte e suo aumento | Placeholder. |
 | Avversari locali determinati dall’anno | Sostituto del futuro servizio di fantasmi. |
+| Interfaccia semplice e provvisoria al posto della plancia 3D | Fase iniziale del prototipo (§14.3). |
 
-Tutti gli esempi di carte e statistiche della bozza restano modificabili.
+Tutti gli esempi di carte e statistiche restano modificabili.
 
 ## 17. Verifica delle meccaniche
 
@@ -595,6 +639,13 @@ Criteri di accettazione proposti per il prototipo:
 | Più truppe pronte | Valutazione da destra a sinistra. |
 | Prima truppa troppo costosa | Saltata; la successiva può usare il mana disponibile. |
 | Truppa a costo zero | Si attiva senza mana al termine del cooldown. |
+| Inizio battaglia | Cooldown e intervalli di produzione pieni; mana a zero. |
+| Stesso istante | Prima la produzione di mana, poi le attivazioni. |
+| Logoramento | Nessun danno prima di 45 secondi; poi danno crescente a entrambe le nazioni. |
+| Doppio azzeramento | Pareggio: vittoria aggiunta, nessuna perdita di Prestigio, malus del fantasma applicati. |
+| Resistenza | Somma di era, identità, anni, edifici e truppe all’inizio dello scontro. |
+| Vendita | Rimborso pari a metà del prezzo pagato, arrotondato per difetto. |
+| Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo. |
 | Avvio di un nuovo combattimento | Resistenza ripristinata; mana secondo la convenzione scelta. |
 | Sconfitta nell’anno N | Perdita di N Prestigio, salvo ultima possibilità già attiva. |
 | Prima discesa a zero Prestigio | Run ancora attiva in ultima possibilità. |
@@ -602,7 +653,8 @@ Criteri di accettazione proposti per il prototipo:
 | Decima vittoria | Fine della run con successo. |
 | Modificatore pluriennale (quando introdotto) | Applicato per la durata prevista e poi rimosso; esempio: Ricerca dimezzata per un anno. |
 | Scontro contro plancia generata | Stessa simulazione e stesse regole dello scontro contro un fantasma. |
-| Sconfitta contro un incontro del mondo | Conseguenza dello stesso tipo della sconfitta annuale, di entità inferiore; nessuna vittoria della run modificata. |
+| Sconfitta contro un incontro del mondo | Oro del Magazzino dimezzato (per difetto); Prestigio e vittorie invariati; durante l’ultima possibilità la run termina. |
+| Vittoria contro un incontro del mondo | Il giocatore può scegliere una ricompensa dal pool dell’incontro, oppure nessuna. |
 | Spionaggio (futuro) | Informazione relativa alla copia effettivamente affrontata. |
 
 Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il motivo di una mancata attivazione è leggibile? Investire in Ricerca è un’alternativa credibile? Le due fasi offrono decisioni diverse? L’economia può riprendersi dopo una sconfitta? Un malus fa cambiare piano o si limita a pesare?
@@ -611,14 +663,11 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 
 | Priorità | Questione |
 |---|---|
-| Prima del test del ciclo | Cooldown iniziale, mana iniziale, risoluzione simultanea. |
-| Prima del test del ciclo | Pareggi e prevenzione degli stalli. |
-| Prima del test delle scelte | Numero di opportunità per fase e alternative presentate. |
-| Prima dei malus pluriennali | Vendita, sostituzione e rimborso (§6.4). |
-| Prima di sviluppare il catalogo | Riserva, duplicati, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
-| Prima del test del ciclo | Incontri del mondo: numero e posizione nell’anno, ricompense, entità della conseguenza leggera, comportamento durante l’ultima possibilità. |
-| Prima di ampliare la plancia | Meccanismo di espansione degli spazi (§6.3); piattaforma e layout. |
-| Prima di ampliare la ricerca | Numero e identità delle ere; momento e costo del passaggio. |
+| Prima del test delle scelte | Numero di alternative mostrate in ogni opportunità (§4.2). |
+| Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
+| Prima di ampliare la plancia | Quantità e prezzi di ciascuna via di espansione (§6.3); layout. |
+| Prima di ampliare la ricerca | Numero e identità definitive delle ere; costo del passaggio. |
+| Prima di più tipi di mana | Colori, temi e vincoli di compatibilità (§5.3). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
 | Per lo spionaggio | Informazioni visibili, costi, bersagli, effetti, contromisure. |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
@@ -653,6 +702,20 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.6 — 4 novembre 2026**
+- Pareggio confermato: conta come vittoria, ma applica i malus del fantasma (§3.4).
+- Incontri del mondo: uno per anno fra Produzione e Preparazione, scelta fra 3, Oro dimezzato in caso di sconfitta, fine run se si perde in ultima possibilità, ricompense a scelta da un pool ristretto (§3.3, §4.1).
+- Opportunità: 3 per fase, offerte pescate a caso da un pool, possibilità di passare e di rinnovare pagando Oro con costo crescente (§4.2).
+- Mana iniziale zero confermato; direzione per più tipi di mana per colore (§5.3).
+- Riordino delle truppe fuori dal combattimento, copie multiple ammesse (§6.1).
+- Espansione della plancia con ere, edifici e acquisto con Oro (§6.3); vendita con rimborso dimezzato (§6.4).
+- Calcolo della Resistenza da era, identità, anni, edifici e truppe (§7.1.1).
+- Produzione degli edifici a ritmo individuale come i cooldown; tempistiche della battaglia confermate; logoramento dopo 45 secondi; nessuna casualità in battaglia (§7.4, §7.5).
+- Solo Danno nel prototipo (§8.3); avanzamento di era senza consumare opportunità, offerte delle ere precedenti non disponibili (§10).
+- Chiarito che la bozza di codice citata in precedenza non esiste; §16.3 diventa l’elenco delle convenzioni provvisorie del prototipo (§0.3).
+- Interfaccia provvisoria 1920×1080 in italiano; nuovo PC Windows; GUT approvato per i test (§14.3, §16.1).
+- Aggiornate le convenzioni del prototipo, i criteri di verifica e le decisioni aperte (§16.3, §17, §18).
 
 **v0.5 — 4 novembre 2026**
 - Confermato GDScript come linguaggio, con esportazione nativa per PC (§16.1).
