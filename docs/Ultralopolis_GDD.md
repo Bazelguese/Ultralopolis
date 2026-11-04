@@ -177,9 +177,9 @@ La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogn
 | Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
 | Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
 | Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo e continua a crescere fra un’opportunità e l’altra | Confermato; valori placeholder |
-| A ogni nuova opportunità il costo di rinnovo accumulato **si dimezza** | Confermato; dettagli del calcolo da definire |
+| A ogni nuova opportunità si dimezza l’**aumento accumulato** del costo di rinnovo (arrotondato per difetto); il costo non scende mai sotto quello iniziale. Esempio: costo iniziale 1, +1 a rinnovo; dopo 4 rinnovi il costo è 5 (aumento +4); all’opportunità successiva l’aumento diventa +2 e il costo 3 | Confermato |
 
-**Da definire:** contenuto dei negozi, frequenza degli eventi, dettagli del dimezzamento del costo di rinnovo (arrotondamento, valore minimo).
+**Da definire:** contenuto dei negozi, frequenza degli eventi.
 
 ## 5. Economia
 
@@ -621,6 +621,9 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Tick di 100 ms | Convenzione della simulazione. |
 | Danno del logoramento: a partire da 45 secondi, danno a entrambe le nazioni che cresce a ogni secondo (1, 2, 3…) | Placeholder. |
 | Valori della Resistenza (era, anni, edifici, truppe) e Resistenza fissa delle plance generate | Placeholder. |
+| Quota degli anni nella Resistenza: l’anno N vale N volte X (l’anno 1 dà già X) | Convenzione. |
+| Edifici e truppe danno nella Resistenza una quota fissa uguale per tutti; l’effetto dei perk arriverà con i modificatori | Semplificazione del prototipo. |
+| Limite tecnico di sicurezza: uno scontro che supera un’ora simulata viene interrotto (solo con dati sbagliati; con il logoramento non accade) | Protezione tecnica, non regola di gioco. |
 | Costo del rinnovo delle offerte e suo aumento | Placeholder. |
 | Avversari locali determinati dall’anno | Sostituto del futuro servizio di fantasmi. |
 | Interfaccia semplice e provvisoria al posto della plancia 3D | Fase iniziale del prototipo (§14.3). |
@@ -707,7 +710,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 **v0.6 — 4 novembre 2026**
 - Pareggio confermato: conta come vittoria, ma applica i malus del fantasma (§3.4).
 - Incontri del mondo: uno per anno fra Produzione e Preparazione, scelta fra 3, Oro dimezzato in caso di sconfitta, fine run se si perde in ultima possibilità, ricompense a scelta da un pool ristretto (§3.3, §4.1).
-- Opportunità: 3 per fase con 3 alternative ciascuna, offerte pescate a caso da un pool, possibilità di passare e di rinnovare pagando Oro con costo crescente che si dimezza a ogni nuova opportunità (§4.2).
+- Opportunità: 3 per fase con 3 alternative ciascuna, offerte pescate a caso da un pool, possibilità di passare e di rinnovare pagando Oro con costo crescente il cui aumento si dimezza a ogni nuova opportunità, senza scendere sotto il costo iniziale (§4.2).
 - Mana iniziale zero confermato; direzione per più tipi di mana per colore (§5.3).
 - Riordino delle truppe fuori dal combattimento, copie multiple ammesse (§6.1).
 - Espansione della plancia con ere, edifici e acquisto con Oro (§6.3); vendita con rimborso dimezzato (§6.4).
