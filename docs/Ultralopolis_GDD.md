@@ -659,6 +659,13 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Costo del rinnovo delle offerte e suo aumento | Placeholder. |
 | Avversari locali determinati dall’anno | Sostituto del futuro servizio di fantasmi. |
 | Interfaccia semplice e provvisoria al posto della plancia 3D | Fase iniziale del prototipo (§14.3). |
+| Intensità dei malus: Oro e Ricerca −50%, intervallo di mana e ricarica +50%, rinnovo +2 Oro, −1 alternativa | Placeholder. |
+| Il bersaglio a caso di un malus (edificio o truppa) si sceglie quando il malus arriva, con il seme della run | Provvisoria. |
+| Se l’elemento colpito viene venduto o sostituito, il malus finisce | Provvisoria. |
+| Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
+| Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
+| Almeno 1 alternativa per opportunità; costo di rinnovo mai sotto 0 | Provvisoria. |
+| Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
