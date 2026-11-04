@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.12
+## Game Design Document — v0.13
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.12 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.13 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -142,7 +142,7 @@ Esempio: perdere nell’anno 3 costa 3 Prestigio; perdere nell’anno 8 costa 8.
 
 Non sono previste per ora regole per recuperare Prestigio o ricompense speciali all’attivazione dell’ultima possibilità.
 
-**Pareggio — Confermato.** Il pareggio (doppio azzeramento della Resistenza nello stesso istante, §7.5) conta come **vittoria**: aggiunge una vittoria e non fa perdere Prestigio. Il giocatore però subisce, come in una sconfitta, i **malus che il fantasma infligge** (le conseguenze lasciate dalle armi avversarie, §11.1 e §13.2). Durante l’ultima possibilità un pareggio quindi non termina la run. Nel primo prototipo i fantasmi non infliggono malus, perciò il pareggio equivale a una vittoria.
+**Pareggio — Confermato.** Il pareggio (entrambe le nazioni cadono nello stesso istante, per Resistenza a zero o per Corruzione, §7.5 e §7.6) conta come **vittoria**: aggiunge una vittoria e non fa perdere Prestigio. Il giocatore però subisce, come in una sconfitta, i **malus che il fantasma infligge** (le conseguenze lasciate dalle armi avversarie, §11.1 e §13.2). Durante l’ultima possibilità un pareggio quindi non termina la run. Nel primo prototipo i fantasmi non infliggono malus, perciò il pareggio equivale a una vittoria.
 
 **Da definire:** conseguenze di abbandono e trattamento dei combattimenti che non terminano.
 
@@ -342,7 +342,7 @@ La stessa simulazione regola gli scontri contro i fantasmi e, nella proposta att
 
 ### 7.1 Obiettivo — Confermato
 
-Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro.
+Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro. Si perde anche quando la **Corruzione** accumulata raggiunge la Resistenza (§7.6.3).
 
 Truppe ed edifici non hanno punti vita individuali e non vengono eliminati durante la battaglia nella base.
 
@@ -395,6 +395,8 @@ Gli edifici producono mana durante il combattimento in una **riserva condivisa**
 
 Ogni colore ha la sua riserva; il mana energetico copre qualsiasi colore (§5.3).
 
+Oltre al mana, un edificio può produrre scudo, cura e Corruzione (§7.6.5): allo scadere del suo **unico intervallo** produce tutto insieme — Confermato.
+
 **Da definire:** capienza della riserva e interazioni che la alterano.
 
 ### 7.5 Tempistiche e casi limite
@@ -402,13 +404,75 @@ Ogni colore ha la sua riserva; il mana energetico copre qualsiasi colore (§5.3)
 | Regola | Stato |
 |---|---|
 | Truppe ed edifici iniziano la battaglia con cooldown e intervallo di produzione **pieni** | Confermato |
-| Nello stesso istante si risolve **prima la produzione di mana**, poi l’attivazione delle truppe | Confermato |
-| Le due nazioni agiscono **in contemporanea**; se entrambe arrivano a Resistenza zero nello stesso istante, lo scontro è un pareggio (§3.4) | Confermato |
+| Nello stesso istante si risolve **prima la produzione di mana**, poi l’attivazione delle truppe; l’ordine completo è in §7.6.6 | Confermato |
+| Le due nazioni agiscono **in contemporanea**; se entrambe cadono nello stesso istante (Resistenza a zero o Corruzione, §7.6.3), lo scontro è un pareggio (§3.4) | Confermato |
 | **Logoramento** contro gli stalli: dopo **45 secondi** di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo (ispirato alla tempesta di sabbia di The Bazaar) | Confermato; forma del danno placeholder (§16.3) |
+| Il logoramento è un danno come gli altri: viene **assorbito dallo scudo** e le cure lo compensano (§7.6) | Confermato (v0.13) |
 | **Nessuna casualità** nella battaglia | Confermato |
 | Pausa, cambio di velocità e possibilità di saltare la visualizzazione | Confermato, presenti nel prototipo |
 
 La simulazione non deve dipendere dalla velocità grafica del dispositivo, per ottenere scontri riproducibili.
+
+### 7.6 Difesa, Corruzione e Assedio — Confermato (modifica del nucleo, v0.13)
+
+Oltre al danno, la battaglia conosce due forme di difesa (**Scudo** e **Cura**), un modo diverso di vincere (**Corruzione**) e un contro dedicato agli scudi (**attacco d’assedio**). Insieme formano un triangolo: nessuna difesa vale contro tutto.
+
+| | contro il Danno | contro la Corruzione |
+|---|---|---|
+| Scudo | Assorbe | Inutile |
+| Cura | Recupera la Resistenza persa | Allontana la soglia, alzando la Resistenza |
+| Attacco d’assedio | Serve solo a togliere lo scudo avversario | — |
+
+Scudo e cura sono disponibili **dalla prima era**. Nessuno di questi effetti ha un legame fisso con temi, risorse o etichette, salvo l’attacco d’assedio (§7.6.4): si decide elemento per elemento nel catalogo. Tutti i valori sono placeholder (§16.3).
+
+#### 7.6.1 Scudo
+
+- Ogni nazione ha una **riserva di scudo unica**, come la riserva di mana; le truppe non hanno punti vita individuali (§7.1).
+- Lo scudo **parte da zero** a inizio scontro.
+- Il danno colpisce **prima lo scudo** e solo ciò che avanza arriva alla Resistenza.
+- Lo scudo **resta finché non viene consumato** e **non ha tetto**.
+- Anche il logoramento viene assorbito dallo scudo (§7.5).
+
+#### 7.6.2 Cura
+
+- Una cura ridà Resistenza persa, **mai oltre la Resistenza massima**.
+- Nessuna regola speciale contro gli scontri che si trascinano: il logoramento cresce a ogni secondo e prima o poi supera qualsiasi cura.
+- Conseguenza dell’ordine dell’istante (§7.6.6): una cura arrivata su Resistenza piena va persa, anche se nello stesso istante arriva un colpo.
+
+#### 7.6.3 Corruzione
+
+- Ogni nazione ha un contatore di **Corruzione** che parte da zero e **si accumula** durante lo scontro.
+- Quando la Corruzione è **pari o superiore alla Resistenza attuale**, la nazione perde lo scontro.
+- La Corruzione **non tocca lo scudo** e lo scudo non la ferma: è il contro naturale di una nazione molto difensiva.
+- La Corruzione **non scende mai** durante lo scontro. L’unica risposta è alzare la Resistenza con la cura.
+- Danno e Corruzione lavorano a tenaglia: il danno abbassa la Resistenza, la Corruzione sale verso di essa.
+
+La Corruzione sostituisce la precedente proposta di un’erosione continua simile al veleno (§8.3).
+
+#### 7.6.4 Attacco d’assedio
+
+- Solo le truppe con etichetta **Assedio** (§6.6) possono avere un attacco d’assedio.
+- È un **secondo valore** della truppa, il danno agli scudi, che colpisce **solo lo scudo**, prima del danno normale. Esempio placeholder: Arieti, 10 agli scudi + 3 di danno.
+- Se l’avversario non ha scudo, il danno agli scudi va perso.
+- La truppa paga il suo normale costo in mana all’attivazione, come ogni altra truppa (§7.2).
+
+#### 7.6.5 Fonti
+
+| Fonte | Che cosa può produrre |
+|---|---|
+| Edificio | Allo scadere del suo unico intervallo (§7.4): mana, scudo, cura e Corruzione all’avversario, **in qualsiasi combinazione**. |
+| Truppa | All’attivazione: danno, scudo, cura e Corruzione all’avversario, **in qualsiasi combinazione**; le truppe Assedio anche il danno agli scudi. |
+
+La libertà delle combinazioni sposta il peso sul bilanciamento del catalogo: un elemento misto non deve essere migliore su tutti i fronti (P3).
+
+#### 7.6.6 Ordine dentro lo stesso istante
+
+1. Gli edifici che hanno finito l’intervallo producono mana, scudo, cura e Corruzione.
+2. Le truppe pronte si attivano da destra verso sinistra (§7.3).
+3. Si applicano le cure e lo scudo nuovo.
+4. Il danno agli scudi (attacco d’assedio) toglie scudo.
+5. Il danno normale e il logoramento colpiscono lo scudo, poi la Resistenza.
+6. Alla **fine dell’istante** si controlla chi è caduto: Resistenza a zero, oppure Corruzione pari o superiore alla Resistenza. Se cadono entrambe le nazioni, è un pareggio (§3.4).
 
 ## 8. Linguaggio degli effetti e modificatori — Proposta
 
@@ -460,15 +524,17 @@ I nomi tematici sono suggeriti dal creatore al posto dei termini generici del ge
 
 | Famiglia | Nome tematico proposto | Funzione | Stato |
 |---|---|---|---|
-| Danno | — | Riduce la Resistenza avversaria. | Base |
-| Erosione | **Corruzione** (al posto di Veleno) | Riduzione continua nel tempo. | Proposta |
+| Danno | — | Riduce la Resistenza avversaria (prima lo scudo, §7.6.1). | Base |
+| Danno agli scudi | **Attacco d’assedio** | Toglie solo scudo, prima del danno normale; solo truppe Assedio (§7.6.4). | Confermato (v0.13) |
+| Difesa | **Scudo**, **Cura** | Assorbe il danno; ridà Resistenza persa (§7.6.1, §7.6.2). | Confermato (v0.13) |
+| Accumulo | **Corruzione** (al posto di Veleno) | Contatore che sconfigge la nazione quando raggiunge la Resistenza (§7.6.3). Sostituisce la precedente proposta di erosione continua. | Confermato (v0.13) |
 | Rallentamento | **Inefficienza** (al posto di Rallentamento) | Allunga cooldown o ritmo di produzione; applicata a un edificio produttore di mana è particolarmente tematica. | Proposta |
 | Disattivazione | **Sabotaggio** (al posto di Distruggi) | Impedisce o ritarda l’attivazione di un elemento, senza eliminarlo. | Proposta |
 | Eliminazione | **Uccidi** | Rimuove un elemento dallo scontro. | Spunto: oggi gli elementi non vengono eliminati in battaglia (§7.1), quindi richiede una modifica del nucleo. |
 
-Il primo prototipo usa **solo la famiglia Danno**; le altre famiglie verranno valutate in seguito.
+Il primo prototipo usa per ora **solo la famiglia Danno**. Difesa, Corruzione e attacco d’assedio sono confermati nel design; quando introdurli nel prototipo è da decidere. Inefficienza e Sabotaggio verranno valutati in seguito.
 
-Il rapporto fra Corruzione come erosione e Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
+Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzioni resta una proposta (§13.3).
 
 ---
 
@@ -602,7 +668,7 @@ Durata, origine e cumulabilità dei malus del prototipo sono fissate in §8.2.1.
 
 ### 13.3 Corruzione e diplomazia
 
-Il creatore ha suggerito Corruzione o Diplomazia come reinterpretazioni tematiche di effetti simili al veleno. La distinzione fra corruzione come erosione e diplomazia come sistema di accordi o diserzioni è una proposta, non una decisione.
+Il creatore ha suggerito Corruzione o Diplomazia come reinterpretazioni tematiche di effetti simili al veleno. Dalla v0.13 la Corruzione in battaglia è un accumulo che sconfigge la nazione quando raggiunge la Resistenza (§7.6.3), non più un’erosione. La Diplomazia come sistema di accordi o diserzioni resta una proposta, non una decisione.
 
 ### 13.4 Struttura dati di un evento — Proposta
 
@@ -639,7 +705,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
 | Ricerca | Costo della prossima era e risorsa disponibile. |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
-| Battaglia | Resistenza delle due parti, mana, cooldown, unità in attesa e motivo dell’attesa. |
+| Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa. |
 | Esito | Risultato, perdita di Prestigio, vittorie, conseguenze. |
 
 **Piattaforma — Confermato:** PC. Una fila fino a 12 truppe e una fino a 10 edifici condizionano comunque inquadratura e layout.
@@ -670,7 +736,7 @@ Idee annotate per il futuro. Non vanno implementate nella base; la base non deve
 | Più tipi di mana per colore e tema (rosso guerra, blu diplomazia, verde ricchezza) | Creatore | Direzione in §5.3; modifica del nucleo quando introdotti. |
 | Identità emergente (cultura e credo dagli eventi) | Proposta precedente | Non confermata; vedi §9. |
 | Nemesi: ritrovare più avanti una copia dello stesso giocatore che ci ha sconfitto | Proposta di Claude | Non discussa. Dà continuità narrativa agli avversari in un contesto asincrono. |
-| Scudo, cura e riduzione del danno | Proposta precedente | Non confermati e non richiesti dalla prima simulazione. |
+| Riduzione del danno a ogni colpo | Proposta precedente | Scudo e cura sono confermati dalla v0.13 (§7.6); la riduzione per colpo resta uno spunto. Punirebbe gli eserciti di truppe veloci e deboli. |
 | Recupero del Prestigio | — | Nessuna regola prevista. |
 | Progressione fra run | — | Non definita. |
 
@@ -779,6 +845,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
 | Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
+| Valori di scudo, cura, Corruzione e danno agli scudi di edifici e truppe | Placeholder. |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -800,6 +867,12 @@ Criteri di accettazione proposti per il prototipo:
 | Stesso istante | Prima la produzione di mana, poi le attivazioni. |
 | Logoramento | Nessun danno prima di 45 secondi; poi danno crescente a entrambe le nazioni. |
 | Doppio azzeramento | Pareggio: vittoria aggiunta, nessuna perdita di Prestigio, malus del fantasma applicati. |
+| Scudo | Parte da zero; assorbe il danno prima della Resistenza; resta finché non viene consumato, senza tetto. |
+| Logoramento con scudo | Il danno del logoramento viene assorbito dallo scudo. |
+| Cura | Ridà Resistenza senza superare il massimo; nello stesso istante si applica prima del danno. |
+| Corruzione | Sconfitta quando è pari o superiore alla Resistenza attuale, anche con scudo pieno; non scende mai. |
+| Attacco d’assedio | Toglie solo scudo, prima del danno normale; senza scudo va perso; solo truppe Assedio. |
+| Caduta simultanea per danno e Corruzione | Pareggio. |
 | Resistenza | Somma di era, identità, anni, edifici e truppe all’inizio dello scontro. |
 | Vendita | Rimborso pari a metà del prezzo pagato, arrotondato per difetto. |
 | Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo e si dimezza a ogni nuova opportunità. |
@@ -850,6 +923,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Mana | Risorsa prodotta in battaglia e spesa per attivare le truppe. |
 | Cooldown | Tempo di attesa fra due attivazioni. |
 | Resistenza | Capacità della nazione di sopravvivere al singolo scontro. |
+| Scudo | Riserva di battaglia che assorbe il danno prima della Resistenza. |
+| Cura | Effetto che ridà Resistenza persa, senza superare il massimo. |
+| Corruzione | Contatore di battaglia che sconfigge la nazione quando raggiunge la Resistenza. |
+| Attacco d’assedio | Danno che colpisce solo lo scudo; proprio delle truppe Assedio. |
 | Prestigio | Risorsa che determina la sopravvivenza della run dopo le sconfitte. |
 | Fantasma | Copia di una nazione avversaria usata per uno scontro asincrono. |
 | Era | Livello di sviluppo tecnologico raggiunto spendendo Ricerca. |
@@ -860,6 +937,13 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.13 — 4 novembre 2026** (modifica del nucleo)
+- Nuova §7.6: Scudo e Cura (famiglia Difesa), Corruzione come accumulo che sconfigge quando raggiunge la Resistenza, attacco d’assedio che colpisce solo gli scudi (solo truppe Assedio).
+- Edifici e truppe possono produrre mana, scudo, cura e Corruzione in qualsiasi combinazione; un edificio produce tutto allo scadere del suo unico intervallo (§7.4, §7.6.5).
+- Il logoramento viene assorbito dallo scudo; ordine completo dentro lo stesso istante (§7.5, §7.6.6).
+- Pareggio anche per caduta simultanea dovuta alla Corruzione (§3.4).
+- Aggiornati famiglie di effetti, riserva di spunti, informazioni di battaglia, convenzioni, criteri di verifica e glossario (§8.3, §13.3, Parte III, §14.3, §16.3, §17, §19).
 
 **v0.12 — 4 novembre 2026** (modifica del nucleo)
 - Nuove risorse: Cibo, Legno, Pietra, Ferro, Fauna, Fede, Influenza; mercato delle risorse a tasso fisso (§5.3).
