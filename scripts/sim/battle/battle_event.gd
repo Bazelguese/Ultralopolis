@@ -8,6 +8,13 @@ enum Kind {
 	ATTIVAZIONE,       ## Una truppa si è attivata e ha inflitto danno.
 	IN_ATTESA_MANA,    ## Una truppa è pronta ma non c'è abbastanza mana.
 	LOGORAMENTO,       ## Il logoramento ha colpito questa nazione.
+	SCUDO,             ## Scudo aggiunto alla riserva di questa nazione.
+	CURA,              ## Resistenza recuperata da questa nazione.
+	CORRUZIONE,        ## Corruzione inflitta a questa nazione.
+	ASSEDIO,           ## Scudo tolto a questa nazione da un attacco d'assedio.
+	RALLENTATO,        ## Un elemento di questa nazione è stato rallentato (index: 0+ edificio, 1000+ truppa).
+	SABOTATO,          ## Un elemento di questa nazione è stato sabotato (index come sopra).
+	IN_SABOTAGGIO,     ## Una truppa pronta non si attiva perché sabotata.
 }
 
 ## Momento dello scontro, in millisecondi dall'inizio.
@@ -43,4 +50,18 @@ func describe() -> String:
 			return "%d ms [%s] truppa %d pronta, in attesa di mana (riserva %d)" % [time_ms, who, index, mana_after]
 		Kind.LOGORAMENTO:
 			return "%d ms [%s] logoramento: %d danni" % [time_ms, who, amount]
+		Kind.SCUDO:
+			return "%d ms [%s] +%d scudo" % [time_ms, who, amount]
+		Kind.CURA:
+			return "%d ms [%s] cura %d" % [time_ms, who, amount]
+		Kind.CORRUZIONE:
+			return "%d ms [%s] subisce %d Corruzione" % [time_ms, who, amount]
+		Kind.ASSEDIO:
+			return "%d ms [%s] perde %d scudo per l'assedio" % [time_ms, who, amount]
+		Kind.RALLENTATO:
+			return "%d ms [%s] elemento %d rallentato per %d ms" % [time_ms, who, index, amount]
+		Kind.SABOTATO:
+			return "%d ms [%s] elemento %d sabotato per %d ms" % [time_ms, who, index, amount]
+		Kind.IN_SABOTAGGIO:
+			return "%d ms [%s] truppa %d sabotata, non si attiva" % [time_ms, who, index]
 	return "%d ms evento sconosciuto" % time_ms

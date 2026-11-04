@@ -98,6 +98,8 @@ var last_battle: BattleSim
 var last_battle_kind: BattleKind = BattleKind.NESSUNA
 var last_opponent_name: String = ""
 var _last_setups: Array[BattleSideSetup] = []
+## Seme dell'ultimo scontro, ricavato dal seme della run, dall'anno e dal tipo di scontro (§16.3).
+var last_battle_seed: int = 0
 
 ## Riepilogo di un anno della run (per la schermata finale).
 class YearRecord:
@@ -495,7 +497,7 @@ func last_battle_setups() -> Array[BattleSideSetup]:
 func make_battle_replay() -> BattleSim:
 	if _last_setups.size() != 2:
 		return null
-	return BattleSim.new(battle_rules, _last_setups[0], _last_setups[1])
+	return BattleSim.new(battle_rules, _last_setups[0], _last_setups[1], last_battle_seed)
 
 
 # --- Azioni delle opportunità -----------------------------------------------
@@ -1032,7 +1034,8 @@ func _refund(piece: BoardPiece) -> void:
 func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> BattleSim.Outcome:
 	var player: BattleSideSetup = BattleSideSetup.new(_battle_buildings(), _battle_troops(), player_resistance())
 	_last_setups = [player, enemy]
-	last_battle = BattleSim.new(battle_rules, player, enemy)
+	last_battle_seed = run_seed * 7919 + year * 104729 + int(kind)
+	last_battle = BattleSim.new(battle_rules, player, enemy, last_battle_seed)
 	last_battle_kind = kind
 	last_opponent_name = opponent_name
 	var outcome: BattleSim.Outcome = last_battle.run_to_end()

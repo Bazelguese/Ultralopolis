@@ -15,6 +15,10 @@ extends Resource
 ## Aumento del danno a ogni colpo successivo (placeholder).
 @export var attrition_damage_increase: int = 1
 
+@export_group("Inefficienza")
+## Velocità del timer di un elemento rallentato, in percentuale (GDD §7.7: metà velocità).
+@export var inefficiency_speed_percent: int = 50
+
 @export_group("Sicurezza")
 ## Protezione tecnica contro dati sbagliati che impedirebbero la fine dello scontro.
 ## Non è una regola di gioco: con il logoramento attivo non dovrebbe mai scattare.
