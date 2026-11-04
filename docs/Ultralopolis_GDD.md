@@ -2,7 +2,7 @@
 ## Game Design Document — v0.6
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo
+**Stato:** base di design (nucleo) per il primo prototipo — v0.6 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -173,11 +173,13 @@ La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogn
 | Regola | Stato |
 |---|---|
 | **3 opportunità** per macrofase | Confermato |
+| Ogni opportunità mostra **3 alternative** | Confermato |
 | Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
 | Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
-| Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo | Confermato; valori placeholder |
+| Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo e continua a crescere fra un’opportunità e l’altra | Confermato; valori placeholder |
+| A ogni nuova opportunità il costo di rinnovo accumulato **si dimezza** | Confermato; dettagli del calcolo da definire |
 
-**Da definire:** numero di alternative mostrate in ogni opportunità, contenuto dei negozi, frequenza degli eventi, se il costo del rinnovo si azzera a ogni opportunità.
+**Da definire:** contenuto dei negozi, frequenza degli eventi, dettagli del dimezzamento del costo di rinnovo (arrotondamento, valore minimo).
 
 ## 5. Economia
 
@@ -645,7 +647,7 @@ Criteri di accettazione proposti per il prototipo:
 | Doppio azzeramento | Pareggio: vittoria aggiunta, nessuna perdita di Prestigio, malus del fantasma applicati. |
 | Resistenza | Somma di era, identità, anni, edifici e truppe all’inizio dello scontro. |
 | Vendita | Rimborso pari a metà del prezzo pagato, arrotondato per difetto. |
-| Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo. |
+| Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo e si dimezza a ogni nuova opportunità. |
 | Avvio di un nuovo combattimento | Resistenza ripristinata; mana secondo la convenzione scelta. |
 | Sconfitta nell’anno N | Perdita di N Prestigio, salvo ultima possibilità già attiva. |
 | Prima discesa a zero Prestigio | Run ancora attiva in ultima possibilità. |
@@ -663,7 +665,6 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 
 | Priorità | Questione |
 |---|---|
-| Prima del test delle scelte | Numero di alternative mostrate in ogni opportunità (§4.2). |
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
 | Prima di ampliare la plancia | Quantità e prezzi di ciascuna via di espansione (§6.3); layout. |
 | Prima di ampliare la ricerca | Numero e identità definitive delle ere; costo del passaggio. |
@@ -706,7 +707,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 **v0.6 — 4 novembre 2026**
 - Pareggio confermato: conta come vittoria, ma applica i malus del fantasma (§3.4).
 - Incontri del mondo: uno per anno fra Produzione e Preparazione, scelta fra 3, Oro dimezzato in caso di sconfitta, fine run se si perde in ultima possibilità, ricompense a scelta da un pool ristretto (§3.3, §4.1).
-- Opportunità: 3 per fase, offerte pescate a caso da un pool, possibilità di passare e di rinnovare pagando Oro con costo crescente (§4.2).
+- Opportunità: 3 per fase con 3 alternative ciascuna, offerte pescate a caso da un pool, possibilità di passare e di rinnovare pagando Oro con costo crescente che si dimezza a ogni nuova opportunità (§4.2).
 - Mana iniziale zero confermato; direzione per più tipi di mana per colore (§5.3).
 - Riordino delle truppe fuori dal combattimento, copie multiple ammesse (§6.1).
 - Espansione della plancia con ere, edifici e acquisto con Oro (§6.3); vendita con rimborso dimezzato (§6.4).
