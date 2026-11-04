@@ -7,6 +7,7 @@ config_version=5
 config/name="Ultralopolis"
 config/description="Gioco strategico asincrono: costruisci la nazione, prepara la plancia, affronta i fantasmi."
 config/features=PackedStringArray("4.7")
+run/main_scene="res://scenes/main.tscn"
 
 [debug]
 

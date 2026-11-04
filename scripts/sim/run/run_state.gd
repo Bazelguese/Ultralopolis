@@ -195,6 +195,11 @@ func reward_choices() -> Array[RewardDef]:
 	return won_encounter.rewards
 
 
+## Le due nazioni dell'ultima battaglia: [giocatore, avversario].
+func last_battle_setups() -> Array[BattleSideSetup]:
+	return _last_setups
+
+
 ## Crea una copia nuova dell'ultima battaglia, da far scorrere passo per passo
 ## nell'interfaccia. Il risultato è identico a quello già registrato.
 func make_battle_replay() -> BattleSim:
