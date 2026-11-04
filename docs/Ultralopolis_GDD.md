@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.11
+## Game Design Document — v0.12
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.11 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.12 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -221,23 +221,50 @@ Un edificio costruito durante una fase non produce retroattivamente: inizia a pr
 
 **Esempio senza valori:** una biblioteca costruita durante Produzione fornisce la prima Ricerca all’inizio della Preparazione dello stesso anno, e produce di nuovo all’inizio della Produzione dell’anno seguente.
 
-### 5.3 Risorse della base
+### 5.3 Risorse — Confermato (modifica del nucleo, v0.12)
 
-| Risorsa | Origine | Impiego |
-|---|---|---|
-| Oro | Edifici, fuori dal combattimento; potenziali opportunità future. | Acquisti e sviluppo. |
-| Ricerca | Edifici dedicati, fuori dal combattimento. | Pagamento del passaggio di era. |
-| Mana | Edifici, durante il combattimento. | Attivazione delle truppe. |
+Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; le altre servono a **specializzarsi**: potenziamenti, possibilità peculiari, mantenimento.
 
-Oro e Ricerca sono conservati nel **Magazzino**: le risorse non spese restano disponibili fra fasi e anni, senza limite di capacità nella base iniziale.
+| Risorsa | Impiego |
+|---|---|
+| Oro | Moneta comune: edifici, truppe, spazi, rinnovi delle offerte. |
+| Ricerca | Passaggio di era. |
+| Cibo | Mantenimento delle truppe (§5.4). |
+| Legno | Potenziamento degli edifici. |
+| Pietra | Potenziamento degli edifici, soprattutto difensivi. |
+| Ferro | Potenziamento delle truppe. |
+| Fauna | Elementi con etichetta Fauna (allevamenti, cavalleria). |
+| Fede | Elementi Sacri e possibilità legate al credo. |
+| Influenza | Diplomazia e possibilità peculiari (es. Ambasciata). |
 
-Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia.
+- Tutte le risorse stanno nel **Magazzino**, senza limite di capacità.
+- Un edificio può produrre più risorse a ogni fase.
+- I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
 
-**Confermato:** mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
+**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare l’opportunità. Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
 
-**Tipi di mana — Direzione.** Il prototipo usa un solo tipo di mana. In futuro sono previsti più tipi, distinti per colore e tema (esempi del creatore: rosso = guerra, blu = diplomazia, verde = ricchezza). I dati del prototipo devono già poter indicare il tipo di mana prodotto e richiesto. Introdurre i nuovi tipi resta una modifica del nucleo (P5).
+**Mana — Confermato.** Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia. Mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
 
-Altre risorse, materiali e mantenimento non sono definiti. L’introduzione di una nuova risorsa è una modifica del nucleo (P5).
+| Colore | Tema |
+|---|---|
+| Rosso | Guerra |
+| Verde | Ricchezza |
+| Blu | Diplomazia e sapere |
+| Energetico | Vale come mana di qualsiasi colore |
+
+- Ogni edificio produce mana di un colore; il colore indica anche la famiglia dell’edificio.
+- Ogni truppa chiede mana di un colore, oppure nessuno.
+- Una truppa paga **prima con il proprio colore e poi con l’energetico**.
+
+### 5.4 Cibo e mantenimento — Confermato
+
+- Ogni truppa consuma di base **0,5 Cibo**; alcune truppe possono chiederne di più.
+- Il consumo avviene **all’inizio di ogni anno, a partire dall’anno 2**: nel primo anno le truppe non mangiano.
+- Mangiano prima le truppe **più lente**, poi le più veloci; a parità di ricarica, prima quelle più a destra.
+- Una truppa mangia tutta la sua razione o niente; il cibo avanzato passa alla truppa successiva.
+- Una truppa che resta senza cibo ha la **ricarica ×1,5** fino al consumo dell’anno successivo.
+- Le truppe reclutate durante l’anno sono sazie fino al consumo successivo.
+- I fantasmi non soffrono la fame.
 
 ## 6. Plancia della nazione
 
@@ -259,7 +286,7 @@ Sono ammesse **copie multiple** dello stesso edificio o della stessa truppa — 
 ### 6.2 Dotazione iniziale — Base approvata
 
 - Prima era.
-- Un edificio di base che produce Oro fuori dal combattimento e mana in battaglia.
+- La **Capitale** (Confermato): produce 1 di ogni risorsa a ogni fase e 1 mana energetico in battaglia; non si può vendere né sostituire; perk e caratteristiche dell’identità possono potenziarla.
 - Una truppa di base con cooldown, senza richiesta di mana.
 - Tre spazi edificio e due spazi truppa vuoti.
 - Una dotazione di Oro per un primo acquisto.
@@ -292,6 +319,22 @@ Il principio P1 funziona solo se il giocatore, colpito da un malus, ha davvero a
 **Da definire:** riserva fuori plancia, fusioni e potenziamento degli elementi.
 
 Una mappa a distretti con adiacenze era stata discussa come alternativa precedente: **non fa parte della plancia concordata.**
+
+### 6.5 Potenziamenti — Confermato
+
+- Ogni edificio e ogni truppa ha dei **livelli** (3 livelli).
+- Il costo di ogni livello è scritto nei dati dell’elemento e usa le risorse della sua famiglia (es. Ferro per le truppe, Legno o Pietra per gli edifici, Fauna per la cavalleria).
+- La maggior parte dei potenziamenti si fa **in qualunque momento fuori dal combattimento** e non consuma opportunità; alcuni potenziamenti speciali arrivano da eventi o opportunità.
+- Effetti: le truppe fanno più danno, gli edifici producono di più (valori placeholder, §16.3).
+
+### 6.6 Etichette — Confermato
+
+Ogni edificio e ogni truppa ha **una o più etichette**, come i tipi degli oggetti di The Bazaar. Per ora servono a perk, modificatori e potenziamenti (es. “le truppe Cavalleria ricaricano più in fretta”); altri usi verranno in seguito.
+
+| Elementi | Etichette iniziali |
+|---|---|
+| Edifici | Capitale, Agricolo, Estrattivo, Commerciale, Sapere, Sacro, Militare, Difensivo, Fauna |
+| Truppe | Fanteria, Tiratori, Cavalleria, Assedio, Sacro, Fauna |
 
 ## 7. Combattimento automatico
 
@@ -350,7 +393,9 @@ Gli edifici producono mana durante il combattimento in una **riserva condivisa**
 
 **Confermato:** ogni edificio produce con un **ritmo individuale**, esattamente come il cooldown di una truppa (una quantità di mana ogni intervallo). Come le truppe, gli edifici iniziano lo scontro con l’intervallo pieno: il primo mana arriva allo scadere del primo intervallo. Quantità e tempi restano configurabili.
 
-**Da definire:** vincoli di compatibilità fra tipi di mana (§5.3), capienza e interazioni che alterano la riserva.
+Ogni colore ha la sua riserva; il mana energetico copre qualsiasi colore (§5.3).
+
+**Da definire:** capienza della riserva e interazioni che la alterano.
 
 ### 7.5 Tempistiche e casi limite
 
@@ -728,6 +773,10 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Un perk già posseduto non si può prendere di nuovo come ricompensa | Provvisoria. |
 | Dei tratti di un fantasma valgono in battaglia solo quelli su tutta la nazione | Provvisoria. |
 | Se si arriva alla creazione da Gioca (nessuna nazione salvata), dopo il salvataggio si torna alla lista delle nazioni | Provvisoria. |
+| Tasso del mercato: 2 unità di una risorsa → 1 Oro, uguale per tutte | Placeholder. |
+| Potenziamenti: truppe +50% danno per livello; edifici +1 a ogni risorsa che producono per livello | Placeholder. |
+| I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
+| Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
 | Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
 
@@ -811,6 +860,13 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.12 — 4 novembre 2026** (modifica del nucleo)
+- Nuove risorse: Cibo, Legno, Pietra, Ferro, Fauna, Fede, Influenza; mercato delle risorse a tasso fisso (§5.3).
+- Mana a colori (rosso, verde, blu) più l’energetico, che vale come qualsiasi colore (§5.3, §7.4).
+- Cibo e mantenimento delle truppe, con fame che rallenta la ricarica (§5.4).
+- La Capitale diventa l’edificio iniziale (§6.2).
+- Potenziamenti a livelli ed etichette di edifici e truppe (§6.5, §6.6).
 
 **v0.11 — 4 novembre 2026**
 - Menu principale con Gioca, Crea nazione ed Esci; creazione della nazione in una schermata a parte (§14.3).
