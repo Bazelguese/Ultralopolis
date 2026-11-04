@@ -1,27 +1,29 @@
 class_name UiKit
 extends RefCounted
-## Piccoli aiuti per costruire l'interfaccia provvisoria (segnaposto, GDD §14).
+## Piccoli aiuti per costruire l'interfaccia (GDD §14).
 ## Nessuna regola di gioco qui: solo forma e colori.
+## Colori e caratteri seguono lo stile del gioco (StileVisivo).
 
-const COLOR_BUILDING: Color = Color(0.36, 0.27, 0.16)
-const COLOR_TROOP: Color = Color(0.42, 0.17, 0.17)
-const COLOR_EMPTY: Color = Color(0.2, 0.2, 0.22)
-const COLOR_OFFER: Color = Color(0.17, 0.27, 0.36)
-const COLOR_ENCOUNTER: Color = Color(0.3, 0.2, 0.36)
-const COLOR_REWARD: Color = Color(0.18, 0.34, 0.22)
-const COLOR_PANEL: Color = Color(0.12, 0.12, 0.14)
-const COLOR_WARNING: Color = Color(1.0, 0.75, 0.3)
-const COLOR_ERROR: Color = Color(1.0, 0.45, 0.45)
+const COLOR_BUILDING: Color = Color("3a3014")
+const COLOR_TROOP: Color = Color("3b1822")
+const COLOR_EMPTY: Color = Color("18202f")
+const COLOR_OFFER: Color = Color("1d2a4a")
+const COLOR_ENCOUNTER: Color = Color("35193c")
+const COLOR_REWARD: Color = Color("163a2a")
+const COLOR_PANEL: Color = Color("0f1626")
+const COLOR_WARNING: Color = Color("ffd76a")
+const COLOR_ERROR: Color = Color("ff7b7b")
 
 
 static func panel(color: Color, min_size: Vector2 = Vector2.ZERO) -> PanelContainer:
 	var container: PanelContainer = PanelContainer.new()
 	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = color
-	style.set_corner_radius_all(6)
-	style.set_content_margin_all(10)
-	style.border_color = color.lightened(0.25)
+	style.bg_color = Color(color, 0.92)
+	style.set_corner_radius_all(12)
+	style.set_content_margin_all(12)
+	style.border_color = color.lightened(0.3)
 	style.set_border_width_all(2)
+	style.anti_aliasing = true
 	container.add_theme_stylebox_override("panel", style)
 	container.custom_minimum_size = min_size
 	return container
@@ -113,13 +115,20 @@ static func identity_text(defs: Array[IdentityDef]) -> String:
 
 ## Sfondo a tutto schermo e margini standard; restituisce il contenitore in cui costruire.
 static func screen(root: Control) -> MarginContainer:
-	var ui_theme: Theme = Theme.new()
-	ui_theme.default_font_size = 18
+	var ui_theme: Theme = StileVisivo.tema_interfaccia()
+	ui_theme.default_font_size = 19
 	root.theme = ui_theme
 	var background: ColorRect = ColorRect.new()
-	background.color = Color(0.09, 0.09, 0.11)
+	background.color = StileVisivo.NOTTE
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(background)
+	var glow: TextureRect = TextureRect.new()
+	glow.texture = _background_glow()
+	glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	glow.stretch_mode = TextureRect.STRETCH_SCALE
+	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glow.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_child(glow)
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	for side: String in ["left", "right", "top", "bottom"]:
@@ -128,25 +137,44 @@ static func screen(root: Control) -> MarginContainer:
 	return margin
 
 
+## Alone di luce al centro dello sfondo, che sfuma verso bordi più scuri.
+static func _background_glow() -> GradientTexture2D:
+	var gradient: Gradient = Gradient.new()
+	gradient.set_color(0, Color(0.17, 0.25, 0.45, 0.55))
+	gradient.set_color(1, Color(0.0, 0.01, 0.04, 0.85))
+	var texture: GradientTexture2D = GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5, 0.42)
+	texture.fill_to = Vector2(1.15, 1.15)
+	return texture
+
+
 ## Pulsante grande per menu e schermate principali.
 static func big_button(text: String, callback: Callable, enabled: bool = true) -> Button:
 	var result: Button = button(text, callback, enabled)
-	result.custom_minimum_size = Vector2(420, 64)
-	result.add_theme_font_size_override("font_size", 26)
+	result.custom_minimum_size = Vector2(440, 66)
+	result.add_theme_font_override("font", StileVisivo.FONT_TITOLI)
+	result.add_theme_font_size_override("font_size", 28)
 	var states: Dictionary[String, Color] = {
-		"normal": Color(0.2, 0.24, 0.32),
-		"hover": Color(0.28, 0.34, 0.46),
-		"pressed": Color(0.16, 0.2, 0.27),
-		"disabled": Color(0.15, 0.15, 0.17),
-		"focus": Color(0.28, 0.34, 0.46),
+		"normal": Color("1d2840"),
+		"hover": Color("2a3a5c"),
+		"pressed": Color("141c2e"),
+		"disabled": Color("151b28"),
+		"focus": Color("2a3a5c"),
 	}
 	for state: String in states:
-		var style: StyleBoxFlat = StyleBoxFlat.new()
-		style.bg_color = states[state]
-		style.set_corner_radius_all(8)
-		style.border_color = Color(0.95, 0.85, 0.55, 0.6 if state != "disabled" else 0.15)
-		style.set_border_width_all(2)
-		if state == "focus":
-			style.draw_center = false
+		var style: StyleBoxFlat = StileVisivo.riquadro(states[state], Color(1.0, 1.0, 1.0, 0.18 if state != "disabled" else 0.06))
+		if state == "hover" or state == "focus":
+			style.border_color = StileVisivo.COLORE_GIOCATORE
 		result.add_theme_stylebox_override(state, style)
+	return result
+
+
+## Pulsante grande dorato per l'azione principale di una schermata.
+static func main_button(text: String, callback: Callable, enabled: bool = true) -> Button:
+	var result: Button = button(text, callback, enabled)
+	result.custom_minimum_size = Vector2(440, 74)
+	StileVisivo.rendi_principale(result)
+	result.add_theme_font_size_override("font_size", 32)
 	return result
