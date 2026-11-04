@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_s5blj"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_mfo6e"]
+
+[resource]
+script = ExtResource("2_mfo6e")
+id = &"quartiermastro"
+display_name = "Quartiermastro"
+description = "Aggiunge uno spazio truppa alla plancia."
+phase = 1
+kind = 3
+cost_gold = 5

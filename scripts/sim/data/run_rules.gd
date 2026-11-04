@@ -23,9 +23,6 @@ extends Resource
 ## Massimi della plancia (GDD §6.1: 10 edifici, 12 truppe).
 @export var max_building_slots: int = 10
 @export var max_troop_slots: int = 12
-## Prezzo in Oro di uno spazio comprato come offerta (GDD §6.3).
-@export var building_slot_price: int = 6
-@export var troop_slot_price: int = 5
 
 @export_group("Opportunità")
 ## Opportunità per macrofase (GDD §4.2: 2).

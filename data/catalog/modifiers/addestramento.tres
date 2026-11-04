@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_sjh0x"]
+
+[resource]
+script = ExtResource("1_sjh0x")
+id = &"addestramento"
+display_name = "Addestramento"
+description = "La truppa scelta ha la ricarica più corta del 25% in battaglia."
+is_malus = false
+effect = 3
+target = 4
+amount = -25

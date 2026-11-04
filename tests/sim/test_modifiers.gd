@@ -248,7 +248,14 @@ func test_rinnovo_piu_caro() -> void:
 
 
 func test_una_alternativa_in_meno() -> void:
-	catalog.buildings = [farm, library, farm.duplicate(), library.duplicate()]
+	var list: Array[OpportunityDef] = []
+	for i: int in range(4):
+		var opportunity: OpportunityDef = OpportunityDef.new()
+		opportunity.id = StringName("scambio_%d" % i)
+		opportunity.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
+		opportunity.gain_gold = 1
+		list.append(opportunity)
+	catalog.opportunities = list
 	_set_ghosts([killer], [_modifier(&"meno_offerte", ModifierDef.Effect.ALTERNATIVE_OFFERTE, -1)])
 	var run: RunState = _new_run()
 	assert_eq(run.offers.size(), 3)

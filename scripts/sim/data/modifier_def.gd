@@ -11,12 +11,20 @@ enum Effect {
 	RICARICA_TRUPPA,      ## Percentuale sulla ricarica di una truppa (+50 = più lenta).
 	COSTO_RINNOVO,        ## Oro in più (o in meno) per rinnovare le offerte.
 	ALTERNATIVE_OFFERTE,  ## Alternative in più (o in meno) in ogni opportunità.
+	RESISTENZA,           ## Resistenza in più (o in meno) negli scontri.
 }
 
 enum Target {
 	NAZIONE,          ## Tutta la nazione.
 	EDIFICIO_A_CASO,  ## Un edificio scelto a caso quando il modificatore viene applicato.
 	TRUPPA_A_CASO,    ## Una truppa scelta a caso quando il modificatore viene applicato.
+	EDIFICIO_SCELTO,  ## Un edificio scelto dal giocatore.
+	TRUPPA_SCELTA,    ## Una truppa scelta dal giocatore.
+}
+
+enum Duration {
+	ANNI,                       ## Anni interi (vedi duration_years).
+	PROSSIMO_SCONTRO_FANTASMA,  ## Finisce dopo il prossimo scontro con il fantasma.
 }
 
 ## Che cosa succede se lo stesso modificatore arriva di nuovo (GDD §8.2).
@@ -35,6 +43,7 @@ enum Stacking {
 @export var target: Target = Target.NAZIONE
 ## Percentuale per gli effetti in percentuale, numero intero per gli altri.
 @export var amount: int = 0
+@export var duration_kind: Duration = Duration.ANNI
 ## Anni interi in cui resta attivo, a partire dall'anno successivo a quello in cui arriva.
 @export var duration_years: int = 1
 @export var stacking: Stacking = Stacking.ALLUNGA_DURATA

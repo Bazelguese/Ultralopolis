@@ -7,7 +7,8 @@ const RUN_RULES_PATH: String = "res://data/rules/run_rules.tres"
 const BATTLE_RULES_PATH: String = "res://data/rules/battle_rules.tres"
 const RESISTANCE_RULES_PATH: String = "res://data/rules/resistance_rules.tres"
 
-enum PendingKind { NESSUNA, OFFERTA, RICOMPENSA }
+## OFFERTA/RICOMPENSA: si sceglie cosa sostituire; SCELTA_OFFERTA: si sceglie una voce interna.
+enum PendingKind { NESSUNA, OFFERTA, RICOMPENSA, SCELTA_OFFERTA }
 
 var run: RunState
 
@@ -230,6 +231,9 @@ func _empty_slot() -> Control:
 
 func _refresh_actions() -> void:
 	UiKit.clear(_action_box)
+	if _pending_kind == PendingKind.SCELTA_OFFERTA:
+		_show_offer_choices()
+		return
 	if _pending_kind != PendingKind.NESSUNA:
 		_action_box.add_child(UiKit.wrapped("Plancia piena: clicca «Sostituisci» sull'elemento da rimpiazzare.\nRiceverai metà del prezzo che avevi pagato.", 20, UiKit.COLOR_WARNING))
 		_action_box.add_child(UiKit.button("Annulla", _on_cancel_pending))
@@ -248,7 +252,7 @@ func _refresh_actions() -> void:
 
 
 func _show_opportunity() -> void:
-	var theme_text: String = "costruzione" if run.phase == RunState.Phase.PRODUZIONE else "reclutamento"
+	var theme_text: String = "costruzione" if run.phase == RunState.Phase.PRODUZIONE else "disposizione"
 	_action_box.add_child(UiKit.wrapped("%s — opportunità %d di %d (%s)" % [run.phase_name(), run.opportunity_number, run.run_rules.opportunities_per_phase, theme_text], 24))
 	_action_box.add_child(UiKit.wrapped("Scegli un'alternativa, rinnova le offerte o lascia passare l'opportunità.", 16))
 	for i: int in range(run.offers.size()):
@@ -256,16 +260,22 @@ func _show_opportunity() -> void:
 		var card: PanelContainer = UiKit.panel(UiKit.COLOR_OFFER)
 		var box: VBoxContainer = VBoxContainer.new()
 		card.add_child(box)
-		box.add_child(UiKit.wrapped("%s — %d Oro" % [offer.describe(), offer.price], 20))
+		box.add_child(UiKit.wrapped("%s — %s" % [offer.describe(), offer.cost_text()], 20))
 		match offer.kind:
-			Offer.Kind.EDIFICIO:
+			OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
 				box.add_child(UiKit.wrapped(UiKit.building_details(offer.building), 15))
-			Offer.Kind.TRUPPA:
+			OpportunityDef.Kind.RECLUTA_TRUPPA:
 				box.add_child(UiKit.wrapped(UiKit.troop_details(offer.troop), 15))
 			_:
-				box.add_child(UiKit.wrapped("Aggiunge uno spazio alla plancia.", 15))
-		var note: String = " (plancia piena: sostituzione)" if run.offer_needs_replacement(offer) else ""
-		box.add_child(UiKit.button("Prendi" + note, _on_buy.bind(i), offer.price <= run.gold + _max_refund()))
+				box.add_child(UiKit.wrapped(offer.opportunity.description, 15))
+		var note: String = ""
+		var enabled: bool = run.can_afford(offer)
+		if run.offer_needs_replacement(offer):
+			note = " (plancia piena: sostituzione)"
+			enabled = offer.price <= run.gold + _max_refund()
+		elif not run.offer_choices(offer).is_empty():
+			note = " (poi scegli)"
+		box.add_child(UiKit.button("Prendi" + note, _on_buy.bind(i), enabled))
 		_action_box.add_child(card)
 
 	var buttons: HBoxContainer = HBoxContainer.new()
@@ -372,6 +382,9 @@ func _act(success: bool) -> void:
 
 
 func _on_buy(index: int) -> void:
+	if not run.offer_choices(run.offers[index]).is_empty():
+		_start_pending(PendingKind.SCELTA_OFFERTA, index)
+		return
 	if run.offer_needs_replacement(run.offers[index]):
 		_start_pending(PendingKind.OFFERTA, index)
 		return
@@ -393,6 +406,23 @@ func _on_replace(replace_index: int) -> void:
 		_act(run.buy_offer(index, replace_index))
 	elif kind == PendingKind.RICOMPENSA:
 		_act(run.take_reward(index, replace_index))
+
+
+## Seconda scelta di un'offerta (quale bonus, quale truppa, quale malus).
+func _show_offer_choices() -> void:
+	var offer: Offer = run.offers[_pending_index]
+	_action_box.add_child(UiKit.wrapped("%s — scegli:" % offer.describe(), 24))
+	_action_box.add_child(UiKit.wrapped(offer.opportunity.description, 16))
+	var labels: Array[String] = run.offer_choices(offer)
+	for i: int in range(labels.size()):
+		_action_box.add_child(UiKit.button(labels[i], _on_offer_choice.bind(i)))
+	_action_box.add_child(UiKit.button("Annulla", _on_cancel_pending))
+
+
+func _on_offer_choice(choice: int) -> void:
+	var index: int = _pending_index
+	_cancel_pending()
+	_act(run.buy_offer(index, choice))
 
 
 func _on_cancel_pending() -> void:
@@ -475,7 +505,7 @@ func _cancel_pending() -> void:
 
 func _pending_replaces_building() -> bool:
 	if _pending_kind == PendingKind.OFFERTA:
-		return run.offers[_pending_index].kind == Offer.Kind.EDIFICIO
+		return run.offers[_pending_index].kind == OpportunityDef.Kind.COSTRUISCI_EDIFICIO
 	if _pending_kind == PendingKind.RICOMPENSA:
 		return run.reward_choices()[_pending_index].kind == RewardDef.Kind.EDIFICIO
 	return false
@@ -491,7 +521,7 @@ func _pending_building_def() -> BuildingDef:
 
 func _pending_replaces_troop() -> bool:
 	if _pending_kind == PendingKind.OFFERTA:
-		return run.offers[_pending_index].kind == Offer.Kind.TRUPPA
+		return run.offers[_pending_index].kind == OpportunityDef.Kind.RECLUTA_TRUPPA
 	if _pending_kind == PendingKind.RICOMPENSA:
 		return run.reward_choices()[_pending_index].kind == RewardDef.Kind.TRUPPA
 	return false

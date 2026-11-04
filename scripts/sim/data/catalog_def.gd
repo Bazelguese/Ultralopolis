@@ -8,3 +8,5 @@ extends Resource
 @export var eras: Array[EraDef] = []
 @export var ghosts: Array[GhostDef] = []
 @export var encounters: Array[EncounterDef] = []
+## Tipi di opportunità che possono comparire fra le alternative (GDD §4.2).
+@export var opportunities: Array[OpportunityDef] = []

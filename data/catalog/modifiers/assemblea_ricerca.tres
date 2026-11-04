@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_aysrn"]
+
+[resource]
+script = ExtResource("1_aysrn")
+id = &"assemblea_ricerca"
+display_name = "Assemblea: sapere"
+description = "La Ricerca prodotta a ogni fase aumenta del 50%."
+is_malus = false
+amount = 50

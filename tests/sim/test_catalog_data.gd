@@ -50,6 +50,19 @@ func test_identificativi_unici_e_valori_validi() -> void:
 		assert_between(def.era, 1, catalog.eras.size(), "Era di %s" % def.id)
 
 
+func test_ogni_fase_ha_almeno_tre_tipi_di_opportunita() -> void:
+	var catalog: CatalogDef = _catalog()
+	var production: int = 0
+	var preparation: int = 0
+	for opportunity: OpportunityDef in catalog.opportunities:
+		if opportunity.phase == OpportunityDef.Phase.PRODUZIONE:
+			production += 1
+		else:
+			preparation += 1
+	assert_gte(production, 3, "Produzione")
+	assert_gte(preparation, 3, "Preparazione")
+
+
 func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
 	var catalog: CatalogDef = _catalog()
 	var rules: RunRules = load(RUN_RULES_PATH) as RunRules

@@ -144,7 +144,8 @@ func reroll_cost() -> int:
 
 ## Resistenza con cui la nazione del giocatore inizia uno scontro (GDD §7.1.1).
 func player_resistance() -> int:
-	return ResistanceCalc.compute(resistance_rules, era, year, board.buildings.size(), board.troops.size())
+	var base: int = ResistanceCalc.compute(resistance_rules, era, year, board.buildings.size(), board.troops.size())
+	return maxi(1, base + modifiers.flat(ModifierDef.Effect.RESISTENZA))
 
 
 ## Resistenza del fantasma dell'anno, calcolata con la stessa formula.
@@ -178,11 +179,36 @@ func is_over() -> bool:
 ## true se l'offerta, per essere presa, richiede di sostituire un elemento.
 func offer_needs_replacement(offer: Offer) -> bool:
 	match offer.kind:
-		Offer.Kind.EDIFICIO:
+		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
 			return not board.can_add_building(offer.building)
-		Offer.Kind.TRUPPA:
+		OpportunityDef.Kind.RECLUTA_TRUPPA:
 			return not board.has_free_troop_slot()
 	return false
+
+
+## true se il Magazzino basta a pagare l'offerta (senza contare rimborsi di sostituzione).
+func can_afford(offer: Offer) -> bool:
+	return gold >= offer.price and research >= offer.research_price
+
+
+## Le scelte interne di un'offerta (es. quale bonus dell'Assemblea, quale truppa da addestrare,
+## quale malus accorciare). Vuoto se non c'è nulla da scegliere.
+func offer_choices(offer: Offer) -> Array[String]:
+	var labels: Array[String] = []
+	match offer.kind:
+		OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
+			var choices: Array[Array] = _modifier_choices(offer)
+			if choices.size() > 1:
+				for choice: Array in choices:
+					var def: ModifierDef = choice[0]
+					var piece: BoardPiece = choice[1]
+					labels.append(def.display_name if piece == null else "%s su %s" % [def.display_name, piece.display_name()])
+		OpportunityDef.Kind.ACCORCIA_MALUS:
+			var malus: Array[ActiveModifier] = modifiers.year_malus()
+			if malus.size() > 1:
+				for modifier: ActiveModifier in malus:
+					labels.append(modifier.describe())
+	return labels
 
 
 func reward_needs_replacement(reward: RewardDef) -> bool:
@@ -236,38 +262,69 @@ func make_battle_replay() -> BattleSim:
 
 # --- Azioni delle opportunità -----------------------------------------------
 
-## Prende un'offerta pagando il suo prezzo. Se la plancia è piena serve
-## replace_index: l'elemento da sostituire (venduto con rimborso dimezzato).
-func buy_offer(offer_index: int, replace_index: int = -1) -> bool:
+## Prende un'offerta pagando il suo prezzo e chiude l'opportunità.
+## choice dipende dal tipo di offerta:
+##   - edificio o truppa con la plancia piena: l'elemento da sostituire (venduto con rimborso dimezzato);
+##   - modificatore a scelta o malus da accorciare: la voce scelta fra offer_choices().
+func buy_offer(offer_index: int, choice: int = -1) -> bool:
 	if not _require_shopping():
 		return false
 	if offer_index < 0 or offer_index >= offers.size():
 		return _fail("Offerta non valida.")
 	var offer: Offer = offers[offer_index]
+	var source: String = offer.opportunity.display_name
 
 	match offer.kind:
-		Offer.Kind.EDIFICIO:
-			if not _place_building(offer.building, offer.price, offer.price, replace_index):
+		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
+			if not _place_building(offer.building, offer.price, offer.price, choice):
 				return false
-		Offer.Kind.TRUPPA:
-			if not _place_troop(offer.troop, offer.price, offer.price, replace_index):
+		OpportunityDef.Kind.RECLUTA_TRUPPA:
+			if not _place_troop(offer.troop, offer.price, offer.price, choice):
 				return false
-		Offer.Kind.SPAZIO_EDIFICIO:
+		OpportunityDef.Kind.SPAZIO_EDIFICIO:
 			if board.building_capacity() >= board.max_building_slots:
 				return _fail("La plancia ha già il massimo di spazi edificio.")
-			if gold < offer.price:
-				return _fail("Oro insufficiente.")
-			gold -= offer.price
+			if not _pay(offer):
+				return false
 			board.base_building_slots += 1
-			_log("Acquistato un nuovo spazio edificio per %d Oro." % offer.price)
-		Offer.Kind.SPAZIO_TRUPPA:
+			_log("%s: nuovo spazio edificio (%s)." % [source, offer.cost_text()])
+		OpportunityDef.Kind.SPAZIO_TRUPPA:
 			if board.troop_capacity() >= board.max_troop_slots:
 				return _fail("La plancia ha già il massimo di spazi truppa.")
-			if gold < offer.price:
-				return _fail("Oro insufficiente.")
-			gold -= offer.price
+			if not _pay(offer):
+				return false
 			board.base_troop_slots += 1
-			_log("Acquistato un nuovo spazio truppa per %d Oro." % offer.price)
+			_log("%s: nuovo spazio truppa (%s)." % [source, offer.cost_text()])
+		OpportunityDef.Kind.SCAMBIO_RISORSE:
+			if not _pay(offer):
+				return false
+			gold += offer.opportunity.gain_gold
+			research += offer.opportunity.gain_research
+			_log("%s: paghi %s, ricevi %d Oro e %d Ricerca." % [source, offer.cost_text(), offer.opportunity.gain_gold, offer.opportunity.gain_research])
+		OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
+			var choices: Array[Array] = _modifier_choices(offer)
+			if choices.is_empty():
+				return _fail("Non c'è nulla su cui applicarlo.")
+			if choices.size() == 1:
+				choice = 0
+			if choice < 0 or choice >= choices.size():
+				return _fail("Scegli quale effetto prendere.")
+			if not _pay(offer):
+				return false
+			var def: ModifierDef = choices[choice][0]
+			var piece: BoardPiece = choices[choice][1]
+			_log(modifiers.apply(def, ActiveModifier.OriginKind.OPPORTUNITA, source, year, board, _rng, piece))
+		OpportunityDef.Kind.ACCORCIA_MALUS:
+			var malus: Array[ActiveModifier] = modifiers.year_malus()
+			if malus.is_empty():
+				return _fail("Non ci sono malus da accorciare.")
+			if malus.size() == 1:
+				choice = 0
+			if choice < 0 or choice >= malus.size():
+				return _fail("Scegli quale malus accorciare.")
+			if not _pay(offer):
+				return false
+			_log("%s: %s" % [source, modifiers.shorten(malus[choice], offer.opportunity.shorten_years, year)])
 	_next_opportunity()
 	return true
 
@@ -427,6 +484,8 @@ func fight_ghost() -> bool:
 	if current_ghost != null:
 		enemy = BattleSideSetup.new(current_ghost.buildings, current_ghost.troops, ghost_resistance())
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
+	for message: String in modifiers.on_ghost_fight_done():
+		_log(message)
 
 	if _player_won_or_drew(outcome):
 		wins += 1
@@ -509,49 +568,111 @@ func _end_shopping_phase() -> void:
 		phase = Phase.SCONTRO_FANTASMA
 
 
-## Pesca a caso le alternative dal pool della fase e dell'era (GDD §4.2).
+## Pesca a caso le alternative (GDD §4.2): tipi di opportunità diversi fra loro, tutti con la
+## stessa probabilità; per costruttori e reclutatori si pesca poi l'elemento dell'era corrente.
 func _draw_offers() -> void:
-	var pool: Array[Offer] = _offer_pool()
+	var pool: Array[OpportunityDef] = _available_opportunities()
 	offers = []
 	var wanted: int = maxi(1, run_rules.alternatives_per_opportunity + modifiers.flat(ModifierDef.Effect.ALTERNATIVE_OFFERTE))
 	var count: int = mini(wanted, pool.size())
 	for i: int in range(count):
 		var pick: int = _rng.randi_range(0, pool.size() - 1)
-		offers.append(pool[pick])
+		offers.append(_make_offer(pool[pick]))
 		pool.remove_at(pick)
 
 
-## Pool di offerte (convenzione §16.3): solo elementi dell'era corrente;
-## edifici in Produzione, truppe in Preparazione, più l'acquisto di uno spazio.
-func _offer_pool() -> Array[Offer]:
-	var pool: Array[Offer] = []
-	if phase == Phase.PRODUZIONE:
-		for def: BuildingDef in catalog.buildings:
-			if def.era == era:
-				var offer: Offer = Offer.new()
-				offer.kind = Offer.Kind.EDIFICIO
-				offer.building = def
-				offer.price = def.cost_gold
-				pool.append(offer)
-		if board.building_capacity() < board.max_building_slots:
-			var slot: Offer = Offer.new()
-			slot.kind = Offer.Kind.SPAZIO_EDIFICIO
-			slot.price = run_rules.building_slot_price
-			pool.append(slot)
-	elif phase == Phase.PREPARAZIONE:
-		for def: TroopDef in catalog.troops:
-			if def.era == era:
-				var offer: Offer = Offer.new()
-				offer.kind = Offer.Kind.TRUPPA
-				offer.troop = def
-				offer.price = def.cost_gold
-				pool.append(offer)
-		if board.troop_capacity() < board.max_troop_slots:
-			var slot: Offer = Offer.new()
-			slot.kind = Offer.Kind.SPAZIO_TRUPPA
-			slot.price = run_rules.troop_slot_price
-			pool.append(slot)
+## Tipi di opportunità della fase corrente che hanno senso adesso
+## (es. niente Ambasciata se non ci sono malus, niente spazi oltre il massimo).
+func _available_opportunities() -> Array[OpportunityDef]:
+	var wanted_phase: OpportunityDef.Phase = OpportunityDef.Phase.PRODUZIONE if phase == Phase.PRODUZIONE else OpportunityDef.Phase.PREPARAZIONE
+	var pool: Array[OpportunityDef] = []
+	for opportunity: OpportunityDef in catalog.opportunities:
+		if opportunity.phase != wanted_phase:
+			continue
+		match opportunity.kind:
+			OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
+				if _buildings_of_era().is_empty():
+					continue
+			OpportunityDef.Kind.RECLUTA_TRUPPA:
+				if _troops_of_era().is_empty():
+					continue
+			OpportunityDef.Kind.SPAZIO_EDIFICIO:
+				if board.building_capacity() >= board.max_building_slots:
+					continue
+			OpportunityDef.Kind.SPAZIO_TRUPPA:
+				if board.troop_capacity() >= board.max_troop_slots:
+					continue
+			OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
+				if _modifier_choices_for(opportunity).is_empty():
+					continue
+			OpportunityDef.Kind.ACCORCIA_MALUS:
+				if modifiers.year_malus().is_empty():
+					continue
+		pool.append(opportunity)
 	return pool
+
+
+func _make_offer(opportunity: OpportunityDef) -> Offer:
+	var offer: Offer = Offer.new()
+	offer.opportunity = opportunity
+	offer.price = opportunity.cost_gold
+	offer.research_price = opportunity.cost_research
+	match opportunity.kind:
+		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
+			var buildings: Array[BuildingDef] = _buildings_of_era()
+			offer.building = buildings[_rng.randi_range(0, buildings.size() - 1)]
+			offer.price = offer.building.cost_gold
+		OpportunityDef.Kind.RECLUTA_TRUPPA:
+			var troops: Array[TroopDef] = _troops_of_era()
+			offer.troop = troops[_rng.randi_range(0, troops.size() - 1)]
+			offer.price = offer.troop.cost_gold
+	return offer
+
+
+## Edifici offerti: solo quelli dell'era corrente (GDD §10.3).
+func _buildings_of_era() -> Array[BuildingDef]:
+	var found: Array[BuildingDef] = []
+	for def: BuildingDef in catalog.buildings:
+		if def.era == era:
+			found.append(def)
+	return found
+
+
+func _troops_of_era() -> Array[TroopDef]:
+	var found: Array[TroopDef] = []
+	for def: TroopDef in catalog.troops:
+		if def.era == era:
+			found.append(def)
+	return found
+
+
+## Voci fra cui scegliere per un'offerta di modificatori: [modificatore, elemento o null].
+func _modifier_choices(offer: Offer) -> Array[Array]:
+	return _modifier_choices_for(offer.opportunity)
+
+
+func _modifier_choices_for(opportunity: OpportunityDef) -> Array[Array]:
+	var choices: Array[Array] = []
+	for def: ModifierDef in opportunity.modifiers:
+		match def.target:
+			ModifierDef.Target.TRUPPA_SCELTA:
+				for piece: BoardPiece in board.troops:
+					choices.append([def, piece])
+			ModifierDef.Target.EDIFICIO_SCELTO:
+				for piece: BoardPiece in board.buildings:
+					choices.append([def, piece])
+			_:
+				choices.append([def, null])
+	return choices
+
+
+## Paga Oro e Ricerca di un'offerta, se bastano.
+func _pay(offer: Offer) -> bool:
+	if not can_afford(offer):
+		return _fail("Risorse insufficienti (servono %s)." % offer.cost_text())
+	gold -= offer.price
+	research -= offer.research_price
+	return true
 
 
 ## Mette un edificio sulla plancia, in uno spazio libero o al posto di un altro.

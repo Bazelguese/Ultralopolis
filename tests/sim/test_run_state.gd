@@ -43,6 +43,8 @@ var era2_troop: TroopDef
 var killer: TroopDef
 
 var catalog: CatalogDef
+var architects: OpportunityDef
+var quartermaster: OpportunityDef
 var run_rules: RunRules
 var battle_rules: BattleRules
 var resistance_rules: ResistanceRules
@@ -74,6 +76,20 @@ func before_each() -> void:
 	catalog.buildings = [farm, library, barracks, market, temple, era2_building]
 	catalog.troops = [sword, spear, bow, era2_troop]
 	catalog.eras = [era1, era2]
+	architects = _opportunity(&"architetti", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SPAZIO_EDIFICIO, 6)
+	quartermaster = _opportunity(&"quartiermastro", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.SPAZIO_TRUPPA, 5)
+	var collectors: OpportunityDef = _opportunity(&"esattori", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE, 0)
+	collectors.gain_gold = 3
+	var tribute: OpportunityDef = _opportunity(&"tributo", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE, 0)
+	tribute.gain_gold = 2
+	catalog.opportunities = [
+		_opportunity(&"costruttori", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, 0),
+		architects,
+		collectors,
+		_opportunity(&"reclutatori", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.RECLUTA_TRUPPA, 0),
+		quartermaster,
+		tribute,
+	]
 
 	run_rules = RunRules.new()
 	run_rules.starting_gold = 5
@@ -96,6 +112,16 @@ func before_each() -> void:
 	# Di base: fantasmi e incontri innocui (si vincono col logoramento, Resistenza 1).
 	_set_ghosts_for_years(5, [], 1)
 	_set_easy_encounters(5)
+
+
+func _opportunity(id: StringName, phase: OpportunityDef.Phase, kind: OpportunityDef.Kind, cost: int) -> OpportunityDef:
+	var def: OpportunityDef = OpportunityDef.new()
+	def.id = id
+	def.display_name = String(id)
+	def.phase = phase
+	def.kind = kind
+	def.cost_gold = cost
+	return def
 
 
 func _set_ghosts_for_years(years: int, troops: Array[TroopDef], ghost_era: int) -> void:
@@ -175,7 +201,7 @@ func _play_year(run: RunState) -> void:
 	run.fight_ghost()
 
 
-func _offer_index(run: RunState, kind: Offer.Kind, def_id: StringName = &"") -> int:
+func _offer_index(run: RunState, kind: OpportunityDef.Kind, def_id: StringName = &"") -> int:
 	for i: int in range(run.offers.size()):
 		var offer: Offer = run.offers[i]
 		if offer.kind != kind:
@@ -190,7 +216,7 @@ func _offer_index(run: RunState, kind: Offer.Kind, def_id: StringName = &"") -> 
 
 
 ## Rinnova finché compare l'offerta cercata (con Oro abbondante).
-func _find_offer(run: RunState, kind: Offer.Kind, def_id: StringName = &"") -> int:
+func _find_offer(run: RunState, kind: OpportunityDef.Kind, def_id: StringName = &"") -> int:
 	for attempt: int in range(200):
 		var index: int = _offer_index(run, kind, def_id)
 		if index >= 0:
@@ -214,7 +240,7 @@ func test_ingresso_in_fase_una_sola_raccolta() -> void:
 
 func test_costruzione_in_produzione_produce_da_preparazione() -> void:
 	var run: RunState = _new_run()
-	var index: int = _find_offer(run, Offer.Kind.EDIFICIO, &"biblioteca")
+	var index: int = _find_offer(run, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, &"biblioteca")
 	run.gold = 10
 	assert_true(run.buy_offer(index))
 	assert_eq(run.research, 0, "Nessuna raccolta retroattiva.")
@@ -249,19 +275,19 @@ func test_offerte_della_fase_e_dell_era() -> void:
 	var run: RunState = _new_run()
 	for attempt: int in range(30):
 		for offer: Offer in run.offers:
-			assert_true(offer.kind == Offer.Kind.EDIFICIO or offer.kind == Offer.Kind.SPAZIO_EDIFICIO)
+			assert_eq(offer.opportunity.phase, OpportunityDef.Phase.PRODUZIONE, "Solo opportunità della Produzione.")
 			if offer.building != null:
 				assert_eq(offer.building.era, 1, "Solo offerte dell'era corrente.")
 		run.gold += run.reroll_cost()
 		run.reroll_offers()
 	_to_preparation(run)
 	for offer: Offer in run.offers:
-		assert_true(offer.kind == Offer.Kind.TRUPPA or offer.kind == Offer.Kind.SPAZIO_TRUPPA)
+		assert_eq(offer.opportunity.phase, OpportunityDef.Phase.PREPARAZIONE, "Solo opportunità della Preparazione.")
 
 
 func test_prendere_un_offerta_chiude_l_opportunita() -> void:
 	var run: RunState = _new_run()
-	var index: int = _find_offer(run, Offer.Kind.EDIFICIO, &"fattoria")
+	var index: int = _find_offer(run, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, &"fattoria")
 	run.gold = 20
 	assert_true(run.buy_offer(index))
 	assert_eq(run.gold, 17)
@@ -271,7 +297,7 @@ func test_prendere_un_offerta_chiude_l_opportunita() -> void:
 
 func test_oro_insufficiente() -> void:
 	var run: RunState = _new_run()
-	var index: int = _find_offer(run, Offer.Kind.EDIFICIO, &"tempio")
+	var index: int = _find_offer(run, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, &"tempio")
 	run.gold = 1
 	assert_false(run.buy_offer(index))
 	assert_ne(run.last_error, "", "Il motivo del rifiuto è spiegato.")
@@ -315,7 +341,7 @@ func test_stesso_seme_stesse_offerte() -> void:
 
 func test_vendita_rimborsa_meta_del_prezzo() -> void:
 	var run: RunState = _new_run()
-	var index: int = _find_offer(run, Offer.Kind.EDIFICIO, &"mercato")
+	var index: int = _find_offer(run, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, &"mercato")
 	run.gold = 5
 	assert_true(run.buy_offer(index))
 	assert_eq(run.gold, 0)
@@ -352,7 +378,7 @@ func test_plancia_piena_richiede_sostituzione() -> void:
 	for def: BuildingDef in [market, market, market]:
 		run.board.buildings.append(BoardPiece.of_building(def, 6))
 	assert_false(run.board.has_free_building_slot(), "4 spazi edificio occupati.")
-	var index: int = _find_offer(run, Offer.Kind.EDIFICIO, &"biblioteca")
+	var index: int = _find_offer(run, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, &"biblioteca")
 	run.gold = 4
 	assert_true(run.offer_needs_replacement(run.offers[index]))
 	assert_false(run.buy_offer(index), "Senza indicare cosa sostituire non si può.")
@@ -375,8 +401,8 @@ func test_caserma_concede_uno_spazio_truppa() -> void:
 
 func test_acquisto_di_uno_spazio() -> void:
 	var run: RunState = _new_run()
-	var index: int = _find_offer(run, Offer.Kind.SPAZIO_EDIFICIO)
-	run.gold = run_rules.building_slot_price
+	var index: int = _find_offer(run, OpportunityDef.Kind.SPAZIO_EDIFICIO)
+	run.gold = architects.cost_gold
 	assert_true(run.buy_offer(index))
 	assert_eq(run.board.building_capacity(), 5)
 
@@ -387,7 +413,7 @@ func test_spazi_mai_oltre_il_massimo() -> void:
 	for attempt: int in range(30):
 		run.gold += run.reroll_cost()
 		run.reroll_offers()
-		assert_eq(_offer_index(run, Offer.Kind.SPAZIO_EDIFICIO), -1, "Niente spazi in offerta al massimo.")
+		assert_eq(_offer_index(run, OpportunityDef.Kind.SPAZIO_EDIFICIO), -1, "Niente spazi in offerta al massimo.")
 	run.board.base_building_slots = 50
 	assert_eq(run.board.building_capacity(), 10)
 

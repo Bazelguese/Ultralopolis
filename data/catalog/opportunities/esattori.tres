@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_pltc3"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_m3kdu"]
+
+[resource]
+script = ExtResource("2_m3kdu")
+id = &"esattori"
+display_name = "Esattori"
+description = "Ottieni subito 3 Oro."
+kind = 4
+gain_gold = 3

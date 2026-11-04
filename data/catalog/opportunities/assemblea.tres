@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_rdbe1"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/assemblea_oro.tres" id="2_56fot"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/assemblea_ricerca.tres" id="3_b36bs"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="4_17m5y"]
+
+[resource]
+script = ExtResource("4_17m5y")
+id = &"assemblea"
+display_name = "Assemblea"
+description = "Per un anno: +50% Oro oppure +50% Ricerca, a tua scelta."
+kind = 5
+modifiers = Array[ExtResource("1_rdbe1")]([ExtResource("2_56fot"), ExtResource("3_b36bs")])

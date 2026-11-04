@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_famdq"]
+
+[resource]
+script = ExtResource("1_famdq")
+id = &"fortificazioni"
+display_name = "Fortificazioni"
+description = "+10 Resistenza nel prossimo scontro con il fantasma."
+is_malus = false
+effect = 6
+amount = 10
+duration_kind = 1

@@ -6,6 +6,7 @@ enum OriginKind {
 	FANTASMA,
 	INCONTRO,
 	EVENTO,
+	OPPORTUNITA,
 	ALTRO,
 }
 
@@ -13,6 +14,7 @@ const ORIGIN_NAMES: Dictionary[OriginKind, String] = {
 	OriginKind.FANTASMA: "fantasma",
 	OriginKind.INCONTRO: "incontro",
 	OriginKind.EVENTO: "evento",
+	OriginKind.OPPORTUNITA: "opportunità",
 	OriginKind.ALTRO: "altro",
 }
 
@@ -32,5 +34,8 @@ func describe() -> String:
 	if target_piece != null:
 		text += " (su %s)" % target_piece.display_name()
 	text += " — da %s" % origin_name
-	text += " — fino alla fine dell'anno %d" % (expires_at_year - 1)
+	if def.duration_kind == ModifierDef.Duration.PROSSIMO_SCONTRO_FANTASMA:
+		text += " — fino al prossimo scontro con il fantasma"
+	else:
+		text += " — fino alla fine dell'anno %d" % (expires_at_year - 1)
 	return text

@@ -9,9 +9,10 @@ var active: Array[ActiveModifier] = []
 
 ## Applica un modificatore. Restituisce una frase per la cronaca della run.
 ## current_year: anno in cui arriva; resta attivo per duration_years anni interi successivi.
+## chosen_piece: l'elemento scelto dal giocatore, per i modificatori EDIFICIO_SCELTO e TRUPPA_SCELTA.
 func apply(def: ModifierDef, origin_kind: ActiveModifier.OriginKind, origin_name: String,
-		current_year: int, board: NationBoard, rng: RandomNumberGenerator) -> String:
-	var existing: ActiveModifier = _find(def)
+		current_year: int, board: NationBoard, rng: RandomNumberGenerator, chosen_piece: BoardPiece = null) -> String:
+	var existing: ActiveModifier = _find(def, chosen_piece)
 	if existing != null:
 		match def.stacking:
 			ModifierDef.Stacking.ALLUNGA_DURATA:
@@ -34,6 +35,10 @@ func apply(def: ModifierDef, origin_kind: ActiveModifier.OriginKind, origin_name
 			if board.troops.is_empty():
 				return "%s non ha effetto: nessuna truppa da colpire." % def.display_name
 			modifier.target_piece = board.troops[rng.randi_range(0, board.troops.size() - 1)]
+		ModifierDef.Target.EDIFICIO_SCELTO, ModifierDef.Target.TRUPPA_SCELTA:
+			if chosen_piece == null:
+				return "%s non ha effetto: nessun elemento scelto." % def.display_name
+			modifier.target_piece = chosen_piece
 	active.append(modifier)
 	return "Nuovo effetto. %s" % modifier.describe()
 
@@ -46,6 +51,34 @@ func on_new_year(year: int) -> Array[String]:
 			active.erase(modifier)
 			messages.append("Finisce l'effetto: %s." % modifier.def.display_name)
 	return messages
+
+
+## Toglie i modificatori che durano fino al prossimo scontro con il fantasma.
+func on_ghost_fight_done() -> Array[String]:
+	var messages: Array[String] = []
+	for modifier: ActiveModifier in active.duplicate():
+		if modifier.def.duration_kind == ModifierDef.Duration.PROSSIMO_SCONTRO_FANTASMA:
+			active.erase(modifier)
+			messages.append("Finisce l'effetto: %s." % modifier.def.display_name)
+	return messages
+
+
+## Malus che durano un certo numero di anni (gli unici che si possono accorciare).
+func year_malus() -> Array[ActiveModifier]:
+	var found: Array[ActiveModifier] = []
+	for modifier: ActiveModifier in active:
+		if modifier.def.is_malus and modifier.def.duration_kind == ModifierDef.Duration.ANNI:
+			found.append(modifier)
+	return found
+
+
+## Accorcia un modificatore di qualche anno; se la durata si azzera, sparisce subito.
+func shorten(modifier: ActiveModifier, years: int, current_year: int) -> String:
+	modifier.expires_at_year -= years
+	if current_year >= modifier.expires_at_year:
+		active.erase(modifier)
+		return "Il malus %s sparisce." % modifier.def.display_name
+	return "Il malus %s ora dura fino alla fine dell'anno %d." % [modifier.def.display_name, modifier.expires_at_year - 1]
 
 
 ## Toglie i modificatori il cui bersaglio non è più sulla plancia (venduto o sostituito).
@@ -99,8 +132,15 @@ static func apply_percent(value: int, percent_change: int) -> int:
 	return value * factor / 100
 
 
-func _find(def: ModifierDef) -> ActiveModifier:
+## Cerca lo stesso modificatore già attivo. Per quelli su un elemento scelto dal giocatore
+## conta anche l'elemento: lo stesso bonus su due truppe diverse sono due effetti distinti.
+func _find(def: ModifierDef, chosen_piece: BoardPiece) -> ActiveModifier:
+	var chosen_target: bool = def.target == ModifierDef.Target.EDIFICIO_SCELTO or def.target == ModifierDef.Target.TRUPPA_SCELTA
 	for modifier: ActiveModifier in active:
-		if modifier.def == def or (def.id != &"" and modifier.def.id == def.id):
-			return modifier
+		var same_def: bool = modifier.def == def or (def.id != &"" and modifier.def.id == def.id)
+		if not same_def:
+			continue
+		if chosen_target and modifier.target_piece != chosen_piece:
+			continue
+		return modifier
 	return null

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_27gct"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_1t2q7"]
+
+[resource]
+script = ExtResource("2_1t2q7")
+id = &"studiosi"
+display_name = "Studiosi"
+description = "Paghi 3 Oro e ottieni subito 3 Ricerca."
+kind = 4
+cost_gold = 3
+gain_research = 3
