@@ -402,6 +402,7 @@ func test_caserma_concede_uno_spazio_truppa() -> void:
 
 func test_acquisto_di_uno_spazio() -> void:
 	var run: RunState = _new_run()
+	run.pass_opportunity()  # La prima opportunità offre solo edifici.
 	var index: int = _find_offer(run, OpportunityDef.Kind.SPAZIO_EDIFICIO)
 	run.gold = architects.cost_gold
 	assert_true(run.buy_offer(index))
@@ -410,6 +411,7 @@ func test_acquisto_di_uno_spazio() -> void:
 
 func test_spazi_mai_oltre_il_massimo() -> void:
 	var run: RunState = _new_run()
+	run.pass_opportunity()  # La prima opportunità offre solo edifici.
 	run.board.base_building_slots = 10
 	for attempt: int in range(30):
 		run.gold += run.reroll_cost()
@@ -579,3 +581,63 @@ func test_replay_della_battaglia_identico() -> void:
 	var replay: BattleSim = run.make_battle_replay()
 	assert_eq(replay.run_to_end(), run.last_battle.outcome)
 	assert_eq(replay.elapsed_ms, run.last_battle.elapsed_ms)
+
+
+# --- Opportunità dedicata, costi in altre risorse, rinnovo minimo ----------------
+
+func test_prima_opportunita_solo_edifici_poi_tipi_diversi() -> void:
+	var run: RunState = _new_run()
+	assert_true(run.is_dedicated_opportunity())
+	for attempt: int in range(20):
+		var ids: Array[StringName] = []
+		for offer: Offer in run.offers:
+			assert_eq(offer.kind, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, "Solo edifici.")
+			assert_false(ids.has(offer.building.id), "Edifici diversi fra loro.")
+			ids.append(offer.building.id)
+		assert_eq(run.offers.size(), 3)
+		run.gold += run.reroll_cost()
+		run.reroll_offers()
+	run.pass_opportunity()
+	assert_false(run.is_dedicated_opportunity(), "La seconda opportunità ha tipi diversi.")
+	var kinds: Array[OpportunityDef.Kind] = []
+	for offer: Offer in run.offers:
+		assert_false(kinds.has(offer.kind))
+		kinds.append(offer.kind)
+
+
+func test_in_preparazione_la_prima_opportunita_offre_solo_truppe() -> void:
+	var run: RunState = _new_run()
+	_to_preparation(run)
+	assert_true(run.is_dedicated_opportunity())
+	for offer: Offer in run.offers:
+		assert_eq(offer.kind, OpportunityDef.Kind.RECLUTA_TRUPPA)
+
+
+func test_il_rinnovo_costa_almeno_1_oro() -> void:
+	var discount: ModifierDef = ModifierDef.new()
+	discount.id = &"sconto"
+	discount.effect = ModifierDef.Effect.COSTO_RINNOVO
+	discount.amount = -3
+	discount.duration_kind = ModifierDef.Duration.PERMANENTE
+	var run: RunState = _new_run()
+	run.modifiers.apply(discount, ActiveModifier.OriginKind.ALTRO, "Prova", 1, run.board, RandomNumberGenerator.new())
+	assert_eq(run.reroll_cost(), 1)
+
+
+func test_azione_pagata_con_altre_risorse() -> void:
+	var training: OpportunityDef = OpportunityDef.new()
+	training.id = &"addestramento"
+	training.phase = OpportunityDef.Phase.PRODUZIONE
+	training.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
+	training.gain_research = 1
+	var iron: ResourceAmounts = ResourceAmounts.new()
+	iron.ferro = 2
+	training.cost_resources = iron
+	catalog.opportunities = [training]
+	var run: RunState = _new_run()
+	assert_false(run.can_afford(run.offers[0]), "Serve Ferro, non Oro.")
+	run.stock[Res.Type.FERRO] = 2
+	var gold_before: int = run.gold
+	assert_true(run.buy_offer(0))
+	assert_eq(run.stock[Res.Type.FERRO], 0)
+	assert_eq(run.gold, gold_before, "L'Oro non viene toccato.")

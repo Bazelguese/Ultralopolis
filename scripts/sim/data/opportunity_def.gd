@@ -29,6 +29,8 @@ enum Kind {
 @export var cost_gold: int = 0
 ## Ricerca da pagare.
 @export var cost_research: int = 0
+## Altre risorse da pagare (es. Ferro per l'Addestramento, Influenza per l'Ambasciata).
+@export var cost_resources: ResourceAmounts
 
 @export_group("Guadagno")
 ## Oro ricevuto (SCAMBIO_RISORSE).

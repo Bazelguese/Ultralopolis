@@ -12,6 +12,8 @@ var troop: TroopDef
 var price: int = 0
 ## Ricerca da pagare.
 var research_price: int = 0
+## Altre risorse da pagare (può essere null).
+var other_cost: ResourceAmounts
 
 
 var kind: OpportunityDef.Kind:
@@ -36,4 +38,6 @@ func cost_text() -> String:
 		parts.append("%d Oro" % price)
 	if research_price > 0:
 		parts.append("%d Ricerca" % research_price)
+	if other_cost != null and not other_cost.is_empty():
+		parts.append(other_cost.describe())
 	return " + ".join(parts) if not parts.is_empty() else "gratis"

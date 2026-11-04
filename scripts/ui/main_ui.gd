@@ -362,7 +362,11 @@ func _refresh_actions() -> void:
 func _show_opportunity() -> void:
 	var theme_text: String = "costruzione" if run.phase == RunState.Phase.PRODUZIONE else "disposizione"
 	_action_box.add_child(UiKit.wrapped("%s — opportunità %d di %d (%s)" % [run.phase_name(), run.opportunity_number, run.run_rules.opportunities_per_phase, theme_text], 24))
-	_action_box.add_child(UiKit.wrapped("Scegli un'alternativa, rinnova le offerte o lascia passare l'opportunità.", 16))
+	if run.is_dedicated_opportunity():
+		var only: String = "solo edifici" if run.phase == RunState.Phase.PRODUZIONE else "solo truppe"
+		_action_box.add_child(UiKit.wrapped("Questa opportunità offre %s: scegline uno, rinnova o lascia passare." % only, 16, UiKit.COLOR_WARNING))
+	else:
+		_action_box.add_child(UiKit.wrapped("Scegli un'alternativa, rinnova le offerte o lascia passare l'opportunità.", 16))
 	for i: int in range(run.offers.size()):
 		var offer: Offer = run.offers[i]
 		var card: PanelContainer = UiKit.panel(UiKit.COLOR_OFFER)

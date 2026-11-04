@@ -48,5 +48,10 @@ extends Resource
 @export var alternatives_per_opportunity: int = 3
 ## Costo del primo rinnovo delle offerte.
 @export var reroll_base_cost: int = 1
+## Il rinnovo non costa mai meno di così, nemmeno con i bonus che lo riducono.
+@export var reroll_min_cost: int = 1
+## Opportunità della fase che mostra solo elementi: in Produzione 3 edifici,
+## in Preparazione 3 truppe (1 = la prima; 0 = nessuna).
+@export var dedicated_opportunity: int = 1
 ## Aumento del costo a ogni rinnovo.
 @export var reroll_cost_increase: int = 1

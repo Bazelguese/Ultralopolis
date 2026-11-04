@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.18
+## Game Design Document — v0.19
 
 **Data:** 4 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -176,11 +176,14 @@ La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogn
 | **2 opportunità** per macrofase (come le due scelte prima e le due dopo lo scontro con i mostri in The Bazaar) | Confermato |
 | Ogni opportunità mostra **3 alternative** | Confermato |
 | Ogni alternativa è un **singolo acquisto o una singola scelta**: prenderne una chiude l’opportunità. Alcune alternative chiedono una seconda scelta interna (quale bonus, quale truppa, quale malus) | Confermato |
-| Le 3 alternative sono **tipi di opportunità diversi**, pescati a caso con la stessa probabilità; per costruttori e reclutatori si pesca poi l’edificio o la truppa dell’era corrente | Confermato |
+| In ogni fase **la prima opportunità è dedicata agli elementi**: in Produzione 3 edifici diversi, in Preparazione 3 truppe diverse, dell’era corrente (esclusivi compresi) | Confermato (v0.19) |
+| Nell’altra opportunità le 3 alternative sono **tipi di opportunità diversi**, pescati a caso con la stessa probabilità; per costruttori e reclutatori si pesca poi l’edificio o la truppa dell’era corrente | Confermato |
+| Le azioni che non sono acquisti di elementi o di spazi **non costano Oro**, ma altre risorse coerenti con il tema | Confermato (v0.19); valori placeholder |
 | Produzione è la fase di **costruzione** (offerte di edifici); Preparazione è la fase di **disposizione** (offerte di truppe) | Confermato |
 | Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
 | Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
 | Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo e continua a crescere fra un’opportunità e l’altra | Confermato; valori placeholder |
+| Il rinnovo costa **sempre almeno 1 Oro**, anche con i bonus che lo riducono | Confermato (v0.19) |
 | A ogni nuova opportunità si dimezza l’**aumento accumulato** del costo di rinnovo (arrotondato per difetto); il costo non scende mai sotto quello iniziale. Esempio: costo iniziale 1, +1 a rinnovo; dopo 4 rinnovi il costo è 5 (aumento +4); all’opportunità successiva l’aumento diventa +2 e il costo 3 | Confermato |
 
 **Tipi di opportunità del prototipo — provvisori** (valori placeholder):
@@ -189,15 +192,15 @@ La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogn
 |---|---|---|
 | Produzione | Costruttori | Costruisci un edificio. |
 | Produzione | Architetti | Compri uno spazio edificio. |
-| Produzione | Studiosi | Paghi Oro, ottieni subito Ricerca. |
+| Produzione | Studiosi | Paghi Legno, ottieni subito Ricerca. |
 | Produzione | Esattori | Ottieni subito Oro. |
 | Produzione | Mercante | Scambi Ricerca con Oro. |
 | Produzione | Assemblea | Per un anno, a scelta: +50% Oro oppure +50% Ricerca. |
 | Preparazione | Reclutatori | Recluti una truppa. |
 | Preparazione | Quartiermastro | Compri uno spazio truppa. |
-| Preparazione | Addestramento | Per un anno, una truppa a scelta ha la ricarica più corta. |
-| Preparazione | Fortificazioni | Resistenza in più nel prossimo scontro con il fantasma (bersaglio Resistenza, §8.2). |
-| Preparazione | Ambasciata | Accorcia di un anno un malus attivo a scelta; se si azzera, sparisce (rimozione anticipata, §13.2). |
+| Preparazione | Addestramento | Paghi Ferro: per un anno, una truppa a scelta ha la ricarica più corta. |
+| Preparazione | Fortificazioni | Paghi Pietra: Resistenza in più nel prossimo scontro con il fantasma (bersaglio Resistenza, §8.2). |
+| Preparazione | Ambasciata | Paghi Influenza: accorcia di un anno un malus attivo a scelta; se si azzera, sparisce (rimozione anticipata, §13.2). |
 
 Un tipo che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, Addestramento senza truppe, spazi oltre il massimo).
 
@@ -898,7 +901,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se l’elemento colpito viene venduto o sostituito, il malus finisce | Provvisoria. |
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
-| Almeno 1 alternativa per opportunità; costo di rinnovo mai sotto 0 | Provvisoria. |
+| Almeno 1 alternativa per opportunità | Provvisoria. |
+| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Influenza; Processione 2 Fede. Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
 | Un’opportunità favorita da un elemento dell’identità ha peso +1 per ogni elemento che la favorisce (peso base 1) | Provvisoria. |
 | Edifici e truppe della dotazione dell’identità entrano solo se c’è spazio, e come la dotazione iniziale non rimborsano nulla | Provvisoria. |
@@ -1020,6 +1024,11 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.19 — 4 novembre 2026** (dopo le prime partite di Davide)
+- La prima opportunità di ogni fase offre solo elementi: 3 edifici in Produzione, 3 truppe in Preparazione (§4.2).
+- Le azioni che non sono acquisti costano risorse diverse dall’Oro (§4.2, §16.3).
+- Il rinnovo delle offerte costa sempre almeno 1 Oro (§4.2).
 
 **v0.18 — 4 novembre 2026** (implementazione)
 - Nel prototipo: scudo, cura, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio con seme casuale (§7.6, §7.7); valori di partenza dello scontro (§8.2); potenziamenti su tutti i valori d’effetto (§6.5); ere con le vie (§10.4); edifici neutri (§5.3).
