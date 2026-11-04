@@ -8,6 +8,8 @@
 
 [resource]
 script = ExtResource("1_usmqx")
+ghost_loot_gold = 3
+ghost_loot_research = 2
 prototype_years = 0
 starting_gold = 7
 starting_buildings = Array[ExtResource("2_nlgyk")]([ExtResource("3_usmqx")])

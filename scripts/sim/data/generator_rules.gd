@@ -38,6 +38,9 @@ extends Resource
 @export var encounter_troops_per_year_tenths: int = 4
 
 @export_group("Ricompense degli incontri")
+## Bottino fisso degli incontri generati, per difficoltà (facile, media, difficile).
+@export var encounter_loot_gold: PackedInt32Array = PackedInt32Array([2, 3, 4])
+@export var encounter_loot_research: PackedInt32Array = PackedInt32Array([1, 2, 3])
 @export var reward_gold_base: int = 3
 @export var reward_gold_per_year: int = 1
 @export var reward_resource_base: int = 2

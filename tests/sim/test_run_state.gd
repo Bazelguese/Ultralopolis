@@ -641,3 +641,52 @@ func test_azione_pagata_con_altre_risorse() -> void:
 	assert_true(run.buy_offer(0))
 	assert_eq(run.stock[Res.Type.FERRO], 0)
 	assert_eq(run.gold, gold_before, "L'Oro non viene toccato.")
+
+
+# --- Bottino dei nemici sconfitti (convenzione provvisoria) -------------------------
+
+func test_vittoria_incontro_da_il_bottino_oltre_alla_ricompensa() -> void:
+	for encounter: EncounterDef in catalog.encounters:
+		encounter.loot_gold = 2
+		encounter.loot_research = 1
+	var run: RunState = _new_run()
+	_pass_all(run)
+	var gold_before: int = run.gold
+	var research_before: int = run.research
+	assert_true(run.choose_encounter(0))
+	assert_eq(run.gold, gold_before + 2, "Bottino: 2 Oro.")
+	assert_eq(run.research, research_before + 1, "Bottino: 1 Ricerca.")
+	assert_eq(run.phase, RunState.Phase.RICOMPENSA_INCONTRO, "La ricompensa a scelta resta.")
+	assert_true(run.chronicle.has("Bottino: 2 Oro e 1 Ricerca."))
+
+
+func test_vittoria_contro_il_fantasma_da_il_bottino() -> void:
+	run_rules.ghost_loot_gold = 3
+	run_rules.ghost_loot_research = 2
+	run_rules.starting_troops = [killer]
+	var run: RunState = _new_run()
+	_to_preparation(run)
+	_pass_all(run)
+	var gold_before: int = run.gold
+	var research_before: int = run.research
+	assert_true(run.fight_ghost())
+	assert_eq(run.wins, 1)
+	var produced: Array[int] = run.production_per_phase()
+	assert_eq(run.gold - produced[Res.Type.ORO], gold_before + 3, "Bottino: 3 Oro (oltre alla produzione del nuovo anno).")
+	assert_eq(run.research - produced[Res.Type.RICERCA], research_before + 2, "Bottino: 2 Ricerca.")
+
+
+func test_la_sconfitta_non_da_bottino() -> void:
+	run_rules.ghost_loot_gold = 3
+	run_rules.ghost_loot_research = 2
+	_set_ghosts_for_years(5, [killer], 1)
+	for encounter: EncounterDef in catalog.encounters:
+		encounter.loot_gold = 2
+	var run: RunState = _new_run()
+	_play_year(run)
+	assert_eq(run.wins, 0, "Il fantasma ha vinto.")
+	var bottini: int = 0
+	for riga: String in run.chronicle:
+		if riga.begins_with("Bottino"):
+			bottini += 1
+	assert_eq(bottini, 1, "Solo l'incontro vinto dà bottino, il fantasma che ha vinto no.")

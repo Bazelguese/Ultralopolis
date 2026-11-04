@@ -15,3 +15,6 @@ extends Resource
 @export var troops: Array[TroopDef] = []
 ## Ricompense fra cui il giocatore può sceglierne una (o nessuna) se vince.
 @export var rewards: Array[RewardDef] = []
+## Bottino fisso se vince (anche con un pareggio), in aggiunta alla ricompensa a scelta.
+@export var loot_gold: int = 0
+@export var loot_research: int = 0

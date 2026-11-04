@@ -165,3 +165,16 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 	assert_lt(guard, 1000, "Nessun ciclo infinito.")
 	assert_ne(run.run_end, RunState.RunEnd.FINE_PROVA, "La run è completa: finisce con vittoria o sconfitta.")
 	assert_eq(run.history.size(), run.year, "Un riepilogo per ogni anno.")
+
+
+func test_bottino_dei_nemici() -> void:
+	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
+	assert_eq(rules.ghost_loot_gold, 3, "Fantasma: 3 Oro.")
+	assert_eq(rules.ghost_loot_research, 2, "Fantasma: 2 Ricerca.")
+	var catalog: CatalogDef = _catalog()
+	for encounter: EncounterDef in catalog.encounters:
+		assert_gt(encounter.loot_gold, 0, "Bottino di %s" % encounter.display_name)
+		assert_gt(encounter.loot_research, 0, "Ricerca di %s" % encounter.display_name)
+	var generati: Array[EncounterDef] = OpponentGenerator.generate_encounters(catalog, catalog.generator, rules, 5, 1, 3)
+	assert_eq(generati[0].loot_gold, 2, "Facile: 2 Oro.")
+	assert_eq(generati[2].loot_research, 3, "Difficile: 3 Ricerca.")

@@ -165,6 +165,8 @@ static func generate_encounters(catalog: CatalogDef, rules: GeneratorRules, run_
 		encounter.troops = _pick_troops(catalog, era, mini(troop_count, run_rules.max_troop_slots), rng)
 		encounter.buildings = _pick_buildings_for(catalog, era, mini(1 + difficulty + _scaled(0, 2, year), run_rules.max_building_slots), encounter.troops, rng)
 		encounter.rewards = _rewards(catalog, rules, era, year, difficulty, strength, rng)
+		encounter.loot_gold = rules.encounter_loot_gold[mini(difficulty, rules.encounter_loot_gold.size() - 1)] if not rules.encounter_loot_gold.is_empty() else 0
+		encounter.loot_research = rules.encounter_loot_research[mini(difficulty, rules.encounter_loot_research.size() - 1)] if not rules.encounter_loot_research.is_empty() else 0
 		result.append(encounter)
 	return result
 

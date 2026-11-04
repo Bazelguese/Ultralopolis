@@ -668,6 +668,7 @@ func choose_encounter(index: int) -> bool:
 		# Il pareggio vale come vittoria (GDD §3.4).
 		won_encounter = encounter
 		_log("Incontro superato: %s." % encounter.display_name)
+		_gain_loot(encounter.loot_gold, encounter.loot_research)
 		phase = Phase.RICOMPENSA_INCONTRO
 		return true
 
@@ -747,6 +748,7 @@ func fight_ghost() -> bool:
 			_apply_ghost_malus(ghost_name)
 		else:
 			_log("Vittoria contro %s (%d)." % [ghost_name, wins])
+		_gain_loot(run_rules.ghost_loot_gold, run_rules.ghost_loot_research)
 		if wins >= run_rules.wins_needed:
 			_end_run(RunEnd.VITTORIA)
 			return true
@@ -771,6 +773,19 @@ func fight_ghost() -> bool:
 
 
 # --- Parti interne ----------------------------------------------------------
+
+## Bottino fisso di un nemico sconfitto: Oro e Ricerca nel Magazzino (convenzione provvisoria).
+func _gain_loot(loot_gold: int, loot_research: int) -> void:
+	if loot_gold <= 0 and loot_research <= 0:
+		return
+	gold += maxi(loot_gold, 0)
+	research += maxi(loot_research, 0)
+	var parts: PackedStringArray = PackedStringArray()
+	if loot_gold > 0:
+		parts.append("%d Oro" % loot_gold)
+	if loot_research > 0:
+		parts.append("%d Ricerca" % loot_research)
+	_log("Bottino: %s." % " e ".join(parts))
 
 func _start_year(new_year: int) -> void:
 	_update_last_record()

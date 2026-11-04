@@ -9,6 +9,9 @@ extends Resource
 @export var starting_prestige: int = 20
 ## Anni della run di prova; 0 = nessun limite (convenzione §16.3: 3).
 @export var prototype_years: int = 3
+## Bottino fisso per una vittoria (o un pareggio) contro il fantasma: Oro e Ricerca.
+@export var ghost_loot_gold: int = 0
+@export var ghost_loot_research: int = 0
 
 @export_group("Dotazione iniziale")
 @export var starting_gold: int = 5
