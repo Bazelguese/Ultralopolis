@@ -17,7 +17,6 @@ func after_each() -> void:
 	GameSession.store_path = NationStore.DEFAULT_PATH
 	GameSession.editing_nation = null
 	GameSession.selected_nation = null
-	GameSession.game_scene = GameSession.GAME_SCENE
 	if FileAccess.file_exists(TEST_STORE):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_STORE))
 
@@ -77,19 +76,8 @@ func test_gioca_con_nazioni_porta_alla_lista_e_poi_alla_partita() -> void:
 	var select: Control = _open("res://scenes/nation_select.tscn")
 	var nation: NationTemplate = GameSession.saved_nations()[0]
 	select.call("_on_play", nation)
-	assert_eq(GameSession.last_scene_request, GameSession.GAME_SCENE_3D, "«Gioca» porta alla partita sulla plancia 3D.")
+	assert_eq(GameSession.last_scene_request, GameSession.GAME_SCENE, "«Gioca» porta alla partita sulla plancia 3D.")
 	assert_eq(GameSession.selected_nation.id, nation.id)
-
-
-func test_interfaccia_provvisoria_resta_raggiungibile() -> void:
-	var creator: Control = _open("res://scenes/nation_creator.tscn")
-	_fill_creator(creator)
-	creator.call("_on_save")
-	var menu: Control = _open("res://scenes/main_menu.tscn")
-	menu.call("_on_play_old_ui")
-	var select: Control = _open("res://scenes/nation_select.tscn")
-	select.call("_on_play", GameSession.saved_nations()[0])
-	assert_eq(GameSession.last_scene_request, GameSession.GAME_SCENE)
 
 
 func test_modifica_mantiene_la_stessa_nazione() -> void:

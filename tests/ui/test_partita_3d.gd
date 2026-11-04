@@ -8,12 +8,32 @@ var _scena: Node3D
 func before_each() -> void:
 	GameSession.navigation_enabled = false
 	GameSession.selected_nation = null
-	_scena = (load("res://scenes/partita_3d.tscn") as PackedScene).instantiate() as Node3D
-	add_child_autofree(_scena)
+	_apri()
 
 
 func after_each() -> void:
 	GameSession.navigation_enabled = true
+	GameSession.selected_nation = null
+
+
+func _apri() -> void:
+	if _scena != null and is_instance_valid(_scena):
+		_scena.queue_free()
+	_scena = (load("res://scenes/partita_3d.tscn") as PackedScene).instantiate() as Node3D
+	add_child_autofree(_scena)
+
+
+## Una nazione completa: l'ultimo elemento di ogni dimensione della creazione.
+func _nazione(nome: String) -> NationTemplate:
+	var catalogo: CatalogDef = GameSession.catalog()
+	var regole: RunRules = GameSession.run_rules()
+	var scelte: Array[IdentityDef] = []
+	for dimensione: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
+		var opzioni: Array[IdentityDef] = IdentityRules.options(catalogo, dimensione)
+		var quante: int = IdentityRules.starting_perk_count(catalogo, regole) if dimensione == IdentityDef.Dimension.PERK else 1
+		for i: int in range(quante):
+			scelte.append(opzioni[opzioni.size() - 1 - i])
+	return NationTemplate.from_choices("prova_3d", nome, scelte)
 
 
 func _run() -> RunState:
@@ -23,6 +43,45 @@ func _run() -> RunState:
 func _carte(nome: String, lato: int) -> Array:
 	var gruppi: Array = _scena.get(nome)
 	return gruppi[lato]
+
+
+func test_senza_nazione_scelta_usa_una_nazione_di_prova() -> void:
+	var run: RunState = _run()
+	assert_eq(run.phase, RunState.Phase.PRODUZIONE)
+	assert_eq(run.nation_name, "Nazione di prova")
+
+
+## Parte dalla nazione scelta nel menu e attraversa un anno usando solo i comandi della schermata.
+func test_la_partita_parte_dalla_nazione_scelta_e_attraversa_un_anno() -> void:
+	GameSession.selected_nation = _nazione("Regno di Prova")
+	_apri()
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	assert_eq(run.phase, RunState.Phase.PRODUZIONE, "La partita comincia dall'anno 1.")
+	assert_eq(run.nation_name, "Regno di Prova")
+	assert_eq(run.identity.size(), GameSession.selected_nation.identity_ids.size())
+
+	while run.is_shopping_phase():
+		hud.passa.emit()
+	var scelte: Array = _scena.get("_scelte")
+	_scena.call("_clic_scelta", scelte[0])
+	hud.azione_principale.emit()
+	_scena.call("_mostra_esito")
+	hud.call("_on_continua_esito")
+	if run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
+		hud.nessuna_ricompensa.emit()
+	while run.is_shopping_phase():
+		hud.passa.emit()
+	assert_eq(run.phase, RunState.Phase.SCONTRO_FANTASMA)
+	hud.azione_principale.emit()
+	assert_not_null(_scena.get("_sim"), "Si rigioca lo scontro con il fantasma.")
+	hud.azione_principale.emit()
+	_scena.call("_mostra_esito")
+	hud.call("_on_continua_esito")
+	assert_eq(run.year, 2, "Dopo il fantasma inizia l'anno 2.")
+
+	hud.menu.emit()
+	assert_eq(GameSession.last_scene_request, GameSession.MENU_SCENE, "Il pulsante porta al menu.")
 
 
 func test_le_carte_corrispondono_alla_plancia_e_alle_offerte() -> void:

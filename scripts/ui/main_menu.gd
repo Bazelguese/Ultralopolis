@@ -24,10 +24,6 @@ func _ready() -> void:
 	column.add_child(UiKit.main_button("Gioca", _on_play))
 	column.add_child(UiKit.big_button("Crea nazione", _on_create))
 	column.add_child(UiKit.big_button("Esci dal gioco", _on_quit))
-	var old_ui: Button = UiKit.button("Gioca con l'interfaccia provvisoria", _on_play_old_ui)
-	old_ui.flat = true
-	old_ui.add_theme_color_override("font_color", StileVisivo.TESTO_TENUE)
-	column.add_child(old_ui)
 
 	var count: int = GameSession.saved_nations().size()
 	var info: Label = UiKit.label("Nazioni create: %d" % count, 16, Color(0.6, 0.6, 0.65))
@@ -36,12 +32,6 @@ func _ready() -> void:
 
 
 func _on_play() -> void:
-	GameSession.game_scene = GameSession.GAME_SCENE_3D
-	GameSession.play()
-
-
-func _on_play_old_ui() -> void:
-	GameSession.game_scene = GameSession.GAME_SCENE
 	GameSession.play()
 
 

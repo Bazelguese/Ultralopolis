@@ -94,5 +94,5 @@ Da proporre per il GDD (§16.3) se Davide le approva:
 |---|---|
 | Colore della cornice delle carte secondo l'era (bronzo, argento, oro) | Proposta visiva |
 | Illustrazioni cercate per identificativo nelle cartelle di `assets/illustrazioni/` | Convenzione tecnica |
-| «Gioca» porta alla partita sulla plancia 3D; l'interfaccia provvisoria resta raggiungibile dal menu | Provvisoria |
+| La partita si gioca solo sulla plancia 3D; l'interfaccia provvisoria è stata tolta (decisione di Davide) | Da riportare nel GDD (§14.3, §16.3) |
 | La plancia mostra gli spazi ancora da conquistare fino al massimo (12 truppe, 10 edifici) | Proposta visiva |
