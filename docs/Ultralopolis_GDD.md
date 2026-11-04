@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.7
+## Game Design Document — v0.8
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.7 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.8 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -367,7 +367,28 @@ Questa sezione è il punto di innesto per i contenuti futuri: ogni nuovo element
 | Origine | Chi o che cosa lo ha generato (un evento, un incontro, una nazione avversaria). |
 | Cumulabilità | Come si comporta con altri modificatori uguali. |
 
-Il campo **Origine** esiste fin dalla base anche se non viene mostrato: permette in futuro di dare un nome ai malus inflitti dagli avversari (Parte III) senza modificare il nucleo.
+Il campo **Origine** è **mostrato al giocatore con il nome** di chi ha inflitto il modificatore (es. il nome del fantasma) — Confermato. Lo spunto dei malus che portano il nome della nazione nel proprio titolo (Parte III) resta separato.
+
+### 8.2.1 Regole dei modificatori — Confermato
+
+| Regola | Stato |
+|---|---|
+| Lo stesso sistema regge **malus e bonus** (perk, ricompense durature) | Confermato |
+| La durata si conta in **anni interi a partire dall’anno successivo**: un malus di 1 anno subito alla fine dell’anno N vale per tutto l’anno N+1 e sparisce all’inizio dell’anno N+2 | Confermato |
+| Se arriva un malus già attivo, **si allunga solo la durata**; l’effetto non si somma | Confermato |
+| Ogni fantasma ha nei dati i propri malus: li applica se il giocatore **perde o pareggia** contro di lui (§3.4, §11.1) | Confermato |
+| La sconfitta contro un incontro del mondo **dimezza solo l’Oro**: gli incontri non lasciano malus (§3.3) | Confermato |
+
+Primo catalogo di malus del prototipo (valori placeholder):
+
+| Malus | Effetto |
+|---|---|
+| Ricerca dimezzata | La Ricerca prodotta a ogni fase è dimezzata (esempio di P1). |
+| Oro dimezzato | L’Oro prodotto a ogni fase è dimezzato. |
+| Inefficienza | Un edificio produce mana più lentamente in battaglia (§8.3). |
+| Truppa provata | Una truppa ha la ricarica più lunga in battaglia. |
+| Mercati diffidenti | Rinnovare le offerte costa di più. |
+| Mercanti in fuga | Ogni opportunità mostra un’alternativa in meno. |
 
 ### 8.3 Famiglie di effetti
 
@@ -485,7 +506,7 @@ Gli incontri del mondo (§3.3) sono la prima forma concreta di evento: inizialme
 
 Un effetto avversario o un evento può lasciare un modificatore per uno o più anni. Le conseguenze seguono P1: cambiano il modo di giocare per un periodo, senza debilitare pesantemente.
 
-Durata, intensità, cumulabilità, rimozione e rapporto con le opportunità annuali restano da definire. È stata proposta una gestione che offra una decisione (ricostruire, accettare un costo temporaneo, scegliere una risposta politica): direzione di design, non catalogo approvato.
+Durata, origine e cumulabilità dei malus del prototipo sono fissate in §8.2.1. Intensità definitive, rimozione anticipata e rapporto con le opportunità annuali restano da definire. È stata proposta una gestione che offra una decisione (ricostruire, accettare un costo temporaneo, scegliere una risposta politica): direzione di design, non catalogo approvato.
 
 ### 13.3 Corruzione e diplomazia
 
@@ -580,7 +601,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 
 ### 15.3 Sistemi successivi
 
-Proposta di ordine: modificatori pluriennali, opportunità alternative complete, identità della civiltà, eventi a scelta, spionaggio e sabotaggi, salvataggi, fantasmi online.
+Proposta di ordine: opportunità alternative complete, identità della civiltà, eventi a scelta, spionaggio e sabotaggi, salvataggi, fantasmi online.
 
 Rimandare un sistema non significa rimuoverlo dal gioco finale.
 
@@ -667,7 +688,9 @@ Criteri di accettazione proposti per il prototipo:
 | Prima discesa a zero Prestigio | Run ancora attiva in ultima possibilità. |
 | Ulteriore sconfitta | Fine della run. |
 | Decima vittoria | Fine della run con successo. |
-| Modificatore pluriennale (quando introdotto) | Applicato per la durata prevista e poi rimosso; esempio: Ricerca dimezzata per un anno. |
+| Modificatore pluriennale | Applicato per la durata prevista e poi rimosso; esempio: Ricerca dimezzata per un anno. |
+| Stesso malus due volte | Si allunga la durata, l’effetto non raddoppia. |
+| Sconfitta o pareggio contro un fantasma | Si applicano i suoi malus, con il suo nome come origine. |
 | Scontro contro plancia generata | Stessa simulazione e stesse regole dello scontro contro un fantasma. |
 | Sconfitta contro un incontro del mondo | Oro del Magazzino dimezzato (per difetto); Prestigio e vittorie invariati; durante l’ultima possibilità la run termina. |
 | Vittoria contro un incontro del mondo | Il giocatore può scegliere una ricompensa dal pool dell’incontro, oppure nessuna. |
@@ -717,6 +740,11 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.8 — 4 novembre 2026**
+- Regole dei modificatori: malus e bonus nello stesso sistema, durata in anni dal successivo, stesso malus allunga la durata, malus dei fantasmi su sconfitta o pareggio, incontri solo Oro dimezzato (§8.2.1).
+- L’origine dei modificatori è mostrata con il nome (§8.2).
+- Primo catalogo di sei malus placeholder (§8.2.1).
 
 **v0.7 — 4 novembre 2026**
 - Corretto un fraintendimento: le opportunità sono **2 per fase**, ognuna con 3 alternative; ogni alternativa è un singolo acquisto (§4.2).
