@@ -12,3 +12,6 @@ extends Resource
 @export var opportunities: Array[OpportunityDef] = []
 ## Popoli, governi, credi, culture e perk fra cui scegliere (GDD §9).
 @export var identities: Array[IdentityDef] = []
+## Regole per generare fantasmi e incontri negli anni senza dati scritti a mano.
+## Se manca, si usa il fantasma più recente e nessun incontro in più.
+@export var generator: GeneratorRules

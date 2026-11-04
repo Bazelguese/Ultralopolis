@@ -42,6 +42,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="34_0738x"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="34_uymuy"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="35_fp2ii"]
+[ext_resource type="Resource" path="res://data/rules/generator_rules.tres" id="35_hkuyl"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/costruttori.tres" id="35_p4jue"]
 [ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="35_tye5o"]
 [ext_resource type="Resource" path="res://data/catalog/identita/popolo_del_delta.tres" id="36_2n8s1"]
@@ -95,3 +96,4 @@ ghosts = Array[ExtResource("30_75gny")]([ExtResource("31_mpbka"), ExtResource("3
 encounters = Array[ExtResource("16_eg6f4")]([ExtResource("17_p5yub"), ExtResource("18_eicds"), ExtResource("19_7hwyi"), ExtResource("20_5hcq5"), ExtResource("21_mleo8"), ExtResource("22_3lga0"), ExtResource("23_su3wr"), ExtResource("24_16be3"), ExtResource("25_fb16c")])
 opportunities = Array[ExtResource("34_0738x")]([ExtResource("35_p4jue"), ExtResource("36_5do7l"), ExtResource("37_eg6f4"), ExtResource("38_p5yub"), ExtResource("39_eicds"), ExtResource("40_7hwyi"), ExtResource("41_5hcq5"), ExtResource("42_mleo8"), ExtResource("43_3lga0"), ExtResource("44_su3wr"), ExtResource("45_16be3")])
 identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8")])
+generator = ExtResource("35_hkuyl")

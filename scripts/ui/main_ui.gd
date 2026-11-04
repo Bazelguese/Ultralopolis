@@ -465,9 +465,33 @@ func _show_end() -> void:
 		RunState.RunEnd.FINE_PROVA:
 			text = "Fine della run di prova (%d anni)." % run.year
 	_action_box.add_child(UiKit.wrapped(text, 28, UiKit.COLOR_WARNING))
-	_action_box.add_child(UiKit.wrapped("Vittorie: %d · Prestigio: %d · Seme della run: %d" % [run.wins, run.prestige, run.run_seed], 18))
+	_action_box.add_child(UiKit.wrapped("%s — %d anni · Vittorie %d/%d · Prestigio %d · Era %s · Seme %d" % [
+		run.nation_name, run.year, run.wins, run.run_rules.wins_needed, run.prestige, run.era_name(), run.run_seed], 18))
 	_action_box.add_child(UiKit.button("Nuova run con la stessa nazione", _new_run))
 	_action_box.add_child(UiKit.button("Menu principale", _on_menu))
+	_action_box.add_child(UiKit.label("Riepilogo anno per anno", 22, UiKit.COLOR_WARNING))
+	var table: GridContainer = GridContainer.new()
+	table.columns = 6
+	table.add_theme_constant_override("h_separation", 18)
+	for heading: String in ["Anno", "Era", "Incontro", "Fantasma", "Vittorie", "Prestigio"]:
+		table.add_child(UiKit.label(heading, 16, Color(0.75, 0.8, 1.0)))
+	for record: RunState.YearRecord in run.history:
+		table.add_child(UiKit.label(str(record.year), 15))
+		table.add_child(UiKit.label(run.era_name(record.era), 15))
+		table.add_child(UiKit.label("%s: %s" % [record.encounter_name, record.encounter_result] if record.encounter_name != "" else "—", 15, _result_color(record.encounter_result)))
+		table.add_child(UiKit.label("%s: %s" % [record.ghost_name.trim_prefix("Fantasma: "), record.ghost_result] if record.ghost_name != "" else "—", 15, _result_color(record.ghost_result)))
+		table.add_child(UiKit.label(str(record.wins_after), 15))
+		table.add_child(UiKit.label(str(record.prestige_after), 15))
+	_action_box.add_child(table)
+
+
+func _result_color(result: String) -> Color:
+	match result:
+		"Vittoria", "Pareggio":
+			return Color(0.55, 0.9, 0.55)
+		"Sconfitta":
+			return UiKit.COLOR_ERROR
+	return Color.WHITE
 
 
 func _refresh_chronicle() -> void:

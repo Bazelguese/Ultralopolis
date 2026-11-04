@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.12
+## Game Design Document — v0.13
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.12 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.13 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -124,6 +124,7 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | Una sconfitta durante l’ultima possibilità **termina la run** | Confermato |
 | Ricompense per la vittoria: edifici, truppe, perk o risorse. Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (i perk entrano quando esisteranno, §9) |
 | Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
+| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato; regole di crescita placeholder (§16.3) |
 
 ### 3.4 Vittoria e fine della run — Base adottata
 
@@ -566,7 +567,7 @@ L’avversario viene fissato prima delle occasioni di spionaggio e rimane lo ste
 
 La scarsità di avversari nei primi tempi non è considerata un problema: il creatore popolerà il gioco con fantasmi ricavati dalle proprie partite sulla versione definitiva. I playtest diventano così avversari utili.
 
-Per il primo prototipo si usano avversari locali di prova (§16.3); non costituiscono multiplayer online. Il salvataggio della propria nazione come fantasma è rimandato a dopo il prototipo.
+Per il prototipo si usano avversari locali (§16.3); non costituiscono multiplayer online. Negli anni senza un fantasma scritto a mano il gioco **genera** una nazione avversaria dal catalogo (nome, Capitale, edifici, truppe, era, identità, perk e un malus), sempre più forte con gli anni e riproducibile con il seme della run — Confermato. Il salvataggio della propria nazione come fantasma è rimandato.
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
@@ -687,7 +688,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 ### 15.2 Funzioni da includere
 
 - Nuova run con dotazione iniziale comune.
-- Run di prova di 3 anni completi (§16.3).
+- Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno.
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
 - Due macrofasi con raccolta automatica all’ingresso e 2 opportunità ciascuna, da 3 alternative.
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
@@ -742,12 +743,12 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 
 | Convenzione | Stato |
 |---|---|
-| Run di prova di 3 anni completi | Limite del prototipo; la run completa resta di 10 vittorie (§3.4). |
+| Fantasmi e incontri scritti a mano per gli anni 1–3; dopo vengono generati. Crescita: un’era ogni 4 anni, più edifici e truppe ogni anno, truppe di un livello in più ogni 4 anni (file dati del generatore) | Placeholder. |
 | Spazi della plancia da tre vie insieme: ingresso nelle ere, edifici che concedono spazi (es. Caserma), acquisto di spazi come offerta | Provvisoria finché §6.3 non è definito. |
 | Entrando in una nuova era, le alternative dell’opportunità in corso vengono ripescate gratis dalla nuova era | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
 | Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
-| Se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
+| Senza regole di generazione nei dati, se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
 | Pool di offerte basato solo sull’era (l’identità non esiste ancora) | Semplificazione del prototipo. |
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
 | Tre ere e relativo catalogo | Base di prova; nomi, costi e statistiche placeholder. |
@@ -808,6 +809,7 @@ Criteri di accettazione proposti per il prototipo:
 | Prima discesa a zero Prestigio | Run ancora attiva in ultima possibilità. |
 | Ulteriore sconfitta | Fine della run. |
 | Decima vittoria | Fine della run con successo. |
+| Anni oltre quelli scritti a mano | Fantasma e 3 incontri generati, uguali a parità di seme. |
 | Modificatore pluriennale | Applicato per la durata prevista e poi rimosso; esempio: Ricerca dimezzata per un anno. |
 | Stesso malus due volte | Si allunga la durata, l’effetto non raddoppia. |
 | Sconfitta o pareggio contro un fantasma | Si applicano i suoi malus, con il suo nome come origine. |
@@ -860,6 +862,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.13 — 4 novembre 2026**
+- Il prototipo gioca una run completa, fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale (§15.2).
+- Fantasmi e incontri generati dal catalogo negli anni senza dati scritti a mano (§3.3, §11.3, §16.3).
 
 **v0.12 — 4 novembre 2026** (modifica del nucleo)
 - Nuove risorse: Cibo, Legno, Pietra, Ferro, Fauna, Fede, Influenza; mercato delle risorse a tasso fisso (§5.3).

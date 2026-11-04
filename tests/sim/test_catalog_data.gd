@@ -95,8 +95,8 @@ func test_ogni_fase_ha_almeno_tre_tipi_di_opportunita() -> void:
 
 func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
 	var catalog: CatalogDef = _catalog()
-	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
-	for year: int in range(1, rules.prototype_years + 1):
+	assert_not_null(catalog.generator, "Dopo gli anni scritti a mano, fantasmi e incontri sono generati.")
+	for year: int in range(1, 4):
 		var ghosts: int = 0
 		for ghost: GhostDef in catalog.ghosts:
 			if ghost.year == year:
@@ -146,4 +146,5 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 				run.fight_ghost()
 	assert_true(run.is_over(), "La run termina.")
 	assert_lt(guard, 1000, "Nessun ciclo infinito.")
-	assert_eq(run.year, 3, "La run di prova dura 3 anni.")
+	assert_ne(run.run_end, RunState.RunEnd.FINE_PROVA, "La run è completa: finisce con vittoria o sconfitta.")
+	assert_eq(run.history.size(), run.year, "Un riepilogo per ogni anno.")

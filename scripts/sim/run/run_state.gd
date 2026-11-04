@@ -99,6 +99,21 @@ var last_battle_kind: BattleKind = BattleKind.NESSUNA
 var last_opponent_name: String = ""
 var _last_setups: Array[BattleSideSetup] = []
 
+## Riepilogo di un anno della run (per la schermata finale).
+class YearRecord:
+	var year: int = 0
+	var era: int = 1
+	var encounter_name: String = ""
+	var encounter_result: String = ""
+	var ghost_name: String = ""
+	var ghost_result: String = ""
+	var prestige_after: int = 0
+	var wins_after: int = 0
+
+
+## Un riepilogo per ogni anno giocato, dal primo all'ultimo.
+var history: Array[YearRecord] = []
+
 ## Cronaca della run per il giocatore, dal più vecchio al più recente.
 var chronicle: Array[String] = []
 ## Motivo dell'ultima azione rifiutata.
@@ -645,6 +660,9 @@ func choose_encounter(index: int) -> bool:
 	var encounter: EncounterDef = encounter_choices[index]
 	var enemy: BattleSideSetup = BattleSideSetup.new(encounter.buildings, encounter.troops, encounter.resistance)
 	var outcome: BattleSim.Outcome = _fight(BattleKind.INCONTRO, encounter.display_name, enemy)
+	if not history.is_empty():
+		history[-1].encounter_name = "%s (%s)" % [encounter.display_name, encounter.difficulty_label]
+		history[-1].encounter_result = _outcome_word(outcome)
 
 	if _player_won_or_drew(outcome):
 		# Il pareggio vale come vittoria (GDD §3.4).
@@ -676,6 +694,8 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 			gold += reward.amount
 		RewardDef.Kind.RICERCA:
 			research += reward.amount
+		RewardDef.Kind.RISORSA:
+			stock[reward.resource] += reward.amount * Res.scale(reward.resource)
 		RewardDef.Kind.EDIFICIO:
 			# Gratis, ma vale come il prezzo di catalogo quando si vende (GDD §6.4).
 			if not _place_building(reward.building, 0, reward.building.cost_gold, replace_index):
@@ -715,6 +735,9 @@ func fight_ghost() -> bool:
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
 	for message: String in modifiers.on_ghost_fight_done():
 		_log(message)
+	if not history.is_empty():
+		history[-1].ghost_name = ghost_name
+		history[-1].ghost_result = _outcome_word(outcome)
 
 	if _player_won_or_drew(outcome):
 		wins += 1
@@ -750,10 +773,17 @@ func fight_ghost() -> bool:
 # --- Parti interne ----------------------------------------------------------
 
 func _start_year(new_year: int) -> void:
+	_update_last_record()
 	year = new_year
 	current_ghost = _ghost_for_year(year)
 	encounter_choices = _encounters_for_year(year)
 	_log("— Anno %d —" % year)
+	var record: YearRecord = YearRecord.new()
+	record.year = year
+	record.era = era
+	record.prestige_after = prestige
+	record.wins_after = wins
+	history.append(record)
 	for message: String in modifiers.on_new_year(year):
 		_log(message)
 	# Il consumo di Cibo avviene a inizio anno, dall'anno 2 (GDD §5.4).
@@ -1039,12 +1069,33 @@ func _battle_troops() -> Array[TroopDef]:
 	return defs
 
 
+## Aggiorna Prestigio, vittorie ed era dell'ultimo anno registrato.
+func _update_last_record() -> void:
+	if history.is_empty():
+		return
+	history[-1].prestige_after = prestige
+	history[-1].wins_after = wins
+	history[-1].era = era
+
+
+static func _outcome_word(outcome: BattleSim.Outcome) -> String:
+	match outcome:
+		BattleSim.Outcome.VITTORIA_A:
+			return "Vittoria"
+		BattleSim.Outcome.VITTORIA_B:
+			return "Sconfitta"
+		BattleSim.Outcome.PAREGGIO:
+			return "Pareggio"
+	return "Interrotto"
+
+
 func _player_won_or_drew(outcome: BattleSim.Outcome) -> bool:
 	return outcome == BattleSim.Outcome.VITTORIA_A \
 		or outcome == BattleSim.Outcome.PAREGGIO \
 		or outcome == BattleSim.Outcome.INTERROTTA
 
 
+## Fantasma dell'anno: quello scritto nei dati, altrimenti uno generato (GDD §11.3).
 func _ghost_for_year(target_year: int) -> GhostDef:
 	var best: GhostDef = null
 	for ghost: GhostDef in catalog.ghosts:
@@ -1052,21 +1103,28 @@ func _ghost_for_year(target_year: int) -> GhostDef:
 			return ghost
 		if ghost.year < target_year and (best == null or ghost.year > best.year):
 			best = ghost
+	if catalog.generator != null:
+		return OpponentGenerator.generate_ghost(catalog, catalog.generator, run_rules, target_year, run_seed)
 	if best != null:
 		push_warning("RunState: nessun fantasma per l'anno %d, uso quello dell'anno %d." % [target_year, best.year])
 	return best
 
 
+## Incontri dell'anno: quelli scritti nei dati, completati fino a 3 con incontri generati (GDD §3.3).
 func _encounters_for_year(target_year: int) -> Array[EncounterDef]:
 	var found: Array[EncounterDef] = []
 	for encounter: EncounterDef in catalog.encounters:
 		if encounter.year == target_year and found.size() < 3:
 			found.append(encounter)
+	if found.size() < 3 and catalog.generator != null:
+		found.append_array(OpponentGenerator.generate_encounters(catalog, catalog.generator, run_rules,
+				target_year, run_seed, 3 - found.size(), found.size()))
 	return found
 
 
 func _end_run(result: RunEnd) -> void:
 	run_end = result
+	_update_last_record()
 	phase = Phase.FINE_RUN
 	offers = []
 	match result:
@@ -1135,20 +1193,23 @@ func _identity_modifiers(elements: Array[IdentityDef]) -> Modifiers:
 func _ghost_setup() -> BattleSideSetup:
 	var ghost_modifiers: Modifiers = _identity_modifiers(current_ghost.identity)
 	var buildings: Array[BuildingDef] = []
-	var interval_change: int = ghost_modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA)
 	for def: BuildingDef in current_ghost.buildings:
+		var change: int = ghost_modifiers.percent(ModifierDef.Effect.INTERVALLO_MANA, BoardPiece.of_building(def, 0))
 		var copy: BuildingDef = def
-		if interval_change != 0:
+		if change != 0:
 			copy = def.duplicate() as BuildingDef
-			copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(def.mana_interval_ms, interval_change))
+			copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(def.mana_interval_ms, change))
 		buildings.append(copy)
 	var troops: Array[TroopDef] = []
-	var cooldown_change: int = ghost_modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA)
 	for def: TroopDef in current_ghost.troops:
+		var piece: BoardPiece = BoardPiece.of_troop(def, 0)
+		var cooldown_change: int = ghost_modifiers.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
+		var damage_change: int = ghost_modifiers.percent(ModifierDef.Effect.DANNO_TRUPPA, piece)
 		var copy: TroopDef = def
-		if cooldown_change != 0:
+		if cooldown_change != 0 or damage_change != 0:
 			copy = def.duplicate() as TroopDef
 			copy.cooldown_ms = maxi(1, Modifiers.apply_percent(def.cooldown_ms, cooldown_change))
+			copy.damage = Modifiers.apply_percent(def.damage, damage_change)
 		troops.append(copy)
 	return BattleSideSetup.new(buildings, troops, ghost_resistance())
 
