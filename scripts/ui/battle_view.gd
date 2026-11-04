@@ -149,7 +149,7 @@ func _build_side(side: int) -> Control:
 		var piece: PanelContainer = UiKit.panel(UiKit.COLOR_BUILDING, Vector2(150, 0))
 		var piece_box: VBoxContainer = VBoxContainer.new()
 		piece.add_child(piece_box)
-		piece_box.add_child(UiKit.label("%s\n+%d mana" % [def.display_name, def.mana_amount], 15))
+		piece_box.add_child(UiKit.label("%s\n+%d mana %s" % [def.display_name, def.mana_amount, def.mana_type], 15))
 		var production: ProgressBar = ProgressBar.new()
 		production.max_value = def.mana_interval_ms
 		production.custom_minimum_size = Vector2(0, 10)
@@ -168,7 +168,7 @@ func _build_side(side: int) -> Control:
 		var piece: PanelContainer = UiKit.panel(UiKit.COLOR_TROOP, Vector2(200, 0))
 		var piece_box: VBoxContainer = VBoxContainer.new()
 		piece.add_child(piece_box)
-		var cost_text: String = "senza mana" if def.mana_cost == 0 else "%d mana" % def.mana_cost
+		var cost_text: String = "senza mana" if def.mana_cost == 0 else "%d mana %s" % [def.mana_cost, def.mana_type]
 		piece_box.add_child(UiKit.label("%s\n%d danni, %s" % [def.display_name, def.damage, cost_text], 16))
 		var cooldown: ProgressBar = ProgressBar.new()
 		cooldown.max_value = def.cooldown_ms
@@ -190,7 +190,10 @@ func _refresh() -> void:
 		var resistance: int = _sim.get_resistance(side)
 		_resistance_bars[side].value = maxi(resistance, 0)
 		_resistance_labels[side].text = "Resistenza %d / %d" % [resistance, _sim.get_max_resistance(side)]
-		_mana_labels[side].text = "Mana: %d" % _sim.get_mana(side)
+		var mana_parts: PackedStringArray = PackedStringArray()
+		for color: StringName in BattleSim.MANA_COLORS:
+			mana_parts.append("%s %d" % [color, _sim.get_mana(side, color)])
+		_mana_labels[side].text = "Mana: " + " · ".join(mana_parts)
 		for i: int in range(_building_bars[side].size()):
 			var bar: ProgressBar = _building_bars[side][i]
 			bar.value = bar.max_value - _sim.get_building_production_left_ms(side, i)
@@ -202,7 +205,8 @@ func _refresh() -> void:
 				BattleSim.TroopState.IN_ATTESA_DI_MANA:
 					bar.value = bar.max_value
 					var troop: TroopDef = _setups[side].troops[i]
-					state_label.text = "In attesa di mana (serve %d, ce n'è %d)" % [troop.mana_cost, _sim.get_mana(side, troop.mana_type)]
+					var usable: int = _sim.get_mana(side, troop.mana_type) + _sim.get_mana(side, BattleSim.MANA_ENERGETICO)
+					state_label.text = "In attesa di mana %s (serve %d, ce n'è %d)" % [troop.mana_type, troop.mana_cost, usable]
 					state_label.add_theme_color_override("font_color", UiKit.COLOR_WARNING)
 				BattleSim.TroopState.IN_RICARICA:
 					bar.value = bar.max_value - left

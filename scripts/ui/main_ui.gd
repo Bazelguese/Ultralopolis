@@ -8,6 +8,7 @@ enum PendingKind { NESSUNA, OFFERTA, RICOMPENSA, SCELTA_OFFERTA }
 var run: RunState
 
 var _status_label: Label
+var _resources_label: Label
 var _buildings_title: Label
 var _buildings_row: HBoxContainer
 var _troops_title: Label
@@ -61,6 +62,8 @@ func _build_layout() -> void:
 	top.add_child(UiKit.label("PROTOTIPO — grafica provvisoria", 14, UiKit.COLOR_WARNING))
 	top.add_child(UiKit.button("Ricomincia", _new_run))
 	top.add_child(UiKit.button("Menu principale", _on_menu))
+	_resources_label = UiKit.wrapped("", 17, Color(0.85, 0.85, 0.75))
+	root.add_child(_resources_label)
 
 	var middle: HBoxContainer = HBoxContainer.new()
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -176,16 +179,19 @@ func _refresh() -> void:
 
 
 func _refresh_status() -> void:
-	if run.phase == RunState.Phase.CREAZIONE_NAZIONE:
-		_status_label.text = "Creazione della nazione   ·   Prestigio %d   ·   Oro %d   ·   Ricerca %d" % [run.prestige, run.gold, run.research]
-		return
-	var preview: Vector2i = run.production_preview()
 	var text: String = "Anno %d   ·   %s   ·   Era: %s   ·   Vittorie %d/%d   ·   Prestigio %d" % [
 		run.year, run.phase_name(), run.era_name(), run.wins, run.run_rules.wins_needed, run.prestige]
 	if run.last_chance:
 		text += " (ULTIMA POSSIBILITÀ)"
-	text += "   ·   Oro %d (+%d a fase)   ·   Ricerca %d (+%d a fase)" % [run.gold, preview.x, run.research, preview.y]
 	_status_label.text = text
+	var produced: Array[int] = run.production_per_phase()
+	var parts: PackedStringArray = PackedStringArray()
+	for type: Res.Type in Res.NAMES:
+		parts.append("%s %s (+%s)" % [Res.NAMES[type], run.stock_text(type), Res.format(type, produced[type])])
+	var upkeep: int = 0
+	for piece: BoardPiece in run.board.troops:
+		upkeep += piece.troop.food_tenths
+	_resources_label.text = "   ·   ".join(parts) + "   —   Cibo richiesto dalle truppe a inizio anno: %s" % Res.format(Res.Type.CIBO, upkeep)
 
 
 func _refresh_board() -> void:
@@ -202,15 +208,19 @@ func _refresh_board() -> void:
 	if run.phase == RunState.Phase.CREAZIONE_NAZIONE:
 		_resistance_label.text = ""
 	UiKit.clear(_modifiers_box)
-	var traits: PackedStringArray = PackedStringArray()
+	var trait_counts: Dictionary[String, int] = {}
 	var temporary: Array[ActiveModifier] = []
 	for modifier: ActiveModifier in run.modifiers.active:
 		if modifier.def.duration_kind == ModifierDef.Duration.PERMANENTE:
-			traits.append("%s (%s)" % [modifier.def.display_name, modifier.def.description.trim_suffix(".")])
+			trait_counts[modifier.def.display_name] = trait_counts.get(modifier.def.display_name, 0) + 1
 		else:
 			temporary.append(modifier)
-	if not traits.is_empty():
-		_modifiers_box.add_child(UiKit.wrapped("Tratti permanenti: " + "; ".join(traits) + ".", 14, Color(0.5, 0.9, 0.5)))
+	if not trait_counts.is_empty():
+		var traits: PackedStringArray = PackedStringArray()
+		for trait_name: String in trait_counts:
+			var count: int = trait_counts[trait_name]
+			traits.append(trait_name if count == 1 else "%s ×%d" % [trait_name, count])
+		_modifiers_box.add_child(UiKit.wrapped("Tratti permanenti: " + " · ".join(traits), 14, Color(0.5, 0.9, 0.5)))
 	if not temporary.is_empty():
 		_modifiers_box.add_child(UiKit.label("Effetti attivi:", 18, UiKit.COLOR_WARNING))
 		for modifier: ActiveModifier in temporary:
@@ -223,19 +233,24 @@ func _refresh_board() -> void:
 	UiKit.clear(_buildings_row)
 	for i: int in range(board.buildings.size()):
 		var piece: BoardPiece = board.buildings[i]
-		var card: PanelContainer = UiKit.panel(UiKit.COLOR_BUILDING, Vector2(210, 170))
+		var card: PanelContainer = UiKit.panel(UiKit.COLOR_BUILDING, Vector2(230, 170))
 		var box: VBoxContainer = VBoxContainer.new()
 		card.add_child(box)
 		box.add_child(UiKit.label(piece.building.display_name, 20))
-		box.add_child(UiKit.label(UiKit.building_details(run.effective_building(piece)), 14))
+		box.add_child(UiKit.wrapped(UiKit.building_details(run.effective_building(piece), run.building_production(piece)), 14))
 		_add_piece_modifiers(box, piece)
+		_add_level(box, piece)
 		if replacing_building:
 			var can_replace: bool = run.board.can_replace_building(i, _pending_building_def())
 			box.add_child(UiKit.button("Sostituisci" if can_replace else "Concede spazi occupati", _on_replace.bind(i), can_replace))
 		elif not run.is_over():
-			var can_sell: bool = run.board.can_sell_building(i)
-			var sell_text: String = "Vendi (+%d)" % RunState.half_down(piece.paid) if can_sell else "Concede spazi occupati"
-			box.add_child(UiKit.button(sell_text, _on_sell_building.bind(i), can_sell))
+			_add_upgrade_button(box, piece, _on_upgrade_building.bind(i))
+			if piece.building.is_capital:
+				box.add_child(UiKit.label("Non si vende", 14, Color(0.7, 0.7, 0.7)))
+			else:
+				var can_sell: bool = run.board.can_sell_building(i)
+				var sell_text: String = "Vendi (+%d)" % RunState.half_down(piece.paid) if can_sell else "Concede spazi occupati"
+				box.add_child(UiKit.button(sell_text, _on_sell_building.bind(i), can_sell))
 		_buildings_row.add_child(card)
 	for i: int in range(board.building_capacity() - board.buildings.size()):
 		_buildings_row.add_child(_empty_slot())
@@ -244,12 +259,15 @@ func _refresh_board() -> void:
 	UiKit.clear(_troops_row)
 	for i: int in range(board.troops.size()):
 		var piece: BoardPiece = board.troops[i]
-		var card: PanelContainer = UiKit.panel(UiKit.COLOR_TROOP, Vector2(210, 170))
+		var card: PanelContainer = UiKit.panel(UiKit.COLOR_TROOP, Vector2(230, 170))
 		var box: VBoxContainer = VBoxContainer.new()
 		card.add_child(box)
 		box.add_child(UiKit.label("%d. %s" % [i + 1, piece.troop.display_name], 20))
-		box.add_child(UiKit.label(UiKit.troop_details(run.effective_troop(piece)), 14))
+		box.add_child(UiKit.wrapped(UiKit.troop_details(run.effective_troop(piece)), 14))
 		_add_piece_modifiers(box, piece)
+		_add_level(box, piece)
+		if piece.hungry:
+			box.add_child(UiKit.label("⚠ Affamata: ricarica ×1,5", 14, UiKit.COLOR_ERROR))
 		if replacing_troop:
 			box.add_child(UiKit.button("Sostituisci", _on_replace.bind(i)))
 		elif not run.is_over():
@@ -258,9 +276,49 @@ func _refresh_board() -> void:
 			buttons.add_child(UiKit.button("▶", _on_move_troop.bind(i, i + 1), i < board.troops.size() - 1))
 			buttons.add_child(UiKit.button("Vendi (+%d)" % RunState.half_down(piece.paid), _on_sell_troop.bind(i)))
 			box.add_child(buttons)
+			_add_upgrade_button(box, piece, _on_upgrade_troop.bind(i))
 		_troops_row.add_child(card)
 	for i: int in range(board.troop_capacity() - board.troops.size()):
 		_troops_row.add_child(_empty_slot())
+
+
+func _add_level(box: VBoxContainer, piece: BoardPiece) -> void:
+	if piece.level > 1:
+		box.add_child(UiKit.label("Livello %d" % piece.level, 14, Color(0.95, 0.85, 0.55)))
+
+
+## Pulsante "Potenzia" con il costo del prossimo livello (GDD §6.5).
+func _add_upgrade_button(box: VBoxContainer, piece: BoardPiece, callback: Callable) -> void:
+	var cost: ResourceAmounts = run.upgrade_cost_of(piece)
+	if cost == null:
+		return
+	box.add_child(UiKit.button("Potenzia (%s)" % cost.describe(), callback, run.can_pay(cost)))
+
+
+func _on_upgrade_building(index: int) -> void:
+	_act(run.upgrade_building(index))
+
+
+func _on_upgrade_troop(index: int) -> void:
+	_act(run.upgrade_troop(index))
+
+
+## Mercato delle risorse (GDD §5.3): vende a gruppi al tasso fisso.
+func _show_market() -> void:
+	var rate: int = run.run_rules.market_units_per_gold
+	_action_box.add_child(UiKit.wrapped("Mercato: vendi %d unità di una risorsa per 1 Oro (non consuma l'opportunità)." % rate, 16))
+	var grid: GridContainer = GridContainer.new()
+	grid.columns = 4
+	for type: Res.Type in Res.NAMES:
+		if type == Res.Type.ORO:
+			continue
+		var enough: bool = run.stock[type] >= rate * Res.scale(type)
+		grid.add_child(UiKit.button("Vendi %d %s" % [rate, Res.NAMES[type]], _on_sell_resource.bind(type), enough))
+	_action_box.add_child(grid)
+
+
+func _on_sell_resource(type: Res.Type) -> void:
+	_act(run.sell_resource(type, run.run_rules.market_units_per_gold))
 
 
 ## Segnala sulla carta i malus o bonus che colpiscono proprio quell'elemento.
@@ -330,6 +388,8 @@ func _show_opportunity() -> void:
 	buttons.add_child(UiKit.button("Rinnova le offerte (%d Oro)" % run.reroll_cost(), _on_reroll, run.gold >= run.reroll_cost()))
 	buttons.add_child(UiKit.button("Lascia passare", _on_pass))
 	_action_box.add_child(buttons)
+
+	_show_market()
 
 	var era_cost: int = run.next_era_cost()
 	if era_cost >= 0:

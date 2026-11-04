@@ -63,24 +63,40 @@ static func seconds(ms: int) -> String:
 	return "%.1f s" % (ms / 1000.0)
 
 
-static func building_details(def: BuildingDef) -> String:
+## Colori associati ai colori del mana, per le scritte.
+const MANA_TEXT_COLORS: Dictionary[StringName, Color] = {
+	&"rosso": Color(1.0, 0.5, 0.45),
+	&"verde": Color(0.55, 0.9, 0.55),
+	&"blu": Color(0.55, 0.75, 1.0),
+	&"energetico": Color(1.0, 0.9, 0.45),
+}
+
+
+## Descrizione di un edificio. produced: produzione per fase in unità interne
+## (se vuota si usa quella di base della scheda).
+static func building_details(def: BuildingDef, produced: Array[int] = []) -> String:
 	var parts: PackedStringArray = PackedStringArray()
-	if def.gold_per_phase > 0:
-		parts.append("+%d Oro" % def.gold_per_phase)
-	if def.research_per_phase > 0:
-		parts.append("+%d Ricerca" % def.research_per_phase)
+	for type: Res.Type in Res.NAMES:
+		var amount: int = produced[type] if not produced.is_empty() else def.production(type) * Res.scale(type)
+		if amount > 0:
+			parts.append("+%s %s" % [Res.format(type, amount), Res.NAMES[type]])
 	var economy: String = ", ".join(parts) + " a fase" if not parts.is_empty() else "Nessuna risorsa"
-	var text: String = "%s\nMana: +%d ogni %s" % [economy, def.mana_amount, seconds(def.mana_interval_ms)]
+	var text: String = "%s\nMana %s: +%d ogni %s" % [economy, def.mana_type, def.mana_amount, seconds(def.mana_interval_ms)]
 	if def.extra_building_slots > 0:
 		text += "\n+%d spazio edificio" % def.extra_building_slots
 	if def.extra_troop_slots > 0:
 		text += "\n+%d spazio truppa" % def.extra_troop_slots
+	if not def.tags.is_empty():
+		text += "\n[%s]" % ", ".join(def.tags)
 	return text
 
 
 static func troop_details(def: TroopDef) -> String:
-	var cost: String = "senza mana" if def.mana_cost == 0 else "%d mana" % def.mana_cost
-	return "Danno %d, %s\nRicarica %s" % [def.damage, cost, seconds(def.cooldown_ms)]
+	var cost: String = "senza mana" if def.mana_cost == 0 else "%d mana %s" % [def.mana_cost, def.mana_type]
+	var text: String = "Danno %d, %s\nRicarica %s · Cibo %s" % [def.damage, cost, seconds(def.cooldown_ms), Res.format(Res.Type.CIBO, def.food_tenths)]
+	if not def.tags.is_empty():
+		text += "\n[%s]" % ", ".join(def.tags)
+	return text
 
 
 ## Riassunto dell'identità: "Popolo · Governo · ..." e i perk su una seconda riga.
