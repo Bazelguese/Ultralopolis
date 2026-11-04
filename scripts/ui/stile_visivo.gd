@@ -63,6 +63,25 @@ static func colore_cornice(era: int) -> Color:
 	return CORNICI_ERA.get(era, CORNICI_ERA[1])
 
 
+## Colore del mana dal nome usato nei dati del gioco (&"rosso", &"verde", &"blu", &"energetico").
+static func colore_mana_nome(nome: StringName) -> Color:
+	return colore_mana(mana_da_nome(nome))
+
+
+static func mana_da_nome(nome: StringName) -> int:
+	match nome:
+		&"rosso": return Mana.ROSSO
+		&"verde": return Mana.VERDE
+		&"blu": return Mana.BLU
+		&"energetico": return Mana.ENERGETICO
+	return Mana.NESSUNO
+
+
+## Cornici che non dipendono dall'era: azioni (offerte senza edificio o truppa) e minacce.
+const CORNICE_AZIONE: Color = Color("a78bfa")
+const CORNICE_MINACCIA: Color = Color("ff4d6d")
+
+
 # --- Materiali ------------------------------------------------------------------
 
 static func materiale(colore: Color, ruvidezza: float = 0.8, metallo: float = 0.0) -> StandardMaterial3D:
