@@ -16,6 +16,20 @@ signal pausa
 signal velocita(fattore: float)
 signal annulla
 
+## Distanza dal fondo dello schermo dei comandi che stanno sopra la barra delle risorse.
+const SOPRA_BARRA: float = -112.0
+const COLORI_RISORSE: Dictionary[int, Color] = {
+	Res.Type.ORO: Color("ffd76a"),
+	Res.Type.RICERCA: Color("7fb4ff"),
+	Res.Type.CIBO: Color("8fe08a"),
+	Res.Type.LEGNO: Color("d9a066"),
+	Res.Type.PIETRA: Color("c9d0dc"),
+	Res.Type.FERRO: Color("a9bfd6"),
+	Res.Type.FAUNA: Color("e8b98a"),
+	Res.Type.FEDE: Color("f5e6a8"),
+	Res.Type.INFLUENZA: Color("d6a6ff"),
+}
+
 var _nazione: Label
 var _identita: Label
 var _fase: Label
@@ -25,6 +39,7 @@ var _vittorie: Label
 var _era: Label
 var _ultima_possibilita: Label
 var _valori_risorse: Dictionary[int, Label] = {}
+var _produzioni_risorse: Dictionary[int, Label] = {}
 var _pulsante_era: Button
 var _magazzino: PanelContainer
 var _righe_magazzino: Dictionary[int, Label] = {}
@@ -199,20 +214,50 @@ func _crea_run() -> void:
 	_ancora(_ultima_possibilita, Control.PRESET_TOP_RIGHT, Vector2(-30, 124))
 
 
+## Barra lunga in fondo allo schermo, sempre visibile: tutte le risorse del Magazzino
+## con la quantità e, accanto, quanto producono a ogni fase.
 func _crea_risorse() -> void:
-	var riquadro: PanelContainer = PanelContainer.new()
+	var barra: PanelContainer = PanelContainer.new()
 	var riga: HBoxContainer = HBoxContainer.new()
-	riga.add_theme_constant_override("separation", 22)
-	riquadro.add_child(riga)
-	var colori: Dictionary[int, Color] = {Res.Type.ORO: StileVisivo.ORO_LUCE, Res.Type.RICERCA: Color("7fb4ff"), Res.Type.CIBO: Color("8fe08a")}
-	for tipo: int in colori:
-		var coppia: Array = _valore(Res.NAMES[tipo], colori[tipo])
-		riga.add_child(coppia[0])
-		_valori_risorse[tipo] = coppia[1]
-	riga.add_child(_pulsante("Magazzino", func() -> void: _magazzino.visible = not _magazzino.visible))
+	riga.add_theme_constant_override("separation", 6)
+	barra.add_child(riga)
+	for tipo: int in Res.NAMES:
+		var cella: VBoxContainer = VBoxContainer.new()
+		cella.add_theme_constant_override("separation", -6)
+		cella.custom_minimum_size = Vector2(124, 0)
+		cella.tooltip_text = "%s: quantità nel Magazzino e produzione a ogni fase." % Res.NAMES[tipo]
+		cella.mouse_filter = Control.MOUSE_FILTER_PASS
+		cella.add_child(StileVisivo.etichetta(Res.NAMES[tipo].to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+		var valori: HBoxContainer = HBoxContainer.new()
+		valori.add_theme_constant_override("separation", 6)
+		var valore: Label = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30, COLORI_RISORSE[tipo])
+		valori.add_child(valore)
+		var produzione: Label = StileVisivo.etichetta("", StileVisivo.FONT_NUMERI, 17, StileVisivo.TESTO_TENUE)
+		produzione.size_flags_vertical = Control.SIZE_SHRINK_END
+		valori.add_child(produzione)
+		cella.add_child(valori)
+		riga.add_child(cella)
+		_valori_risorse[tipo] = valore
+		_produzioni_risorse[tipo] = produzione
+	var spinta: Control = Control.new()
+	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	riga.add_child(spinta)
+	var mercato: Button = _pulsante("Mercato", func() -> void: _magazzino.visible = not _magazzino.visible)
+	mercato.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	riga.add_child(mercato)
 	_pulsante_era = _pulsante("", func() -> void: avanza_era.emit())
+	_pulsante_era.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_era)
-	_ancora(riquadro, Control.PRESET_BOTTOM_LEFT, Vector2(24, -24))
+	add_child(barra)
+	barra.anchor_left = 0.0
+	barra.anchor_right = 1.0
+	barra.anchor_top = 1.0
+	barra.anchor_bottom = 1.0
+	barra.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	barra.offset_left = 24.0
+	barra.offset_right = -24.0
+	barra.offset_bottom = -16.0
+	barra.offset_top = -16.0 - barra.get_combined_minimum_size().y
 
 
 func _crea_magazzino() -> void:
@@ -220,8 +265,8 @@ func _crea_magazzino() -> void:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 6)
 	_magazzino.add_child(colonna)
-	colonna.add_child(StileVisivo.etichetta("MAGAZZINO", StileVisivo.FONT_TITOLI, 28, StileVisivo.ORO_LUCE))
-	colonna.add_child(StileVisivo.etichetta("Quantità, produzione a ogni fase e mercato", StileVisivo.FONT_TESTO, 15, StileVisivo.TESTO_TENUE))
+	colonna.add_child(StileVisivo.etichetta("MERCATO", StileVisivo.FONT_TITOLI, 28, StileVisivo.ORO_LUCE))
+	colonna.add_child(StileVisivo.etichetta("Vendi le risorse in cambio di Oro", StileVisivo.FONT_TESTO, 15, StileVisivo.TESTO_TENUE))
 	var griglia: GridContainer = GridContainer.new()
 	griglia.columns = 2
 	griglia.add_theme_constant_override("h_separation", 18)
@@ -239,7 +284,7 @@ func _crea_magazzino() -> void:
 			vendi.add_theme_font_size_override("font_size", 16)
 			griglia.add_child(vendi)
 			_vendite[tipo] = vendi
-	_ancora(_magazzino, Control.PRESET_BOTTOM_LEFT, Vector2(24, -118))
+	_ancora(_magazzino, Control.PRESET_BOTTOM_LEFT, Vector2(24, SOPRA_BARRA))
 	_magazzino.visible = false
 
 
@@ -303,7 +348,7 @@ func _crea_comandi() -> void:
 	riga.add_child(_pulsante_passa)
 	_pulsante_nessuna = _pulsante("Nessuna ricompensa", func() -> void: nessuna_ricompensa.emit())
 	riga.add_child(_pulsante_nessuna)
-	_ancora(_comandi, Control.PRESET_CENTER_BOTTOM, Vector2(0, -24))
+	_ancora(_comandi, Control.PRESET_CENTER_BOTTOM, Vector2(0, SOPRA_BARRA))
 
 
 func _crea_principale() -> void:
@@ -314,7 +359,7 @@ func _crea_principale() -> void:
 	_principale.custom_minimum_size = Vector2(320, 68)
 	StileVisivo.rendi_principale(_principale)
 	_colonna_principale.add_child(_principale)
-	_ancora(_colonna_principale, Control.PRESET_BOTTOM_RIGHT, Vector2(-24, -24))
+	_ancora(_colonna_principale, Control.PRESET_BOTTOM_RIGHT, Vector2(-24, SOPRA_BARRA))
 
 
 func _crea_barra_scontro() -> void:
@@ -336,7 +381,7 @@ func _crea_barra_scontro() -> void:
 		riga.add_child(pulsante)
 		_pulsanti_velocita.append(pulsante)
 	riga.add_child(_pulsante("Salta alla fine", func() -> void: azione_principale.emit()))
-	_ancora(_barra_scontro, Control.PRESET_CENTER_BOTTOM, Vector2(0, -24))
+	_ancora(_barra_scontro, Control.PRESET_CENTER_BOTTOM, Vector2(0, SOPRA_BARRA))
 	_barra_scontro.visible = false
 
 
@@ -354,7 +399,7 @@ func _crea_pezzo() -> void:
 	_azioni_pezzo = HBoxContainer.new()
 	_azioni_pezzo.add_theme_constant_override("separation", 8)
 	colonna.add_child(_azioni_pezzo)
-	_ancora(_pezzo, Control.PRESET_BOTTOM_RIGHT, Vector2(-24, -190))
+	_ancora(_pezzo, Control.PRESET_BOTTOM_RIGHT, Vector2(-24, SOPRA_BARRA - 166.0))
 	_pezzo.visible = false
 
 
@@ -461,17 +506,18 @@ func aggiorna_partita(run: RunState) -> void:
 	var produzione: Array[int] = run.production_per_phase()
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
+		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
 	var costo_era: int = run.next_era_cost()
 	if costo_era >= 0:
 		_valori_risorse[Res.Type.RICERCA].text = "%s/%d" % [run.stock_text(Res.Type.RICERCA), costo_era]
-		_pulsante_era.text = "Avanza a %s" % run.era_name(run.era + 1)
+		_pulsante_era.text = "Avanza a %s · %d Ricerca" % [run.era_name(run.era + 1), costo_era]
 		_pulsante_era.visible = true
 		_pulsante_era.disabled = not comprando or run.research < costo_era
 	else:
 		_pulsante_era.visible = false
 	var lotto: int = run.run_rules.market_units_per_gold
 	for tipo: int in _righe_magazzino:
-		_righe_magazzino[tipo].text = "%s  %s  (+%s)" % [Res.NAMES[tipo], run.stock_text(tipo), Res.format(tipo, produzione[tipo])]
+		_righe_magazzino[tipo].text = "%s  %s" % [Res.NAMES[tipo], run.stock_text(tipo)]
 		if _vendite.has(tipo):
 			_vendite[tipo].text = "Vendi %d → 1 Oro" % lotto
 			_vendite[tipo].disabled = not comprando or run.stock[tipo] < lotto * Res.scale(tipo)
@@ -610,10 +656,13 @@ func mostra_esito(titolo: String, sottotitolo: String, righe: Array[String], col
 		var etichetta: Label = StileVisivo.etichetta("• " + riga, StileVisivo.FONT_TESTO, 19)
 		etichetta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		etichetta.custom_minimum_size = Vector2(600, 0)
+		etichetta.size = Vector2(600, 0)
 		_righe_esito.add_child(etichetta)
 	_al_continua = al_continua
 	_esito.visible = true
 	_centra(_esito)
+	# Le scritte che vanno a capo conoscono la loro altezza solo dopo un passaggio di impaginazione.
+	_ricentra_dopo_impaginazione(_esito)
 	_esito.pivot_offset = _esito.size * 0.5
 	_esito.scale = Vector2.ONE * 0.9
 	var animazione: Tween = create_tween()
@@ -626,6 +675,13 @@ func _centra(pannello: Control) -> void:
 	pannello.size = Vector2.ZERO
 	pannello.size = pannello.get_combined_minimum_size()
 	pannello.position = (get_viewport_rect().size - pannello.size) * 0.5
+
+
+func _ricentra_dopo_impaginazione(pannello: Control) -> void:
+	await get_tree().process_frame
+	if is_instance_valid(pannello) and pannello.visible:
+		_centra(pannello)
+		pannello.pivot_offset = pannello.size * 0.5
 
 
 func esito_visibile() -> bool:
