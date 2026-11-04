@@ -1,6 +1,6 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 2 — 4 novembre 2026
+**Versione:** bozza 3 — 4 novembre 2026
 **Riferimento:** Game Design Document v0.16 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Questo catalogo **non è ancora nel gioco**: i file dati (`data/catalog/`) contengono la versione precedente e verranno aggiornati quando si deciderà di implementarlo.
 
@@ -14,13 +14,31 @@ Ogni elemento ha un valore in **punti** che dipende dalla sua era. Gli effetti c
 
 ### 1.1 Moltiplicatore d’era
 
-| Era | Moltiplicatore | Budget di un edificio | Costo in Oro (edifici e truppe) |
+| Era | Moltiplicatore | Budget di un edificio | Costo base in Oro (edifici e truppe) |
 |---|---:|---:|---:|
 | 1 | ×1 | 4 punti | 4 |
 | 2 | ×1,5 | 6 punti | 7 |
 | 3 | ×2 | 8 punti | 10 |
 
 Il moltiplicatore cresce con l’era: è il principio P2a (gli effetti più forti nelle ere avanzate).
+
+**Costi variabili.** Un elemento può costare 1 Oro in più o in meno del costo base della sua era; ogni Oro in più o in meno vale **±1 punto** di budget. Elementi che si discostano dal costo base:
+
+| Elemento | Era | Costo | Budget |
+|---|---:|---:|---|
+| Fattoria | 1 | 3 | −1 |
+| Mercato | 1 | 5 | +1 |
+| Santuario | 1 | 5 | +1 |
+| Lancieri | 1 | 3 | −1 |
+| Frombolieri | 1 | 5 | +1 |
+| Guardie | 2 | 6 | −1 |
+| Cavalieri | 2 | 8 | +1 |
+| Banca | 3 | 11 | +1 |
+| Cattedrale | 3 | 11 | +1 |
+| Moschettieri | 3 | 9 | −1 |
+| Bombarde | 3 | 11 | +1 |
+
+Nelle tabelle seguenti la colonna “Punti” tiene già conto di queste variazioni.
 
 ### 1.2 Valore degli effetti
 
@@ -72,7 +90,7 @@ Effetti (GDD §6.5): ogni livello dà **+50% a tutti i valori d’effetto**, dur
 
 Il colore segue la famiglia (§5.3 del GDD): **rosso** Militare, Estrattivo, Difensivo; **verde** Commerciale, Agricolo, Fauna; **blu** Sapere, Sacro. Ogni era ha truppe di tutti e tre i colori, così ogni famiglia di edifici serve anche in battaglia.
 
-Un edificio **senza mana è neutro** e non compare fra le offerte comuni: si ottiene solo come esclusivo dell’identità o di una via (§5.3 del GDD). Per questo tutti gli edifici base producono almeno un po’ di mana.
+Un edificio **senza mana è neutro**: non ha colore (§5.3 del GDD). Come ogni altro edificio può essere disponibile a tutti (Palizzata, Bastioni) oppure esclusivo di certe nazioni (Reliquiario).
 
 ---
 
@@ -80,20 +98,23 @@ Un edificio **senza mana è neutro** e non compare fra le offerte comuni: si ott
 
 Legenda della colonna “In battaglia”: ciò che l’edificio produce allo scadere del suo unico intervallo (§7.4 del GDD).
 
-### 2.1 Era 1 — budget 4, costo 4 Oro
+### 2.1 Era 1 — budget 4, costo base 4 Oro (11 edifici)
 
 | Edificio | Etichette | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
-| Fattoria | Agricolo | verde | Oro 1, Cibo 2 | 1 mana ogni 2 s | — | 4 |
+| Fattoria | Agricolo | verde | Oro 1, Cibo 2 | 1 mana ogni 4 s | — | 3 |
 | Segheria | Estrattivo | verde | Oro 1, Legno 2 | 1 mana ogni 2 s | — | 4 |
 | Miniera | Estrattivo | rosso | Pietra 1, Ferro 2 | 1 mana ogni 1,5 s | — | 4,2 |
-| Mercato | Commerciale | verde | Oro 2, Influenza 1 | 1 mana ogni 3 s | — | 3,8 |
+| Mercato | Commerciale | verde | Oro 2, Influenza 1 | 1 mana ogni 1,5 s | — | 5,2 |
 | Biblioteca | Sapere | blu | Ricerca 2 | 1 mana ogni 2 s | — | 4 |
 | Santuario | Sacro | blu | Fede 2 | 1 mana + 1 cura ogni 2 s | — | 4,5 |
 | Caserma | Militare | rosso | Ferro 1 | 1 mana ogni 3 s | +1 spazio truppa | 3,8 |
-| Palizzata | Difensivo | rosso | Pietra 1, Legno 1 | 1 mana + 2 scudo ogni 3 s | — | 4,3 |
+| Palizzata | Difensivo | **neutro** | Pietra 1, Legno 1 | 3 scudo ogni 3 s (nessun mana) | — | 4 |
+| Cava | Estrattivo | rosso | Pietra 3 | 1 mana ogni 1,5 s | — | 4,2 |
+| Consolato | Commerciale | blu | Oro 1, Influenza 2 | 1 mana ogni 2 s | — | 4 |
+| Stalle | Fauna, Agricolo | verde | Cibo 1, Fauna 2 | 1 mana ogni 1,5 s | — | 4,2 |
 
-### 2.2 Era 2 — budget 6, costo 7 Oro
+### 2.2 Era 2 — budget 6, costo base 7 Oro
 
 | Edificio | Etichette | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
@@ -102,20 +123,20 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Cantiere | Estrattivo | verde | Legno 2, Pietra 2 | 1 mana ogni 2 s | +1 spazio edificio | 6 |
 | Fortezza | Difensivo, Militare | rosso | Pietra 1 | 1 mana + 2 scudo ogni 3 s | +1 spazio truppa | 5,8 |
 | Tempio | Sacro | blu | Fede 2 | 1 mana + 2 cura ogni 2 s | — | 6 |
-| Stalle | Fauna, Agricolo | verde | Cibo 1, Fauna 3 | 1 mana ogni 1 s | — | 6 |
-| Consolato | Commerciale | blu | Oro 2, Influenza 3 | 1 mana ogni 1,5 s | — | 6,2 |
+| Granaio | Agricolo | verde | Cibo 4, Oro 1 | 1 mana ogni 1,5 s | — | 5,7 |
+| Fonderia | Estrattivo | rosso | Ferro 3, Oro 1 | 1 mana ogni 1 s | — | 6,5 |
 | Loggia segreta | Sapere | blu | Ricerca 1, Influenza 1 | 1 mana + 2 Corruzione ogni 3 s | — | 5,8 |
 
-### 2.3 Era 3 — budget 8, costo 10 Oro
+### 2.3 Era 3 — budget 8, costo base 10 Oro
 
 | Edificio | Etichette | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
 | Università | Sapere | blu | Ricerca 6 | 1 mana ogni 2 s | — | 8 |
-| Banca | Commerciale | verde | Oro 5, Influenza 1 | 1 mana ogni 1,5 s | — | 8,2 |
-| Cattedrale | Sacro | blu | Fede 4 | 3 mana ogni 2 s | — | 8 |
+| Banca | Commerciale | verde | Oro 6, Influenza 1 | 1 mana ogni 1,5 s | — | 9,2 |
+| Cattedrale | Sacro | blu | Fede 4, Oro 1 | 3 mana ogni 2 s | — | 9 |
 | Cittadella | Difensivo, Militare | rosso | Ferro 1 | 1 mana + 1 scudo ogni 2 s | +2 spazi truppa | 8 |
 | Arsenale | Militare | rosso | Oro 1, Ferro 2 | 3 mana ogni 2 s | — | 8 |
-| Bastioni | Difensivo | rosso | Pietra 2 | 1 mana + 6 scudo ogni 3 s | — | 8,3 |
+| Bastioni | Difensivo | **neutro** | Pietra 2 | 7 scudo ogni 3 s (nessun mana) | — | 8 |
 | Ospedale | Sapere | blu | Ricerca 1 | 1 mana + 3 cura ogni 2 s | — | 7,5 |
 | Rete di informatori | Commerciale | verde | Oro 2, Influenza 3 | 1 mana + Sabotaggio 2 s (truppe) ogni 4 s | — | 7,5 |
 
@@ -129,40 +150,40 @@ Invariata (§6.2 del GDD): 1 di ogni risorsa a ogni fase, 1 mana energetico ogni
 
 Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “Effetti” è ciò che la truppa fa quando si attiva. Inefficienza e Sabotaggio indicano tra parentesi la categoria di bersaglio (§7.7 del GDD).
 
-### 3.1 Era 1 — moltiplicatore ×1, costo 4 Oro
+### 3.1 Era 1 — moltiplicatore ×1, costo base 4 Oro
 
 | Truppa | Etichette | Mana | Ricarica | Effetti | Cibo | Punti |
 |---|---|---|---:|---|---:|---:|
 | Milizia | Fanteria | nessuno | 2 s | Danno 2 | 0,5 | 2 |
-| Lancieri | Fanteria | nessuno | 3 s | Danno 2, Scudo 1 | 0,5 | 3 |
+| Lancieri | Fanteria | nessuno | 3 s | Danno 1, Scudo 1 | 0,5 | 2 |
 | Arcieri | Tiratori | rosso 2 | 1,5 s | Danno 4 | 0,5 | 4 |
 | Scudieri | Fanteria | rosso 2 | 2,5 s | Scudo 5 | 0,5 | 5 |
-| Frombolieri | Tiratori | verde 3 | 2 s | Danno 6 | 0,5 | 6 |
+| Frombolieri | Tiratori | verde 3 | 2 s | Danno 7 | 0,5 | 7 |
 | Esploratori | Cavalleria, Fauna | verde 1 | 1 s | Danno 2 | 1 | 2 |
 | Erboristi | Sacro | blu 2 | 2 s | Cura 5 | 0,5 | 5 |
 | Sobillatori | Fanteria | blu 2 | 3 s | Corruzione 4 | 0,5 | 6 |
 
-### 3.2 Era 2 — moltiplicatore ×1,5, costo 7 Oro
+### 3.2 Era 2 — moltiplicatore ×1,5, costo base 7 Oro
 
 | Truppa | Etichette | Mana | Ricarica | Effetti | Cibo | Punti |
 |---|---|---|---:|---|---:|---:|
-| Guardie | Fanteria | nessuno | 2,5 s | Scudo 3 | 0,5 | 3 |
+| Guardie | Fanteria | nessuno | 2,5 s | Scudo 2 | 0,5 | 2 |
 | Balestrieri | Tiratori | rosso 2 | 1,5 s | Danno 6 | 0,5 | 6 |
 | Arieti | Assedio | rosso 4 | 3 s | Danno agli scudi 10, Danno 8 | 1 | 13 |
 | Guastatori | Fanteria | rosso 3 | 3 s | Danno 7, Inefficienza 4 s (edifici) | 0,5 | 11 |
-| Cavalieri | Cavalleria, Fauna | verde 3 | 2 s | Danno 9 | 1 | 9 |
+| Cavalieri | Cavalleria, Fauna | verde 3 | 2 s | Danno 10 | 1 | 10 |
 | Arcieri a cavallo | Cavalleria, Tiratori, Fauna | verde 2 | 1,5 s | Danno 4, Inefficienza 2 s (truppe) | 1 | 6 |
 | Confraternita | Sacro | blu 3 | 2,5 s | Cura 6, Scudo 4 | 0,5 | 10 |
 | Predicatori | Sacro | blu 3 | 3 s | Corruzione 6, Danno 2 | 0,5 | 11 |
 
-### 3.3 Era 3 — moltiplicatore ×2, costo 10 Oro
+### 3.3 Era 3 — moltiplicatore ×2, costo base 10 Oro
 
 | Truppa | Etichette | Mana | Ricarica | Effetti | Cibo | Punti |
 |---|---|---|---:|---|---:|---:|
-| Moschettieri | Tiratori | nessuno | 2,5 s | Danno 5 | 0,5 | 5 |
+| Moschettieri | Tiratori | rosso 2 | 2,5 s | Danno 10 | 0,5 | 10 |
 | Granatieri | Fanteria, Assedio | rosso 5 | 3 s | Danno 15, Danno agli scudi 12 | 1 | 21 |
 | Catapulte | Assedio | rosso 6 | 3,5 s | Danno agli scudi 16, Danno 17 | 1 | 25 |
-| Bombarde | Assedio | rosso 8 | 4 s | Danno agli scudi 12, Danno 26 | 1 | 32 |
+| Bombarde | Assedio | rosso 8 | 4 s | Danno agli scudi 12, Danno 27 | 1 | 33 |
 | Corazzieri | Cavalleria, Fauna | verde 4 | 2,5 s | Danno 12, Scudo 5 | 1 | 17 |
 | Spie | Fanteria | verde 4 | 4 s | Sabotaggio 4 s (truppe), Corruzione 8 | 0,5 | 20 |
 | Paladini | Fanteria, Sacro | blu 4 | 2 s | Danno 10, Cura 6 | 0,5 | 16 |
@@ -296,30 +317,24 @@ I sei malus esistenti restano (Ricerca dimezzata, Oro dimezzato, Inefficienza, T
 
 ## 7. Questioni per Davide
 
-### 7.1 Decise (bozza 2)
+Tutte le questioni della bozza 1 sono decise.
 
 | # | Questione | Decisione |
 |---|---|---|
-| A | Edifici senza mana | Sono **neutri** e si ottengono solo come esclusivi dell’identità o delle vie (GDD §5.3, v0.16). Palizzata e Bastioni ricevono un po’ di mana; il Reliquiario resta neutro. |
+| A | Edifici senza mana | Sono **neutri**, senza colore; possono essere comuni (Palizzata, Bastioni) o esclusivi di certe nazioni (Reliquiario) (GDD §5.3, v0.16). |
 | B | Era degli effetti | Come in §3.4. |
 | C | Valori di partenza dello scontro | I modificatori possono cambiarli (GDD §8.2, v0.16): Semi del dissenso e Rete compromessa restano. |
+| D | Via dell’Ombra allunga la durata di Inefficienza e Sabotaggio | Ammesso: la durata è un valore dell’effetto, come danno e cura. |
+| E | Edifici dell’era 1 | L’era 1 ha **11 edifici**: restano Cava, Consolato e Stalle, più la Palizzata. L’era 2 riceve **Granaio** e **Fonderia** per restare a 8. |
 | F | Potenziamenti | +50% a tutti i valori d’effetto per livello (GDD §6.5, v0.16). |
-
-### 7.2 Ancora aperte
-
-| # | Questione | Proposta |
-|---|---|---|
-| D | Via dell’Ombra modifica la **durata** di Inefficienza e Sabotaggio: è un bersaglio nuovo per i modificatori (§8.2 del GDD). | Ammetterlo, oppure sostituire il tratto. |
-| E | Elementi spostati o tolti: Consolato e Stalle passano all’era 2 (per avere 8 edifici per era); la Cava esce dal catalogo (la Pietra arriva da Miniera, Palizzata, Cantiere, Bastioni). | Confermare o scegliere altri spostamenti. |
-| G | Numeri che cambiano molto rispetto ai dati attuali: Moschettieri da 10 a 5 di danno (erano fuori scala), costi uniformi per era (4 / 7 / 10). | Accettare come effetto della regola di budget. |
-| H | Dimensioni ipotizzate: pool di 4 vie per era più le esclusive; 1 elemento esclusivo per via e per era; esclusivi +1 punto. | Confermare. |
-| I | Gli edifici neutri si possono ottenere anche come ricompense degli incontri del mondo? | Da decidere; per ora solo identità e vie. |
+| G | Numeri | Costi variabili di ±1 Oro dentro l’era, compensati da ±1 punto (§1.1). I Moschettieri chiedono 2 mana rosso e tornano a 10 di danno. |
+| H | Dimensioni | Pool di 4 vie per era più le esclusive; 1 esclusivo per via e per era; esclusivi +1 punto. |
 
 ## 8. Riepilogo dei numeri
 
 | | Era 1 | Era 2 | Era 3 | Totale |
 |---|---:|---:|---:|---:|
-| Edifici base | 8 | 8 | 8 | 24 |
+| Edifici base | 11 | 8 | 8 | 27 |
 | Truppe base | 8 | 8 | 8 | 24 |
 | Vie | — | 4 | 4 + 1 esclusiva | 9 |
 | Esclusivi delle vie | — | 4 | 9 | 13 |
