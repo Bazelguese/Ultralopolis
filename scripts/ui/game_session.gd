@@ -6,7 +6,8 @@ extends Node
 const MENU_SCENE: String = "res://scenes/main_menu.tscn"
 const SELECT_SCENE: String = "res://scenes/nation_select.tscn"
 const CREATOR_SCENE: String = "res://scenes/nation_creator.tscn"
-const GAME_SCENE: String = "res://scenes/main.tscn"
+## Partita sulla plancia 3D (GDD §14.2).
+const GAME_SCENE: String = "res://scenes/partita_3d.tscn"
 
 const CATALOG_PATH: String = "res://data/catalog/catalog.tres"
 const RUN_RULES_PATH: String = "res://data/rules/run_rules.tres"

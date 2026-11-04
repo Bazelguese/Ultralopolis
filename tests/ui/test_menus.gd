@@ -76,7 +76,7 @@ func test_gioca_con_nazioni_porta_alla_lista_e_poi_alla_partita() -> void:
 	var select: Control = _open("res://scenes/nation_select.tscn")
 	var nation: NationTemplate = GameSession.saved_nations()[0]
 	select.call("_on_play", nation)
-	assert_eq(GameSession.last_scene_request, GameSession.GAME_SCENE)
+	assert_eq(GameSession.last_scene_request, GameSession.GAME_SCENE, "«Gioca» porta alla partita sulla plancia 3D.")
 	assert_eq(GameSession.selected_nation.id, nation.id)
 
 

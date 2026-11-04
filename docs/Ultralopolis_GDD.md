@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.19
+## Game Design Document — v0.20
 
 **Data:** 4 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -176,14 +176,14 @@ La produzione di risorse avviene all’inizio delle **due macrofasi**, non a ogn
 | **2 opportunità** per macrofase (come le due scelte prima e le due dopo lo scontro con i mostri in The Bazaar) | Confermato |
 | Ogni opportunità mostra **3 alternative** | Confermato |
 | Ogni alternativa è un **singolo acquisto o una singola scelta**: prenderne una chiude l’opportunità. Alcune alternative chiedono una seconda scelta interna (quale bonus, quale truppa, quale malus) | Confermato |
-| In ogni fase **la prima opportunità è dedicata agli elementi**: in Produzione 3 edifici diversi, in Preparazione 3 truppe diverse, dell’era corrente (esclusivi compresi) | Confermato (v0.19) |
+| In ogni fase **la prima opportunità è dedicata agli elementi**: in Produzione 3 edifici diversi, in Preparazione 3 truppe diverse, dell’era corrente (esclusivi compresi) | Confermato (v0.20) |
 | Nell’altra opportunità le 3 alternative sono **tipi di opportunità diversi**, pescati a caso con la stessa probabilità; per costruttori e reclutatori si pesca poi l’edificio o la truppa dell’era corrente | Confermato |
-| Le azioni che non sono acquisti di elementi o di spazi **non costano Oro**, ma altre risorse coerenti con il tema | Confermato (v0.19); valori placeholder |
+| Le azioni che non sono acquisti di elementi o di spazi **non costano Oro**, ma altre risorse coerenti con il tema | Confermato (v0.20); valori placeholder |
 | Produzione è la fase di **costruzione** (offerte di edifici); Preparazione è la fase di **disposizione** (offerte di truppe) | Confermato |
 | Le offerte vengono **pescate a caso** da un pool composto da una base comune, ampliato, ridotto e influenzato dalle caratteristiche e dalle componenti della nazione | Confermato |
 | Un’opportunità si può **passare**; passare non dà nulla in cambio | Confermato |
 | Le offerte si possono **rinnovare** pagando Oro; il costo aumenta a ogni rinnovo e continua a crescere fra un’opportunità e l’altra | Confermato; valori placeholder |
-| Il rinnovo costa **sempre almeno 1 Oro**, anche con i bonus che lo riducono | Confermato (v0.19) |
+| Il rinnovo costa **sempre almeno 1 Oro**, anche con i bonus che lo riducono | Confermato (v0.20) |
 | A ogni nuova opportunità si dimezza l’**aumento accumulato** del costo di rinnovo (arrotondato per difetto); il costo non scende mai sotto quello iniziale. Esempio: costo iniziale 1, +1 a rinnovo; dopo 4 rinnovi il costo è 5 (aumento +4); all’opportunità successiva l’aumento diventa +2 e il costo 3 | Confermato |
 
 **Tipi di opportunità del prototipo — provvisori** (valori placeholder):
@@ -789,7 +789,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Menu principale | Gioca, Crea nazione, Esci dal gioco. |
 | Gioca | Se esistono nazioni create, si sceglie con quale giocare; altrimenti si va alla creazione. |
 | Crea nazione | Schermata a parte (§9.1). Creata dal menu, si torna al menu principale. |
-| Partita | Plancia, opportunità, incontri e battaglie; si può tornare al menu o ricominciare con la stessa nazione. | Il primo prototipo parte con un’**interfaccia semplice e provvisoria** per provare le regole; la plancia 3D arriva in un secondo momento.
+| Partita | Si gioca sulla **plancia 3D** (§14.2): plancia, opportunità, incontri e battaglie; si può tornare al menu o ricominciare con la stessa nazione. |
 
 ---
 
@@ -832,7 +832,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Produzione di mana e attivazioni automatiche.
 - Resistenza, esito e progressione della run.
 - Incontri del mondo come scontri automatici contro plance generate (scelta fra 3), con Oro dimezzato in caso di sconfitta e ricompense a scelta in caso di vittoria.
-- Interfaccia provvisoria leggibile, con il motivo dell’attesa delle truppe, pausa, velocità e salto della visualizzazione.
+- Interfaccia leggibile sulla plancia 3D, con il motivo dell’attesa delle truppe, pausa, velocità e salto della visualizzazione.
 - Valori separati dal codice della simulazione.
 
 ### 15.3 Sistemi successivi
@@ -895,7 +895,6 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Limite tecnico di sicurezza: uno scontro che supera un’ora simulata viene interrotto (solo con dati sbagliati; con il logoramento non accade) | Protezione tecnica, non regola di gioco. |
 | Costo del rinnovo delle offerte e suo aumento | Placeholder. |
 | Avversari locali determinati dall’anno | Sostituto del futuro servizio di fantasmi. |
-| Interfaccia semplice e provvisoria al posto della plancia 3D | Fase iniziale del prototipo (§14.3). |
 | Intensità dei malus: Oro e Ricerca −50%, intervallo di mana e ricarica +50%, rinnovo +2 Oro, −1 alternativa | Placeholder. |
 | Il bersaglio a caso di un malus (edificio o truppa) si sceglie quando il malus arriva, con il seme della run | Provvisoria. |
 | Se l’elemento colpito viene venduto o sostituito, il malus finisce | Provvisoria. |
@@ -1025,10 +1024,14 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 ## Registro delle versioni
 
-**v0.19 — 4 novembre 2026** (dopo le prime partite di Davide)
+**v0.20 — 4 novembre 2026** (dopo le prime partite di Davide)
 - La prima opportunità di ogni fase offre solo elementi: 3 edifici in Produzione, 3 truppe in Preparazione (§4.2).
 - Le azioni che non sono acquisti costano risorse diverse dall’Oro (§4.2, §16.3).
 - Il rinnovo delle offerte costa sempre almeno 1 Oro (§4.2).
+- Nota: queste modifiche erano state numerate “v0.19” in parallelo alla v0.19 della plancia 3D.
+
+**v0.19 — 4 novembre 2026**
+- La partita si gioca solo sulla plancia 3D; l’interfaccia provvisoria è stata tolta (§14.3, §15.2, §16.3).
 
 **v0.18 — 4 novembre 2026** (implementazione)
 - Nel prototipo: scudo, cura, Corruzione, attacco d’assedio, Inefficienza e Sabotaggio con seme casuale (§7.6, §7.7); valori di partenza dello scontro (§8.2); potenziamenti su tutti i valori d’effetto (§6.5); ere con le vie (§10.4); edifici neutri (§5.3).

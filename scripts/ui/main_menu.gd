@@ -11,15 +11,17 @@ func _ready() -> void:
 	column.add_theme_constant_override("separation", 22)
 	center.add_child(column)
 
-	var title: Label = UiKit.label("ULTRALOPOLIS", 72, Color(0.95, 0.85, 0.55))
+	var title: Label = StileVisivo.etichetta("ULTRALOPOLIS", StileVisivo.FONT_TITOLI, 110, StileVisivo.ORO_LUCE)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_constant_override("outline_size", 16)
+	title.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
 	column.add_child(title)
-	var subtitle: Label = UiKit.label("Prototipo — grafica provvisoria", 18, UiKit.COLOR_WARNING)
+	var subtitle: Label = StileVisivo.etichetta("Prototipo", StileVisivo.FONT_TESTO_FORTE, 20, StileVisivo.TESTO_TENUE)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(subtitle)
 	column.add_child(Control.new())
 
-	column.add_child(UiKit.big_button("Gioca", _on_play))
+	column.add_child(UiKit.main_button("Gioca", _on_play))
 	column.add_child(UiKit.big_button("Crea nazione", _on_create))
 	column.add_child(UiKit.big_button("Esci dal gioco", _on_quit))
 
