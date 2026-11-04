@@ -1,8 +1,8 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.15
+## Game Design Document — v0.16
 
 **Data:** 4 novembre 2026
-**Stato:** base di design (nucleo) per il primo prototipo — v0.15 approvata dal creatore
+**Stato:** base di design (nucleo) per il primo prototipo — v0.16 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
 
@@ -252,7 +252,8 @@ Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; l
 | Blu | Diplomazia e sapere |
 | Energetico | Vale come mana di qualsiasi colore |
 
-- Ogni edificio produce mana di un colore; il colore indica anche la famiglia dell’edificio.
+- Un edificio che produce mana ha un colore, che indica anche la sua famiglia.
+- Un edificio **senza mana** è **neutro**. Gli edifici neutri normalmente **non compaiono fra le offerte**: vi si accede solo attraverso caratteristiche della nazione, cioè elementi esclusivi dell’identità o delle vie (§9.2, §10.4) — Confermato (modifica del nucleo, v0.16).
 - Ogni truppa chiede mana di un colore, oppure nessuno.
 - Una truppa paga **prima con il proprio colore e poi con l’energetico**.
 
@@ -327,7 +328,7 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
 - Ogni edificio e ogni truppa ha dei **livelli** (3 livelli).
 - Il costo di ogni livello è scritto nei dati dell’elemento e usa le risorse della sua famiglia (es. Ferro per le truppe, Legno o Pietra per gli edifici, Fauna per la cavalleria).
 - La maggior parte dei potenziamenti si fa **in qualunque momento fuori dal combattimento** e non consuma opportunità; alcuni potenziamenti speciali arrivano da eventi o opportunità.
-- Effetti: le truppe fanno più danno, gli edifici producono di più (valori placeholder, §16.3).
+- Effetti: ogni livello aumenta **tutti i valori d’effetto** dell’elemento (danno, scudo, cura, Corruzione, danno agli scudi, durate di Inefficienza e Sabotaggio); gli edifici producono anche più risorse per fase (valori placeholder, §16.3) — Confermato (v0.16).
 
 ### 6.6 Etichette — Confermato
 
@@ -430,7 +431,7 @@ Scudo e cura sono disponibili **dalla prima era**. Nessuno di questi effetti ha 
 #### 7.6.1 Scudo
 
 - Ogni nazione ha una **riserva di scudo unica**, come la riserva di mana; le truppe non hanno punti vita individuali (§7.1).
-- Lo scudo **parte da zero** a inizio scontro.
+- Lo scudo **parte da zero** a inizio scontro. È il valore di base: un modificatore può cambiarlo (§8.2).
 - Il danno colpisce **prima lo scudo** e solo ciò che avanza arriva alla Resistenza.
 - Lo scudo **resta finché non viene consumato** e **non ha tetto**.
 - Anche il logoramento viene assorbito dallo scudo (§7.5).
@@ -443,7 +444,7 @@ Scudo e cura sono disponibili **dalla prima era**. Nessuno di questi effetti ha 
 
 #### 7.6.3 Corruzione
 
-- Ogni nazione ha un contatore di **Corruzione** che parte da zero e **si accumula** durante lo scontro.
+- Ogni nazione ha un contatore di **Corruzione** che parte da zero e **si accumula** durante lo scontro. Zero è il valore di base: un modificatore può cambiarlo (§8.2).
 - Quando la Corruzione è **pari o superiore alla Resistenza attuale**, la nazione perde lo scontro.
 - La Corruzione **non tocca lo scudo** e lo scudo non la ferma: è il contro naturale di una nazione molto difensiva.
 - La Corruzione **non scende mai** durante lo scontro. L’unica risposta è alzare la Resistenza con la cura.
@@ -462,7 +463,7 @@ La Corruzione sostituisce la precedente proposta di un’erosione continua simil
 
 | Fonte | Che cosa può produrre |
 |---|---|
-| Edificio | Allo scadere del suo unico intervallo (§7.4): mana, scudo, cura e Corruzione all’avversario, **in qualsiasi combinazione**. |
+| Edificio | Allo scadere del suo unico intervallo (§7.4): mana, scudo, cura e Corruzione all’avversario, **in qualsiasi combinazione**. Un edificio senza mana è neutro (§5.3). |
 | Truppa | All’attivazione: danno, scudo, cura e Corruzione all’avversario, **in qualsiasi combinazione**; le truppe Assedio anche il danno agli scudi. |
 
 La libertà delle combinazioni sposta il peso sul bilanciamento del catalogo: un elemento misto non deve essere migliore su tutti i fronti (P3).
@@ -493,6 +494,7 @@ Due effetti che agiscono sui **timer** degli elementi avversari (ricarica delle 
 - Colpiscono truppe ed edifici. Ogni effetto dichiara nei dati la propria **categoria di bersaglio**: solo truppe, solo edifici o qualsiasi elemento.
 - Su un edificio, rallentare o bloccare il timer rallenta o ferma **tutto ciò che produce** (mana, scudo, cura, Corruzione), perché l’edificio ha un unico intervallo (§7.4).
 - Se non esiste un bersaglio valido nella categoria, l’effetto va perso.
+- Un modificatore può far partire uno scontro con un elemento già rallentato o sabotato (§8.2).
 
 #### 7.7.2 Scelta del bersaglio: a caso, a rotazione
 
@@ -523,7 +525,7 @@ Questa sezione è il punto di innesto per i contenuti futuri: ogni nuovo element
 
 | Campo | Significato |
 |---|---|
-| Bersaglio | Che cosa viene modificato: Resistenza, riserva di mana, una truppa, un edificio, una risorsa del Magazzino, una produzione, gli spazi, le offerte. |
+| Bersaglio | Che cosa viene modificato: Resistenza, riserva di mana, una truppa, un edificio, una risorsa del Magazzino, una produzione, gli spazi, le offerte, i valori di partenza dello scontro (scudo, Corruzione, elementi rallentati o sabotati; dalla v0.16). |
 | Effetto | La variazione applicata. |
 | Durata | Istantaneo, secondi di battaglia, numero di fasi o di anni. |
 | Origine | Chi o che cosa lo ha generato (un evento, un incontro, una nazione avversaria). |
@@ -904,7 +906,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Dei tratti di un fantasma valgono in battaglia solo quelli su tutta la nazione | Provvisoria. |
 | Se si arriva alla creazione da Gioca (nessuna nazione salvata), dopo il salvataggio si torna alla lista delle nazioni | Provvisoria. |
 | Tasso del mercato: 2 unità di una risorsa → 1 Oro, uguale per tutte | Placeholder. |
-| Potenziamenti: truppe +50% danno per livello; edifici +1 a ogni risorsa che producono per livello | Placeholder. |
+| Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto; gli edifici anche +1 a ogni risorsa che producono per fase. Il mana prodotto non cambia | Placeholder. |
 | I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
@@ -1013,6 +1015,12 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.16 — 4 novembre 2026** (modifica del nucleo per gli edifici neutri)
+- Edifici senza mana: neutri, accessibili solo tramite esclusivi dell’identità o delle vie (§5.3).
+- I modificatori possono cambiare i valori di partenza dello scontro: scudo, Corruzione, elementi rallentati o sabotati (§7.6, §7.7, §8.2).
+- Potenziamenti: ogni livello aumenta tutti i valori d’effetto (§6.5, §16.3).
+- Il catalogo placeholder dei contenuti è in `docs/Catalogo.md`.
 
 **v0.15 — 4 novembre 2026** (modifica del nucleo per gli spazi della plancia)
 - Ere lineari con scelta obbligatoria di una via fra 3 dalla seconda era; le vie usano la scheda dell’identità, compaiono da un pool pesato e hanno esclusivi diversi per ogni era (§10.2, §10.4).
