@@ -9,11 +9,19 @@ enum Family {
 	FORTUNA,  ## Un dono semplice: una sola opzione.
 }
 
+## Eventi con opzioni costruite dalle regole invece che scritte nei dati (GDD §9.4, v0.24).
+enum Special {
+	NESSUNO,
+	RIFORMA,  ## Un'opzione per ogni governo a cui il governo attuale può evolvere, pagata in Influenza.
+}
+
 @export var id: StringName = &""
 @export var display_name: String = ""
 ## Testo dell'evento, come lo legge il giocatore.
 @export_multiline var description: String = ""
 @export var family: Family = Family.EVENTO
+## Le opzioni scritte nei dati si aggiungono, in coda, a quelle costruite dalle regole.
+@export var special: Special = Special.NESSUNO
 ## Sfera: il nome di una categoria del Consiglio (es. "Fede"), per tema e cornice.
 @export var sphere: String = ""
 ## Colore della sfera (solo grafica), come AdvisorDef.color.

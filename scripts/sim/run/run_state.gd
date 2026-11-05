@@ -177,6 +177,11 @@ var nation_name: String = "La tua nazione"
 var identity: Array[IdentityDef] = []
 ## Vie proposte entrando nell'era: finché non se ne sceglie una, le altre azioni aspettano.
 var way_choices: Array[IdentityDef] = []
+## Governi a cui la nazione può evolvere entrando nella nuova era (GDD §9.4, v0.24): si sceglie
+## uno o si rifiuta. Vuoto se non c'è nulla da decidere.
+var government_choices: Array[IdentityDef] = []
+## Opzioni costruite dalle regole per l'evento scelto (Riforma), seguite da quelle dei dati.
+var _built_options: Array[EventOptionDef] = []
 
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
@@ -774,9 +779,9 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			var target: int = _spy_pick(offer.opportunity)
 			var spy: OpportunityDef = offer.opportunity
 			var effect: int = BattleSim.EFFECT_SABOTAGE if spy.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else BattleSim.EFFECT_SLOW
-			spy_effects.append([effect, target, spy.spy_ms])
+			spy_effects.append([effect, target, spy_duration(spy)])
 			_log("%s: %s parte %s per %d s nello scontro con il fantasma." % [source, _ghost_element_name(target),
-					"sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato", _whole_seconds(spy.spy_ms)])
+					"sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato", _whole_seconds(spy_duration(spy))])
 		OpportunityDef.Kind.INCANTO:
 			var troops: Array[BoardPiece] = _enchantable_troops()
 			if troops.is_empty():
@@ -827,13 +832,38 @@ func choose_event() -> bool:
 	if event_choice == null:
 		return _fail("In questo round non c'è nessun evento.")
 	chosen_event = event_choice
+	_built_options = _special_options(chosen_event)
 	_log("Round %d: %s." % [round_number, chosen_event.display_name])
 	return true
 
 
-## Opzioni dell'evento scelto (una sola per le Fortune).
+## Opzioni dell'evento scelto (una sola per le Fortune). Per la Riforma le prime sono costruite
+## dalle regole, una per ogni governo raggiungibile.
 func event_options() -> Array[EventOptionDef]:
-	return chosen_event.options if chosen_event != null else []
+	if chosen_event == null:
+		return []
+	if _built_options.is_empty():
+		return chosen_event.options
+	var all: Array[EventOptionDef] = _built_options.duplicate()
+	all.append_array(chosen_event.options)
+	return all
+
+
+## Opzioni della Riforma (GDD §9.4, v0.24): una per ramo, pagata in Influenza secondo il tier.
+func _special_options(event: EventDef) -> Array[EventOptionDef]:
+	var built: Array[EventOptionDef] = []
+	if event.special != EventDef.Special.RIFORMA:
+		return built
+	for target: IdentityDef in evolution_targets():
+		var option: EventOptionDef = EventOptionDef.new()
+		option.label = "Verso: %s" % target.display_name
+		option.description = "Il governo diventa %s (tier %d). %s" % [target.display_name, target.tier, target.description]
+		option.cost = ResourceAmounts.new()
+		option.cost.add(Res.Type.INFLUENZA, run_rules.reform_influence_per_tier * target.tier)
+		option.requires_types = target.reform_requires_types
+		option.change_government = target
+		built.append(option)
+	return built
 
 
 ## Requisito di un'opzione, es. "Spirituale" o "Repubblica"; vuoto se non ne ha.
@@ -926,8 +956,10 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 	if option.spy != null:
 		var effect: int = BattleSim.EFFECT_SABOTAGE if option.spy.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else BattleSim.EFFECT_SLOW
 		var spy_target: int = _spy_pick(option.spy)
-		spy_effects.append([effect, spy_target, option.spy.spy_ms])
+		spy_effects.append([effect, spy_target, spy_duration(option.spy)])
 		_log("%s: %s partirà %s nello scontro con il fantasma." % [source, _ghost_element_name(spy_target), "sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato"])
+	if option.change_government != null:
+		_change_government(option.change_government as IdentityDef, source)
 	_log("%s: %s." % [source, option.label])
 	_next_round()
 	return true
@@ -1064,6 +1096,10 @@ func advance_era() -> bool:
 	way_choices = _draw_ways(next)
 	if not way_choices.is_empty():
 		_log("Scegli la via della nazione per l'era %s." % next.display_name)
+	# Entrando in un'era il governo può evolvere: dopo la via, e si può rifiutare (§16.3).
+	government_choices = evolution_targets()
+	if not government_choices.is_empty():
+		_log("Il governo può evolvere: scegli la nuova forma o resta com'è.")
 	# Le offerte delle ere precedenti non restano disponibili (GDD §10.3):
 	# le proposte in corso vengono ripescate gratis dalla nuova era (§16.3).
 	_redraw_round()
@@ -1451,6 +1487,8 @@ func _available_events(family: EventDef.Family) -> Array[EventDef]:
 		if event.requires_stock != null and not can_pay(event.requires_stock):
 			continue
 		if event.requires_malus and modifiers.year_malus().is_empty():
+			continue
+		if event.special == EventDef.Special.RIFORMA and evolution_targets().is_empty():
 			continue
 		if event.options.is_empty():
 			continue
@@ -2145,6 +2183,8 @@ func _require_shopping() -> bool:
 		return _fail("Questa azione è possibile solo in Produzione o Preparazione.")
 	if not way_choices.is_empty():
 		return _fail("Prima scegli la via della nazione.")
+	if not government_choices.is_empty():
+		return _fail("Prima decidi se far evolvere il governo.")
 	return true
 
 
@@ -2160,6 +2200,69 @@ func choose_way(index: int) -> bool:
 	# Le proposte in corso tengono conto della via appena scelta.
 	_redraw_round()
 	return true
+
+
+# --- Governi a tier (GDD §9.4, v0.24) ------------------------------------------------
+
+## Il governo attuale della nazione (null prima della creazione).
+func government() -> IdentityDef:
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.GOVERNO:
+			return def
+	return null
+
+
+## Governi del tier successivo a cui il governo attuale può evolvere.
+func evolution_targets() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	var current: IdentityDef = government()
+	if current == null:
+		return found
+	for target: Resource in current.evolves_to:
+		if target is IdentityDef:
+			found.append(target as IdentityDef)
+	return found
+
+
+## Evolve al governo proposto entrando nell'era (si può scegliere anche durante la scelta della via).
+func choose_government(index: int) -> bool:
+	if index < 0 or index >= government_choices.size():
+		return _fail("Governo non valido.")
+	var target: IdentityDef = government_choices[index]
+	government_choices = []
+	_change_government(target, "Evoluzione")
+	_redraw_round()
+	return true
+
+
+## Rifiuta l'evoluzione proposta: il governo resta com'è.
+func refuse_evolution() -> bool:
+	if government_choices.is_empty():
+		return _fail("Non c'è nessuna evoluzione da rifiutare.")
+	government_choices = []
+	_log("Il governo resta %s." % government().display_name)
+	return true
+
+
+## Cambia il governo: finisce il tratto del vecchio e vale quello nuovo, con i suoi effetti sul
+## Consiglio e la sua risorsa della Capitale. Gli elementi sulla plancia restano (GDD §9.4).
+func _change_government(target: IdentityDef, source: String) -> void:
+	var old: IdentityDef = government()
+	if old == target:
+		return
+	if old != null:
+		identity.erase(old)
+		for active_modifier: ActiveModifier in modifiers.active.duplicate():
+			if active_modifier.origin_kind == ActiveModifier.OriginKind.IDENTITA and active_modifier.origin_name == old.display_name \
+					and old.permanent_modifiers.has(active_modifier.def):
+				modifiers.active.erase(active_modifier)
+	_log("%s: il governo passa da %s a %s." % [source, old.display_name if old != null else "nessuno", target.display_name])
+	_adopt_identity(target)
+
+
+## Durata di uno spionaggio, con quella in più data dal governo (GDD §9.4, v0.24).
+func spy_duration(spy: OpportunityDef) -> int:
+	return maxi(0, spy.spy_ms + _identity_int(&"spy_ms_change"))
 
 
 ## Tre vie pescate dal pool dell'era, pesate da identità e vie già scelte (§16.3).

@@ -52,3 +52,5 @@ enum PieceKind {
 @export var extra_troop_slots: int = 0
 ## Spionaggio sul fantasma dell'anno: si usano i campi di spionaggio di questa azione.
 @export var spy: OpportunityDef
+## Nuovo governo della nazione (IdentityDef), per la Riforma e la Rivoluzione (GDD §9.4, v0.24).
+@export var change_government: Resource

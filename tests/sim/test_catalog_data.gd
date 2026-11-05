@@ -331,7 +331,7 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
 		else:
 			events += 1
-	assert_eq(events, 18)
+	assert_eq(events, 19, "18 eventi più la Riforma (v0.24).")
 	assert_eq(fortunes, 6)
 	assert_eq(catalog.visitors.size(), 6)
 	for visitor: AdvisorDef in catalog.visitors:

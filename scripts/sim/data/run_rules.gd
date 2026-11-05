@@ -59,6 +59,8 @@ extends Resource
 ## Costo di Potenzia: per salire al livello 2 servono upgrade_cost_per_era[0] × era della carta
 ## unità della risorsa del consigliere, per il livello 3 upgrade_cost_per_era[1] × era (placeholder).
 @export var upgrade_cost_per_era: PackedInt32Array = PackedInt32Array([2, 3])
+## Riforma (GDD §9.4, v0.24): Influenza per ogni tier del governo da raggiungere (placeholder).
+@export var reform_influence_per_tier: int = 3
 ## Potenzia dell'Anziano (solo edifici neutri) per anno (GDD §4.2.2: 1).
 @export var elder_upgrades_per_year: int = 1
 ## Probabilità, in percentuale, che in un round una delle carte sia un Evento, un Visitatore

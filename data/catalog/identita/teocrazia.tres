@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_5el4a"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_teocrazia_fede.tres" id="7_v0ri3"]
 [ext_resource type="Resource" path="res://data/catalog/consiglieri/sacerdote.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/ierocrazia.tres" id="p2"]
 
 [resource]
 script = ExtResource("7_5el4a")
@@ -22,3 +23,4 @@ exclusive_opportunities = Array[ExtResource("2_v0ri3")]([ExtResource("3_kalu3")]
 favored_opportunities = Array[ExtResource("2_v0ri3")]([ExtResource("5_0jdl3")])
 permanent_modifiers = Array[ExtResource("6_euifu")]([ExtResource("7_v0ri3")])
 always_present_advisor = ExtResource("p1")
+evolves_to = Array[Resource]([ExtResource("p2")])

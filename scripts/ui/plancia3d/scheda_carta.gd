@@ -302,6 +302,32 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	return scheda
 
 
+## Un governo a cui la nazione può evolvere entrando nell'era (GDD §9.4, v0.24).
+static func da_governo(governo: IdentityDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.VIA
+	scheda.id = governo.id
+	scheda.titolo = governo.display_name
+	scheda.sopratitolo = "Governo · tier %d" % governo.tier
+	scheda.riga = "Evolvi verso questo governo"
+	scheda.costo = "Evolvi"
+	scheda.dettagli = governo.description + "\nIl tratto del governo attuale finisce e vale questo; le carte sulla plancia restano."
+	scheda.illustrazione = _carica("identita/%s.png" % governo.id)
+	return scheda
+
+
+## La carta per rifiutare l'evoluzione del governo.
+static func da_resta(governo: IdentityDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.VIA
+	scheda.titolo = "Resta com'è"
+	scheda.sopratitolo = "Governo"
+	scheda.riga = "Rifiuta l'evoluzione"
+	scheda.costo = "Resta"
+	scheda.dettagli = "Il governo resta %s. Potrai evolvere entrando nella prossima era, o con una Riforma." % (governo.display_name if governo != null else "com'è")
+	return scheda
+
+
 static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.FANTASMA

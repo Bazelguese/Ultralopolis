@@ -8,6 +8,8 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/mercato_libero.tres" id="6_4t4p0"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_repubblica_influenza.tres" id="7_5y0vq"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_jtfog"]
+[ext_resource type="Resource" path="res://data/catalog/identita/oligarchia.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/dittatura.tres" id="p2"]
 
 [resource]
 script = ExtResource("7_jtfog")
@@ -21,3 +23,4 @@ favored_opportunities = Array[ExtResource("2_5y0vq")]([ExtResource("4_4sdoy")])
 permanent_modifiers = Array[ExtResource("5_uvpq4")]([ExtResource("6_4t4p0"), ExtResource("7_5y0vq")])
 advisors_change = 1
 proposal_gold_change = 1
+evolves_to = Array[Resource]([ExtResource("p1"), ExtResource("p2")])

@@ -66,6 +66,15 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 ## Consiglieri che compaiono più spesso nei round (peso +1 ciascuno, GDD §4.2).
 @export var favored_advisors: Array[AdvisorDef] = []
 
+@export_group("Governo a tier")
+## Tier del governo (GDD §9.4, v0.24): alla creazione si sceglie solo il tier 1.
+@export var tier: int = 1
+## Governi del tier successivo a cui può evolvere (IdentityDef). Dichiarato come Resource
+## per lo stesso motivo di requires_any (vedi sotto).
+@export var evolves_to: Array[Resource] = []
+## Tipi richiesti sulla plancia per raggiungere questo governo con una Riforma.
+@export var reform_requires_types: Array[StringName] = []
+
 @export_group("Consiglio")
 ## Effetti sul Consiglio e sulle risorse (GDD §9.2, v0.24): valgono fuori dalla battaglia e si
 ## sommano fra tutti gli elementi dell'identità.
@@ -93,6 +102,8 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export var market_rate_change: int = 0
 ## Unità in meno a ogni Potenzia (minimo 1 per risorsa).
 @export var upgrade_discount: int = 0
+## Millisecondi in più (o in meno) per gli effetti dello spionaggio (GDD §4.2.3).
+@export var spy_ms_change: int = 0
 
 @export_group("Elementi esclusivi")
 ## Edifici offerti dai Costruttori solo a questa nazione (nella loro era).

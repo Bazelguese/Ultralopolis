@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/repubblica_parlamentare.tres" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/cancelliere.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="x5"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/ambasciata.tres" id="x6"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x7"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_monarchia_costituzionale_influenza.tres" id="x8"]
+
+[resource]
+script = ExtResource("x1")
+id = &"monarchia_costituzionale"
+display_name = "Monarchia costituzionale"
+description = "Il sovrano giura sulla carta. Cancelliere più frequente; l'Ambasciata costa 1 Stabilità in meno (almeno 1). Capitale: +1 Influenza."
+dimension = 1
+identity_type = &"Costituzionale"
+resistance_bonus = 5
+tier = 2
+evolves_to = Array[Resource]([ExtResource("x2")])
+reform_requires_types = Array[StringName]([&"Legge"])
+action_discount = 1
+favored_advisors = Array[ExtResource("x3")]([ExtResource("x4")])
+cheaper_actions = Array[ExtResource("x5")]([ExtResource("x6")])
+permanent_modifiers = Array[ExtResource("x7")]([ExtResource("x8")])

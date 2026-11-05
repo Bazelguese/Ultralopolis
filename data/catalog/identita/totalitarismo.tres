@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/maestro_delle_spie.tres" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/clown.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x5"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/pugno_di_ferro.tres" id="x6"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_totalitarismo_documenti.tres" id="x7"]
+
+[resource]
+script = ExtResource("x1")
+id = &"totalitarismo"
+display_name = "Totalitarismo"
+description = "Lo Stato è tutto. Compaiono 2 consiglieri, ma quello scelto offre una proposta in più; Maestro delle spie più frequente, spionaggi più lunghi di 1 s, il Clown non compare mai. Capitale: +1 Documenti."
+dimension = 1
+identity_type = &"Totalitario"
+resistance_bonus = 8
+tier = 3
+reform_requires_types = Array[StringName]([&"Criminale"])
+advisors_change = -1
+spy_ms_change = 1000
+favored_advisors = Array[ExtResource("x2")]([ExtResource("x3")])
+excluded_advisors = Array[ExtResource("x2")]([ExtResource("x4")])
+permanent_modifiers = Array[ExtResource("x5")]([ExtResource("x6"), ExtResource("x7")])

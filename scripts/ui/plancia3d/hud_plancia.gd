@@ -539,7 +539,7 @@ func aggiorna_partita(run: RunState) -> void:
 	ultime.reverse()
 	_testo_cronaca.text = "\n".join(ultime)
 
-	var scelta_via: bool = not run.way_choices.is_empty()
+	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty()
 	var consigliere: AdvisorDef = run.chosen_advisor
 	_pulsante_rinnova.visible = comprando and not scelta_via and consigliere != null
 	_pulsante_passa.visible = comprando and not scelta_via
@@ -567,8 +567,10 @@ func aggiorna_partita(run: RunState) -> void:
 			_principale.text = "Nuova partita"
 		_:
 			_suggerimento_fase.text = ""
-	if scelta_via:
+	if not run.way_choices.is_empty():
 		_suggerimento_fase.text = "Nuova era: scegli la via della nazione. Diventa parte della tua identità."
+	elif not run.government_choices.is_empty():
+		_suggerimento_fase.text = "Nuova era: il governo può evolvere. Scegli la nuova forma, oppure resta com'è."
 
 
 ## Suggerimento durante i round del Consiglio (GDD §4.2).

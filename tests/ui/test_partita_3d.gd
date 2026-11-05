@@ -166,7 +166,32 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
 	scelte = _scena.get("_scelte")
+	# Dopo la via il governo può evolvere (GDD §9.4, v0.24): una carta per ramo più "Resta com'è".
+	if not run.government_choices.is_empty():
+		var governo: IdentityDef = run.government()
+		assert_eq(scelte.size(), run.government_choices.size() + 1, "Una carta per ramo e una per restare.")
+		_scena.call("_clic_scelta", scelte[scelte.size() - 1])
+		assert_true(run.government_choices.is_empty(), "L'ultima carta rifiuta l'evoluzione.")
+		assert_eq(run.government(), governo, "Il governo resta com'è.")
+		scelte = _scena.get("_scelte")
 	assert_eq(scelte.size(), _carte_del_round(run), "Dopo la via tornano i consiglieri del round.")
+
+
+func test_entrando_in_una_nuova_era_il_governo_puo_evolvere() -> void:
+	var run: RunState = _run()
+	run.stock[Res.Type.RICERCA] += run.next_era_cost()
+	assert_true(run.advance_era())
+	while not run.way_choices.is_empty():
+		run.choose_way(0)
+	_scena.call("_aggiorna_tutto")
+	if run.government_choices.is_empty():
+		pass_test("Il governo di prova non evolve.")
+		return
+	var nuovo: IdentityDef = run.government_choices[0]
+	var scelte: Array = _scena.get("_scelte")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_eq(run.government(), nuovo, "Cliccando la carta il governo evolve.")
+	assert_true(run.government_choices.is_empty())
 
 
 ## Cambiare qualcosa sulla plancia non rifà le offerte: restano le stesse carte, senza nuova entrata.
