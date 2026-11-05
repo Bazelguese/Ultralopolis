@@ -92,8 +92,8 @@ func test_ogni_elemento_dell_identita_indica_una_risorsa_della_capitale() -> voi
 
 func test_catalogo_bozza_3() -> void:
 	var catalog: CatalogDef = _catalog()
-	assert_eq(catalog.buildings.size(), 27, "27 edifici (Catalogo §8).")
-	assert_eq(catalog.troops.size(), 24, "24 truppe.")
+	assert_eq(catalog.buildings.size(), 34, "34 edifici (Catalogo §8, bozza 4).")
+	assert_eq(catalog.troops.size(), 27, "27 truppe (bozza 4).")
 	assert_eq(catalog.eras[1].ways.size(), 4, "4 vie nell'era 2.")
 	assert_eq(catalog.eras[2].ways.size(), 5, "4 vie più l'esclusiva nell'era 3.")
 	for def: TroopDef in catalog.troops:
@@ -273,3 +273,30 @@ func test_ogni_era_ha_truppe_di_tutti_e_quattro_i_colori() -> void:
 				colors[def.mana_type] = true
 		for color: StringName in [BattleSim.MANA_ROSSO, BattleSim.MANA_VERDE, BattleSim.MANA_BLU, BattleSim.MANA_VIOLA]:
 			assert_true(colors.has(color), "Era %d: truppe %s" % [era, color])
+
+
+func test_ogni_consigliere_ha_edifici_truppe_e_azioni_in_ogni_era() -> void:
+	# Catalogo bozza 4: niente consiglieri a mani vuote nei round Edifici, Truppe e Azioni.
+	var catalog: CatalogDef = _catalog()
+	var exclusive: Array[OpportunityDef] = []
+	for def: IdentityDef in catalog.identities:
+		exclusive.append_array(def.exclusive_opportunities)
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special != AdvisorDef.Special.NESSUNO:
+			continue
+		var common_actions: int = 0
+		for action: OpportunityDef in advisor.actions:
+			if not exclusive.has(action):
+				common_actions += 1
+		assert_gte(common_actions, 2, "%s ha almeno due azioni comuni" % advisor.display_name)
+		for era: int in range(1, catalog.eras.size() + 1):
+			var buildings: int = 0
+			var troops: int = 0
+			for def: BuildingDef in catalog.buildings:
+				if def.era == era and advisor.covers(def.types):
+					buildings += 1
+			for def: TroopDef in catalog.troops:
+				if def.era == era and advisor.covers(def.types):
+					troops += 1
+			assert_gt(buildings, 0, "%s: edifici nell'era %d" % [advisor.display_name, era])
+			assert_gt(troops, 0, "%s: truppe nell'era %d" % [advisor.display_name, era])

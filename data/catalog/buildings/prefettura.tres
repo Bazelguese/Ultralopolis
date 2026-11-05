@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_bld"]
+
+[resource]
+script = ExtResource("1_bld")
+id = &"prefettura"
+display_name = "Prefettura"
+era = 2
+cost_gold = 7
+types = Array[StringName]([&"Legge", &"Patriota"])
+gold_per_phase = 2
+stability_per_phase = 2
+mana_type = &"blu"
+mana_amount = 1
+mana_interval_ms = 2000
+shield = 1

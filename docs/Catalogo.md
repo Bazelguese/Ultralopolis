@@ -100,7 +100,7 @@ Un edificio **senza mana è neutro**: non ha colore (§5.3 del GDD). Come ogni a
 
 Legenda della colonna “In battaglia”: ciò che l’edificio produce allo scadere del suo unico intervallo (§7.4 del GDD).
 
-### 2.1 Era 1 — budget 4, costo base 4 Oro (11 edifici)
+### 2.1 Era 1 — budget 4, costo base 4 Oro (13 edifici)
 
 | Edificio | Tipi | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
@@ -115,6 +115,8 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Cava | Produzione | rosso | Pietra 3 | 1 mana ogni 1,5 s | — | 4,2 |
 | Consolato | Nobile, Legge | blu | Oro 1, Stabilità 2 | 1 mana ogni 2 s | — | 4 |
 | Stalle | Fauna, Produzione | verde | Cibo 2, Legno 1 | 1 mana ogni 1,5 s | — | 4,2 |
+| Tribunale *(nuovo, bozza 4)* | Legge | blu | Oro 1, Stabilità 2 | 1 mana ogni 2 s | — | 4 |
+| Covo *(nuovo, bozza 4)* | Criminale, Infrastruttura Segreta | viola | Influenza 1, Documenti 1 | 1 mana + 1 Corruzione ogni 3 s | — | 3,8 |
 
 ### 2.2 Era 2 — budget 6, costo base 7 Oro
 
@@ -128,6 +130,8 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Granaio | Produzione, Economico | verde | Oro 1, Cibo 4 | 1 mana ogni 1,5 s | — | 5,7 |
 | Fonderia | Produzione | rosso | Oro 1, Ferro 3 | 1 mana ogni 1 s | — | 6,5 |
 | Loggia segreta | Infrastruttura Segreta, Criminale | viola | Influenza 1, Documenti 2 | 1 mana + 2 Corruzione ogni 3 s | — | 5,8 |
+| Prefettura *(nuova, bozza 4)* | Legge, Patriota | blu | Oro 2, Stabilità 2 | 1 mana + 1 scudo ogni 2 s | — | 6,5 |
+| Mercato nero *(nuovo, bozza 4)* | Criminale, Infrastruttura Strategica | viola | Oro 2, Influenza 2 | 1 mana ogni 1,5 s | — | 5,7 |
 
 ### 2.3 Era 3 — budget 8, costo base 10 Oro
 
@@ -141,6 +145,9 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Bastioni | Guardiano | **neutro** | Pietra 2 | 7 scudo ogni 3 s (nessun mana) | — | 8 |
 | Ospedale | Spirituale | blu | Ricerca 1 | 1 mana + 3 cura ogni 2 s | — | 7,5 |
 | Rete di informatori | Infrastruttura Segreta, Criminale | viola | Oro 2, Influenza 1, Documenti 2 | 1 mana + Sabotaggio 2 s (truppe) ogni 4 s | — | 7,5 |
+| Palazzo del governo *(nuovo, bozza 4)* | Nobile, Legge | blu | Oro 2, Influenza 1, Stabilità 3 | 2 mana ogni 2 s | — | 8 |
+| Arsenale clandestino *(nuovo, bozza 4)* | Infrastruttura Bellica, Criminale | viola | Oro 1, Ferro 2, Documenti 2 | 2 mana + Sabotaggio 2 s (truppe) ogni 4 s | — | 8 |
+| Acciaieria *(nuova, bozza 4)* | Produzione | rosso | Oro 1, Pietra 2, Ferro 4 | 2 mana ogni 2 s | — | 8 |
 
 ### 2.4 Capitale
 
@@ -164,6 +171,8 @@ Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “E
 | Esploratori | Fauna | verde 1 | 1 s | Danno 2 | 1 | 2 |
 | Erboristi | Spirituale | blu 2 | 2 s | Cura 5 | 0,5 | 5 |
 | Sobillatori | Criminale | viola 2 | 3 s | Corruzione 4 | 0,5 | 6 |
+| Zappatori *(nuovi, bozza 4)* | Assedio | rosso 2 | 2,5 s | Danno 3, Scudo 2 (niente danno agli scudi nell’era 1) | 1 | 5 |
+| Tagliagole *(nuovi, bozza 4)* | Criminale | viola 2 | 2 s | Danno 5 | 0,5 | 5 |
 
 ### 3.2 Era 2 — moltiplicatore ×1,5, costo base 7 Oro
 
@@ -190,6 +199,7 @@ Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “E
 | Spie | Criminale | viola 4 | 4 s | Sabotaggio 4 s (truppe), Corruzione 8 | 0,5 | 20 |
 | Paladini | Spirituale, Guardiano | blu 4 | 2 s | Danno 10, Cura 6 | 0,5 | 16 |
 | Inquisitori | Spirituale, Legge | blu 4 | 3 s | Corruzione 12 | 0,5 | 18 |
+| Guardia reale *(nuova, bozza 4)* | Nobile, Patriota | blu 4 | 2,5 s | Danno 10, Scudo 7 | 0,5 | 17 |
 
 ### 3.4 Quando compaiono gli effetti — deciso con Davide
 
@@ -338,9 +348,9 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 | Architetto | Opera · rosso | Pietra | Architetti (6 Oro, spazio edificio) · Fortificazioni (2 Pietra) |
 | Fattore | Terra · verde | Legno | Scorte (2 Legno → 3 Cibo) · Razioni (2 Legno: per un anno le truppe mangiano la metà) |
 | Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Mercante (2 Ricerca → 4 Oro) · Assemblea (+50% Oro o Ricerca per un anno) |
-| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) |
+| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) |
 | Sacerdote | Fede · blu | Fede | Cinque incanti (2 Fede ciascuno) · Processione (2 Fede, solo Teocrazia) |
-| Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Tributi feudali (+5 Oro, solo Monarchia) |
+| Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Decreto fiscale (2 Stabilità → 4 Oro) · Censimento (2 Stabilità: per un anno ogni consigliere mostra una proposta in più) · Tributi feudali (+5 Oro, solo Monarchia) |
 | Maestro delle spie | Ombra · viola | Oro + una risorsa casuale | Quattro spionaggi (2 Documenti ciascuno) |
 | Clown | — | — (non potenzia) | Un elemento per colore (rosso, verde, blu, viola) e un edificio neutro |
 | Anziano | — | Oro (solo edifici neutri, una volta all’anno) | Consiglio degli anziani: un perk (2 Fede + 2 Influenza) · edifici neutri |
@@ -364,7 +374,7 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 | Rifornimenti avvelenati | Inefficienza 10 s | l’edificio più veloce |
 | Infiltrati | Inefficienza 10 s | un elemento a caso |
 
-**Buchi noti** (da coprire con carte o azioni nuove): l’Architetto non ha truppe nell’era 1; Studioso e Cancelliere hanno una sola azione comune; Stato e Ombra hanno pochi edifici propri.
+**Copertura (bozza 4).** Ogni consigliere ordinario ha almeno due azioni comuni e, in ogni era, almeno un edificio e una truppa con un suo tipo (lo verifica un test automatico). Per riempire i buchi sono state aggiunte: Tribunale, Prefettura e Palazzo del governo (Stato); Covo, Mercato nero e Arsenale clandestino (Ombra); Acciaieria (Opera, era 3); Zappatori (Assedio dell’era 1, per l’Architetto); Tagliagole (Ombra, era 1); Guardia reale (Stato, era 3); le azioni Archivisti, Manuali tecnici, Decreto fiscale e Censimento. Restano sottili: le truppe del Maestro delle spie (1–2 per era) e gli edifici del Generale nell’era 2 (solo la Fortezza).
 
 ---
 
@@ -387,12 +397,12 @@ Tutte le questioni della bozza 1 sono decise.
 
 | | Era 1 | Era 2 | Era 3 | Totale |
 |---|---:|---:|---:|---:|
-| Edifici base | 11 | 8 | 8 | 27 |
-| Truppe base | 8 | 8 | 8 | 24 |
+| Edifici base | 13 | 10 | 11 | 34 |
+| Truppe base | 10 | 8 | 9 | 27 |
 | Vie | — | 4 | 4 + 1 esclusiva | 9 |
 | Esclusivi delle vie | — | 4 | 9 | 13 |
 | Esclusivi dell’identità | 3 | — | — | 3 |
 | Perk | 11 (7 esistenti + 4 nuovi) | | | 11 |
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
-| Azioni del Consiglio | 23 (di cui 2 esclusive dell’identità) | | | 23 |
+| Azioni del Consiglio | 27 (di cui 2 esclusive dell’identità) | | | 27 |

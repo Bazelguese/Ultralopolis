@@ -224,9 +224,9 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 | Fattore | Terra | Scorte: Cibo in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno |
 | Architetto | Opera | Architetti: spazio edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | Pietra, Legno (lo spazio in Oro) |
 | Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
-| Studioso | Conoscenza | Studiosi: Legno in Ricerca | Legno |
+| Studioso | Conoscenza | Studiosi: Legno in Ricerca · Archivisti: Documenti in Ricerca · Manuali tecnici: per un anno una truppa fa più danno | Legno, Documenti |
 | Sacerdote | Fede | Incanta una truppa (§4.3), un’azione per ogni effetto | Fede |
-| Cancelliere (ex Diplomatico) | Stato | Ambasciata: accorcia un malus attivo | Stabilità |
+| Cancelliere (ex Diplomatico) | Stato | Ambasciata: accorcia un malus attivo · Decreto fiscale: Stabilità in Oro · Censimento: per un anno una proposta in più | Stabilità |
 | Maestro delle spie | Ombra | Sabotaggio o rallentamento del fantasma (§12) | Documenti |
 | Clown | — | 5 elementi di mana diverso (§4.2.2) | — |
 | Anziano | — | Un perk (§9.3) | Fede e Influenza |
@@ -234,8 +234,6 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Ogni risorsa di categoria (§5.3) deve pagare **almeno un’azione** del Consiglio — Confermato (v0.22). L’assegnazione attuale (Ambasciata in Stabilità, spionaggio in Documenti) è una Proposta. Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
 
 Una proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
-
-**Da definire:** Studioso e Cancelliere hanno una sola azione: in un round Azioni mostrerebbero una sola proposta.
 
 **Da definire:** catalogo definitivo del Consiglio e dei pool, frequenza dei consiglieri, eventi.
 
@@ -1038,7 +1036,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
 | Almeno 1 proposta per consigliere (prima del Consiglio: 1 alternativa per opportunità) | Provvisoria. |
-| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; Scorte 2 Legno → 3 Cibo; Razioni 2 Legno; incanti 2 Fede; spionaggi 2 Documenti; perk dell’Anziano 2 Fede + 2 Influenza (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
+| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; Scorte 2 Legno → 3 Cibo; Razioni 2 Legno; incanti 2 Fede; spionaggi 2 Documenti; perk dell’Anziano 2 Fede + 2 Influenza; Archivisti 2 Documenti → 3 Ricerca; Manuali tecnici 2 Documenti; Decreto fiscale 2 Stabilità → 4 Oro; Censimento 2 Stabilità (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
 | Bottino dei nemici sconfitti: fantasma 3 Oro e 2 Ricerca; incontri facile 2 Oro e 1 Ricerca, media 3 e 2, difficile 4 e 3 | Placeholder (v0.21). |
 | Un consigliere o una proposta favoriti da un elemento dell’identità hanno peso +1 per ogni elemento che li favorisce (peso base 1) | Provvisoria (estesa ai consiglieri, v0.21). |
@@ -1050,7 +1048,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Tasso del mercato: 2 unità di una risorsa → 1 Oro, uguale per tutte | Placeholder. |
 | Ogni uso di Potenzia sale di un livello | Provvisoria (v0.22). |
 | Costo di Potenzia: livello 2 = 2 × era della carta, livello 3 = 3 × era, in unità della risorsa della categoria; il Maestro delle spie chiede la stessa quantità di Oro e della risorsa casuale; l’Anziano chiede Oro | Placeholder (v0.22). |
-| La Capitale non si potenzia: il suo tipo (Capitale) non sta in nessuna categoria | Provvisoria (v0.22); da decidere con Davide. |
+| La Capitale non si potenzia: il suo tipo (Capitale) non sta in nessuna categoria | Accettata dal creatore per ora (v0.22). |
 | In un round Misto almeno una proposta è un’azione, se il consigliere ne ha | Provvisoria (v0.22). |
 | Clown e Anziano compaiono in qualsiasi round, con lo stesso peso degli altri consiglieri | Provvisoria (v0.22). |
 | Un consigliere è favorito (+1) da ogni elemento dell’identità che lo indica o che favorisce una sua azione | Provvisoria (v0.22). |
@@ -1148,7 +1146,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
-| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4); nuove azioni per Studioso e Cancelliere. |
+| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4). |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
 | Più avanti | Progressione fra run, audio, monetizzazione, stile visivo. |
 
