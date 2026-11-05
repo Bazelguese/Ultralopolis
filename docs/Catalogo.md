@@ -1,6 +1,6 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 4 — 5 novembre 2026
+**Versione:** bozza 5 — 5 novembre 2026 (tecnologie, §6 quater)
 **Riferimento:** Game Design Document v0.22 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `consiglieri/`, `opportunities/` per le azioni, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
 
@@ -228,7 +228,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 | Via | Favorita da | Offerte più frequenti | Tratto permanente | Bonus immediato |
 |---|---|---|---|---|
-| Via del Commercio | Cultura mercantile, Popolo del delta, Repubblica | Tesoriere, Mercante | +1 Oro per fase da ogni edificio Economico | +6 Oro |
+| Via del Commercio | Cultura mercantile, Popolo del delta, Repubblica | Tesoriere, Esattori (prima Mercante) | +1 Oro per fase da ogni edificio Economico | +6 Oro |
 | Via della Guerra | Cultura guerriera, Montanari, Monarchia | Generale, Addestramento | Le truppe Fante ricaricano il 10% più in fretta | +1 spazio truppa |
 | Via della Fede | Teocrazia, Culto del Sole, Antichi spiriti | Ambasciata, Fortificazioni | +1 Fede per fase da ogni edificio Spirituale | +4 Fede |
 | Via del Sapere | Cultura erudita, Ordine della Ragione | Studiosi | +1 Ricerca per fase da ogni edificio Accademico | +5 Ricerca |
@@ -247,7 +247,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | Via | Favorita da | Offerte più frequenti | Tratto permanente | Bonus immediato |
 |---|---|---|---|---|
 | Via dell’Impero | Via della Guerra, Monarchia | Quartiermastro, Generale | +10 Resistenza in ogni scontro | +1 spazio truppa, +1 spazio edificio |
-| Via dell’Oro | Via del Commercio, Repubblica, Popolo del delta | Esattori, Mercante | Rinnovare le offerte costa 1 Oro in meno | +10 Oro |
+| Via dell’Oro | Via del Commercio, Repubblica, Popolo del delta | Esattori | Rinnovare le offerte costa 1 Oro in meno | +10 Oro |
 | Via della Rivelazione | Via della Fede, Teocrazia, Culto del Sole | Ambasciata | Gli edifici Spirituali producono il 10% più in fretta | +6 Fede |
 | Via dell’Ombra | Via del Sapere, Ordine della Ragione, Repubblica | Studiosi, Ambasciata | Inefficienza e Sabotaggio inflitti durano 1 s in più (§7 questione D) | +5 Influenza |
 | Via degli Spiriti *(esclusiva: solo con Antichi spiriti)* | Popolo delle foreste | Esattori | +1 Cibo per fase da ogni edificio Fauna o di Produzione | +4 Legno |
@@ -353,8 +353,8 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 | Generale | Militare · rosso | Ferro | Quartiermastro (5 Oro, spazio truppa) · Addestramento (2 Ferro) |
 | Architetto | Opera · rosso | Pietra | Architetti (6 Oro, spazio edificio) · Fortificazioni (2 Pietra) |
 | Fattore | Terra · verde | Legno | Scorte (2 Legno → 3 Cibo) · Razioni (2 Legno: per un anno le truppe mangiano la metà) |
-| Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Mercante (2 Ricerca → 4 Oro) · Assemblea (+50% Oro o Ricerca per un anno) · *Ministri:* Grandi esattori (+6 Oro) |
-| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) · *Ministri:* Trattati (4 Legno → 5 Ricerca) |
+| Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Assemblea (+50% Oro o Ricerca per un anno) · *Ministri:* Grandi esattori (+6 Oro) |
+| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) · *Ministri:* Trattati (4 Legno → 5 Ricerca) · Revisione dei piani (2 Documenti: ripesca la mano delle tecnologie, v0.25) |
 | Sacerdote | Fede · blu | Fede | Cinque incanti (2 Fede ciascuno) · Processione (2 Fede, solo Teocrazia) |
 | Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Decreto fiscale (2 Stabilità → 4 Oro) · Censimento (2 Stabilità: per un anno ogni consigliere mostra una proposta in più) · Tributi feudali (+5 Oro, solo Monarchia) |
 | Maestro delle spie | Ombra · viola | Oro + una risorsa casuale | Sei spionaggi (2 Documenti ciascuno) · *Ministri:* Rete di sabotatori (3 Documenti) |
@@ -453,6 +453,144 @@ Nota: il Contrabbandiere richiede una carta Criminale sulla plancia ed è favori
 
 ---
 
+## 6 quater. Tecnologie (GDD §10.5, v0.25)
+
+**Stato: proposta di Claude, tutta placeholder** (nomi, effetti e costi). File dati: `data/catalog/tecnologie/` e, per le linee, `data/catalog/linee/`.
+
+Regole del GDD usate qui: 4 rami per colore; ogni era ha due **altezze**; per era e per ramo ci sono 2 tecnologie alla prima altezza (una per categoria) e 1 alla seconda; la seconda altezza si apre con 1 tecnologia della prima nello stesso ramo. Costi di prova: era 1 **3 / 4** Ricerca, era 2 **5 / 6**, era 3 **7 / 8** (prima / seconda altezza). Per entrare nell’era 2 servono **4 tecnologie dell’era 1**, per l’era 3 **5 dell’era 2**.
+
+Tutti gli effetti usano modificatori che il gioco ha già (P5): nessuna regola nuova. “Prerequisito” indica una freccia precisa dell’albero, oltre alla regola dell’altezza.
+
+### 6 quater.1 Era 1 — Fondazione (altezze 1 e 2)
+
+| Ramo | Altezza | Tecnologia | Sfera | Effetto | Prerequisito |
+|---|---:|---|---|---|---|
+| Rosso | 1 | **Disciplina** | Militare | Linea dei **Picchieri** (§6 quater.5) | — |
+| Rosso | 1 | **Carpenteria** | Opera | +1 spazio edificio | — |
+| Rosso | 2 | **Schieramento** | Militare | Le truppe Fante ricaricano il 5% più in fretta | Disciplina |
+| Verde | 1 | **Rotazione dei campi** | Terra | Linea degli **Orti** | — |
+| Verde | 1 | **Contabilità** | Ricchezza | +1 Oro per fase dalla Capitale | — |
+| Verde | 2 | **Fiere** | Ricchezza | Rinnovare le proposte costa 1 Oro in meno | — |
+| Blu | 1 | **Liturgia** | Fede | Linea dei **Penitenti** | — |
+| Blu | 1 | **Codice delle leggi** | Stato | +1 Stabilità per fase dalla Capitale | — |
+| Blu | 2 | **Milizie cittadine** | Stato | +5 Resistenza in ogni scontro | — |
+| Viola | 1 | **Scrittura** | Conoscenza | Linea dello **Scriptorium** | — |
+| Viola | 1 | **Bassifondi** | Ombra | Le truppe Criminali ricaricano il 10% più in fretta | — |
+| Viola | 2 | **Copisti** | Conoscenza | +1 Documenti per fase da ogni edificio Accademico | Scrittura |
+
+### 6 quater.2 Era 2 — Sviluppo (altezze 3 e 4)
+
+| Ramo | Altezza | Tecnologia | Sfera | Effetto | Prerequisito |
+|---|---:|---|---|---|---|
+| Rosso | 3 | **Armi in acciaio** | Militare | Le truppe Fante fanno il 10% di danno in più | Disciplina |
+| Rosso | 3 | **Ingegneria d’assedio** | Opera | Perk **Genio militare** (Assedio +25% danno agli scudi) | — |
+| Rosso | 4 | **Caserme permanenti** | Opera | +1 spazio truppa | — |
+| Verde | 3 | **Aratro pesante** | Terra | +1 Cibo per fase da ogni edificio di Produzione | — |
+| Verde | 3 | **Banchi di cambio** | Ricchezza | +1 Influenza per fase da ogni edificio Economico | Contabilità |
+| Verde | 4 | **Lettere di credito** | Ricchezza | Ogni consigliere mostra una proposta in più | — |
+| Blu | 3 | **Ordini ospitalieri** | Fede | Perk **Erboristi di corte** (chi cura cura 1 in più) | — |
+| Blu | 3 | **Burocrazia** | Stato | +1 Stabilità per fase da ogni edificio di Legge | Codice delle leggi |
+| Blu | 4 | **Reliquie** | Fede | +1 Fede per fase da ogni edificio Spirituale | — |
+| Viola | 3 | **Archivi di Stato** | Conoscenza | +1 Documenti per fase dalla Capitale | — |
+| Viola | 3 | **Alchimia dei veleni** | Ombra | Perk **Veleni sottili** (Corruzione +1) | — |
+| Viola | 4 | **Controspionaggio** | Ombra | L’Inefficienza inflitta dura il 25% in più | — |
+
+### 6 quater.3 Era 3 — Ascesa (altezze 5 e 6)
+
+| Ramo | Altezza | Tecnologia | Sfera | Effetto | Prerequisito |
+|---|---:|---|---|---|---|
+| Rosso | 5 | **Polvere da sparo** | Militare | Le truppe Assedio fanno il 15% di danno in più | Ingegneria d’assedio |
+| Rosso | 5 | **Grandi opere** | Opera | +1 spazio edificio | — |
+| Rosso | 6 | **Stato maggiore** | Militare | +10 Resistenza in ogni scontro | — |
+| Verde | 5 | **Irrigazione** | Terra | +1 Legno per fase da ogni edificio di Produzione | Aratro pesante |
+| Verde | 5 | **Banca centrale** | Ricchezza | +20% Oro prodotto | — |
+| Verde | 6 | **Compagnie di ventura** | Ricchezza | Le truppe Fante ricaricano il 10% più in fretta | — |
+| Blu | 5 | **Teologia** | Fede | Gli edifici Spirituali producono il 10% più in fretta | — |
+| Blu | 5 | **Diritto** | Stato | Gli elementi di Legge che producono scudo ne producono 2 in più | — |
+| Blu | 6 | **Amministrazione centrale** | Stato | Rinnovare le proposte costa 1 Oro in meno | — |
+| Viola | 5 | **Stampa** | Conoscenza | +20% Ricerca prodotta | Copisti |
+| Viola | 5 | **Cifrari** | Ombra | Il Sabotaggio inflitto dura il 25% in più | — |
+| Viola | 6 | **Metodo scientifico** | Conoscenza | Perk **Biblioteca reale** (+25% Ricerca prodotta) | — |
+
+Le tecnologie che danno un perk non compaiono se la nazione ha già quel perk.
+
+### 6 quater.4 Tecnologie esclusive
+
+Compaiono solo per chi ha la via o il popolo, alla prima altezza della loro era e nel ramo della loro sfera. Costano come le altre della stessa altezza.
+
+**Vie (13)**
+
+| Via | Era | Tecnologia | Sfera | Effetto |
+|---|---:|---|---|---|
+| Commercio | 2 | **Rotte carovaniere** | Ricchezza | +1 Oro per fase da ogni edificio Infrastruttura Strategica |
+| Commercio | 3 | **Monopoli** | Ricchezza | +10% Oro prodotto |
+| Guerra | 2 | **Veterani di cento battaglie** | Militare | Le truppe Fante che fanno danno ne fanno 1 in più |
+| Guerra | 3 | **Arte della guerra** | Militare | +1 spazio truppa |
+| Fede | 2 | **Pellegrinaggi** | Fede | +1 Fede per fase dalla Capitale |
+| Fede | 3 | **Concilio** | Fede | Gli elementi Spirituali che curano curano 1 in più |
+| Sapere | 2 | **Enciclopedia** | Conoscenza | +1 Ricerca per fase da ogni edificio Accademico |
+| Sapere | 3 | **Accademie reali** | Conoscenza | +20% Ricerca prodotta |
+| Impero | 3 | **Legioni di frontiera** | Militare | +10 Resistenza in ogni scontro |
+| Oro | 3 | **Zecca** | Ricchezza | +1 Oro per fase da ogni edificio Economico |
+| Rivelazione | 3 | **Miracoli** | Fede | Gli elementi Spirituali che producono scudo ne producono 2 in più |
+| Ombra | 3 | **Gilda degli assassini** | Ombra | Le truppe Criminali fanno il 15% di danno in più |
+| Spiriti | 3 | **Canti degli antenati** | Terra | Gli edifici Fauna producono il 10% più in fretta |
+
+**Popoli (9).** Il gioco usa ancora i popoli del catalogo precedente; quando arriveranno le razze della v0.24 (§9.4.1 del GDD) queste tecnologie passeranno a Pietrosangue, Maremani e Cinerali, come gli altri esclusivi.
+
+| Popolo | Era | Tecnologia | Sfera | Effetto |
+|---|---:|---|---|---|
+| Montanari | 1 | **Scalpellini** | Opera | +1 Pietra per fase dalla Capitale |
+| Montanari | 2 | **Rocche di montagna** | Militare | Gli elementi Guardiani che producono scudo ne producono 1 in più |
+| Montanari | 3 | **Cuore di pietra** | Opera | +10 Resistenza in ogni scontro |
+| Popolo del delta | 1 | **Chiatte** | Ricchezza | +1 Oro per fase da ogni edificio Infrastruttura Strategica |
+| Popolo del delta | 2 | **Canali** | Terra | +1 Cibo per fase da ogni edificio di Produzione |
+| Popolo del delta | 3 | **Porto franco** | Ricchezza | Rinnovare le proposte costa 1 Oro in meno |
+| Popolo delle foreste | 1 | **Sentieri nascosti** | Terra | Le truppe Guardiane ricaricano il 10% più in fretta |
+| Popolo delle foreste | 2 | **Erbe dei boschi** | Fede | Gli elementi che curano curano 1 in più |
+| Popolo delle foreste | 3 | **Spiriti del bosco** | Terra | +1 Legno per fase da ogni edificio Fauna |
+
+### 6 quater.5 Linee di elementi
+
+Una linea ha una versione per era (GDD §10.5.5). Le versioni **non sono nel catalogo base**: compaiono fra le proposte solo dopo la tecnologia. Come gli esclusivi (§1.5) hanno **+1 punto** di budget e costano il costo base della loro era.
+
+| Linea | Tecnologia | Era 1 | Era 2 | Era 3 |
+|---|---|---|---|---|
+| Picchieri (truppe) | Disciplina | **Picchieri** | **Alabardieri** | **Lanzichenecchi** |
+| Orti (edifici) | Rotazione dei campi | **Orti** | **Poderi** | **Latifondi** |
+| Penitenti (truppe) | Liturgia | **Penitenti** | **Custodi del tempio** | **Templari** |
+| Scriptorium (edifici) | Scrittura | **Scriptorium** | **Collegio** | **Ateneo** |
+
+**Truppe delle linee**
+
+| Truppa | Era | Tipi | Mana | Ricarica | Effetti | Cibo | Punti |
+|---|---:|---|---|---:|---|---:|---:|
+| Picchieri | 1 | Fante | rosso 2 | 2 s | Danno 4, Scudo 2 | 0,5 | 6 |
+| Alabardieri | 2 | Fante | rosso 3 | 2,5 s | Danno 8, Scudo 3 | 0,5 | 11 |
+| Lanzichenecchi | 3 | Fante | rosso 4 | 2,5 s | Danno 13, Scudo 5 | 0,5 | 18 |
+| Penitenti | 1 | Spirituale | blu 2 | 2,5 s | Cura 3, Scudo 3 | 0,5 | 6 |
+| Custodi del tempio | 2 | Spirituale | blu 3 | 2,5 s | Cura 6, Scudo 5 | 0,5 | 11 |
+| Templari | 3 | Spirituale | blu 4 | 2,5 s | Danno 8, Cura 5, Scudo 5 | 0,5 | 18 |
+
+**Edifici delle linee**
+
+| Edificio | Era | Tipi | Colore | Per fase | In battaglia | Punti |
+|---|---:|---|---|---|---|---:|
+| Orti | 1 | Produzione | verde | Oro 1, Cibo 2, Legno 2 | 1 mana ogni 2 s | 5 |
+| Poderi | 2 | Produzione | verde | Oro 1, Cibo 3, Legno 3 | 1 mana ogni 1,5 s | 6,7 |
+| Latifondi | 3 | Produzione | verde | Oro 2, Cibo 4, Legno 3 | 1 mana ogni 1 s | 9,5 |
+| Scriptorium | 1 | Accademico | viola | Ricerca 1, Documenti 2 | 1 mana ogni 1,5 s | 4,7 |
+| Collegio | 2 | Accademico | viola | Ricerca 2, Documenti 2 | 1 mana ogni 1 s | 7 |
+| Ateneo | 3 | Accademico | viola | Ricerca 3, Documenti 3 | 1 mana ogni 1 s | 8,5 |
+
+### 6 quater.6 Studioso e carte dorate
+
+- **Revisione dei piani** (Studioso, nuova): 2 Documenti, ripesca la mano delle tecnologie.
+- Il **Mercante** del Tesoriere (2 Ricerca → 4 Oro) è tolto (GDD v0.25). Dove le vie e il Popolo del delta lo rendevano più frequente, ora rendono più frequenti gli **Esattori**.
+- **Carte dorate** (GDD §10.5.6), primi esempi: l’evento **La disputa dei dotti** e la fortuna **La biblioteca ritrovata** danno, oltre ai loro effetti, una tecnologia di Conoscenza già iniziata a metà; gli incontri del mondo generati possono offrire fra le ricompense una tecnologia già iniziata.
+
+---
+
 ## 7. Questioni per Davide
 
 Tutte le questioni della bozza 1 sono decise.
@@ -482,3 +620,6 @@ Tutte le questioni della bozza 1 sono decise.
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
 | Azioni del Consiglio | 33 (di cui 2 esclusive dell’identità e 3 dal livello Ministri) | | | 33 |
 | Eventi / Fortune / Visitatori | 18 / 6 / 6 | | | 30 |
+| Tecnologie base | 12 | 12 | 12 | 36 |
+| Tecnologie esclusive (vie / popoli) | 0 / 3 | 4 / 3 | 9 / 3 | 13 / 9 |
+| Elementi delle linee | 2 + 2 | 2 + 2 | 2 + 2 | 12 |
