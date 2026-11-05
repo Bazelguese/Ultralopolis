@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="AdvisorDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="v1"]
-[ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="v2"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="v3"]
 
 [resource]
@@ -12,7 +11,7 @@ special = 3
 color = &"viola"
 category_name = "Conoscenza"
 description = "Viene dal futuro, o così dice: carte dell'era successiva, a 3 Oro in più."
-favored_by = Array[Resource]([ExtResource("v2"), ExtResource("v3")])
+favored_by = Array[Resource]([ExtResource("v3")])
 max_era = 2
 any_type = true
 era_shift_min = 1

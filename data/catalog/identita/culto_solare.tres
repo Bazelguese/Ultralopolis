@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/benedizione_del_sole.tres" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_culto_solare_fede.tres" id="x4"]
+
+[resource]
+script = ExtResource("x1")
+id = &"culto_solare"
+display_name = "Culto solare"
+description = "Adorazione del sole e della luce, che benedice i raccolti: +20% Oro prodotto. Capitale: +1 Fede."
+dimension = 2
+resistance_bonus = 2
+permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])

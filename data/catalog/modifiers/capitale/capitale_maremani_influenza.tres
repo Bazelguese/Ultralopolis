@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_y0h2u")
-id = &"capitale_popolo_del_delta_influenza"
+id = &"capitale_maremani_influenza"
 display_name = "Capitale: +1 Influenza"
 description = "La Capitale produce 1 Influenza in più a ogni fase."
 is_malus = false

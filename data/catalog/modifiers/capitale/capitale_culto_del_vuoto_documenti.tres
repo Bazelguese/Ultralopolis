@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_iubkx")
-id = &"capitale_cultura_erudita_documenti"
+id = &"capitale_culto_del_vuoto_documenti"
 display_name = "Capitale: +1 Documenti"
 description = "La Capitale produce 1 Documenti in più a ogni fase."
 is_malus = false

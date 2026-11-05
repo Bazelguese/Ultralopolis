@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/favore_degli_spiriti.tres" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_spiriti_dei_luoghi_legno.tres" id="x4"]
+
+[resource]
+script = ExtResource("x1")
+id = &"spiriti_dei_luoghi"
+display_name = "Spiriti dei luoghi"
+description = "Ogni bosco e fiume ha uno spirito che aiuta gli edifici: mana prodotto il 10% più in fretta. Capitale: +1 Legno."
+dimension = 2
+resistance_bonus = 2
+permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])

@@ -91,7 +91,7 @@ func test_le_carte_corrispondono_alla_plancia_ai_consiglieri_e_alle_proposte() -
 	assert_eq(_carte("_edifici", 0).size(), run.board.buildings.size(), "Una carta per ogni edificio.")
 	var scelte: Array = _scena.get("_scelte")
 	assert_gt(run.advisor_choices.size(), 0, "Ci sono consiglieri nel primo round.")
-	assert_eq(scelte.size(), run.advisor_choices.size(), "Prima del round: una carta per ogni consigliere.")
+	assert_eq(scelte.size(), _carte_del_round(run), "Prima del round: una carta per ogni consigliere e per l'evento.")
 	_scena.call("_clic_scelta", scelte[0])
 	assert_not_null(run.chosen_advisor, "Cliccando la carta si ascolta il consigliere.")
 	scelte = _scena.get("_scelte")
@@ -105,7 +105,7 @@ func test_passare_il_round_aggiorna_le_carte() -> void:
 	hud.passa.emit()
 	assert_ne(run.round_number, numero, "Si passa al round successivo.")
 	var scelte: Array = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.advisor_choices.size())
+	assert_eq(scelte.size(), _carte_del_round(run))
 
 
 func test_potenzia_dal_pannello_della_carta() -> void:
@@ -166,7 +166,7 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
 	scelte = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.advisor_choices.size(), "Dopo la via tornano i consiglieri del round.")
+	assert_eq(scelte.size(), _carte_del_round(run), "Dopo la via tornano i consiglieri del round.")
 
 
 ## Cambiare qualcosa sulla plancia non rifà le offerte: restano le stesse carte, senza nuova entrata.
@@ -229,3 +229,8 @@ func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	assert_almost_eq(float(larghezze[0]), attesa, 0.001)
 	var plancia: Node3D = _scena.get("_plancia")
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
+
+
+## Carte attese prima di scegliere: i consiglieri del round più l'evento, se c'è (GDD §4.2.5).
+func _carte_del_round(run: RunState) -> int:
+	return run.advisor_choices.size() + (1 if run.event_choice != null else 0)

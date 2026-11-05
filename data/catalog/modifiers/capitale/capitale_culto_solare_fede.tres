@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_ohv5f")
-id = &"capitale_culto_del_sole_fede"
+id = &"capitale_culto_solare_fede"
 display_name = "Capitale: +1 Fede"
 description = "La Capitale produce 1 Fede in più a ogni fase."
 is_malus = false

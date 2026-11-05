@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/campi_allagati.tres" id="e5"]
-[ext_resource type="Resource" path="res://data/catalog/identita/popolo_del_delta.tres" id="e6"]
+[ext_resource type="Resource" path="res://data/catalog/identita/maremani.tres" id="e6"]
 
 [sub_resource type="Resource" id="RA_2"]
 script = ExtResource("e3")

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/mercante.tres" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esattori.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="x5"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/porto_lagunare.tres" id="x6"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x7"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_maremani_influenza.tres" id="x8"]
+
+[resource]
+script = ExtResource("x1")
+id = &"maremani"
+display_name = "Maremani"
+description = "Anfibi delle lagune, barcaioli e commercianti. +3 Oro iniziale, Mercante ed Esattori più frequenti, può costruire il Porto lagunare. Capitale: +1 Influenza."
+resistance_bonus = 2
+extra_gold = 3
+favored_opportunities = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
+exclusive_buildings = Array[ExtResource("x5")]([ExtResource("x6")])
+permanent_modifiers = Array[ExtResource("x7")]([ExtResource("x8")])

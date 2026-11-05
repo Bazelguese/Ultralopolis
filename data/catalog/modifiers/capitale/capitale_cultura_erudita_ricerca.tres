@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_qhkah")
-id = &"capitale_ordine_della_ragione_ricerca"
+id = &"capitale_cultura_erudita_ricerca"
 display_name = "Capitale: +1 Ricerca"
 description = "La Capitale produce 1 Ricerca in più a ogni fase."
 is_malus = false

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/fame_del_vuoto.tres" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_culto_del_vuoto_documenti.tres" id="x4"]
+
+[resource]
+script = ExtResource("x1")
+id = &"culto_del_vuoto"
+display_name = "Culto del vuoto"
+description = "Fede oscura nel nulla: la Corruzione inflitta è il 20% più forte. Capitale: +1 Documenti."
+dimension = 2
+resistance_bonus = 1
+permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])

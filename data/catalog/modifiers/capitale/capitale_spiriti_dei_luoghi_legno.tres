@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_gtl3d")
-id = &"capitale_antichi_spiriti_legno"
+id = &"capitale_spiriti_dei_luoghi_legno"
 display_name = "Capitale: +1 Legno"
 description = "La Capitale produce 1 Legno in più a ogni fase."
 is_malus = false

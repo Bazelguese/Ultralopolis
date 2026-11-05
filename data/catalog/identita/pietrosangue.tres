@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/guardie_delle_vette.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x5"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_pietrosangue_pietra.tres" id="x6"]
+
+[resource]
+script = ExtResource("x1")
+id = &"pietrosangue"
+display_name = "Pietrosangue"
+description = "Popolo di roccia viva delle montagne, lento a cedere. Parte con i Lancieri e può reclutare le Guardie delle vette. Capitale: +1 Pietra."
+resistance_bonus = 8
+extra_troops = Array[ExtResource("x2")]([ExtResource("x3")])
+exclusive_troops = Array[ExtResource("x2")]([ExtResource("x4")])
+permanent_modifiers = Array[ExtResource("x5")]([ExtResource("x6")])
