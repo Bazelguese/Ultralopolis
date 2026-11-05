@@ -2,7 +2,7 @@
 ## L'anno in dodici mesi e quattro stagioni
 
 **Data:** 5 novembre 2026
-**Stato:** **bozza 3, domande chiuse; da approvare per il GDD.** Non cambia ancora né il GDD né il gioco.
+**Stato:** **approvata da Davide e riportata nel GDD v0.25** (5 novembre 2026). Non ancora nel gioco. Questo file resta come memoria della discussione.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.24
 
 Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Da definire** = nessuna regola ancora; **Spunto** = idea per il futuro, da non implementare.
