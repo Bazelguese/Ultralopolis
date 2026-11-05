@@ -1,7 +1,7 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 6 — 5 novembre 2026 (identità v0.24 e tecnologie v0.25)
-**Riferimento:** Game Design Document v0.25 (`docs/Ultralopolis_GDD.md`)
+**Versione:** bozza 7 — 5 novembre 2026 (identità v0.24, tecnologie v0.25, tradizioni v0.26)
+**Riferimento:** Game Design Document v0.26 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `consiglieri/`, `opportunities/` per le azioni, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
 
 **Bozza 4 (GDD v0.22):** le etichette diventano **tipi** (1–2 per carta), i colori del mana sono **quattro** (viola nuovo), le risorse cambiano (via la Fauna, nuove **Stabilità** e **Documenti**), i potenziamenti si fanno con l’opzione **Potenzia** del Consiglio. Il Consiglio è in §6 bis.
@@ -288,6 +288,86 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | Ingegneri militari | Sapere | 3 | Assedio, Accademico | viola 5 | 3 s | Danno agli scudi 14, Danno 10, Inefficienza 5 s (edifici) | 1 | 22 |
 | Legione | Impero | 3 | Fante, Patriota | rosso 5 | 2,5 s | Danno 14, Scudo 7 | 0,5 | 21 |
 | Assassini | Ombra | 3 | Criminale | viola 4 | 3 s | Sabotaggio 4 s (truppe), Corruzione 6, Danno 2 | 0,5 | 19 |
+
+---
+
+## 4.4 Tradizioni delle vie (GDD §10.4.1, v0.26)
+
+**Stato: placeholder.** Ogni via ha 4 passi; ognuno si completa con la sua impresa e dà un effetto permanente. File dati: i passi sono dentro i file delle vie (`data/catalog/vie/`).
+
+#### 4.4.1 Vie dell'era 2
+
+| Via | Passo | Impresa | Effetto |
+|---|---|---|---|
+| **Commercio** | Botteghe | Prendi 3 proposte dal Tesoriere | +1 Oro per fase dalla Capitale |
+| | Carovane | Abbi 2 edifici Infrastruttura Strategica | +1 Influenza per fase da ogni edificio Infrastruttura Strategica |
+| | Fiere annuali | Raccogli almeno 12 Oro in una sola produzione | Rinnovare le proposte costa 1 Oro in meno |
+| | Gilde | Abbi 3 edifici Economici al livello 2 o più | +10% Oro prodotto |
+| **Guerra** | Veterani | Vinci 2 scontri | Le truppe Fante che fanno danno ne fanno 1 in più |
+| | Arsenali | Abbi 2 edifici Infrastruttura Bellica | +1 Ferro per fase da ogni edificio Infrastruttura Bellica |
+| | Dottrina | Prendi 4 proposte dal Generale | +1 spazio truppa |
+| | Esercito di popolo | Abbi 3 carte Fante al livello 2 o più | +8 Resistenza in ogni scontro |
+| **Fede** | Pellegrini | Scegli 1 Evento di Fede | +1 Fede per fase dalla Capitale |
+| | Confraternite | Abbi 3 carte Spirituali | Gli elementi Spirituali che curano curano 1 in più |
+| | Concilio | Prendi 4 proposte dal Sacerdote | +6 Resistenza in ogni scontro |
+| | Santità | Chiudi un anno con il Malcontento a 2 o meno | Gli edifici Spirituali producono il 10% più in fretta |
+| **Sapere** | Scuole | Completa 2 tecnologie | +1 Documenti per fase dalla Capitale |
+| | Biblioteche | Abbi 2 edifici Accademici | +1 Documenti per fase da ogni edificio Accademico |
+| | Accademie | Completa 3 tecnologie di Conoscenza | +10% Ricerca prodotta |
+| | Enciclopedisti | Raccogli almeno 8 Ricerca in una sola produzione | Ogni consigliere mostra una proposta in più |
+
+#### 4.4.2 Vie dell'era 3
+
+| Via | Passo | Impresa | Effetto |
+|---|---|---|---|
+| **Impero** | Legati | Vinci 2 scontri | +1 spazio edificio |
+| | Strade | Abbi 2 edifici Infrastruttura Strategica | +1 Pietra per fase da ogni edificio Infrastruttura Strategica |
+| | Legioni | Abbi 4 carte Fante al livello 2 o più | Le truppe Fante fanno il 10% di danno in più |
+| | Pax | Vinci 3 scontri con il fantasma | +10 Resistenza in ogni scontro |
+| **Oro** | Zecche | Prendi 3 proposte dal Tesoriere | +2 Oro per fase dalla Capitale |
+| | Banchieri | Abbi 3 edifici Economici | +1 Influenza per fase da ogni edificio Economico |
+| | Credito | Raccogli almeno 20 Oro in una sola produzione | Rinnovare le proposte costa 1 Oro in meno |
+| | Monopolio | Abbi 2 edifici Economici al livello 3 | +15% Oro prodotto |
+| **Rivelazione** | Visioni | Scegli 1 Evento di Fede | +1 Fede per fase da ogni edificio Spirituale |
+| | Martiri | Vinci 2 scontri | Gli elementi Spirituali che producono scudo ne producono 1 in più |
+| | Profeti | Prendi 3 proposte dal Sacerdote | +8 Resistenza in ogni scontro |
+| | Ultima rivelazione | Abbi 2 carte Spirituali al livello 3 | Gli elementi che curano curano 2 in più |
+| **Ombra** | Informatori | Prendi 3 proposte dal Maestro delle spie | Le truppe Criminali ricaricano il 10% più in fretta |
+| | Covi | Abbi 2 edifici Infrastruttura Segreta | +1 Documenti per fase da ogni edificio Infrastruttura Segreta |
+| | Sicari | Vinci 2 scontri con il fantasma | Il Sabotaggio inflitto dura il 25% in più |
+| | Ombra lunga | Abbi 4 carte Criminali | Gli elementi che infliggono Corruzione ne infliggono 1 in più |
+| **Spiriti** | Boschi sacri | Abbi 2 edifici di Produzione o Fauna | +1 Legno per fase dalla Capitale |
+| | Branchi | Abbi 3 carte Fauna | Le truppe Fauna ricaricano il 10% più in fretta |
+| | Antenati | Scegli 2 Eventi di Terra o di Fede | +8 Resistenza in ogni scontro |
+| | Grande madre | Raccogli almeno 10 Cibo in una sola produzione | +1 Cibo per fase da ogni edificio Fauna o di Produzione |
+
+## 4.5 Ascensioni (GDD §10.4.2, v0.26)
+
+**Stato: placeholder.** File dati: `data/catalog/ascensioni/`.
+
+#### 4.5.1 Livello 1 — effetti forti con il linguaggio di oggi
+
+| Ascensione | Effetto |
+|---|---|
+| **Nazione in armi** | +1 spazio truppa e +1 spazio edificio |
+| **Consiglio ristretto** | In ogni round compare un consigliere in più (effetto già usato dai governi, v0.24) |
+| **Botteghe maestre** | Potenzia costa 1 in meno, mai sotto 1 (effetto già usato dalla cultura artigiana, v0.24) |
+| **Eredità imperiale** | +20 Resistenza in ogni scontro |
+| **Età dell'oro** | +25% di tutte le risorse prodotte |
+| **Maestri d'armi** | Tutte le truppe fanno il 15% di danno in più |
+
+#### 4.5.2 Livello 2 — cambiano una regola (modifiche del nucleo, GDD §10.4.2)
+
+| Ascensione | Effetto | Regola che cambia | Rischio da tenere d'occhio |
+|---|---|---|---|
+| **Seconda natura** | Ogni truppa si può incantare **due volte** | §4.3: "ogni truppa si può incantare una sola volta" | Truppe con due effetti e +4 mana: forti ma lente da alimentare |
+| **Ultima trincea** | La prima volta in ogni scontro che la Resistenza arriva a zero, torna a **1** | §7.1: "arrivare a zero significa perdere" | Non salva dalla Corruzione: resta il contro |
+| **Prima scintilla** | Gli edifici iniziano lo scontro con l'intervallo **a metà**, non pieno | §7.5: "truppe ed edifici iniziano con l'intervallo pieno" | Rende più veloce l'inizio: da provare con il logoramento |
+| **Disciplina ferrea** | La truppa più a destra **prenota** il mana: le altre non lo usano finché lei non si attiva | §7.3: "il mana non viene prenotato per la truppa saltata" | Cambia l'ordine delle truppe: la regola di priorità va spiegata bene a schermo |
+| **Mana unito** | Una truppa può pagare con il mana di **qualsiasi colore**, dopo il proprio e l'energetico | §5.3: "una truppa paga prima con il proprio colore e poi con l'energetico" | Molto forte per le nazioni a più colori |
+| **Maestria** | Le carte possono arrivare al **livello 4** | §6.5: "3 livelli" | Serve un costo di Potenzia per il livello 4 |
+| **Doppio ascolto** | Una volta per metà anno si prendono **due proposte** dallo stesso consigliere | §4.2: "se ne prende una sola" | Da limitare (una volta per metà) per non svuotare la scelta |
+| **Esercito frugale** | Le truppe senza Cibo **non rallentano** | §5.4: "ricarica ×1,5 senza cibo" | Toglie peso al Cibo: da accoppiare a nazioni che ne hanno poco |
 
 ---
 

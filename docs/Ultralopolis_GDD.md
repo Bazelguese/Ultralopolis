@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.25
+## Game Design Document — v0.26
 
 **Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -185,7 +185,7 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 |---|---|
 | In ogni round compaiono **3 consiglieri** pescati a caso, diversi fra loro; al massimo uno può essere sostituito da un Evento, un Visitatore o una Fortuna (§4.2.5) | Confermato (v0.23) |
 | Il giocatore ne sceglie **uno**; la scelta è definitiva per il round | Confermato |
-| Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato |
+| Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato; eccezione: l'ascensione *Doppio ascolto* (§10.4.2, v0.26) |
 | Il pool di un consigliere è dato dalla sua **categoria** (§4.2.4): propone gli edifici e le truppe che hanno almeno un tipo della categoria | Confermato (v0.22) |
 | Oltre alle proposte, ogni consigliere ordinario offre l’opzione **Potenzia** (§6.5): non consuma la scelta del round e si usa una volta per round | Confermato (v0.22) |
 | Ogni round ha un **tema**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
@@ -296,7 +296,7 @@ Il Sacerdote può **incantare** una truppa: le aggiunge un effetto in battaglia 
 | Effetti possibili: quelli esistenti, cioè danno, scudo, cura, Corruzione e rallentamento (§7.6, §7.7) | Confermato |
 | Solo le truppe si possono incantare, non gli edifici | Confermato |
 | Una truppa che non usava mana, dopo l’incanto ne richiede | Confermato |
-| Ogni truppa si può incantare **una sola volta** | Confermato |
+| Ogni truppa si può incantare **una sola volta** | Confermato; eccezione: con l'ascensione *Seconda natura* due volte (§10.4.2, v0.26) |
 | Il mana richiesto è del colore della truppa; se la truppa non usava mana, è del colore dell’incanto. Costo in più: 2 mana | Confermato (v0.21); valori placeholder |
 | Valore dell’effetto: circa metà del danno di una truppa dell’era; cresce con i potenziamenti come gli altri valori (§6.5) | Confermato (v0.21); valori placeholder |
 | L’incanto resta sulla truppa per tutta la run e si perde se la truppa viene venduta o sostituita | Confermato (v0.21) |
@@ -371,7 +371,7 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 - Con 4 colori la plancia iniziale non può coprirli tutti: si sceglie presto una direzione. Da osservare nel playtest.
 - Un edificio **senza mana** è **neutro**: non ha colore. Come ogni altro edificio, può essere disponibile a tutti oppure peculiare di certe nazioni, come esclusivo dell’identità o di una via (§9.2, §10.4) — Confermato (modifica del nucleo, v0.16).
 - Ogni truppa chiede mana di un colore, oppure nessuno.
-- Una truppa paga **prima con il proprio colore e poi con l’energetico**.
+- Una truppa paga **prima con il proprio colore e poi con l’energetico**. Eccezione: con l'ascensione *Mana unito* paga poi anche con gli altri colori (§10.4.2, v0.26).
 
 ### 5.4 Cibo e mantenimento — Confermato
 
@@ -379,7 +379,7 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 - Il consumo avviene **all’inizio di ogni anno, a partire dall’anno 2**: nel primo anno le truppe non mangiano.
 - Mangiano prima le truppe **più lente**, poi le più veloci; a parità di ricarica, prima quelle più a destra.
 - Una truppa mangia tutta la sua razione o niente; il cibo avanzato passa alla truppa successiva.
-- Una truppa che resta senza cibo ha la **ricarica ×1,5** fino al consumo dell’anno successivo.
+- Una truppa che resta senza cibo ha la **ricarica ×1,5** fino al consumo dell’anno successivo. Eccezione: con l'ascensione *Esercito frugale* non rallenta (§10.4.2, v0.26).
 - Le truppe reclutate durante l’anno sono sazie fino al consumo successivo.
 - I fantasmi non soffrono la fame.
 
@@ -457,7 +457,7 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
 
 ### 6.5 Potenziamenti — Confermato
 
-- Ogni edificio e ogni truppa ha dei **livelli** (3 livelli).
+- Ogni edificio e ogni truppa ha dei **livelli** (3 livelli). Eccezione: con l'ascensione *Maestria* si arriva al livello 4 (§10.4.2, v0.26).
 - **Potenzia — Confermato (modifica del nucleo, v0.22).** Si potenzia **solo con il Consiglio**, oltre che con eventi e ricompense; non più in qualunque momento.
   - Ogni consigliere ordinario offre, oltre alle 3 proposte, una quarta opzione: **Potenzia**.
   - Potenzia porta di livello un edificio o una truppa della plancia che abbia **almeno un tipo** della categoria del consigliere (§4.2.4).
@@ -512,7 +512,7 @@ La stessa simulazione regola gli scontri contro i fantasmi e, nella proposta att
 
 ### 7.1 Obiettivo — Confermato
 
-Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro. Si perde anche quando la **Corruzione** accumulata raggiunge la Resistenza (§7.6.3).
+Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro (eccezione: l'ascensione *Ultima trincea*, §10.4.2, v0.26). Si perde anche quando la **Corruzione** accumulata raggiunge la Resistenza (§7.6.3).
 
 Truppe ed edifici non hanno punti vita individuali e non vengono eliminati durante la battaglia nella base.
 
@@ -550,7 +550,7 @@ Le truppe pronte vengono valutate **da destra verso sinistra** sulla plancia del
 - la truppa più a destra viene considerata per prima;
 - se può pagare, si attiva e riduce il mana disponibile per le successive;
 - se non può pagare, viene saltata;
-- il mana non viene prenotato per la truppa saltata;
+- il mana non viene prenotato per la truppa saltata (eccezione: l'ascensione *Disciplina ferrea*, §10.4.2, v0.26);
 - le truppe più a sinistra possono usare il mana residuo se sufficiente.
 
 Una truppa economica può quindi ritardare una truppa costosa. Produzione, costi, cooldown e ordine della plancia formano insieme la strategia. Con plance fino a 12 truppe questo ordine diventa una fonte importante di profondità, e per la stessa ragione la sua leggibilità (P4) è un requisito.
@@ -573,7 +573,7 @@ Oltre al mana, un edificio può produrre scudo, cura e Corruzione (§7.6.5): all
 
 | Regola | Stato |
 |---|---|
-| Truppe ed edifici iniziano la battaglia con cooldown e intervallo di produzione **pieni** | Confermato |
+| Truppe ed edifici iniziano la battaglia con cooldown e intervallo di produzione **pieni** | Confermato; eccezione: con l'ascensione *Prima scintilla* gli edifici partono a metà (§10.4.2, v0.26) |
 | Nello stesso istante si risolve **prima la produzione di mana**, poi l’attivazione delle truppe; l’ordine completo è in §7.6.6 | Confermato |
 | Le due nazioni agiscono **in contemporanea**; se entrambe cadono nello stesso istante (Resistenza a zero o Corruzione, §7.6.3), lo scontro è un pareggio (§3.4) | Confermato |
 | **Logoramento** contro gli stalli: dopo **45 secondi** di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo (ispirato alla tempesta di sabbia di The Bazaar) | Confermato; forma del danno placeholder (§16.3) |
@@ -893,10 +893,52 @@ Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una 
 | Gli effetti sono **liberi**: possono riferirsi a tipi o a elementi specifici, caso per caso nel catalogo | Confermato |
 | Gli **elementi esclusivi** di una via sono **diversi per ogni era**: una via scelta nell’era 2 ha esclusivi propri per l’era 2, per l’era 3 e per le successive. Gli esclusivi di un’era passata spariscono come le altre offerte | Confermato |
 | Le vie si accumulano: nessuna sostituisce le precedenti o gli elementi scelti alla creazione | Confermato |
+| Ogni via è un **albero di tradizioni**: adozione, 4 passi sbloccati dalle imprese, completamento con un'ascensione (§10.4.1, §10.4.2) | Confermato (v0.26) |
 
 Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un tipo continua a contare.
 
 Le vie sono nel prototipo dalla v0.18, con il catalogo di `docs/Catalogo.md`.
+
+#### 10.4.1 Tradizioni e imprese — Confermato (v0.26)
+
+Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come sistema a parte. Le regole sono state discusse in `docs/Bozza_v0.26_tradizioni.md`, approvata da Davide il 5 novembre 2026. Il catalogo dei passi è in `docs/Catalogo.md` (§4.4). Valori placeholder (§16.3).
+
+| Regola | Stato |
+|---|---|
+| L'**adozione** è la scelta della via entrando nell'era, come prima: tratto permanente, bonus immediato, offerte più frequenti, esclusivi e tecnologie esclusive | Confermato |
+| Ogni via ha **4 passi**. Ogni passo ha un'**impresa** e un effetto permanente, espresso con il linguaggio del nucleo (P5) | Confermato |
+| I passi non costano risorse: si completano **da soli** appena l'impresa riesce, **in qualsiasi ordine** | Confermato |
+| L'albero di una via resta aperto anche nelle ere successive | Confermato |
+| La carta della via mostra le 4 imprese e i loro effetti **prima della scelta** | Confermato |
+| L'era 1 non ha un albero: le tradizioni cominciano con la prima via, nell'era 2 | Confermato |
+| Un'impresa **traguardo** conta solo ciò che si fa dopo l'adozione (es. vincere N scontri, completare N tecnologie di una sfera, prendere N proposte da un consigliere, scegliere N eventi di una sfera) | Confermato |
+| Un'impresa **di stato** guarda com'è la nazione (es. N carte con un tipo sulla plancia, N carte con un tipo al livello 2 o più, N di una risorsa in una sola produzione, Malcontento a N o meno a fine anno); basta arrivarci una volta | Confermato |
+| Le imprese sono scritte nei dati della via; accanto a ognuna si vede quanto manca (P4) | Confermato |
+| Imprese che guardano dentro la battaglia | Spunto (servono statistiche della battaglia che oggi non si registrano) |
+
+#### 10.4.2 Ascensioni — Confermato (v0.26; il livello 2 è una modifica del nucleo)
+
+| Regola | Stato |
+|---|---|
+| Completando i 4 passi di una via si sceglie **1 ascensione fra 3**, pescate con più probabilità per quelle coerenti con l'identità e le vie | Confermato |
+| Le ascensioni sono **permanenti**; una già presa non si ripresenta; alcune possono essere esclusive di una via o di un elemento dell'identità | Confermato |
+| **Livello 1**: effetti forti con il linguaggio di oggi. **Livello 2**: cambiano una regola e compaiono solo a chi ha già un'ascensione. Nel prototipo la prima ascensione è di livello 1, la seconda di livello 2 | Confermato |
+| Un'ascensione che cambia una regola si vede in battaglia o sulla plancia (P4) | Confermato |
+
+**Ascensioni del livello 2 — Confermato (modifica del nucleo, v0.26), valori placeholder.** Ognuna è un'eccezione scritta anche nella sezione della regola che cambia.
+
+| Ascensione | Effetto | Regola che cambia |
+|---|---|---|
+| **Seconda natura** | Ogni truppa si può incantare due volte | §4.3 |
+| **Ultima trincea** | La prima volta in ogni scontro che la Resistenza arriva a zero, torna a 1; non salva dalla Corruzione | §7.1 |
+| **Prima scintilla** | Gli edifici iniziano lo scontro con l'intervallo a metà | §7.5 |
+| **Disciplina ferrea** | La truppa più a destra prenota il mana: finché aspetta, le altre truppe non spendono mana | §7.3 |
+| **Mana unito** | Dopo il proprio colore e l'energetico, una truppa può pagare con gli altri colori | §5.3 |
+| **Maestria** | Le carte arrivano al livello 4 | §6.5 |
+| **Doppio ascolto** | Una volta per metà anno si prendono due proposte dallo stesso consigliere | §4.2 |
+| **Esercito frugale** | Le truppe senza Cibo non rallentano | §5.4 |
+
+Le ascensioni del livello 1 (es. +1 spazio truppa e +1 spazio edificio; +20 Resistenza; +25% delle risorse prodotte) sono nel Catalogo (§4.5).
 
 ### 10.5 Tecnologie — Confermato (modifica del nucleo, v0.25)
 
@@ -987,6 +1029,7 @@ Alcune tecnologie, i **progetti speciali**, potranno chiedere oltre alla Ricerca
 - Catalogo delle vie e dei loro esclusivi.
 - Catalogo dell’albero, delle linee e delle tecnologie esclusive di vie e razze.
 - Progetti speciali (§10.5.7).
+- Catalogo definitivo dei passi e delle ascensioni (§10.4.1, §10.4.2).
 
 ## 11. Fantasmi e asincronia
 
@@ -1010,7 +1053,7 @@ Per il prototipo si usano avversari locali (§16.3); non costituiscono multiplay
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
-Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi (comprese le tecnologie che agiscono in battaglia, v0.25) e versione delle regole. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
+Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi (comprese le tecnologie che agiscono in battaglia, v0.25), passi e ascensioni (v0.26) e versione delle regole. Le ascensioni che cambiano le regole della battaglia valgono anche per il fantasma. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
 
 È proposto di salvare le **statistiche complete** degli elementi e non solo il loro identificativo: se in seguito un elemento viene ribilanciato, la copia continua a combattere com’era stata registrata.
 
@@ -1089,6 +1132,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
 | Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.25). |
+| Tradizioni | Per ogni via adottata: i 4 passi, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.26). |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
 | Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa, elementi rallentati o sabotati con durata residua e origine. |
 | Esito | Risultato, perdita di Prestigio, vittorie, conseguenze. |
@@ -1146,6 +1190,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Due macrofasi con raccolta automatica all’ingresso e 5 round del Consiglio ciascuna (§4.2): nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Albero delle tecnologie con la mano di 3 carte; ere raggiunte con le tecnologie (v0.25).
+- Tradizioni delle vie con imprese e ascensioni (v0.26).
 - Riordino delle truppe fuori dal combattimento.
 - Fantasma locale fissato per l’anno.
 - Produzione di mana e attivazioni automatiche.
@@ -1279,6 +1324,14 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Albero del prototipo: per era e per ramo 2 tecnologie alla prima altezza e 1 alla seconda (12 per era); 1 tecnologia esclusiva per via e per razza in ogni era; la seconda altezza si apre con 1 tecnologia della prima nello stesso ramo | Placeholder (v0.25). |
 | Sconto sulla carta scartata: peso dimezzato a ogni scarto, fino a un minimo di 1/8 | Placeholder (v0.25). |
 | Carta dorata: metà del costo già pagata | Placeholder (v0.25). |
+| Tradizioni: passi, imprese ed effetti del Catalogo §4.4; ascensioni del Catalogo §4.5 | Placeholder (v0.26). |
+| Imprese di stato: si controllano dopo ogni azione, a ogni produzione e a fine anno; un traguardo conta dal momento in cui la via è adottata | Provvisoria (v0.26). |
+| Pescata delle 3 ascensioni: peso base 1, +1 per ogni elemento dell'identità o via che la favorisce, con il seme della run; se ce ne sono meno di 3 si mostrano tutte | Provvisoria (v0.26). |
+| Disciplina ferrea: prenota il mana solo la truppa più a destra, e solo se è pronta e non sabotata; le truppe senza mana si attivano comunque | Provvisoria (v0.26). |
+| Mana unito: gli altri colori si usano nell'ordine rosso, verde, blu, viola | Provvisoria (v0.26). |
+| Maestria: il livello 4 costa 4 × era della carta nella risorsa del consigliere, come gli altri livelli | Placeholder (v0.26). |
+| Doppio ascolto: dopo la prima proposta il round non si chiude e la proposta presa sparisce; vale una volta per metà anno, con i consiglieri ordinari | Provvisoria (v0.26). |
+| Fantasmi generati: tutti i passi delle vie delle ere passate e metà di quelli della via dell'era corrente, a caso con il seme della run; un'ascensione per ogni albero completo | Provvisoria (v0.26). |
 | Revisione dei piani (Studioso): 2 Documenti, ripesca la mano delle tecnologie | Placeholder (v0.25). |
 | I fantasmi generati ricevono a caso, con il seme della run, il numero di tecnologie richiesto per ogni era raggiunta; in battaglia valgono solo quelle che agiscono in battaglia | Provvisoria (v0.25). |
 
@@ -1306,6 +1359,16 @@ Criteri di accettazione proposti per il prototipo:
 | Ingresso in un’era | Spazi e quota di Resistenza dell’era concessi; dalla seconda era, scelta obbligatoria fra 3 vie. |
 | Vie | Le 3 proposte vengono dal pool dell’era, pesate da identità e vie precedenti; la via scelta applica bonus immediato e tratto permanente. |
 | Esclusivi delle vie | Compaiono fra le offerte solo nell’era a cui appartengono e solo per chi ha la via. |
+| Passi delle vie | Un traguardo conta solo dopo l'adozione; un'impresa di stato si completa appena è vera; il passo dà subito il suo effetto. |
+| Albero completo | Con 4 passi completati si sceglie un'ascensione fra 3; la seconda ascensione è di livello 2. |
+| Seconda natura | Una truppa si incanta due volte, con due effetti e +2 mana per incanto. |
+| Ultima trincea | La prima volta che la Resistenza arriva a zero torna a 1; la seconda volta lo scontro è perso; la Corruzione sconfigge comunque. |
+| Prima scintilla | Gli edifici producono la prima volta a metà del loro intervallo. |
+| Disciplina ferrea | Con la truppa più a destra in attesa di mana, le altre non spendono mana. |
+| Mana unito | Una truppa paga con un altro colore quando mancano il suo e l'energetico. |
+| Maestria | Potenzia porta una carta al livello 4. |
+| Doppio ascolto | Dopo una proposta il round resta aperto una volta per metà anno. |
+| Esercito frugale | Una truppa senza Cibo mantiene la sua ricarica. |
 | Abbinamento dei fantasmi | Stesso anno, era qualsiasi. |
 | Truppa pronta senza mana | In attesa, senza consumi né cooldown aggiuntivo; il motivo è visibile. |
 | Più truppe pronte | Valutazione da destra a sinistra. |
@@ -1372,7 +1435,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 |---|---|
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
 | Prima di ampliare la plancia | Quantità e prezzi degli spazi (§6.3); layout. |
-| Prima di ampliare la ricerca | Numero definitivo delle ere; costi delle tecnologie e numero richiesto per ogni era; catalogo delle vie, dei loro esclusivi e dell’albero; progetti speciali (§10.4, §10.5). |
+| Prima di ampliare la ricerca | Numero definitivo delle ere; costi delle tecnologie e numero richiesto per ogni era; catalogo delle vie, dei loro esclusivi e dell’albero; progetti speciali; catalogo dei passi e delle ascensioni (§10.4, §10.5). |
 | Per la componente GDR | Valori del Malcontento; tratti delle razze; costo della Riforma; governi dei fantasmi; tipi d'identità delle vie. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
 | Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4). |
@@ -1419,6 +1482,9 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Mano | Le 3 tecnologie proposte, fra cui si sceglie quella da studiare. |
 | Linea | Serie di elementi, uno per era, sbloccata da una tecnologia. |
 | Carta dorata | Tecnologia già iniziata, ottenuta da eventi, fortune o incontri. |
+| Tradizione | Uno dei 4 passi dell'albero di una via; si completa con un'impresa (§10.4.1). |
+| Impresa | Obiettivo che completa una tradizione: un traguardo o uno stato della nazione. |
+| Ascensione | Effetto permanente scelto completando l'albero di una via; il livello 2 cambia una regola (§10.4.2). |
 | Modificatore | Effetto con bersaglio, durata, origine e regole di cumulo. |
 | Origine | Fonte di un modificatore; permette in futuro i malus con nome. |
 | Conseguenza | Modifica dello stato della run che persiste dopo un evento o uno scontro. |
@@ -1426,6 +1492,12 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.26 — 5 novembre 2026** (modifica del nucleo)
+- Approvata la bozza `docs/Bozza_v0.26_tradizioni.md`: ogni **via** diventa un albero di **tradizioni**, come in Stellaris ma senza una risorsa nuova (§10.4.1).
+- 4 passi per via, sbloccati dalle **imprese** (traguardi o stati della nazione), in qualsiasi ordine; le imprese si vedono sulla carta della via.
+- Completando l'albero si sceglie un'**ascensione** fra 3 (§10.4.2). Il livello 2 cambia una regola del nucleo: Seconda natura (§4.3), Ultima trincea (§7.1), Prima scintilla (§7.5), Disciplina ferrea (§7.3), Mana unito (§5.3), Maestria (§6.5), Doppio ascolto (§4.2), Esercito frugale (§5.4).
+- Aggiornati fantasmi, informazioni da mostrare, prototipo, convenzioni, verifica, decisioni e glossario (§11.4, §14.3, §15.2, §16.3, §17, §18, §19).
 
 **v0.25 — 5 novembre 2026** (modifica del nucleo)
 - Approvata la bozza `docs/Bozza_v0.25_ricerca_tecnologie.md`: la Ricerca serve a un **albero delle tecnologie** (§10.5).

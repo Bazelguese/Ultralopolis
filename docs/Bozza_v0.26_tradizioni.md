@@ -2,7 +2,7 @@
 ## Tradizioni e ascensioni: le vie diventano alberi
 
 **Data:** 5 novembre 2026
-**Stato:** bozza 2, da approvare. Il GDD non è ancora stato modificato.
+**Stato:** **approvata da Davide il 5 novembre 2026 e riportata nel GDD v0.26** (§10.4.1, §10.4.2) e nel Catalogo (§4.4, §4.5). Questo file resta come memoria della discussione.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.25
 
 Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Da definire** = manca una regola; **Spunto** = idea per il futuro, da non implementare.
@@ -26,7 +26,8 @@ Riferimento verificato (Stellaris Wiki, pagine *Traditions* e *Ascension perks*)
 | 5 | L'era 1 **non ha un albero**: le tradizioni cominciano con la prima via, nell'era 2 | Confermato |
 | 6 | **4 passi** per via | Confermato |
 | 7 | Le **imprese si vedono prima di scegliere la via**, sulla sua carta | Confermato |
-| 8 | Piacciono soprattutto le ascensioni che **cambiano una regola**, come "Seconda natura" | Confermato nella direzione; ogni ascensione va approvata (§6.2) |
+| 8 | Piacciono soprattutto le ascensioni che **cambiano una regola**, come "Seconda natura" | Confermato |
+| 9 | Approvate **tutte** le 8 ascensioni del livello 2, come placeholder; la prima ascensione è di livello 1, la seconda di livello 2; il catalogo dei passi va bene come punto di partenza | Confermato |
 
 ---
 
@@ -97,7 +98,7 @@ Gli effetti usano modificatori che il gioco ha già. I numeri sono placeholder.
 | **Guerra** | Veterani | Vinci 2 scontri | Le truppe Fante che fanno danno ne fanno 1 in più |
 | | Arsenali | Abbi 2 edifici Infrastruttura Bellica | +1 Ferro per fase da ogni edificio Infrastruttura Bellica |
 | | Dottrina | Prendi 4 proposte dal Generale | +1 spazio truppa |
-| | Esercito di popolo | Abbi 6 carte Fante, di cui 2 al livello 2 o più | +8 Resistenza in ogni scontro |
+| | Esercito di popolo | Abbi 3 carte Fante al livello 2 o più | +8 Resistenza in ogni scontro |
 | **Fede** | Pellegrini | Scegli 1 Evento di Fede | +1 Fede per fase dalla Capitale |
 | | Confraternite | Abbi 3 carte Spirituali | Gli elementi Spirituali che curano curano 1 in più |
 | | Concilio | Prendi 4 proposte dal Sacerdote | +6 Resistenza in ogni scontro |
