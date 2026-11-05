@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+
+[resource]
+script = ExtResource("1_tech")
+id = &"grandi_opere"
+display_name = "Grandi opere"
+description = "+1 spazio edificio."
+sphere = "Opera"
+era = 3
+cost = 7
+extra_building_slots = 1

@@ -15,6 +15,7 @@ enum Kind {
 	RALLENTATO,        ## Un elemento di questa nazione è stato rallentato (index: 0+ edificio, 1000+ truppa).
 	SABOTATO,          ## Un elemento di questa nazione è stato sabotato (index come sopra).
 	IN_SABOTAGGIO,     ## Una truppa pronta non si attiva perché sabotata.
+	ULTIMA_TRINCEA,    ## La Resistenza è arrivata a zero ed è tornata a 1 (GDD §10.4.2).
 }
 
 ## Momento dello scontro, in millisecondi dall'inizio.

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_amministrazione_centrale"
+display_name = "Amministrazione centrale"
+description = "Rinnovare le proposte costa 1 Oro in meno."
+is_malus = false
+effect = 4
+amount = -1
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"amministrazione_centrale"
+display_name = "Amministrazione centrale"
+description = "Rinnovare le proposte costa 1 Oro in meno."
+sphere = "Stato"
+era = 3
+tier = 2
+cost = 8
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LineDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/line_def.gd" id="1_line"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="2_el"]
+[ext_resource type="Resource" path="res://data/catalog/linee/edifici/orti.tres" id="v_0"]
+[ext_resource type="Resource" path="res://data/catalog/linee/edifici/poderi.tres" id="v_1"]
+[ext_resource type="Resource" path="res://data/catalog/linee/edifici/latifondi.tres" id="v_2"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"orti"
+display_name = "Linea degli Orti"
+buildings = Array[ExtResource("2_el")]([ExtResource("v_0"), ExtResource("v_1"), ExtResource("v_2")])

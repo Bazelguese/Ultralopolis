@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LineDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/line_def.gd" id="1_line"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="2_el"]
+[ext_resource type="Resource" path="res://data/catalog/linee/truppe/penitenti.tres" id="v_0"]
+[ext_resource type="Resource" path="res://data/catalog/linee/truppe/custodi_del_tempio.tres" id="v_1"]
+[ext_resource type="Resource" path="res://data/catalog/linee/truppe/templari.tres" id="v_2"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"penitenti"
+display_name = "Linea dei Penitenti"
+troops = Array[ExtResource("2_el")]([ExtResource("v_0"), ExtResource("v_1"), ExtResource("v_2")])

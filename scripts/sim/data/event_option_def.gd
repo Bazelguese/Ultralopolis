@@ -52,6 +52,11 @@ enum PieceKind {
 @export var extra_troop_slots: int = 0
 ## Spionaggio sul fantasma dell'anno: si usano i campi di spionaggio di questa azione.
 @export var spy: OpportunityDef
+## Carta dorata (GDD §10.5.6, v0.26): una tecnologia già iniziata. Se give_random_tech è vero,
+## una tecnologia a caso fra quelle ricercabili nella sua era, della sfera indicata (vuota = qualsiasi).
+@export var give_tech: TechDef
+@export var give_random_tech: bool = false
+@export var give_tech_sphere: String = ""
 ## Nuovo governo della nazione (IdentityDef), per la Riforma e la Rivoluzione (GDD §9.4, v0.24).
 @export var change_government: Resource
 ## Malcontento in più (o, se negativo, in meno) (GDD §5.5, v0.24).

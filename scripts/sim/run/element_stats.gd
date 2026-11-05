@@ -33,18 +33,24 @@ static func troop(def: TroopDef, piece: BoardPiece, mods: Modifiers, level: int,
 ## La truppa con l'incanto del Sacerdote (GDD §4.3): l'effetto si aggiunge al valore di base,
 ## quindi cresce con i livelli come gli altri; il mana sale di enchant_mana. Una truppa che non
 ## chiedeva mana lo chiede del colore dell'incanto.
+## Con l'ascensione Seconda natura (GDD §10.4.2) si aggiunge allo stesso modo il secondo incanto.
 static func _with_enchant(def: TroopDef, piece: BoardPiece) -> TroopDef:
 	if piece == null or piece.enchant == null:
 		return def
 	var result: TroopDef = def.duplicate() as TroopDef
-	var spell: OpportunityDef = piece.enchant
+	_add_spell(result, piece.enchant, piece.enchant_amount, piece.enchant_amount_2)
+	if piece.second_enchant != null:
+		_add_spell(result, piece.second_enchant, piece.second_enchant_amount, piece.second_enchant_amount_2)
+	return result
+
+
+static func _add_spell(result: TroopDef, spell: OpportunityDef, amount: int, amount_2: int) -> void:
 	if result.mana_cost <= 0:
 		result.mana_type = spell.enchant_color
 	result.mana_cost = maxi(0, result.mana_cost) + spell.enchant_mana
-	_add_enchant_value(result, spell.enchant_value, piece.enchant_amount)
+	_add_enchant_value(result, spell.enchant_value, amount)
 	if not spell.enchant_amounts_2.is_empty():
-		_add_enchant_value(result, spell.enchant_value_2, piece.enchant_amount_2)
-	return result
+		_add_enchant_value(result, spell.enchant_value_2, amount_2)
 
 
 static func _add_enchant_value(result: TroopDef, value: ModifierDef.BattleValue, amount: int) -> void:

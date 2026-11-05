@@ -12,6 +12,104 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="11_sk6kw"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_guerra_fanteria.tres" id="12_e8xyd"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="13_clnc3"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
+
+[sub_resource type="Resource" id="tr_deed_veterani_tradizione"]
+script = ExtResource("tr_deed")
+kind = 0
+amount = 2
+
+[sub_resource type="Resource" id="tr_mod_veterani_tradizione"]
+script = ExtResource("tr_mod")
+id = &"trad_veterani_tradizione"
+display_name = "Veterani"
+description = "Le truppe Fante che fanno danno ne fanno 1 in più."
+is_malus = false
+effect = 11
+target_type = &"Fante"
+battle_value = 0
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_veterani_tradizione"]
+script = ExtResource("tr_trad")
+id = &"veterani_tradizione"
+display_name = "Veterani"
+description = "Le truppe Fante che fanno danno ne fanno 1 in più."
+deed = SubResource("tr_deed_veterani_tradizione")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_veterani_tradizione")])
+
+[sub_resource type="Resource" id="tr_deed_arsenali"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 2
+types = Array[StringName]([&"Infrastruttura Bellica"])
+pieces = 1
+
+[sub_resource type="Resource" id="tr_mod_arsenali"]
+script = ExtResource("tr_mod")
+id = &"trad_arsenali"
+display_name = "Arsenali"
+description = "+1 Ferro per fase da ogni edificio Infrastruttura Bellica."
+is_malus = false
+effect = 8
+target_type = &"Infrastruttura Bellica"
+resource = 5
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_arsenali"]
+script = ExtResource("tr_trad")
+id = &"arsenali"
+display_name = "Arsenali"
+description = "+1 Ferro per fase da ogni edificio Infrastruttura Bellica."
+deed = SubResource("tr_deed_arsenali")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_arsenali")])
+
+[sub_resource type="Resource" id="tr_deed_dottrina"]
+script = ExtResource("tr_deed")
+kind = 2
+amount = 4
+advisor_id = &"generale"
+advisor_name = "Generale"
+
+[sub_resource type="Resource" id="tr_step_dottrina"]
+script = ExtResource("tr_trad")
+id = &"dottrina"
+display_name = "Dottrina"
+description = "+1 spazio truppa."
+deed = SubResource("tr_deed_dottrina")
+extra_troop_slots = 1
+
+[sub_resource type="Resource" id="tr_deed_esercito_di_popolo"]
+script = ExtResource("tr_deed")
+kind = 5
+amount = 3
+types = Array[StringName]([&"Fante"])
+min_level = 2
+
+[sub_resource type="Resource" id="tr_mod_esercito_di_popolo"]
+script = ExtResource("tr_mod")
+id = &"trad_esercito_di_popolo"
+display_name = "Esercito di popolo"
+description = "+8 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 8
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_esercito_di_popolo"]
+script = ExtResource("tr_trad")
+id = &"esercito_di_popolo"
+display_name = "Esercito di popolo"
+description = "+8 Resistenza in ogni scontro."
+deed = SubResource("tr_deed_esercito_di_popolo")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_esercito_di_popolo")])
 
 [resource]
 script = ExtResource("13_clnc3")
@@ -24,3 +122,4 @@ favored_opportunities = Array[ExtResource("2_fidwm")]([ExtResource("10_4q663")])
 exclusive_troops = Array[ExtResource("3_bsbpn")]([ExtResource("4_d4vqu"), ExtResource("5_xoo1y")])
 favored_by = Array[Resource]([ExtResource("6_ine2h"), ExtResource("7_18q52"), ExtResource("8_ma60e")])
 permanent_modifiers = Array[ExtResource("11_sk6kw")]([ExtResource("12_e8xyd")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_veterani_tradizione"), SubResource("tr_step_arsenali"), SubResource("tr_step_dottrina"), SubResource("tr_step_esercito_di_popolo")])

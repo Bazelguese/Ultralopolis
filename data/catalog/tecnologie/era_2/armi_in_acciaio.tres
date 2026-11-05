@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_1/disciplina.tres" id="3_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_armi_in_acciaio"
+display_name = "Armi in acciaio"
+description = "Le truppe Fante fanno il 10% di danno in più."
+is_malus = false
+effect = 10
+target_type = &"Fante"
+battle_value = 0
+amount = 10
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"armi_in_acciaio"
+display_name = "Armi in acciaio"
+description = "Le truppe Fante fanno il 10% di danno in più."
+sphere = "Militare"
+era = 2
+cost = 5
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])
+prerequisites = Array[Resource]([ExtResource("3_x")])

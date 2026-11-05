@@ -49,7 +49,7 @@ func before_each() -> void:
 	era1 = EraDef.new()
 	era2 = EraDef.new()
 	era2.display_name = "Sviluppo"
-	era2.research_cost = 5
+	era2.techs_required = 0
 	era2.ways = [commerce, war, faith, knowledge]
 	catalog = CatalogDef.new()
 	catalog.eras = [era1, era2]

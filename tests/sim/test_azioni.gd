@@ -125,18 +125,21 @@ func test_studiosi_oro_in_ricerca() -> void:
 	assert_eq(run.research, research_before + 3)
 
 
-func test_mercante_ricerca_in_oro_e_risorse_insufficienti() -> void:
-	var merchant: OpportunityDef = _opportunity(&"mercante", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
-	merchant.cost_research = 2
-	merchant.gain_gold = 4
-	var run: RunState = _run_with(merchant)
-	run.research = 1
+## Il Mercante (Ricerca in Oro) non esiste più dalla v0.26: la Ricerca non paga azioni.
+## Qui uno scambio che costa Documenti, come Decreto fiscale costa Stabilità.
+func test_scambio_e_risorse_insufficienti() -> void:
+	var exchange: OpportunityDef = _opportunity(&"scambio", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
+	exchange.cost_resources = ResourceAmounts.new()
+	exchange.cost_resources.add(Res.Type.DOCUMENTI, 2)
+	exchange.gain_gold = 4
+	var run: RunState = _run_with(exchange)
+	run.stock[Res.Type.DOCUMENTI] = 1
 	assert_false(run.can_afford(run.offers[0]))
-	assert_false(run.buy_offer(0), "Ricerca insufficiente.")
-	run.research = 2
+	assert_false(run.buy_offer(0), "Documenti insufficienti.")
+	run.stock[Res.Type.DOCUMENTI] = 2
 	var gold_before: int = run.gold
 	assert_true(run.buy_offer(0))
-	assert_eq(run.research, 0)
+	assert_eq(run.stock[Res.Type.DOCUMENTI], 0)
 	assert_eq(run.gold, gold_before + 4)
 
 

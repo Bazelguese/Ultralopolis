@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Resource" path="res://data/catalog/perk/biblioteca_reale.tres" id="2_x"]
+
+[resource]
+script = ExtResource("1_tech")
+id = &"metodo_scientifico"
+display_name = "Metodo scientifico"
+description = "Perk Biblioteca reale: +25% Ricerca prodotta."
+sphere = "Conoscenza"
+era = 3
+tier = 2
+cost = 8
+perk = ExtResource("2_x")

@@ -64,7 +64,7 @@ func before_each() -> void:
 	catalog.buildings = [farm]
 	catalog.troops = [monk, soldier_troop]
 	var era2: EraDef = EraDef.new()
-	era2.research_cost = 1
+	era2.techs_required = 0
 	catalog.eras = [EraDef.new(), era2]
 	rules = RunRules.new()
 	rules.starting_gold = 20

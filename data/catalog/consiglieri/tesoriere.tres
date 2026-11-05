@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
 [ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/esattori.tres" id="act_0"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/mercante.tres" id="act_1"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/assemblea.tres" id="act_2"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/grandi_esattori.tres" id="lv_0"]
 
@@ -16,4 +15,4 @@ category_name = "Ricchezza"
 description = "Tiene i conti: propone commerci, nobili, infrastrutture strategiche e mercenari."
 types = Array[StringName]([&"Economico", &"Fante", &"Infrastruttura Strategica", &"Nobile"])
 upgrade_resource = 7
-actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("act_2"), ExtResource("lv_0")])
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_2"), ExtResource("lv_0")])

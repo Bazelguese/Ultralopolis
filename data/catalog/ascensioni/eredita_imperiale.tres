@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="1_id"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_mod"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_impero.tres" id="fav_0"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_della_fede.tres" id="fav_1"]
+
+[sub_resource type="Resource" id="m_0"]
+script = ExtResource("2_mod")
+id = &"asc_eredita_imperiale_0"
+display_name = "Eredità imperiale"
+description = "+20 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 20
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_id")
+id = &"eredita_imperiale"
+display_name = "Eredità imperiale"
+description = "+20 Resistenza in ogni scontro."
+dimension = 6
+ascension_level = 1
+favored_by = Array[Resource]([ExtResource("fav_0"), ExtResource("fav_1")])
+permanent_modifiers = Array[ExtResource("2_mod")]([SubResource("m_0")])

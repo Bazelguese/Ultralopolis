@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_1/scrittura.tres" id="3_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_copisti"
+display_name = "Copisti"
+description = "+1 Documenti per fase da ogni edificio Accademico."
+is_malus = false
+effect = 8
+target_type = &"Accademico"
+resource = 9
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"copisti"
+display_name = "Copisti"
+description = "+1 Documenti per fase da ogni edificio Accademico."
+sphere = "Conoscenza"
+tier = 2
+cost = 4
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])
+prerequisites = Array[Resource]([ExtResource("3_x")])

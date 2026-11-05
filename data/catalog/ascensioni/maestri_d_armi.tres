@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="1_id"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_mod"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_della_guerra.tres" id="fav_0"]
+
+[sub_resource type="Resource" id="m_0"]
+script = ExtResource("2_mod")
+id = &"asc_maestri_d_armi_0"
+display_name = "Maestri d'armi"
+description = "Tutte le truppe fanno il 15% di danno in più."
+is_malus = false
+effect = 10
+battle_value = 0
+amount = 15
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_id")
+id = &"maestri_d_armi"
+display_name = "Maestri d'armi"
+description = "Tutte le truppe fanno il 15% di danno in più."
+dimension = 6
+ascension_level = 1
+favored_by = Array[Resource]([ExtResource("fav_0")])
+permanent_modifiers = Array[ExtResource("2_mod")]([SubResource("m_0")])

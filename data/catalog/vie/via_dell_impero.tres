@@ -10,6 +10,103 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="9_e82xv"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_impero_resistenza.tres" id="10_qpw5x"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="11_n3f3e"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
+
+[sub_resource type="Resource" id="tr_deed_legati"]
+script = ExtResource("tr_deed")
+kind = 0
+amount = 2
+
+[sub_resource type="Resource" id="tr_step_legati"]
+script = ExtResource("tr_trad")
+id = &"legati"
+display_name = "Legati"
+description = "+1 spazio edificio."
+deed = SubResource("tr_deed_legati")
+extra_building_slots = 1
+
+[sub_resource type="Resource" id="tr_deed_strade"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 2
+types = Array[StringName]([&"Infrastruttura Strategica"])
+pieces = 1
+
+[sub_resource type="Resource" id="tr_mod_strade"]
+script = ExtResource("tr_mod")
+id = &"trad_strade"
+display_name = "Strade"
+description = "+1 Pietra per fase da ogni edificio Infrastruttura Strategica."
+is_malus = false
+effect = 8
+target_type = &"Infrastruttura Strategica"
+resource = 4
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_strade"]
+script = ExtResource("tr_trad")
+id = &"strade"
+display_name = "Strade"
+description = "+1 Pietra per fase da ogni edificio Infrastruttura Strategica."
+deed = SubResource("tr_deed_strade")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_strade")])
+
+[sub_resource type="Resource" id="tr_deed_legioni"]
+script = ExtResource("tr_deed")
+kind = 5
+amount = 4
+types = Array[StringName]([&"Fante"])
+min_level = 2
+
+[sub_resource type="Resource" id="tr_mod_legioni"]
+script = ExtResource("tr_mod")
+id = &"trad_legioni"
+display_name = "Legioni"
+description = "Le truppe Fante fanno il 10% di danno in più."
+is_malus = false
+effect = 10
+target_type = &"Fante"
+battle_value = 0
+amount = 10
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_legioni"]
+script = ExtResource("tr_trad")
+id = &"legioni"
+display_name = "Legioni"
+description = "Le truppe Fante fanno il 10% di danno in più."
+deed = SubResource("tr_deed_legioni")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_legioni")])
+
+[sub_resource type="Resource" id="tr_deed_pax"]
+script = ExtResource("tr_deed")
+kind = 0
+amount = 3
+battles = 1
+
+[sub_resource type="Resource" id="tr_mod_pax"]
+script = ExtResource("tr_mod")
+id = &"trad_pax"
+display_name = "Pax"
+description = "+10 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 10
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_pax"]
+script = ExtResource("tr_trad")
+id = &"pax"
+display_name = "Pax"
+description = "+10 Resistenza in ogni scontro."
+deed = SubResource("tr_deed_pax")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_pax")])
 
 [resource]
 script = ExtResource("11_n3f3e")
@@ -23,3 +120,4 @@ favored_opportunities = Array[ExtResource("2_ejdwo")]([ExtResource("7_gjige")])
 exclusive_troops = Array[ExtResource("3_hmns4")]([ExtResource("4_aag50")])
 favored_by = Array[Resource]([ExtResource("5_s24lc"), ExtResource("6_144ty")])
 permanent_modifiers = Array[ExtResource("9_e82xv")]([ExtResource("10_qpw5x")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_legati"), SubResource("tr_step_strade"), SubResource("tr_step_legioni"), SubResource("tr_step_pax")])

@@ -74,7 +74,7 @@ func before_each() -> void:
 	era1.display_name = "Prima"
 	var era2: EraDef = EraDef.new()
 	era2.display_name = "Seconda"
-	era2.research_cost = 5
+	era2.techs_required = 0  # Qui l'era si apre senza tecnologie (vedi test_tecnologie.gd).
 	era2.bonus_building_slots = 1
 	era2.bonus_troop_slots = 1
 
@@ -467,7 +467,7 @@ func test_passaggio_di_era() -> void:
 	run.research = 7
 	assert_true(run.advance_era())
 	assert_eq(run.era, 2)
-	assert_eq(run.research, 2, "Ricerca pagata una volta, resto conservato.")
+	assert_eq(run.research, 7, "L'era non costa Ricerca (GDD v0.26).")
 	assert_eq(run.round_number, 1, "Non consuma il round.")
 	assert_eq(run.board.building_capacity(), 5, "L'era concede uno spazio edificio.")
 	assert_eq(run.board.troop_capacity(), 4, "L'era concede uno spazio truppa.")
@@ -477,7 +477,8 @@ func test_passaggio_di_era() -> void:
 	assert_false(run.advance_era(), "Non ci sono altre ere.")
 
 
-func test_era_senza_ricerca_sufficiente() -> void:
+func test_era_senza_tecnologie_sufficienti() -> void:
+	catalog.eras[1].techs_required = 1
 	var run: RunState = _new_run()
 	run.research = 4
 	assert_false(run.advance_era())
