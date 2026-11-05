@@ -16,3 +16,6 @@ extends Resource
 @export var malus: Array[ModifierDef] = []
 ## Identità della nazione copiata: popolo, governo, credo, cultura e perk (GDD §11.4).
 @export var identity: Array[IdentityDef] = []
+## Tecnologie completate dalla nazione copiata (GDD §11.4, v0.25): in battaglia valgono
+## i loro modificatori su tutta la nazione.
+@export var technologies: Array[TechDef] = []

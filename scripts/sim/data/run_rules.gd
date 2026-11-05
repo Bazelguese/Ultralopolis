@@ -29,6 +29,18 @@ extends Resource
 @export var max_building_slots: int = 10
 @export var max_troop_slots: int = 12
 
+@export_group("Tecnologie (GDD §10.5, v0.25)")
+## Carte della mano delle tecnologie (GDD §10.5.3: 3).
+@export var tech_hand_size: int = 3
+## Sconto sulla carta scartata: il peso si dimezza a ogni scarto, fino a 1 / 2^tech_discard_max_halvings
+## del peso pieno (placeholder §16.3: 3, cioè 1/8).
+@export var tech_discard_max_halvings: int = 3
+## Parte del costo già pagata in una carta dorata, in percentuale (placeholder §16.3: 50).
+@export var golden_progress_percent: int = 50
+## Tecnologie della prima altezza di un ramo che aprono la seconda altezza dello stesso ramo
+## nella stessa era (placeholder §16.3: 1).
+@export var tech_second_tier_needed: int = 1
+
 @export_group("Risorse e mantenimento")
 ## Unità di una risorsa da vendere al mercato per ottenere 1 Oro (GDD §5.3).
 @export var market_units_per_gold: int = 2

@@ -5,6 +5,7 @@ extends RefCounted
 
 const SALT_GHOST: int = 17
 const SALT_ENCOUNTERS: int = 31
+const SALT_TECH: int = 53
 
 
 ## Generatore casuale dedicato, così la generazione non cambia le offerte pescate nella run.
@@ -72,7 +73,44 @@ static func generate_ghost(catalog: CatalogDef, rules: GeneratorRules, run_rules
 
 	if not rules.ghost_malus_pool.is_empty():
 		ghost.malus = [rules.ghost_malus_pool[rng.randi_range(0, rules.ghost_malus_pool.size() - 1)]]
+	ghost.technologies = _pick_technologies(catalog, ghost.era, identity, _rng(run_seed, year, SALT_TECH))
 	return ghost
+
+
+## Tecnologie di un fantasma generato (convenzione §16.3, v0.25): per ogni era da cui è uscito,
+## a caso, il numero di tecnologie che serviva per entrare nella successiva. Prima le tecnologie
+## della prima altezza, poi della seconda, rispettando i prerequisiti quando si può.
+static func _pick_technologies(catalog: CatalogDef, ghost_era: int, identity: Array[IdentityDef],
+		rng: RandomNumberGenerator) -> Array[TechDef]:
+	var picked: Array[TechDef] = []
+	for era_number: int in range(1, mini(ghost_era, catalog.eras.size())):
+		var needed: int = catalog.eras[era_number].techs_required
+		for tier: int in [1, 2]:
+			var options: Array[TechDef] = []
+			for def: TechDef in catalog.technologies:
+				if def.era != era_number or def.tier != tier or not _ghost_can_have(def, identity, picked):
+					continue
+				options.append(def)
+			while needed > 0 and not options.is_empty():
+				var pick: int = rng.randi_range(0, options.size() - 1)
+				picked.append(options[pick])
+				options.remove_at(pick)
+				needed -= 1
+	return picked
+
+
+static func _ghost_can_have(def: TechDef, identity: Array[IdentityDef], picked: Array[TechDef]) -> bool:
+	if def.is_exclusive():
+		var allowed: bool = false
+		for needed: Resource in def.requires_any:
+			if identity.has(needed):
+				allowed = true
+		if not allowed:
+			return false
+	for needed: Resource in def.prerequisites:
+		if not picked.has(needed):
+			return false
+	return true
 
 
 static func _nation_name(rules: GeneratorRules, rng: RandomNumberGenerator) -> String:
@@ -196,6 +234,11 @@ static func _rewards(catalog: CatalogDef, rules: GeneratorRules, era: int, year:
 			troop.kind = RewardDef.Kind.TRUPPA
 			troop.troop = troops[rng.randi_range(0, troops.size() - 1)]
 			rewards.append(troop)
+		# Carta dorata (GDD §10.5.6, v0.25): una tecnologia già iniziata, scelta quando la si prende.
+		if not catalog.technologies.is_empty():
+			var tech: RewardDef = RewardDef.new()
+			tech.kind = RewardDef.Kind.TECNOLOGIA
+			rewards.append(tech)
 	if difficulty >= 2:
 		var buildings: Array[BuildingDef] = []
 		for def: BuildingDef in catalog.buildings:

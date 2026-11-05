@@ -11,6 +11,10 @@ extends RefCounted
 ##   -> PREPARAZIONE (5 round del Consiglio) -> SCONTRO_FANTASMA -> anno successivo.
 ## In ogni round compaiono 3 consiglieri; se ne ascolta uno e si prende una sua proposta
 ## (GDD §4.2). Il consigliere scelto offre anche Potenzia (GDD §6.5).
+##
+## Ricerca e tecnologie (GDD §10.5, v0.25): la Ricerca guadagnata va nella tecnologia in corso;
+## se non ce n'è una resta in attesa nella casella RICERCA di stock, che quindi non è un Magazzino
+## da spendere ma la Ricerca in attesa. Le ere si raggiungono con un numero di tecnologie.
 
 enum Phase {
 	PRODUZIONE,
@@ -173,6 +177,31 @@ var identity: Array[IdentityDef] = []
 ## Vie proposte entrando nell'era: finché non se ne sceglie una, le altre azioni aspettano.
 var way_choices: Array[IdentityDef] = []
 
+## Stato di una tecnologia, per l'interfaccia (GDD §10.5).
+enum TechStatus {
+	COMPLETATA,
+	IN_CORSO,     ## Quella che riceve la Ricerca.
+	INIZIATA,     ## Iniziata (o carta dorata) e lasciata a metà: i progressi restano.
+	DISPONIBILE,  ## Si può ricercare, se compare nella mano.
+	BLOCCATA,     ## Manca qualcosa: vedi tech_block_reason().
+}
+
+## Tecnologie completate, nell'ordine in cui sono state completate (GDD §10.5).
+var techs_done: Array[TechDef] = []
+## Tecnologia in studio: riceve la Ricerca guadagnata. null se nessuna.
+var current_tech: TechDef
+## Ricerca già raccolta sulle tecnologie iniziate e sulle carte dorate, per id.
+## Una tecnologia è "iniziata" appena la si sceglie, anche con zero Ricerca.
+var tech_progress: Dictionary[StringName, int] = {}
+## Carte della mano pescata (GDD §10.5.3: 3).
+var tech_hand: Array[TechDef] = []
+## Carte dorate non ancora completate (GDD §10.5.6).
+var golden_techs: Array[TechDef] = []
+## Volte in cui ogni tecnologia è stata mostrata nella mano e non scelta (sconto sulla carta scartata).
+var tech_discards: Dictionary[StringName, int] = {}
+## Generatore dedicato alla mano, così le tecnologie non cambiano le altre pescate della run.
+var _tech_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
 		p_resistance_rules: ResistanceRules, p_seed: int) -> void:
@@ -182,6 +211,7 @@ func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleR
 	resistance_rules = p_resistance_rules
 	run_seed = p_seed
 	_rng.seed = p_seed
+	_tech_rng.seed = p_seed * 1000003 + 7340033
 
 	prestige = run_rules.starting_prestige
 	gold = run_rules.starting_gold
@@ -217,11 +247,32 @@ func era_name(era_number: int = era) -> String:
 	return "Era %d" % era_number
 
 
-## Ricerca necessaria per la prossima era, oppure -1 se non ci sono altre ere.
-func next_era_cost() -> int:
+## Tecnologie dell'era corrente necessarie per la prossima era (GDD §10.3), oppure -1 se non
+## ci sono altre ere.
+func next_era_techs_needed() -> int:
 	if era >= catalog.eras.size():
 		return -1
-	return catalog.eras[era].research_cost
+	return catalog.eras[era].techs_required
+
+
+## Tecnologie completate di un'era (esclusive comprese).
+func techs_done_in_era(era_number: int) -> int:
+	var count: int = 0
+	for def: TechDef in techs_done:
+		if def.era == era_number:
+			count += 1
+	return count
+
+
+## Perché non si può ancora entrare nella prossima era; vuoto se si può.
+func era_block_reason() -> String:
+	var needed: int = next_era_techs_needed()
+	if needed < 0:
+		return "Non ci sono altre ere."
+	var done: int = techs_done_in_era(era)
+	if done < needed:
+		return "Servono %d tecnologie dell'era %s (ne hai %d)." % [needed, era_name(), done]
+	return ""
 
 
 ## Livello del Consiglio: quello dell'era corrente (GDD §4.2.1). Un livello più alto
@@ -283,7 +334,7 @@ func ghost_resistance() -> int:
 	if current_ghost == null:
 		return 0
 	var identity_bonus: int = _identity_resistance(current_ghost.identity)
-	var ghost_modifiers: Modifiers = _identity_modifiers(current_ghost.identity)
+	var ghost_modifiers: Modifiers = _ghost_modifiers()
 	var base: int = ResistanceCalc.compute(resistance_rules, current_ghost.era, year,
 			current_ghost.buildings.size(), current_ghost.troops.size(), identity_bonus)
 	return maxi(1, base + ghost_modifiers.flat(ModifierDef.Effect.RESISTENZA))
@@ -495,6 +546,8 @@ func sell_resource(type: Res.Type, units: int) -> bool:
 		return false
 	if type == Res.Type.ORO:
 		return _fail("L'Oro non si vende.")
+	if type == Res.Type.RICERCA:
+		return _fail("La Ricerca non si vende: va nelle tecnologie (GDD §10.5).")
 	var rate: int = run_rules.market_units_per_gold
 	if units <= 0 or units % rate != 0:
 		return _fail("Si vende a gruppi di %d." % rate)
@@ -618,10 +671,16 @@ func reward_needs_replacement(reward: RewardDef) -> bool:
 	return false
 
 
+## Ricompense dell'incontro vinto. Una tecnologia già completata non compare.
 func reward_choices() -> Array[RewardDef]:
 	if phase != Phase.RICOMPENSA_INCONTRO or won_encounter == null:
 		return []
-	return won_encounter.rewards
+	var found: Array[RewardDef] = []
+	for reward: RewardDef in won_encounter.rewards:
+		if reward.kind == RewardDef.Kind.TECNOLOGIA and reward.tech != null and techs_done.has(reward.tech):
+			continue
+		found.append(reward)
+	return found
 
 
 ## Edificio come entrerà in battaglia: livello e modificatori (GDD §6.5, §8).
@@ -775,9 +834,17 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			if not _pay(offer):
 				return false
 			_adopt_identity(offer.perk)
+		OpportunityDef.Kind.RIPESCA_TECNOLOGIE:
+			if _tech_pool().is_empty():
+				return _fail("Non ci sono altre tecnologie da pescare.")
+			if not _pay(offer):
+				return false
+			_log("%s: la mano delle tecnologie si ripesca (%s)." % [source, offer.cost_text()])
+			_draw_tech_hand()
 	if element_extra != null:
 		for type: Res.Type in Res.NAMES:
 			stock[type] -= element_extra.internal(type)
+	_flow_research()
 	_next_round()
 	return true
 
@@ -903,7 +970,12 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 		var spy_target: int = _spy_pick(option.spy)
 		spy_effects.append([effect, spy_target, option.spy.spy_ms])
 		_log("%s: %s partirà %s nello scontro con il fantasma." % [source, _ghost_element_name(spy_target), "sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato"])
+	if option.give_tech != null:
+		_give_golden(option.give_tech)
+	elif option.give_random_tech:
+		_give_golden(_random_golden(option.give_tech_sphere))
 	_log("%s: %s." % [source, option.label])
+	_flow_research()
 	_next_round()
 	return true
 
@@ -1020,25 +1092,28 @@ func reroll_offers(with_resource: bool = false) -> bool:
 	return true
 
 
-## Paga la Ricerca ed entra nella prossima era (GDD §10). Non consuma il round.
+## Entra nella prossima era, se le tecnologie richieste sono completate (GDD §10.3, v0.25).
+## Non è automatico, non costa Ricerca e non consuma il round.
 func advance_era() -> bool:
 	if not _require_shopping():
 		return false
-	var cost: int = next_era_cost()
-	if cost < 0:
-		return _fail("Non ci sono altre ere.")
-	if research < cost:
-		return _fail("Ricerca insufficiente (servono %d)." % cost)
-	research -= cost
+	var reason: String = era_block_reason()
+	if reason != "":
+		return _fail(reason)
+	var needed: int = next_era_techs_needed()
 	var next: EraDef = catalog.eras[era]
 	era += 1
 	board.base_building_slots += next.bonus_building_slots
 	board.base_troop_slots += next.bonus_troop_slots
-	_log("La nazione entra nell'era %s (%d Ricerca)." % [next.display_name, cost])
+	_log("La nazione entra nell'era %s (%d tecnologie dell'era %s)." % [next.display_name, needed, era_name(era - 1)])
 	# Dalla seconda era si sceglie una via fra 3 (GDD §10.4).
 	way_choices = _draw_ways(next)
 	if not way_choices.is_empty():
 		_log("Scegli la via della nazione per l'era %s." % next.display_name)
+	else:
+		# Si aprono le tecnologie della nuova era: la mano si ripesca gratis (GDD §10.5.3).
+		# Con una via da scegliere si ripesca dopo, perché la via può aprire tecnologie esclusive.
+		_draw_tech_hand()
 	# Le offerte delle ere precedenti non restano disponibili (GDD §10.3):
 	# le proposte in corso vengono ripescate gratis dalla nuova era (§16.3).
 	_redraw_round()
@@ -1054,6 +1129,264 @@ func _redraw_round() -> void:
 		_draw_offers()
 	else:
 		_draw_advisors()
+
+
+# --- Ricerca e tecnologie (GDD §10.5, v0.25) ----------------------------------------
+
+## Ricerca in attesa: guadagnata senza una tecnologia in corso, passa alla prima scelta.
+func research_waiting() -> int:
+	return research
+
+
+## Ricerca già raccolta su una tecnologia (il costo intero se è completata).
+func tech_progress_of(def: TechDef) -> int:
+	if techs_done.has(def):
+		return def.cost
+	return tech_progress.get(def.id, 0)
+
+
+## Carte fra cui scegliere: le 3 della mano, più le tecnologie iniziate e le carte dorate,
+## che compaiono sempre finché non sono completate (GDD §10.5.3).
+func tech_hand_cards() -> Array[TechDef]:
+	var cards: Array[TechDef] = tech_hand.duplicate()
+	for def: TechDef in _started_techs():
+		if not cards.has(def):
+			cards.append(def)
+	return cards
+
+
+## true se la tecnologia è una carta dorata ancora da completare.
+func is_golden(def: TechDef) -> bool:
+	return golden_techs.has(def)
+
+
+## Tecnologie dell'albero che la nazione vede: tutte quelle comuni, più le esclusive della sua
+## identità e delle sue vie (GDD §10.5.2).
+func tree_technologies() -> Array[TechDef]:
+	var found: Array[TechDef] = []
+	for def: TechDef in catalog.technologies:
+		if def.is_exclusive() and not _has_any_identity(def.requires_any):
+			continue
+		found.append(def)
+	return found
+
+
+func tech_status(def: TechDef) -> TechStatus:
+	if techs_done.has(def):
+		return TechStatus.COMPLETATA
+	if def == current_tech:
+		return TechStatus.IN_CORSO
+	if tech_progress.has(def.id):
+		return TechStatus.INIZIATA
+	if tech_block_reason(def) == "":
+		return TechStatus.DISPONIBILE
+	return TechStatus.BLOCCATA
+
+
+## Perché la tecnologia non si può ricercare; vuoto se si può (P4).
+## ignore_tier: le carte dorate ignorano l'altezza, ma mai l'era (GDD §10.5.6).
+func tech_block_reason(def: TechDef, ignore_tier: bool = false) -> String:
+	if techs_done.has(def):
+		return "Già completata."
+	if def.era > era:
+		return "Si apre nell'era %s." % era_name(def.era)
+	if def.is_exclusive() and not _has_any_identity(def.requires_any):
+		return "Esclusiva di: %s." % _identity_names(def.requires_any)
+	if not def.requires_types.is_empty() and _pieces_with(def.requires_types, EventOptionDef.PieceKind.QUALSIASI).is_empty():
+		return "Serve sulla plancia una carta %s." % ", ".join(def.requires_types)
+	var missing: PackedStringArray = PackedStringArray()
+	for needed: Resource in def.prerequisites:
+		var prerequisite: TechDef = needed as TechDef
+		if prerequisite != null and not techs_done.has(prerequisite):
+			missing.append(prerequisite.display_name)
+	if not missing.is_empty():
+		return "Richiede: %s." % ", ".join(missing)
+	if def.perk != null and identity.has(def.perk):
+		return "Hai già il perk %s." % def.perk.display_name
+	if not ignore_tier and def.tier > 1:
+		var needed_first: int = run_rules.tech_second_tier_needed
+		if _first_tier_done(def.era, def.branch()) < needed_first:
+			return "Si apre con %d tecnologia della prima altezza del ramo %s in quest'era." % [needed_first, TechDef.BRANCH_NAMES.get(def.branch(), "?")]
+	return ""
+
+
+## Sceglie la tecnologia da studiare fra le carte (GDD §10.5.1): in qualunque momento,
+## senza consumare il round. La Ricerca in attesa ci entra subito.
+func choose_tech(def: TechDef) -> bool:
+	if not _require_not_over():
+		return false
+	if def == null or not tech_hand_cards().has(def):
+		return _fail("Questa tecnologia non è fra le carte della mano.")
+	var reason: String = tech_block_reason(def, is_golden(def))
+	if reason != "":
+		return _fail(reason)
+	if def == current_tech:
+		return _fail("La stai già studiando.")
+	current_tech = def
+	if not tech_progress.has(def.id):
+		tech_progress[def.id] = 0
+	tech_discards.erase(def.id)
+	_log("Ricerca: si studia %s (%d/%d)." % [def.display_name, tech_progress_of(def), def.cost])
+	_flow_research()
+	return true
+
+
+## La Ricerca in attesa va nella tecnologia in corso; quella in più resta in attesa (GDD §10.5.1).
+func _flow_research() -> void:
+	while current_tech != null:
+		var progress: int = tech_progress.get(current_tech.id, 0)
+		var missing: int = current_tech.cost - progress
+		if missing > 0:
+			if research <= 0:
+				return
+			var moved: int = mini(missing, research)
+			research -= moved
+			tech_progress[current_tech.id] = progress + moved
+			if moved < missing:
+				return
+		_complete_tech(current_tech)
+
+
+func _complete_tech(def: TechDef) -> void:
+	techs_done.append(def)
+	tech_progress.erase(def.id)
+	tech_discards.erase(def.id)
+	golden_techs.erase(def)
+	if current_tech == def:
+		current_tech = null
+	_log("Tecnologia completata: %s. %s" % [def.display_name, def.description])
+	for modifier: ModifierDef in def.permanent_modifiers:
+		_log(modifiers.apply(modifier, ActiveModifier.OriginKind.TECNOLOGIA, def.display_name, year, board, _rng))
+	if def.perk != null and not identity.has(def.perk):
+		_adopt_identity(def.perk)
+	if def.extra_building_slots > 0:
+		board.base_building_slots += mini(def.extra_building_slots, maxi(0, board.max_building_slots - board.building_capacity()))
+	if def.extra_troop_slots > 0:
+		board.base_troop_slots += mini(def.extra_troop_slots, maxi(0, board.max_troop_slots - board.troop_capacity()))
+	if def.line != null:
+		_log("Nuova linea fra le proposte del Consiglio: %s." % def.line.display_name)
+	_draw_tech_hand()
+
+
+## Tecnologie iniziate e carte dorate, non ancora completate.
+func _started_techs() -> Array[TechDef]:
+	var found: Array[TechDef] = []
+	for def: TechDef in catalog.technologies:
+		if tech_progress.has(def.id) and not techs_done.has(def):
+			found.append(def)
+	for def: TechDef in golden_techs:
+		if not found.has(def):
+			found.append(def)
+	return found
+
+
+## Tecnologie che possono entrare nella mano: disponibili, non iniziate e non dorate.
+func _tech_pool() -> Array[TechDef]:
+	var found: Array[TechDef] = []
+	for def: TechDef in catalog.technologies:
+		if tech_progress.has(def.id) or golden_techs.has(def):
+			continue
+		if tech_block_reason(def) == "":
+			found.append(def)
+	return found
+
+
+## Pesca la mano (GDD §10.5.3): 3 tecnologie dall'altezza più bassa ancora aperta e da quella
+## subito sopra, pesate dalle radici; una carta scartata ha il peso dimezzato a ogni scarto.
+func _draw_tech_hand() -> void:
+	for def: TechDef in tech_hand:
+		if not techs_done.has(def) and not tech_progress.has(def.id):
+			tech_discards[def.id] = tech_discards.get(def.id, 0) + 1
+	tech_hand = []
+	var pool: Array[TechDef] = _tech_pool()
+	if pool.is_empty():
+		return
+	var lowest: int = pool[0].height()
+	for def: TechDef in pool:
+		lowest = mini(lowest, def.height())
+	var candidates: Array[TechDef] = []
+	var weights: Array[int] = []
+	for def: TechDef in pool:
+		if def.height() > lowest + 1:
+			continue
+		candidates.append(def)
+		weights.append(_tech_weight(def))
+	for i: int in range(mini(run_rules.tech_hand_size, candidates.size())):
+		var total: int = 0
+		for weight: int in weights:
+			total += weight
+		var roll: int = _tech_rng.randi_range(0, total - 1)
+		var pick: int = 0
+		while roll >= weights[pick]:
+			roll -= weights[pick]
+			pick += 1
+		tech_hand.append(candidates[pick])
+		candidates.remove_at(pick)
+		weights.remove_at(pick)
+
+
+## Peso di una tecnologia nella mano: 1 più 1 per radice, dimezzato a ogni scarto fino al minimo.
+func _tech_weight(def: TechDef) -> int:
+	var halvings_max: int = maxi(0, run_rules.tech_discard_max_halvings)
+	var halvings: int = mini(tech_discards.get(def.id, 0), halvings_max)
+	return maxi(1, (_roots_weight(def.favored_by) << halvings_max) >> halvings)
+
+
+## Carta dorata: la tecnologia arriva già iniziata e resta nella mano finché non è completata.
+func _give_golden(def: TechDef) -> void:
+	if def == null:
+		_log("Nessuna tecnologia da ricevere già iniziata.")
+		return
+	if techs_done.has(def):
+		_log("%s è già completata." % def.display_name)
+		return
+	@warning_ignore("integer_division")
+	var head_start: int = def.cost * run_rules.golden_progress_percent / 100
+	tech_progress[def.id] = maxi(tech_progress.get(def.id, 0), head_start)
+	if not golden_techs.has(def):
+		golden_techs.append(def)
+	tech_hand.erase(def)
+	_log("Carta dorata: %s, già iniziata (%d/%d)." % [def.display_name, tech_progress[def.id], def.cost])
+	if def == current_tech:
+		_flow_research()
+
+
+## Una tecnologia a caso per una carta dorata: ricercabile nella sua era (anche di un'altezza
+## più alta), della sfera indicata se c'è; null se non ce ne sono.
+func _random_golden(sphere: String) -> TechDef:
+	var found: Array[TechDef] = []
+	for def: TechDef in catalog.technologies:
+		if golden_techs.has(def) or (sphere != "" and def.sphere != sphere):
+			continue
+		if tech_block_reason(def, true) == "":
+			found.append(def)
+	if found.is_empty():
+		return null
+	return found[_tech_rng.randi_range(0, found.size() - 1)]
+
+
+func _first_tier_done(era_number: int, branch: StringName) -> int:
+	var count: int = 0
+	for def: TechDef in techs_done:
+		if def.era == era_number and def.tier == 1 and def.branch() == branch:
+			count += 1
+	return count
+
+
+func _has_any_identity(elements: Array[Resource]) -> bool:
+	for element: Resource in elements:
+		if identity.has(element):
+			return true
+	return false
+
+
+static func _identity_names(elements: Array[Resource]) -> String:
+	var names: PackedStringArray = PackedStringArray()
+	for element: Resource in elements:
+		var def: IdentityDef = element as IdentityDef
+		if def != null:
+			names.append(def.display_name)
+	return ", ".join(names)
 
 
 # --- Azioni sulla plancia (in qualunque momento fuori dal combattimento) -----
@@ -1153,7 +1486,10 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 			if identity.has(reward.perk):
 				return _fail("Hai già questo perk.")
 			_adopt_identity(reward.perk)
+		RewardDef.Kind.TECNOLOGIA:
+			_give_golden(reward.tech if reward.tech != null else _random_golden(""))
 	_log("Ricompensa presa: %s." % reward.describe())
+	_flow_research()
 	won_encounter = null
 	_enter_phase(Phase.PREPARAZIONE)
 	return true
@@ -1234,10 +1570,14 @@ func _gain_loot(loot_gold: int, loot_research: int) -> void:
 	if loot_research > 0:
 		parts.append("%d Ricerca" % loot_research)
 	_log("Bottino: %s." % " e ".join(parts))
+	_flow_research()
 
 func _start_year(new_year: int) -> void:
 	_update_last_record()
 	year = new_year
+	if new_year == 1:
+		# La prima mano delle tecnologie, con l'identità già scelta (GDD §10.5.3).
+		_draw_tech_hand()
 	current_ghost = _ghost_for_year(year)
 	encounter_choices = _encounters_for_year(year)
 	_log("— Anno %d —" % year)
@@ -1279,6 +1619,7 @@ func _collect_production() -> void:
 		if collected[type] != 0:
 			parts.append("%s %s" % [Res.format(type, collected[type]), Res.NAMES[type]])
 	_log("%s: gli edifici producono %s." % [phase_name(), ", ".join(parts) if not parts.is_empty() else "nulla"])
+	_flow_research()
 
 
 ## Temi dei round della metà: quelli delle regole, in un ordine pescato con il seme della run.
@@ -1730,6 +2071,8 @@ func _action_available(opportunity: OpportunityDef) -> bool:
 			return not _enchantable_troops().is_empty()
 		OpportunityDef.Kind.PERK:
 			return not _available_perks().is_empty()
+		OpportunityDef.Kind.RIPESCA_TECNOLOGIE:
+			return not _tech_pool().is_empty()
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO, OpportunityDef.Kind.RECLUTA_TRUPPA:
 			return false  # Gli elementi li propongono i consiglieri dai loro tipi.
 	return true
@@ -1793,6 +2136,12 @@ func _buildings_of_era() -> Array[BuildingDef]:
 	for def: BuildingDef in candidates:
 		if def.era == era and not found.has(def):
 			found.append(def)
+	# Linee sbloccate dalle tecnologie: la versione dell'era, o l'ultima precedente (GDD §10.5.5).
+	for tech: TechDef in techs_done:
+		if tech.line != null:
+			var version: BuildingDef = tech.line.building_for_era(era)
+			if version != null and not found.has(version):
+				found.append(version)
 	return found
 
 
@@ -1804,6 +2153,11 @@ func _troops_of_era() -> Array[TroopDef]:
 	for def: TroopDef in candidates:
 		if def.era == era and not found.has(def):
 			found.append(def)
+	for tech: TechDef in techs_done:
+		if tech.line != null:
+			var version: TroopDef = tech.line.troop_for_era(era)
+			if version != null and not found.has(version):
+				found.append(version)
 	return found
 
 
@@ -2092,6 +2446,8 @@ func choose_way(index: int) -> bool:
 	var way: IdentityDef = way_choices[index]
 	way_choices = []
 	_adopt_identity(way)
+	# La via arriva entrando in un'era: la mano si ripesca gratis con le nuove tecnologie.
+	_draw_tech_hand()
 	# Le proposte in corso tengono conto della via appena scelta.
 	_redraw_round()
 	return true
@@ -2165,6 +2521,7 @@ func _adopt_identity(def: IdentityDef) -> void:
 			_log("Nessuno spazio per %s." % troop.display_name)
 	for modifier: ModifierDef in def.permanent_modifiers:
 		_log(modifiers.apply(modifier, ActiveModifier.OriginKind.IDENTITA, def.display_name, year, board, _rng))
+	_flow_research()
 
 
 static func _identity_resistance(elements: Array[IdentityDef]) -> int:
@@ -2185,9 +2542,23 @@ func _identity_modifiers(elements: Array[IdentityDef]) -> Modifiers:
 	return result
 
 
+## Tratti del fantasma: quelli della sua identità più le sue tecnologie, solo su tutta la nazione.
+func _ghost_modifiers() -> Modifiers:
+	var result: Modifiers = _identity_modifiers(current_ghost.identity)
+	var empty_board: NationBoard = NationBoard.new()
+	for tech: TechDef in current_ghost.technologies:
+		var mods: Array[ModifierDef] = tech.permanent_modifiers.duplicate()
+		if tech.perk != null:
+			mods.append_array(tech.perk.permanent_modifiers)
+		for modifier: ModifierDef in mods:
+			if modifier.target == ModifierDef.Target.NAZIONE:
+				result.apply(modifier, ActiveModifier.OriginKind.TECNOLOGIA, tech.display_name, year, empty_board, _rng)
+	return result
+
+
 ## Il fantasma come entra in battaglia: con la Resistenza e i tratti della sua identità.
 func _ghost_setup() -> BattleSideSetup:
-	var ghost_modifiers: Modifiers = _identity_modifiers(current_ghost.identity)
+	var ghost_modifiers: Modifiers = _ghost_modifiers()
 	var buildings: Array[BuildingDef] = []
 	for def: BuildingDef in current_ghost.buildings:
 		buildings.append(ElementStats.building(def, BoardPiece.of_building(def, 0), ghost_modifiers, 1, run_rules))

@@ -21,6 +21,7 @@ enum Kind {
 	SPIONAGGIO,             ## Un elemento del fantasma parte sabotato o rallentato (GDD §12).
 	INCANTO,                ## Aggiunge un effetto e un costo di mana a una truppa (GDD §4.3).
 	PERK,                   ## Un perk proposto dall'Anziano (GDD §4.2.2, §9.3).
+	RIPESCA_TECNOLOGIE,     ## Ripesca la mano delle tecnologie (Revisione dei piani, GDD §4.2.3, v0.25).
 }
 
 ## Criterio con cui lo spionaggio sceglie l'elemento nemico (GDD §12).
