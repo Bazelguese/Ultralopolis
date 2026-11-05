@@ -150,6 +150,8 @@ static func da_pezzo(run: RunState, pezzo: BoardPiece) -> SchedaCarta:
 	var scheda: SchedaCarta = da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
 	if pezzo.enchant != null:
 		scheda.dettagli += "\n%s (già compreso nei valori)." % pezzo.enchant.display_name
+	if pezzo.second_enchant != null:
+		scheda.dettagli += "\nSecondo incanto, Seconda natura: %s (già compreso nei valori)." % pezzo.second_enchant.display_name
 	return scheda
 
 
@@ -309,7 +311,26 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	scheda.sopratitolo = "Via"
 	scheda.riga = "Scegli questa via"
 	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: offerte, elementi esclusivi, un tratto permanente e un bonus immediato."
+	if not via.traditions.is_empty():
+		# Le imprese si vedono prima di scegliere la via (GDD §10.4.1, v0.26).
+		scheda.dettagli += "\nTradizioni (completale tutte per un'ascensione):"
+		for passo: TraditionDef in via.traditions:
+			scheda.dettagli += "\n• %s: %s → %s" % [passo.display_name, passo.deed.describe() if passo.deed != null else "", passo.description]
 	scheda.illustrazione = _carica("vie/%s.png" % via.id)
+	return scheda
+
+
+## Un'ascensione da scegliere completando l'albero di una via (GDD §10.4.2, v0.26).
+static func da_ascensione(ascensione: IdentityDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.VIA
+	scheda.id = ascensione.id
+	scheda.titolo = ascensione.display_name
+	scheda.sopratitolo = "Ascensione · livello %d" % ascensione.ascension_level
+	scheda.riga = ascensione.description
+	scheda.costo = "Scegli"
+	scheda.dettagli = ascensione.description + "\nÈ permanente." + ("\nCambia una regola del gioco." if ascensione.rule != IdentityDef.Rule.NESSUNA else "")
+	scheda.illustrazione = _carica("ascensioni/%s.png" % ascensione.id)
 	return scheda
 
 

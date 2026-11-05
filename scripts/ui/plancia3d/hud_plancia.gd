@@ -54,6 +54,9 @@ var _ricerca: PanelContainer
 var _stato_ricerca: Label
 var _mano_ricerca: HBoxContainer
 var _colonne_albero: Dictionary[StringName, VBoxContainer] = {}
+var _pulsante_tradizioni: Button
+var _tradizioni: PanelContainer
+var _lista_tradizioni: VBoxContainer
 var _effetti: PanelContainer
 var _lista_effetti: VBoxContainer
 var _pulsante_effetti: Button
@@ -104,6 +107,7 @@ func _ready() -> void:
 	_crea_risorse()
 	_crea_magazzino()
 	_crea_ricerca()
+	_crea_tradizioni()
 	_crea_pannelli_destra()
 	_crea_comandi()
 	_crea_principale()
@@ -266,6 +270,9 @@ func _crea_risorse() -> void:
 	_pulsante_ricerca = _pulsante("Ricerca", func() -> void: _ricerca.visible = not _ricerca.visible)
 	_pulsante_ricerca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_ricerca)
+	_pulsante_tradizioni = _pulsante("Tradizioni", func() -> void: _tradizioni.visible = not _tradizioni.visible)
+	_pulsante_tradizioni.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	riga.add_child(_pulsante_tradizioni)
 	var mercato: Button = _pulsante("Mercato", func() -> void: _magazzino.visible = not _magazzino.visible)
 	mercato.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(mercato)
@@ -352,6 +359,70 @@ func _crea_ricerca() -> void:
 		_colonne_albero[ramo] = lista
 	_ancora(_ricerca, Control.PRESET_CENTER, Vector2.ZERO)
 	_ricerca.visible = false
+
+
+## Pannello delle Tradizioni (GDD §10.4.1, §14.3): per ogni via adottata i suoi passi,
+## l'impresa con quanto manca e l'effetto; poi le ascensioni prese.
+func _crea_tradizioni() -> void:
+	_tradizioni = PanelContainer.new()
+	_tradizioni.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.96), StileVisivo.ORO))
+	var colonna: VBoxContainer = VBoxContainer.new()
+	colonna.add_theme_constant_override("separation", 10)
+	_tradizioni.add_child(colonna)
+	var testa: HBoxContainer = HBoxContainer.new()
+	testa.add_child(StileVisivo.etichetta("TRADIZIONI", StileVisivo.FONT_TITOLI, 34, StileVisivo.ORO_LUCE))
+	var spinta: Control = Control.new()
+	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	testa.add_child(spinta)
+	testa.add_child(_pulsante("Chiudi", func() -> void: _tradizioni.visible = false))
+	colonna.add_child(testa)
+	var scorri: ScrollContainer = ScrollContainer.new()
+	scorri.custom_minimum_size = Vector2(1000, 560)
+	scorri.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	colonna.add_child(scorri)
+	_lista_tradizioni = VBoxContainer.new()
+	_lista_tradizioni.add_theme_constant_override("separation", 6)
+	_lista_tradizioni.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scorri.add_child(_lista_tradizioni)
+	_ancora(_tradizioni, Control.PRESET_CENTER, Vector2.ZERO)
+	_tradizioni.visible = false
+
+
+func _aggiorna_tradizioni(run: RunState) -> void:
+	for figlio: Node in _lista_tradizioni.get_children():
+		figlio.queue_free()
+	var vie: Array[IdentityDef] = run.adopted_ways()
+	var fatti: int = 0
+	if vie.is_empty():
+		_lista_tradizioni.add_child(_riga_tradizioni("Le tradizioni cominciano con la prima via, entrando nell'era 2.", StileVisivo.TESTO_TENUE, 18))
+	for via: IdentityDef in vie:
+		var completa: bool = run.completed_ways.has(via)
+		_lista_tradizioni.add_child(_riga_tradizioni("%s%s" % [via.display_name.to_upper(), " · albero completo" if completa else ""], StileVisivo.ORO_LUCE, 22))
+		for passo: TraditionDef in via.traditions:
+			var fatto: bool = run.traditions_done.has(passo)
+			if fatto:
+				fatti += 1
+			var impresa: String = passo.deed.describe() if passo.deed != null else ""
+			var testo: String = "%s — %s (%s) → %s" % [passo.display_name, impresa, run.tradition_progress_text(passo), passo.description]
+			_lista_tradizioni.add_child(_riga_tradizioni(testo, Color("9be8a5") if fatto else StileVisivo.TESTO, 17))
+	var prese: Array[IdentityDef] = run.ascensions()
+	if not prese.is_empty():
+		_lista_tradizioni.add_child(_riga_tradizioni("ASCENSIONI", StileVisivo.ORO_LUCE, 22))
+		for ascensione: IdentityDef in prese:
+			_lista_tradizioni.add_child(_riga_tradizioni("%s (livello %d) → %s" % [ascensione.display_name, ascensione.ascension_level, ascensione.description], Color("c7b8ff"), 17))
+	_pulsante_tradizioni.text = "Tradizioni · %d" % fatti
+
+
+func _riga_tradizioni(testo: String, colore: Color, dimensione: int) -> Label:
+	var riga: Label = StileVisivo.etichetta(testo, StileVisivo.FONT_TESTO, dimensione, colore)
+	riga.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	riga.custom_minimum_size = Vector2(960, 0)
+	return riga
+
+
+## true se il pannello delle Tradizioni è aperto.
+func tradizioni_visibile() -> bool:
+	return _tradizioni.visible
 
 
 ## true se il pannello della Ricerca è aperto.
@@ -690,6 +761,7 @@ func aggiorna_partita(run: RunState) -> void:
 	else:
 		_pulsante_era.visible = false
 	_aggiorna_ricerca(run)
+	_aggiorna_tradizioni(run)
 	var lotto: int = run.market_rate()
 	for tipo: int in _righe_magazzino:
 		_righe_magazzino[tipo].text = "%s  %s" % [Res.NAMES[tipo], run.stock_text(tipo)]
@@ -711,7 +783,7 @@ func aggiorna_partita(run: RunState) -> void:
 	ultime.reverse()
 	_testo_cronaca.text = "\n".join(ultime)
 
-	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty()
+	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty() or not run.ascension_choices.is_empty()
 	var consigliere: AdvisorDef = run.chosen_advisor
 	_pulsante_rinnova.visible = comprando and not scelta_via and consigliere != null
 	_pulsante_passa.visible = comprando and not scelta_via and not run.is_revolution_round()
@@ -741,6 +813,8 @@ func aggiorna_partita(run: RunState) -> void:
 			_suggerimento_fase.text = ""
 	if not run.way_choices.is_empty():
 		_suggerimento_fase.text = "Nuova era: scegli la via della nazione. Diventa parte della tua identità."
+	elif not run.ascension_choices.is_empty():
+		_suggerimento_fase.text = "Albero di una via completo: scegli un'ascensione. È per sempre."
 	elif not run.government_choices.is_empty():
 		_suggerimento_fase.text = "Nuova era: il governo può evolvere. Scegli la nuova forma, oppure resta com'è."
 

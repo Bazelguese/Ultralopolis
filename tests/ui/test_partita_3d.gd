@@ -305,3 +305,20 @@ func test_dal_pannello_della_ricerca_si_sceglie_la_tecnologia() -> void:
 	var pulsante_era: Button = hud.get("_pulsante_era")
 	assert_true(pulsante_era.disabled, "Senza le tecnologie richieste non si entra nell'era.")
 	assert_string_contains(pulsante_era.text, "0/%d" % run.next_era_techs_needed())
+
+
+## Le tradizioni si leggono dal loro pannello e l'ascensione si sceglie con le carte (GDD §10.4).
+func test_ascensione_scelta_con_le_carte_e_pannello_tradizioni() -> void:
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var lista: VBoxContainer = hud.get("_lista_tradizioni")
+	assert_gt(lista.get_child_count(), 0, "Il pannello spiega quando cominciano le tradizioni.")
+	run.ascension_choices = run.catalog.ascensions.slice(0, 3)
+	run.pending_ascensions = 1
+	_scena.call("_aggiorna_tutto")
+	var scelte: Array = _scena.get("_scelte")
+	assert_eq(scelte.size(), 3, "Una carta per ascensione.")
+	var scelta: IdentityDef = run.ascension_choices[0]
+	_scena.call("_clic_scelta", scelte[0])
+	assert_true(run.identity.has(scelta), "Cliccando la carta l'ascensione è presa.")
+	assert_true(run.ascension_choices.is_empty())

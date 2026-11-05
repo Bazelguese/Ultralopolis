@@ -7,7 +7,7 @@ extends Node3D
 
 enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
-enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE, GOVERNO }
+enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE, GOVERNO, ASCENSIONE }
 
 const PASSO_TRUPPE: float = 1.75
 const PASSO_EDIFICI: float = 2.1
@@ -565,6 +565,13 @@ func _costruisci_scelte() -> void:
 			schede.append(SchedaCarta.da_via(via))
 			origini.append(via)
 		fase = -1
+	elif not run.ascension_choices.is_empty():
+		# Albero di una via completo (GDD §10.4.2): si sceglie un'ascensione.
+		tipo = TipoScelta.ASCENSIONE
+		for ascensione: IdentityDef in run.ascension_choices:
+			schede.append(SchedaCarta.da_ascensione(ascensione))
+			origini.append(ascensione)
+		fase = -1
 	elif not run.government_choices.is_empty():
 		# Evoluzione del governo entrando nell'era (GDD §9.4): l'ultima carta la rifiuta.
 		tipo = TipoScelta.GOVERNO
@@ -803,6 +810,9 @@ func _clic_scelta(tessera: Tessera3D) -> void:
 		TipoScelta.VIA:
 			var nome_via: String = run.way_choices[i].display_name
 			_esegui(run.choose_way(i), "Via scelta: %s" % nome_via)
+		TipoScelta.ASCENSIONE:
+			var nome_ascensione: String = run.ascension_choices[i].display_name
+			_esegui(run.choose_ascension(i), "Ascensione: %s" % nome_ascensione)
 		TipoScelta.GOVERNO:
 			if i < run.government_choices.size():
 				var nome_governo: String = run.government_choices[i].display_name
@@ -1039,6 +1049,8 @@ func _mostra_eventi() -> void:
 				_scritta_volante(evento.side, "+%d Corruzione" % evento.amount, Color("8b3fc9"))
 			BattleEvent.Kind.ASSEDIO:
 				_scritta_volante(evento.side, "−%d scudo" % evento.amount, Color("7a6a55"))
+			BattleEvent.Kind.ULTIMA_TRINCEA:
+				_scritta_volante(evento.side, "Ultima trincea!", StileVisivo.ORO_LUCE)
 			BattleEvent.Kind.RALLENTATO, BattleEvent.Kind.SABOTATO:
 				var colpita: Tessera3D = _elemento_da_indice(evento.side, evento.index)
 				if colpita != null:
@@ -1084,6 +1096,9 @@ func _aggiorna_visuale_scontro() -> void:
 			if stato == BattleSim.TroopState.SABOTATA:
 				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
 				tessera.imposta_stato("Sabotata: non può attivarsi", Color("8b3fc9"))
+			elif stato == BattleSim.TroopState.MANA_PRENOTATO:
+				tessera.imposta_ricarica(1.0)
+				tessera.imposta_stato("Aspetta: il mana è prenotato dalla truppa più a destra", Color("e08a2e"))
 			elif stato == BattleSim.TroopState.IN_ATTESA_DI_MANA:
 				tessera.imposta_ricarica(1.0)
 				var disponibile: int = _sim.get_mana(lato, def.mana_type) + _sim.get_mana(lato, BattleSim.MANA_ENERGETICO)
