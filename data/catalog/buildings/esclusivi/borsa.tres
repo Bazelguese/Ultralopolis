@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_lew1i"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_klgqa"]
-
-[sub_resource type="Resource" id="Resource_lew1i"]
-script = ExtResource("2_klgqa")
-legno = 6
-
-[sub_resource type="Resource" id="Resource_klgqa"]
-script = ExtResource("2_klgqa")
-legno = 9
 
 [resource]
 script = ExtResource("1_lew1i")
@@ -22,4 +13,3 @@ gold_per_phase = 7
 mana_type = &"verde"
 mana_amount = 1
 mana_interval_ms = 2000
-upgrade_costs = Array[ExtResource("2_klgqa")]([SubResource("Resource_lew1i"), SubResource("Resource_klgqa")])

@@ -6,6 +6,7 @@ extends Control
 
 signal azione_principale
 signal rinnova
+signal rinnova_risorsa
 signal passa
 signal nessuna_ricompensa
 signal avanza_era
@@ -53,6 +54,7 @@ var _testo_cronaca: Label
 var _comandi: VBoxContainer
 var _suggerimento_fase: Label
 var _pulsante_rinnova: Button
+var _pulsante_rinnova_risorsa: Button
 var _pulsante_passa: Button
 var _pulsante_nessuna: Button
 var _colonna_principale: VBoxContainer
@@ -345,7 +347,9 @@ func _crea_comandi() -> void:
 	_comandi.add_child(riga)
 	_pulsante_rinnova = _pulsante("", func() -> void: rinnova.emit())
 	riga.add_child(_pulsante_rinnova)
-	_pulsante_passa = _pulsante("Passa", func() -> void: passa.emit())
+	_pulsante_rinnova_risorsa = _pulsante("", func() -> void: rinnova_risorsa.emit())
+	riga.add_child(_pulsante_rinnova_risorsa)
+	_pulsante_passa = _pulsante("Passa il round", func() -> void: passa.emit())
 	riga.add_child(_pulsante_passa)
 	_pulsante_nessuna = _pulsante("Nessuna ricompensa", func() -> void: nessuna_ricompensa.emit())
 	riga.add_child(_pulsante_nessuna)
@@ -495,9 +499,7 @@ func aggiorna_partita(run: RunState) -> void:
 	var comprando: bool = run.is_shopping_phase()
 	_fase.text = "Anno %d · %s" % [run.year, run.phase_name()]
 	if comprando:
-		_fase.text += " · opportunità %d di %d" % [run.opportunity_number, run.run_rules.opportunities_per_phase]
-		if run.is_dedicated_opportunity():
-			_fase.text += " · solo edifici" if run.phase == RunState.Phase.PRODUZIONE else " · solo truppe"
+		_fase.text += " · round %d di %d · tema: %s" % [run.round_number, run.run_rules.rounds_per_half, run.theme_name()]
 	_sotto_fase.text = "Resistenza nel prossimo scontro: %d" % run.player_resistance()
 	_prestigio.text = str(run.prestige)
 	_vittorie.text = "%d/%d" % [run.wins, run.run_rules.wins_needed]
@@ -538,17 +540,21 @@ func aggiorna_partita(run: RunState) -> void:
 	_testo_cronaca.text = "\n".join(ultime)
 
 	var scelta_via: bool = not run.way_choices.is_empty()
-	_pulsante_rinnova.visible = comprando and not scelta_via
+	var consigliere: AdvisorDef = run.chosen_advisor
+	_pulsante_rinnova.visible = comprando and not scelta_via and consigliere != null
 	_pulsante_passa.visible = comprando and not scelta_via
-	_pulsante_rinnova.text = "Rinnova le offerte · %d Oro" % run.reroll_cost()
+	_pulsante_rinnova.text = "Rinnova · %d Oro" % run.reroll_cost()
 	_pulsante_rinnova.disabled = run.gold < run.reroll_cost()
+	var costo_risorsa: ResourceAmounts = run.reroll_resource_cost()
+	_pulsante_rinnova_risorsa.visible = _pulsante_rinnova.visible and costo_risorsa != null
+	if costo_risorsa != null:
+		_pulsante_rinnova_risorsa.text = "Rinnova · %s" % costo_risorsa.describe()
+		_pulsante_rinnova_risorsa.disabled = not run.can_pay(costo_risorsa)
 	_pulsante_nessuna.visible = run.phase == RunState.Phase.RICOMPENSA_INCONTRO
 	_principale.visible = run.phase in [RunState.Phase.SCONTRO_FANTASMA, RunState.Phase.FINE_RUN]
 	match run.phase:
-		RunState.Phase.PRODUZIONE:
-			_suggerimento_fase.text = "Si costruisce: scegli un'offerta. Passa il mouse sulle carte per i dettagli."
-		RunState.Phase.PREPARAZIONE:
-			_suggerimento_fase.text = "Si dispone l'esercito: scegli un'offerta. Clicca una tua carta per venderla, potenziarla o spostarla."
+		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
+			_suggerimento_fase.text = _testo_consiglio(run)
 		RunState.Phase.SCELTA_INCONTRO:
 			_suggerimento_fase.text = "Incontro del mondo: scegli quale minaccia affrontare. Se perdi, l'Oro si dimezza."
 		RunState.Phase.RICOMPENSA_INCONTRO:
@@ -563,6 +569,23 @@ func aggiorna_partita(run: RunState) -> void:
 			_suggerimento_fase.text = ""
 	if scelta_via:
 		_suggerimento_fase.text = "Nuova era: scegli la via della nazione. Diventa parte della tua identità."
+
+
+## Suggerimento durante i round del Consiglio (GDD §4.2).
+func _testo_consiglio(run: RunState) -> String:
+	var consigliere: AdvisorDef = run.chosen_advisor
+	if consigliere == null:
+		if run.advisor_choices.is_empty():
+			return "Nessun consigliere ha proposte per questo tema: passa il round."
+		return "Scegli quale consigliere ascoltare (tema: %s). Passa il mouse sulle carte per i dettagli." % run.theme_name()
+	var testo: String = "%s: prendi una proposta, oppure passa." % consigliere.display_name
+	if run.upgrade_used:
+		testo += " Potenzia già usato in questo round."
+	elif consigliere.special == AdvisorDef.Special.NESSUNO:
+		testo += " Potenzia: clicca una tua carta con tipo %s." % ", ".join(consigliere.types)
+	elif consigliere.special == AdvisorDef.Special.ANZIANO and run.elder_upgrades_used < run.run_rules.elder_upgrades_per_year:
+		testo += " Potenzia: clicca un tuo edificio neutro."
+	return testo
 
 
 func _testo_fine(run: RunState) -> String:

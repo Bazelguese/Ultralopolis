@@ -1,6 +1,8 @@
 extends GutTest
 ## Verifiche dell'identità della nazione (GDD §9). Numeri solo di prova.
 
+const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")
+
 var farm: BuildingDef
 var sword: TroopDef
 var exclusive_troop: TroopDef
@@ -16,8 +18,8 @@ var perk_b: IdentityDef
 var perk_c: IdentityDef
 var builders: OpportunityDef
 var collectors: OpportunityDef
-var recruiters: OpportunityDef
 var secret: OpportunityDef
+var advisor: AdvisorDef
 
 
 func _identity(id: StringName, dimension: IdentityDef.Dimension) -> IdentityDef:
@@ -65,7 +67,6 @@ func before_each() -> void:
 
 	builders = _opportunity(&"costruttori", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
 	collectors = _opportunity(&"esattori", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
-	recruiters = _opportunity(&"reclutatori", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.RECLUTA_TRUPPA)
 	secret = _opportunity(&"segreta", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
 
 	people = _identity(&"popolo", IdentityDef.Dimension.POPOLO)
@@ -92,9 +93,9 @@ func before_each() -> void:
 	catalog.buildings = [farm]
 	catalog.troops = [sword]
 	catalog.eras = [era1]
-	catalog.opportunities = [builders, collectors, recruiters]
 	catalog.identities = [people, government, creed, culture, perk_a, perk_b, perk_c]
 	run_rules = RunRules.new()
+	advisor = Aiuti.consiglio_semplice(catalog, run_rules, [builders, collectors, secret])
 	run_rules.starting_gold = 0
 	run_rules.starting_perks = 2
 	run_rules.prototype_years = 0
@@ -184,7 +185,7 @@ func test_tratto_permanente_dura_tutta_la_run() -> void:
 	assert_eq(run.production_preview().x, 6, "4 Oro +50% del credo.")
 	for i: int in range(3):
 		while not run.is_over() and run.phase != RunState.Phase.SCONTRO_FANTASMA:
-			run.pass_opportunity()
+			run.pass_round()
 		run.fight_ghost()
 	assert_eq(run.year, 4)
 	assert_eq(run.production_preview().x, 6, "Ancora attivo dopo tre anni.")
@@ -203,32 +204,39 @@ func test_i_tratti_permanenti_non_si_accorciano() -> void:
 	assert_eq(run.modifiers.year_malus().size(), 0, "L'Ambasciata non li vede.")
 
 
-# --- Opportunità ed elementi esclusivi -----------------------------------------
+# --- Azioni, consiglieri ed elementi esclusivi ----------------------------------
 
-func test_opportunita_esclusiva_solo_con_l_identita() -> void:
+func test_azione_esclusiva_solo_con_l_identita() -> void:
+	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
 	var with_identity: RunState = _new_run()
 	with_identity.found_nation("X", _full_choice())
+	Aiuti.ascolta(with_identity)
 	var ids: Array[StringName] = []
 	for offer: Offer in with_identity.offers:
 		ids.append(offer.opportunity.id)
-	assert_true(ids.has(&"segreta"), "Il governo porta la sua opportunità esclusiva.")
+	assert_true(ids.has(&"segreta"), "Il governo porta la sua azione esclusiva.")
 
 	var other_government: IdentityDef = _identity(&"altro_governo", IdentityDef.Dimension.GOVERNO)
 	catalog.identities.append(other_government)
 	var without: RunState = _new_run()
 	without.found_nation("X", [people, other_government, creed, culture, perk_a, perk_b])
+	Aiuti.ascolta(without)
 	for attempt: int in range(30):
 		for offer: Offer in without.offers:
-			assert_ne(offer.opportunity.id, &"segreta")
+			if offer.opportunity != null:
+				assert_ne(offer.opportunity.id, &"segreta")
 		without.gold += without.reroll_cost()
 		without.reroll_offers()
 
 
-func test_opportunita_favorita_compare_piu_spesso() -> void:
-	run_rules.alternatives_per_opportunity = 1
+func test_azione_favorita_compare_piu_spesso() -> void:
+	run_rules.proposals_per_advisor = 1
+	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+	advisor.actions = [builders, collectors]
 	government.exclusive_opportunities = []
 	var run: RunState = _new_run(11)
 	run.found_nation("X", _full_choice())
+	Aiuti.ascolta(run)
 	var counts: Dictionary[StringName, int] = {}
 	for attempt: int in range(600):
 		var id: StringName = run.offers[0].opportunity.id
@@ -239,11 +247,31 @@ func test_opportunita_favorita_compare_piu_spesso() -> void:
 	assert_gt(counts.get(&"esattori", 0), counts.get(&"costruttori", 0) * 3 / 2, "Gli esattori favoriti escono più spesso.")
 
 
-func test_truppa_esclusiva_fra_i_reclutatori() -> void:
+func test_consigliere_favorito_compare_piu_spesso() -> void:
+	var favored: AdvisorDef = Aiuti.consigliere(&"favorito", [Aiuti.TIPO_PROVA])
+	var other: AdvisorDef = Aiuti.consigliere(&"altro", [Aiuti.TIPO_PROVA])
+	catalog.advisors = [favored, other]
+	culture.favored_advisors = [favored]
+	run_rules.rounds_per_half = 200
+	var temi: PackedInt32Array = PackedInt32Array()
+	temi.resize(200)
+	temi.fill(RunState.RoundTheme.MISTO)
+	run_rules.half_themes = temi
+	var run: RunState = _new_run(13)
+	run.found_nation("X", _full_choice())
+	var counts: Dictionary[StringName, int] = {}
+	for attempt: int in range(200):
+		var id: StringName = run.advisor_choices[0].id
+		counts[id] = counts.get(id, 0) + 1
+		run.pass_round()
+	# Peso 2 contro 1: circa 133 contro 67.
+	assert_gt(counts.get(&"favorito", 0), counts.get(&"altro", 0) * 3 / 2, "Il consigliere favorito dall'identità esce più spesso.")
+
+
+func test_truppa_esclusiva_fra_le_proposte() -> void:
 	var run: RunState = _new_run()
 	run.found_nation("X", _full_choice())
-	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
+	Aiuti.ascolta(run)
 	var seen: bool = false
 	for attempt: int in range(40):
 		for offer: Offer in run.offers:
@@ -269,7 +297,7 @@ func test_perk_ottenuto_come_ricompensa() -> void:
 	var run: RunState = _new_run()
 	run.found_nation("X", _full_choice())
 	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
+		run.pass_round()
 	run.choose_encounter(0)
 	var before: int = run.player_resistance()
 	assert_true(run.take_reward(0))
@@ -293,7 +321,7 @@ func test_identita_del_fantasma() -> void:
 	run.found_nation("X", _full_choice())
 	assert_eq(run.ghost_resistance(), 17, "Era 10 + perk 7.")
 	while run.phase != RunState.Phase.SCONTRO_FANTASMA:
-		run.pass_opportunity()
+		run.pass_round()
 	run.fight_ghost()
 	assert_eq(run.last_battle_setups()[1].troops[0].cooldown_ms, 1000, "Il tratto vale anche per il fantasma.")
 	assert_eq(sword.cooldown_ms, 2000, "La scheda del catalogo non cambia.")

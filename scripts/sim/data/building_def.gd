@@ -54,9 +54,6 @@ extends Resource
 ## Spazi truppa aggiunti alla plancia finché l'edificio è costruito (GDD §6.3).
 @export var extra_troop_slots: int = 0
 
-@export_group("Potenziamenti")
-## Costo per salire di livello: posizione 0 = dal livello 1 al 2, posizione 1 = dal 2 al 3 (GDD §6.5).
-@export var upgrade_costs: Array[ResourceAmounts] = []
 
 
 ## Produzione per fase di una risorsa, in unità intere.

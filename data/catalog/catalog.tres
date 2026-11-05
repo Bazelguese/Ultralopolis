@@ -47,40 +47,28 @@
 [ext_resource type="Resource" path="res://data/catalog/ghosts/fantasma_anno_2.tres" id="32_uymuy"]
 [ext_resource type="Resource" path="res://data/catalog/ghosts/fantasma_anno_3.tres" id="33_tye5o"]
 [ext_resource type="Script" path="res://scripts/sim/data/catalog_def.gd" id="34_2n8s1"]
-[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="34_0738x"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="34_uymuy"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="35_fp2ii"]
 [ext_resource type="Resource" path="res://data/rules/generator_rules.tres" id="35_hkuyl"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/costruttori.tres" id="35_p4jue"]
 [ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="35_tye5o"]
 [ext_resource type="Resource" path="res://data/catalog/identita/popolo_del_delta.tres" id="36_2n8s1"]
 [ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="36_03c6b"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/architetti.tres" id="36_5do7l"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/studiosi.tres" id="37_eg6f4"]
 [ext_resource type="Resource" path="res://data/catalog/identita/popolo_delle_foreste.tres" id="37_fp2ii"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="37_rvnac"]
 [ext_resource type="Resource" path="res://data/catalog/identita/monarchia.tres" id="38_03c6b"]
 [ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="38_cd6s8"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/esattori.tres" id="38_p5yub"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/mercante.tres" id="39_eicds"]
 [ext_resource type="Resource" path="res://data/catalog/troops/esploratori.tres" id="39_hkuyl"]
 [ext_resource type="Resource" path="res://data/catalog/identita/repubblica.tres" id="39_rvnac"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/assemblea.tres" id="40_7hwyi"]
 [ext_resource type="Resource" path="res://data/catalog/troops/frombolieri.tres" id="40_7tkbw"]
 [ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="40_cd6s8"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/reclutatori.tres" id="41_5hcq5"]
 [ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="41_hkuyl"]
 [ext_resource type="Resource" path="res://data/catalog/troops/cavalieri.tres" id="41_rht80"]
 [ext_resource type="Resource" path="res://data/catalog/identita/antichi_spiriti.tres" id="42_7tkbw"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/quartiermastro.tres" id="42_mleo8"]
 [ext_resource type="Resource" path="res://data/catalog/troops/balestrieri.tres" id="42_ynrp2"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/addestramento.tres" id="43_3lga0"]
 [ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="43_rht80"]
 [ext_resource type="Resource" path="res://data/catalog/troops/guardie.tres" id="43_v1cj4"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arieti.tres" id="44_dt2h5"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/fortificazioni.tres" id="44_su3wr"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_guerriera.tres" id="44_ynrp2"]
-[ext_resource type="Resource" path="res://data/catalog/opportunities/ambasciata.tres" id="45_16be3"]
 [ext_resource type="Resource" path="res://data/catalog/troops/catapulte.tres" id="45_nc1ak"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_mercantile.tres" id="45_v1cj4"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="46_dt2h5"]
@@ -128,7 +116,6 @@ troops = Array[ExtResource("35_fp2ii")]([ExtResource("36_03c6b"), ExtResource("3
 eras = Array[ExtResource("26_7jtq1")]([ExtResource("27_6fg57"), ExtResource("28_sahax"), ExtResource("29_gw2p0")])
 ghosts = Array[ExtResource("30_75gny")]([ExtResource("31_mpbka"), ExtResource("32_uymuy"), ExtResource("33_tye5o")])
 encounters = Array[ExtResource("16_eg6f4")]([ExtResource("17_p5yub"), ExtResource("18_eicds"), ExtResource("19_7hwyi"), ExtResource("20_5hcq5"), ExtResource("21_mleo8"), ExtResource("22_3lga0"), ExtResource("23_su3wr"), ExtResource("24_16be3"), ExtResource("25_fb16c")])
-opportunities = Array[ExtResource("34_0738x")]([ExtResource("35_p4jue"), ExtResource("36_5do7l"), ExtResource("37_eg6f4"), ExtResource("38_p5yub"), ExtResource("39_eicds"), ExtResource("40_7hwyi"), ExtResource("41_5hcq5"), ExtResource("42_mleo8"), ExtResource("43_3lga0"), ExtResource("44_su3wr"), ExtResource("45_16be3")])
 identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8"), ExtResource("68_1w4xj"), ExtResource("69_wrjoy"), ExtResource("70_jdf2v"), ExtResource("71_h1k3v")])
 generator = ExtResource("35_hkuyl")
 advisors = Array[ExtResource("adv_script")]([ExtResource("adv_0"), ExtResource("adv_1"), ExtResource("adv_2"), ExtResource("adv_3"), ExtResource("adv_4"), ExtResource("adv_5"), ExtResource("adv_6"), ExtResource("adv_7"), ExtResource("adv_8"), ExtResource("adv_9")])

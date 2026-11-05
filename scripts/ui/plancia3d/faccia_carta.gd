@@ -269,6 +269,8 @@ func _crea_arte() -> void:
 		colore = StileVisivo.CORNICE_AZIONE.darkened(0.2)
 	elif scheda.genere == SchedaCarta.Genere.VIA:
 		colore = StileVisivo.ORO.darkened(0.15)
+	elif scheda.genere == SchedaCarta.Genere.CONSIGLIERE:
+		colore = scheda.colore_cornice().darkened(0.25)
 	elif scheda.genere in [SchedaCarta.Genere.INCONTRO, SchedaCarta.Genere.FANTASMA]:
 		colore = StileVisivo.CORNICE_MINACCIA.darkened(0.25)
 	var sfumatura: Gradient = Gradient.new()

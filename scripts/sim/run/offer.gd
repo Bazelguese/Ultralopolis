@@ -1,13 +1,19 @@
 class_name Offer
 extends RefCounted
-## Una delle alternative mostrate in un'opportunità (GDD §4.2):
-## un tipo di opportunità (OpportunityDef) più, se serve, l'edificio o la truppa pescati.
+## Una proposta del consigliere scelto nel round (GDD §4.2): un edificio, una truppa,
+## un perk oppure un'azione del Consiglio (OpportunityDef).
 
+var kind: OpportunityDef.Kind = OpportunityDef.Kind.COSTRUISCI_EDIFICIO
+## Azione proposta (null per edifici e truppe).
 var opportunity: OpportunityDef
+## Consigliere che fa la proposta.
+var advisor: AdvisorDef
 ## Edificio offerto (COSTRUISCI_EDIFICIO).
 var building: BuildingDef
 ## Truppa offerta (RECLUTA_TRUPPA).
 var troop: TroopDef
+## Perk offerto (PERK).
+var perk: IdentityDef
 ## Oro da pagare.
 var price: int = 0
 ## Ricerca da pagare.
@@ -16,19 +22,30 @@ var research_price: int = 0
 var other_cost: ResourceAmounts
 
 
-var kind: OpportunityDef.Kind:
-	get:
-		return opportunity.kind
+## true se la proposta è un edificio o una truppa.
+func is_element() -> bool:
+	return kind == OpportunityDef.Kind.COSTRUISCI_EDIFICIO or kind == OpportunityDef.Kind.RECLUTA_TRUPPA
 
 
-## Titolo breve, es. "Costruttori: Fattoria".
+## Titolo breve, es. "Fattoria", "Esattori", "Perk: Mulini".
 func describe() -> String:
-	match opportunity.kind:
+	match kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
-			return "%s: %s" % [opportunity.display_name, building.display_name]
+			return building.display_name
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
-			return "%s: %s" % [opportunity.display_name, troop.display_name]
+			return troop.display_name
+		OpportunityDef.Kind.PERK:
+			return "Perk: %s" % perk.display_name
 	return opportunity.display_name
+
+
+## Descrizione completa della proposta (per le azioni e i perk).
+func description() -> String:
+	if kind == OpportunityDef.Kind.PERK and perk != null:
+		return perk.description
+	if opportunity != null:
+		return opportunity.description
+	return ""
 
 
 ## Costo leggibile, es. "3 Oro", "2 Ricerca", "gratis".

@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_kpuwf"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ta307"]
-
-[sub_resource type="Resource" id="Resource_ta307"]
-script = ExtResource("2_ta307")
-legno = 4
-
-[sub_resource type="Resource" id="Resource_pdtyv"]
-script = ExtResource("2_ta307")
-legno = 6
 
 [resource]
 script = ExtResource("1_kpuwf")
@@ -24,4 +15,3 @@ mana_type = &"verde"
 mana_amount = 1
 mana_interval_ms = 2000
 extra_building_slots = 1
-upgrade_costs = Array[ExtResource("2_ta307")]([SubResource("Resource_ta307"), SubResource("Resource_pdtyv")])

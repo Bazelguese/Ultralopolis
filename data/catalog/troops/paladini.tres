@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_tbrys"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_fjdxk"]
-
-[sub_resource type="Resource" id="Resource_fjdxk"]
-script = ExtResource("2_fjdxk")
-fede = 6
-
-[sub_resource type="Resource" id="Resource_d88a0"]
-script = ExtResource("2_fjdxk")
-fede = 9
 
 [resource]
 script = ExtResource("1_tbrys")
@@ -23,4 +14,3 @@ mana_cost = 4
 cooldown_ms = 2000
 damage = 10
 heal = 6
-upgrade_costs = Array[ExtResource("2_fjdxk")]([SubResource("Resource_fjdxk"), SubResource("Resource_d88a0")])

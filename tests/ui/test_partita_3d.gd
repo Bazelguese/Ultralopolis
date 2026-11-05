@@ -84,29 +84,58 @@ func test_la_partita_parte_dalla_nazione_scelta_e_attraversa_un_anno() -> void:
 	assert_eq(GameSession.last_scene_request, GameSession.MENU_SCENE, "Il pulsante porta al menu.")
 
 
-func test_le_carte_corrispondono_alla_plancia_e_alle_offerte() -> void:
+func test_le_carte_corrispondono_alla_plancia_ai_consiglieri_e_alle_proposte() -> void:
 	var run: RunState = _run()
 	assert_not_null(run, "La scena avvia una run.")
 	assert_eq(_carte("_truppe", 0).size(), run.board.troops.size(), "Una carta per ogni truppa.")
 	assert_eq(_carte("_edifici", 0).size(), run.board.buildings.size(), "Una carta per ogni edificio.")
 	var scelte: Array = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.offers.size(), "Una carta per ogni offerta.")
+	assert_gt(run.advisor_choices.size(), 0, "Ci sono consiglieri nel primo round.")
+	assert_eq(scelte.size(), run.advisor_choices.size(), "Prima del round: una carta per ogni consigliere.")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_not_null(run.chosen_advisor, "Cliccando la carta si ascolta il consigliere.")
+	scelte = _scena.get("_scelte")
+	assert_eq(scelte.size(), run.offers.size(), "Poi una carta per ogni proposta.")
 
 
-func test_passare_l_opportunita_aggiorna_le_carte() -> void:
+func test_passare_il_round_aggiorna_le_carte() -> void:
 	var run: RunState = _run()
-	var numero: int = run.opportunity_number
+	var numero: int = run.round_number
 	var hud: HudPlancia = _scena.get("_hud")
 	hud.passa.emit()
-	assert_ne(run.opportunity_number, numero, "Si passa all'opportunità successiva.")
+	assert_ne(run.round_number, numero, "Si passa al round successivo.")
 	var scelte: Array = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.offers.size())
+	assert_eq(scelte.size(), run.advisor_choices.size())
+
+
+func test_potenzia_dal_pannello_della_carta() -> void:
+	var run: RunState = _run()
+	var scelte: Array = _scena.get("_scelte")
+	# Cerca un round con un consigliere che possa potenziare una carta della plancia.
+	for tentativo: int in range(10):
+		if not run.is_shopping_phase():
+			break
+		scelte = _scena.get("_scelte")
+		_scena.call("_clic_scelta", scelte[0])
+		for i: int in range(run.board.troops.size()):
+			var pezzo: BoardPiece = run.board.troops[i]
+			if run.upgrade_block_reason(pezzo) == "":
+				var costo: ResourceAmounts = run.upgrade_cost_of(pezzo)
+				for tipo: Res.Type in Res.NAMES:
+					run.stock[tipo] += costo.internal(tipo)
+				_scena.call("_potenzia", true, i)
+				assert_eq(pezzo.level, 2, "Potenzia dal pannello della carta.")
+				assert_true(run.upgrade_used)
+				return
+		var hud: HudPlancia = _scena.get("_hud")
+		hud.passa.emit()
+	pass_test("Nessun consigliere adatto nei primi round con questo seme.")
 
 
 func test_uno_scontro_si_rigioca_fino_all_esito() -> void:
 	var run: RunState = _run()
 	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
+		run.pass_round()
 	_scena.call("_aggiorna_tutto")
 	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO)
 	var scelte: Array = _scena.get("_scelte")
@@ -137,7 +166,7 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
 	scelte = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.offers.size(), "Dopo la via tornano le offerte.")
+	assert_eq(scelte.size(), run.advisor_choices.size(), "Dopo la via tornano i consiglieri del round.")
 
 
 ## Cambiare qualcosa sulla plancia non rifà le offerte: restano le stesse carte, senza nuova entrata.
@@ -160,7 +189,7 @@ func test_le_offerte_restano_ferme_se_cambia_solo_la_plancia() -> void:
 func test_dopo_lo_scontro_la_plancia_si_azzera() -> void:
 	var run: RunState = _run()
 	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
+		run.pass_round()
 	_scena.call("_aggiorna_tutto")
 	var scelte: Array = _scena.get("_scelte")
 	_scena.call("_clic_scelta", scelte[0])

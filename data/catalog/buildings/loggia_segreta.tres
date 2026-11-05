@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_qv7io"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_s6x0y"]
-
-[sub_resource type="Resource" id="Resource_qv7io"]
-script = ExtResource("2_s6x0y")
-legno = 4
-
-[sub_resource type="Resource" id="Resource_s6x0y"]
-script = ExtResource("2_s6x0y")
-legno = 6
 
 [resource]
 script = ExtResource("1_qv7io")
@@ -24,4 +15,3 @@ mana_type = &"viola"
 mana_amount = 1
 mana_interval_ms = 3000
 corruption = 2
-upgrade_costs = Array[ExtResource("2_s6x0y")]([SubResource("Resource_qv7io"), SubResource("Resource_s6x0y")])

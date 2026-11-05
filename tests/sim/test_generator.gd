@@ -89,7 +89,7 @@ func test_ricompensa_di_una_risorsa() -> void:
 	var run: RunState = RunState.new(catalog, _rules(), BattleRules.new(), ResistanceRules.new(), 3)
 	run.found_nation("Prova", _choices(run))
 	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
+		run.pass_round()
 	run.choose_encounter(0)
 	var before: int = run.stock[Res.Type.CIBO]
 	run.take_reward(0)
@@ -101,13 +101,13 @@ func test_riepilogo_anno_per_anno() -> void:
 	run.found_nation("Prova", _choices(run))
 	for year: int in range(2):
 		while run.is_shopping_phase():
-			run.pass_opportunity()
+			run.pass_round()
 		if run.phase == RunState.Phase.SCELTA_INCONTRO:
 			run.choose_encounter(0)
 		if run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
 			run.skip_reward()
 		while run.is_shopping_phase():
-			run.pass_opportunity()
+			run.pass_round()
 		run.fight_ghost()
 	assert_eq(run.history.size(), 3, "Anni 1, 2 e l'anno 3 appena iniziato.")
 	assert_ne(run.history[0].encounter_result, "")

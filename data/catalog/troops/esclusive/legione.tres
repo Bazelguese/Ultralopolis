@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_ucfn8"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_nfndl"]
-
-[sub_resource type="Resource" id="Resource_ucfn8"]
-script = ExtResource("2_nfndl")
-ferro = 6
-
-[sub_resource type="Resource" id="Resource_nfndl"]
-script = ExtResource("2_nfndl")
-ferro = 9
 
 [resource]
 script = ExtResource("1_ucfn8")
@@ -22,4 +13,3 @@ mana_cost = 5
 cooldown_ms = 2500
 damage = 14
 shield = 7
-upgrade_costs = Array[ExtResource("2_nfndl")]([SubResource("Resource_ucfn8"), SubResource("Resource_nfndl")])

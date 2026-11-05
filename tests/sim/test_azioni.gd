@@ -1,5 +1,8 @@
 extends GutTest
-## Verifiche dei tipi di opportunità (GDD §4.2). Numeri solo di prova.
+## Verifiche delle azioni del Consiglio (GDD §4.2.3). Numeri solo di prova.
+## Ogni prova usa un solo consigliere che propone solo l'azione da verificare (round Azioni).
+
+const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")
 
 var farm: BuildingDef
 var sword: TroopDef
@@ -67,15 +70,25 @@ func before_each() -> void:
 	resistance_rules.per_troop = 0
 
 
-## Run in cui la prima alternativa è l'unica opportunità della fase indicata.
+## Un solo consigliere che propone queste azioni; tutti i round sono Azioni.
+func _council(actions: Array[OpportunityDef]) -> void:
+	Aiuti.consiglio_semplice(catalog, run_rules, actions)
+	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+
+
+## Run in cui la prima proposta del consigliere è l'unica azione.
 func _run_with(opportunity: OpportunityDef) -> RunState:
-	catalog.opportunities = [opportunity]
+	_council([opportunity])
 	var run: RunState = RunState.new(catalog, run_rules, BattleRules.new(), resistance_rules, 3)
-	if opportunity.phase == OpportunityDef.Phase.PREPARAZIONE:
-		while run.phase == RunState.Phase.PRODUZIONE:
-			run.pass_opportunity()
-		# Nessun incontro nei dati: si arriva subito in Preparazione.
+	Aiuti.ascolta(run)
 	return run
+
+
+## Passa i round finché il consigliere ha qualcosa da proporre, poi lo ascolta.
+func _until_advisor(run: RunState) -> void:
+	while run.is_shopping_phase() and run.advisor_choices.is_empty():
+		run.pass_round()
+	Aiuti.ascolta(run)
 
 
 # --- Pesca delle alternative -------------------------------------------------
@@ -85,13 +98,14 @@ func test_alternative_di_tipi_diversi() -> void:
 	for i: int in range(5):
 		var opportunity: OpportunityDef = _opportunity(StringName("scambio_%d" % i), OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)
 		list.append(opportunity)
-	catalog.opportunities = list
+	_council(list)
 	var run: RunState = RunState.new(catalog, run_rules, BattleRules.new(), resistance_rules, 3)
+	Aiuti.ascolta(run)
 	for attempt: int in range(20):
 		assert_eq(run.offers.size(), 3)
 		var ids: Dictionary[StringName, bool] = {}
 		for offer: Offer in run.offers:
-			assert_false(ids.has(offer.opportunity.id), "Nessun tipo ripetuto nella stessa opportunità.")
+			assert_false(ids.has(offer.opportunity.id), "Nessuna azione ripetuta fra le proposte.")
 			ids[offer.opportunity.id] = true
 		run.gold += run.reroll_cost()
 		run.reroll_offers()
@@ -137,7 +151,7 @@ func test_assemblea_si_sceglie_il_bonus() -> void:
 	assert_true(run.buy_offer(0, 1))
 	assert_eq(run.modifiers.active.size(), 1)
 	assert_eq(run.modifiers.active[0].def.id, &"ricerca")
-	assert_eq(run.modifiers.active[0].origin_name, "assemblea", "L'origine è l'opportunità.")
+	assert_eq(run.modifiers.active[0].origin_name, "assemblea", "L'origine è l'azione.")
 	assert_eq(run.production_preview().y, 3, "2 Ricerca +50%.")
 
 
@@ -145,7 +159,6 @@ func test_addestramento_sulla_truppa_scelta() -> void:
 	var training: OpportunityDef = _opportunity(&"addestramento", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.MODIFICATORE_A_SCELTA)
 	training.modifiers = [_bonus(&"addestramento", ModifierDef.Effect.RICARICA_TRUPPA, -25, ModifierDef.Target.TRUPPA_SCELTA)]
 	var run: RunState = _run_with(training)
-	assert_eq(run.phase, RunState.Phase.PREPARAZIONE)
 	assert_eq(run.offer_choices(run.offers[0]).size(), 2, "Una voce per ogni truppa.")
 	assert_true(run.buy_offer(0, 1))
 	assert_eq(run.effective_troop(run.board.troops[1]).cooldown_ms, 1500, "2000 ms -25%.")
@@ -157,6 +170,7 @@ func test_addestramento_non_compare_senza_truppe() -> void:
 	var training: OpportunityDef = _opportunity(&"addestramento", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.MODIFICATORE_A_SCELTA)
 	training.modifiers = [_bonus(&"addestramento", ModifierDef.Effect.RICARICA_TRUPPA, -25, ModifierDef.Target.TRUPPA_SCELTA)]
 	var run: RunState = _run_with(training)
+	assert_true(run.advisor_choices.is_empty(), "Un consigliere senza proposte non compare.")
 	assert_eq(run.offers.size(), 0)
 
 
@@ -173,7 +187,7 @@ func test_fortificazioni_solo_per_il_prossimo_fantasma() -> void:
 	assert_true(run.buy_offer(0), "Un solo modificatore: nessuna scelta da fare.")
 	assert_eq(run.player_resistance(), before + 10)
 	while run.is_shopping_phase():
-		run.pass_opportunity()
+		run.pass_round()
 	run.fight_ghost()
 	assert_eq(run.last_battle.get_max_resistance(BattleSim.SIDE_A), before + 10, "Vale nello scontro con il fantasma.")
 	assert_eq(run.modifiers.active.size(), 0, "Poi finisce.")
@@ -199,18 +213,17 @@ func _malus(id: StringName, years: int) -> ModifierDef:
 
 func test_ambasciata_non_compare_senza_malus() -> void:
 	var run: RunState = _run_with(_embassy())
+	assert_true(run.advisor_choices.is_empty(), "Senza malus il consigliere non ha nulla da proporre.")
 	assert_eq(run.offers.size(), 0)
 
 
 func test_ambasciata_accorcia_e_fa_sparire() -> void:
-	catalog.opportunities = [_embassy()]
+	_council([_embassy()])
 	var run: RunState = RunState.new(catalog, run_rules, BattleRules.new(), resistance_rules, 3)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	run.modifiers.apply(_malus(&"lungo", 2), ActiveModifier.OriginKind.FANTASMA, "Prova", 0, run.board, rng)
 	run.modifiers.apply(_malus(&"breve", 1), ActiveModifier.OriginKind.FANTASMA, "Prova", 0, run.board, rng)
-	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
-	assert_eq(run.phase, RunState.Phase.PREPARAZIONE)
+	_until_advisor(run)
 	assert_eq(run.offers.size(), 1, "Ora l'Ambasciata compare.")
 	assert_eq(run.offer_choices(run.offers[0]).size(), 2, "Si sceglie quale malus.")
 	assert_true(run.buy_offer(0, 1), "Accorcia il malus breve: durava fino alla fine dell'anno 1.")
@@ -220,10 +233,9 @@ func test_ambasciata_accorcia_e_fa_sparire() -> void:
 
 
 func test_ambasciata_accorcia_senza_far_sparire() -> void:
-	catalog.opportunities = [_embassy()]
+	_council([_embassy()])
 	var run: RunState = RunState.new(catalog, run_rules, BattleRules.new(), resistance_rules, 3)
 	run.modifiers.apply(_malus(&"lungo", 2), ActiveModifier.OriginKind.FANTASMA, "Prova", 0, run.board, RandomNumberGenerator.new())
-	while run.phase == RunState.Phase.PRODUZIONE:
-		run.pass_opportunity()
+	_until_advisor(run)
 	assert_true(run.buy_offer(0), "Un solo malus: nessuna scelta da fare.")
 	assert_eq(run.modifiers.active[0].expires_at_year, 2, "Ora dura fino alla fine dell'anno 1.")

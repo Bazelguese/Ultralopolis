@@ -11,19 +11,54 @@ extends RefCounted
 static func troop(def: TroopDef, piece: BoardPiece, mods: Modifiers, level: int, rules: RunRules,
 		extra_cooldown_percent: int = 0) -> TroopDef:
 	var copy: TroopDef = def.duplicate() as TroopDef
+	var base: TroopDef = _with_enchant(def, piece)
 	var cooldown_change: int = extra_cooldown_percent
 	if mods != null:
 		cooldown_change += mods.percent(ModifierDef.Effect.RICARICA_TRUPPA, piece)
 	copy.cooldown_ms = maxi(1, Modifiers.apply_percent(def.cooldown_ms, cooldown_change))
 	var damage_extra: int = mods.percent(ModifierDef.Effect.DANNO_TRUPPA, piece) if mods != null else 0
-	copy.damage = _value(def.damage, ModifierDef.BattleValue.DANNO, piece, mods, level, rules, damage_extra)
-	copy.shield = _value(def.shield, ModifierDef.BattleValue.SCUDO, piece, mods, level, rules)
-	copy.heal = _value(def.heal, ModifierDef.BattleValue.CURA, piece, mods, level, rules)
-	copy.corruption = _value(def.corruption, ModifierDef.BattleValue.CORRUZIONE, piece, mods, level, rules)
-	copy.siege_damage = _value(def.siege_damage, ModifierDef.BattleValue.ASSEDIO, piece, mods, level, rules)
-	copy.inefficiency_ms = _value(def.inefficiency_ms, ModifierDef.BattleValue.INEFFICIENZA, piece, mods, level, rules)
-	copy.sabotage_ms = _value(def.sabotage_ms, ModifierDef.BattleValue.SABOTAGGIO, piece, mods, level, rules)
+	copy.mana_type = base.mana_type
+	copy.mana_cost = base.mana_cost
+	copy.inefficiency_target = base.inefficiency_target
+	copy.damage = _value(base.damage, ModifierDef.BattleValue.DANNO, piece, mods, level, rules, damage_extra)
+	copy.shield = _value(base.shield, ModifierDef.BattleValue.SCUDO, piece, mods, level, rules)
+	copy.heal = _value(base.heal, ModifierDef.BattleValue.CURA, piece, mods, level, rules)
+	copy.corruption = _value(base.corruption, ModifierDef.BattleValue.CORRUZIONE, piece, mods, level, rules)
+	copy.siege_damage = _value(base.siege_damage, ModifierDef.BattleValue.ASSEDIO, piece, mods, level, rules)
+	copy.inefficiency_ms = _value(base.inefficiency_ms, ModifierDef.BattleValue.INEFFICIENZA, piece, mods, level, rules)
+	copy.sabotage_ms = _value(base.sabotage_ms, ModifierDef.BattleValue.SABOTAGGIO, piece, mods, level, rules)
 	return copy
+
+
+## La truppa con l'incanto del Sacerdote (GDD §4.3): l'effetto si aggiunge al valore di base,
+## quindi cresce con i livelli come gli altri; il mana sale di enchant_mana. Una truppa che non
+## chiedeva mana lo chiede del colore dell'incanto.
+static func _with_enchant(def: TroopDef, piece: BoardPiece) -> TroopDef:
+	if piece == null or piece.enchant == null:
+		return def
+	var result: TroopDef = def.duplicate() as TroopDef
+	var spell: OpportunityDef = piece.enchant
+	if result.mana_cost <= 0:
+		result.mana_type = spell.enchant_color
+	result.mana_cost = maxi(0, result.mana_cost) + spell.enchant_mana
+	match spell.enchant_value:
+		ModifierDef.BattleValue.DANNO:
+			result.damage += piece.enchant_amount
+		ModifierDef.BattleValue.SCUDO:
+			result.shield += piece.enchant_amount
+		ModifierDef.BattleValue.CURA:
+			result.heal += piece.enchant_amount
+		ModifierDef.BattleValue.CORRUZIONE:
+			result.corruption += piece.enchant_amount
+		ModifierDef.BattleValue.INEFFICIENZA:
+			if result.inefficiency_ms <= 0:
+				result.inefficiency_target = TimerTarget.Kind.TRUPPE
+			result.inefficiency_ms += piece.enchant_amount
+		ModifierDef.BattleValue.SABOTAGGIO:
+			result.sabotage_ms += piece.enchant_amount
+		ModifierDef.BattleValue.ASSEDIO:
+			result.siege_damage += piece.enchant_amount
+	return result
 
 
 static func building(def: BuildingDef, piece: BoardPiece, mods: Modifiers, level: int, rules: RunRules) -> BuildingDef:

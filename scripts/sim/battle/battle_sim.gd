@@ -138,6 +138,8 @@ func _init(p_rules: BattleRules, side_a: BattleSideSetup, side_b: BattleSideSetu
 		var setup: BattleSideSetup = side_a if side_index == SIDE_A else side_b
 		if setup.start_building_sabotage_ms > 0:
 			_apply_timer_effect(side_index, EFFECT_SABOTAGE, TimerTarget.Kind.EDIFICI, setup.start_building_sabotage_ms)
+		for effect: Array in setup.start_timer_effects:
+			_apply_timer_effect_to(side_index, effect[0], effect[1], effect[2])
 
 
 ## Fa avanzare lo scontro di un passo. Non fa nulla se lo scontro è finito.
@@ -402,6 +404,29 @@ func _apply_timer_effect(side_index: int, effect: int, category: TimerTarget.Kin
 		else:
 			state.troop_sabotage_ms[troop_index] += duration_ms
 	else:
+		if effect == EFFECT_SLOW:
+			state.building_slow_ms[target] += duration_ms
+		else:
+			state.building_sabotage_ms[target] += duration_ms
+	var kind: BattleEvent.Kind = BattleEvent.Kind.RALLENTATO if effect == EFFECT_SLOW else BattleEvent.Kind.SABOTATO
+	_record(side_index, kind, target, duration_ms, 0)
+
+
+## Applica Inefficienza o Sabotaggio a un elemento preciso (es. lo spionaggio, GDD §12).
+## Un indice che non esiste viene ignorato.
+func _apply_timer_effect_to(side_index: int, effect: int, target: int, duration_ms: int) -> void:
+	var state: SideState = _sides[side_index]
+	if target >= TROOP_INDEX_OFFSET:
+		var troop_index: int = target - TROOP_INDEX_OFFSET
+		if troop_index < 0 or troop_index >= state.troops.size():
+			return
+		if effect == EFFECT_SLOW:
+			state.troop_slow_ms[troop_index] += duration_ms
+		else:
+			state.troop_sabotage_ms[troop_index] += duration_ms
+	else:
+		if target < 0 or target >= state.buildings.size():
+			return
 		if effect == EFFECT_SLOW:
 			state.building_slow_ms[target] += duration_ms
 		else:

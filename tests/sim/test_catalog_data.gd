@@ -27,8 +27,10 @@ func test_regole_confermate_nel_gdd() -> void:
 	assert_eq(rules.starting_troop_slots, 3, "GDD §6.1")
 	assert_eq(rules.max_building_slots, 10, "GDD §6.1")
 	assert_eq(rules.max_troop_slots, 12, "GDD §6.1")
-	assert_eq(rules.opportunities_per_phase, 2, "GDD §4.2")
-	assert_eq(rules.alternatives_per_opportunity, 3, "GDD §4.2")
+	assert_eq(rules.rounds_per_half, 5, "GDD §3.2: 5 round per metà")
+	assert_eq(rules.advisors_per_round, 3, "GDD §4.2: 3 consiglieri per round")
+	assert_eq(rules.proposals_per_advisor, 3, "GDD §4.2: 3 proposte")
+	assert_eq(rules.elder_upgrades_per_year, 1, "GDD §4.2.2: l'Anziano potenzia una volta all'anno")
 	assert_eq(rules.starting_research, 0, "GDD §6.2")
 	assert_eq(rules.starting_buildings.size(), 1, "GDD §6.2: un edificio di base")
 	assert_eq(rules.starting_troops.size(), 1, "GDD §6.2: una truppa di base")
@@ -63,7 +65,6 @@ func test_colori_tipi_e_capitale() -> void:
 	for def: TroopDef in catalog.troops:
 		assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
 		assert_false(def.types.is_empty(), "Tipi di %s" % def.id)
-		assert_eq(def.upgrade_costs.size(), rules.max_level - 1, "Costi di potenziamento di %s" % def.id)
 	assert_eq(rules.starting_buildings.size(), 1)
 	assert_true(rules.starting_buildings[0].is_capital, "Si parte dalla Capitale.")
 	# GDD §6.2 (v0.22): la Capitale produce di base solo Oro, Cibo e Ricerca.
@@ -116,17 +117,39 @@ func test_identita_complete() -> void:
 		assert_false(ghost.identity.is_empty(), "Identità del fantasma %s" % ghost.display_name)
 
 
-func test_ogni_fase_ha_almeno_tre_tipi_di_opportunita() -> void:
+func test_il_consiglio_del_prototipo() -> void:
+	# GDD §4.2.2, §4.2.3 (v0.22): 8 consiglieri ordinari con azioni, più Clown e Anziano.
 	var catalog: CatalogDef = _catalog()
-	var production: int = 0
-	var preparation: int = 0
-	for opportunity: OpportunityDef in catalog.opportunities:
-		if opportunity.phase == OpportunityDef.Phase.PRODUZIONE:
-			production += 1
-		else:
-			preparation += 1
-	assert_gte(production, 3, "Produzione")
-	assert_gte(preparation, 3, "Preparazione")
+	var specials: Array[AdvisorDef.Special] = []
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special != AdvisorDef.Special.NESSUNO:
+			specials.append(advisor.special)
+			continue
+		assert_false(advisor.actions.is_empty(), "Azioni di %s" % advisor.display_name)
+		for action: OpportunityDef in advisor.actions:
+			assert_ne(action.kind, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, "Gli edifici vengono dai tipi (%s)" % action.id)
+			assert_ne(action.kind, OpportunityDef.Kind.RECLUTA_TRUPPA, "Le truppe vengono dai tipi (%s)" % action.id)
+			assert_eq(action.cost_gold if action.kind not in [OpportunityDef.Kind.SPAZIO_EDIFICIO, OpportunityDef.Kind.SPAZIO_TRUPPA] else 0, 0,
+					"Le azioni non costano Oro, salvo gli spazi (GDD §4.2): %s" % action.id)
+		if advisor.random_resource:
+			assert_eq(advisor.upgrade_resource, Res.Type.ORO, "Ombra: Oro più una risorsa casuale")
+	assert_true(specials.has(AdvisorDef.Special.CLOWN), "C'è il Clown")
+	assert_true(specials.has(AdvisorDef.Special.ANZIANO), "C'è l'Anziano")
+
+
+func test_ogni_risorsa_di_categoria_paga_almeno_un_azione() -> void:
+	# GDD §4.2.3, §5.3 (v0.22).
+	var catalog: CatalogDef = _catalog()
+	var paid: Dictionary[Res.Type, bool] = {}
+	for advisor: AdvisorDef in catalog.advisors:
+		for action: OpportunityDef in advisor.actions:
+			if action.cost_resources != null:
+				for type: Res.Type in Res.NAMES:
+					if action.cost_resources.whole(type) > 0:
+						paid[type] = true
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special == AdvisorDef.Special.NESSUNO and not advisor.random_resource:
+			assert_true(paid.has(advisor.upgrade_resource), "%s paga almeno un'azione" % Res.NAMES[advisor.upgrade_resource])
 
 
 func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
@@ -165,15 +188,23 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 		guard += 1
 		match run.phase:
 			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-				# Compra la prima offerta che si può pagare senza sostituzioni, altrimenti passa.
+				# Ascolta il primo consigliere, potenzia se può, compra la prima proposta che si può
+				# pagare senza sostituzioni e senza scelte, altrimenti passa.
+				if run.chosen_advisor == null and not run.advisor_choices.is_empty():
+					run.choose_advisor(0)
+				for piece: BoardPiece in run.board.buildings + run.board.troops:
+					var cost: ResourceAmounts = run.upgrade_cost_of(piece)
+					if run.upgrade_block_reason(piece) == "" and cost != null and run.can_pay(cost):
+						run.upgrade_building(run.board.buildings.find(piece)) if piece.building != null else run.upgrade_troop(run.board.troops.find(piece))
+						break
 				var bought: bool = false
 				for i: int in range(run.offers.size()):
 					var offer: Offer = run.offers[i]
-					if offer.price <= run.gold and not run.offer_needs_replacement(offer):
+					if run.can_afford(offer) and not run.offer_needs_replacement(offer) and run.offer_choices(offer).is_empty():
 						bought = run.buy_offer(i)
 						break
 				if not bought:
-					run.pass_opportunity()
+					run.pass_round()
 			RunState.Phase.SCELTA_INCONTRO:
 				run.choose_encounter(0)
 			RunState.Phase.RICOMPENSA_INCONTRO:

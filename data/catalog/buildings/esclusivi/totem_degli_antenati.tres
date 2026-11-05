@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_keln0"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_bjhca"]
-
-[sub_resource type="Resource" id="Resource_keln0"]
-script = ExtResource("2_bjhca")
-legno = 6
-
-[sub_resource type="Resource" id="Resource_bjhca"]
-script = ExtResource("2_bjhca")
-legno = 9
 
 [resource]
 script = ExtResource("1_keln0")
@@ -24,4 +15,3 @@ mana_amount = 2
 mana_interval_ms = 2000
 shield = 2
 heal = 1
-upgrade_costs = Array[ExtResource("2_bjhca")]([SubResource("Resource_keln0"), SubResource("Resource_bjhca")])

@@ -1,12 +1,17 @@
 [gd_resource type="Resource" script_class="AdvisorDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/scorte.tres" id="act_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/razioni.tres" id="act_1"]
 
 [resource]
 script = ExtResource("1_advdf")
 id = &"fattore"
 display_name = "Fattore"
+color = &"verde"
 category_name = "Terra"
 description = "Cura campi, boschi e animali: propone elementi Fauna, di produzione, guardiani ed economici."
 types = Array[StringName]([&"Fauna", &"Produzione", &"Guardiano", &"Economico"])
 upgrade_resource = 3
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1")])

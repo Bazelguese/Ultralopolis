@@ -17,6 +17,8 @@ enum Special {
 @export var category_name: String = ""
 @export_multiline var description: String = ""
 @export var special: Special = Special.NESSUNO
+## Colore di mana a cui tende la categoria (GDD §5.3): serve solo alla grafica della carta.
+@export var color: StringName = &""
 
 @export_group("Categoria")
 ## Tipi della categoria (GDD §4.2.4). Vuoto per Clown e Anziano.

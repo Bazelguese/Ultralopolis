@@ -2,6 +2,8 @@ extends GutTest
 ## Verifiche dei modificatori (GDD §8, §13.2, §17: "Modificatore pluriennale").
 ## I numeri qui servono solo ai test e non sono valori di gioco.
 
+const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")
+
 var farm: BuildingDef
 var library: BuildingDef
 var sword: TroopDef
@@ -92,7 +94,7 @@ func _new_run() -> RunState:
 func _play_year(run: RunState) -> void:
 	while run.is_shopping_phase() or run.phase == RunState.Phase.SCELTA_INCONTRO or run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
 		if run.is_shopping_phase():
-			run.pass_opportunity()
+			run.pass_round()
 		else:
 			# Nessun incontro nei dati: si passa direttamente alla Preparazione.
 			break
@@ -256,12 +258,15 @@ func test_una_alternativa_in_meno() -> void:
 		opportunity.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
 		opportunity.gain_gold = 1
 		list.append(opportunity)
-	catalog.opportunities = list
+	Aiuti.consiglio_semplice(catalog, run_rules, list)
+	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
 	_set_ghosts([killer], [_modifier(&"meno_offerte", ModifierDef.Effect.ALTERNATIVE_OFFERTE, -1)])
 	var run: RunState = _new_run()
+	Aiuti.ascolta(run)
 	assert_eq(run.offers.size(), 3)
 	_play_year(run)
-	assert_eq(run.offers.size(), 2)
+	Aiuti.ascolta(run)
+	assert_eq(run.offers.size(), 2, "Ogni consigliere mostra una proposta in meno.")
 
 
 # --- Bonus ------------------------------------------------------------------

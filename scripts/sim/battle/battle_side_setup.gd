@@ -15,6 +15,10 @@ var start_shield: int = 0
 var start_corruption: int = 0
 ## Un edificio a caso parte sabotato per questi millisecondi (es. malus Rete compromessa).
 var start_building_sabotage_ms: int = 0
+## Effetti dello spionaggio su elementi precisi, all'inizio dello scontro (GDD §12):
+## ogni voce è [effetto (BattleSim.EFFECT_SLOW o EFFECT_SABOTAGE), indice dell'elemento
+## (edifici da 0, truppe da BattleSim.TROOP_INDEX_OFFSET), millisecondi].
+var start_timer_effects: Array[Array] = []
 
 
 func _init(p_buildings: Array[BuildingDef] = [], p_troops: Array[TroopDef] = [], p_max_resistance: int = 0) -> void:

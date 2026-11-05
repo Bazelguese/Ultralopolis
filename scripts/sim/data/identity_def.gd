@@ -54,8 +54,11 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export_group("Opportunità")
 ## Tipi di opportunità che compaiono solo con questo elemento.
 @export var exclusive_opportunities: Array[OpportunityDef] = []
-## Tipi di opportunità che compaiono più spesso (peso +1 ciascuno).
+## Azioni che compaiono più spesso fra le proposte (peso +1 ciascuno). Rendono più frequente
+## anche il consigliere che le propone (GDD §4.2).
 @export var favored_opportunities: Array[OpportunityDef] = []
+## Consiglieri che compaiono più spesso nei round (peso +1 ciascuno, GDD §4.2).
+@export var favored_advisors: Array[AdvisorDef] = []
 
 @export_group("Elementi esclusivi")
 ## Edifici offerti dai Costruttori solo a questa nazione (nella loro era).

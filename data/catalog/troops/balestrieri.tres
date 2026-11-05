@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_1gmbr"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_amjta"]
-
-[sub_resource type="Resource" id="Resource_amjta"]
-script = ExtResource("2_amjta")
-ferro = 4
-
-[sub_resource type="Resource" id="Resource_fk5xs"]
-script = ExtResource("2_amjta")
-ferro = 6
 
 [resource]
 script = ExtResource("1_1gmbr")
@@ -22,4 +13,3 @@ mana_type = &"verde"
 mana_cost = 2
 cooldown_ms = 1500
 damage = 6
-upgrade_costs = Array[ExtResource("2_amjta")]([SubResource("Resource_amjta"), SubResource("Resource_fk5xs")])

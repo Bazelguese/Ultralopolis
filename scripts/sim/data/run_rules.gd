@@ -44,17 +44,24 @@ extends Resource
 ## Unità in più, per ogni livello oltre il primo, di ogni risorsa che l'edificio produce.
 @export var building_production_per_level: int = 1
 
-@export_group("Opportunità")
-## Opportunità per macrofase (GDD §4.2: 2).
-@export var opportunities_per_phase: int = 2
-## Alternative mostrate in ogni opportunità (GDD §4.2: 3).
-@export var alternatives_per_opportunity: int = 3
-## Costo del primo rinnovo delle offerte.
+@export_group("Consiglio")
+## Round in ogni metà dell'anno (GDD §3.2: 5).
+@export var rounds_per_half: int = 5
+## Consiglieri pescati in ogni round, diversi fra loro (GDD §4.2: 3).
+@export var advisors_per_round: int = 3
+## Proposte mostrate dal consigliere scelto (GDD §4.2: 3; il Clown ne mostra una per colore più un neutro).
+@export var proposals_per_advisor: int = 3
+## Temi dei round di una metà, in un ordine pescato a caso con il seme della run (GDD §4.2, Proposta):
+## 0 = Azioni, 1 = Edifici, 2 = Truppe, 3 = Misto. Se sono meno dei round si ripete l'ultimo.
+@export var half_themes: PackedInt32Array = PackedInt32Array([0, 1, 2, 3, 3])
+## Costo di Potenzia: per salire al livello 2 servono upgrade_cost_per_era[0] × era della carta
+## unità della risorsa del consigliere, per il livello 3 upgrade_cost_per_era[1] × era (placeholder).
+@export var upgrade_cost_per_era: PackedInt32Array = PackedInt32Array([2, 3])
+## Potenzia dell'Anziano (solo edifici neutri) per anno (GDD §4.2.2: 1).
+@export var elder_upgrades_per_year: int = 1
+## Costo del primo rinnovo delle proposte.
 @export var reroll_base_cost: int = 1
 ## Il rinnovo non costa mai meno di così, nemmeno con i bonus che lo riducono.
 @export var reroll_min_cost: int = 1
-## Opportunità della fase che mostra solo elementi: in Produzione 3 edifici,
-## in Preparazione 3 truppe (1 = la prima; 0 = nessuna).
-@export var dedicated_opportunity: int = 1
 ## Aumento del costo a ogni rinnovo.
 @export var reroll_cost_increase: int = 1

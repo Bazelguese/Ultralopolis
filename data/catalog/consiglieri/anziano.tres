@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="AdvisorDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/perk_anziano.tres" id="act_0"]
 
 [resource]
 script = ExtResource("1_advdf")
@@ -9,3 +11,4 @@ display_name = "Anziano"
 category_name = ""
 description = "Propone perk ed edifici neutri; una volta all'anno potenzia un edificio neutro."
 special = 2
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0")])

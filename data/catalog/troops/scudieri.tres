@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_4brb2"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_xvukr"]
-
-[sub_resource type="Resource" id="Resource_4brb2"]
-script = ExtResource("2_xvukr")
-ferro = 2
-
-[sub_resource type="Resource" id="Resource_xvukr"]
-script = ExtResource("2_xvukr")
-ferro = 3
 
 [resource]
 script = ExtResource("1_4brb2")
@@ -20,4 +11,3 @@ types = Array[StringName]([&"Fante", &"Guardiano"])
 mana_cost = 2
 cooldown_ms = 2500
 shield = 5
-upgrade_costs = Array[ExtResource("2_xvukr")]([SubResource("Resource_4brb2"), SubResource("Resource_xvukr")])

@@ -31,6 +31,21 @@ func whole(type: Res.Type) -> int:
 	return 0
 
 
+## Aggiunge unità intere di una risorsa (es. per comporre un costo calcolato dalle regole).
+func add(type: Res.Type, amount: int) -> void:
+	match type:
+		Res.Type.ORO: oro += amount
+		Res.Type.RICERCA: ricerca += amount
+		Res.Type.CIBO: cibo += amount
+		Res.Type.LEGNO: legno += amount
+		Res.Type.PIETRA: pietra += amount
+		Res.Type.FERRO: ferro += amount
+		Res.Type.FEDE: fede += amount
+		Res.Type.INFLUENZA: influenza += amount
+		Res.Type.STABILITA: stabilita += amount
+		Res.Type.DOCUMENTI: documenti += amount
+
+
 ## Quantità di una risorsa in unità interne (il Cibo in decimi).
 func internal(type: Res.Type) -> int:
 	return whole(type) * Res.scale(type)

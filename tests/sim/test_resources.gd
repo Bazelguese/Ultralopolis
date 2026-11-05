@@ -2,11 +2,16 @@ extends GutTest
 ## Risorse, mercato, Cibo, Capitale, mana a colori, potenziamenti e tipi (GDD v0.12, v0.22).
 ## Numeri solo di prova.
 
+const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")
+
 var capital: BuildingDef
 var farm: BuildingDef
 var slow: TroopDef
 var fast: TroopDef
 var catalog: CatalogDef
+## Consigliere che potenzia le truppe Fauna con il Ferro; quello della terra potenzia la Produzione con il Legno.
+var soldier: AdvisorDef
+var farmer: AdvisorDef
 var run_rules: RunRules
 var resistance_rules: ResistanceRules
 
@@ -25,9 +30,6 @@ func before_each() -> void:
 	farm.types = [&"Produzione"]
 	farm.food_per_phase = 2
 	farm.cost_gold = 3
-	var cost: ResourceAmounts = ResourceAmounts.new()
-	cost.legno = 2
-	farm.upgrade_costs = [cost]
 	slow = TroopDef.new()
 	slow.id = &"lenta"
 	slow.display_name = "Lenta"
@@ -40,11 +42,6 @@ func before_each() -> void:
 	fast.cooldown_ms = 1000
 	fast.damage = 4
 	fast.types = [&"Fauna"]
-	var iron: ResourceAmounts = ResourceAmounts.new()
-	iron.ferro = 2
-	var more_iron: ResourceAmounts = ResourceAmounts.new()
-	more_iron.ferro = 4
-	fast.upgrade_costs = [iron, more_iron]
 
 	catalog = CatalogDef.new()
 	catalog.buildings = [farm]
@@ -52,8 +49,11 @@ func before_each() -> void:
 	catalog.eras = [EraDef.new()]
 	var opportunity: OpportunityDef = OpportunityDef.new()
 	opportunity.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
-	catalog.opportunities = [opportunity]
 	run_rules = RunRules.new()
+	Aiuti.consiglio_semplice(catalog, run_rules, [opportunity])
+	soldier = Aiuti.consigliere(&"soldato", [&"Fauna"], [opportunity], Res.Type.FERRO)
+	farmer = Aiuti.consigliere(&"contadino", [&"Produzione"], [opportunity], Res.Type.LEGNO)
+	catalog.advisors = [soldier]
 	run_rules.starting_gold = 0
 	run_rules.prototype_years = 0
 	run_rules.starting_buildings = [capital]
@@ -71,7 +71,7 @@ func _new_run() -> RunState:
 
 func _finish_year(run: RunState) -> void:
 	while run.phase != RunState.Phase.SCONTRO_FANTASMA:
-		run.pass_opportunity()
+		run.pass_round()
 	run.fight_ghost()
 
 
@@ -107,7 +107,7 @@ func test_mercato_a_tasso_fisso() -> void:
 	assert_eq(run.gold, 1 + 2, "1 Oro della Capitale + 2 dalla vendita.")
 	assert_false(run.sell_resource(Res.Type.FERRO, 2), "Ferro insufficiente.")
 	assert_false(run.sell_resource(Res.Type.ORO, 2), "L'Oro non si vende.")
-	assert_eq(run.opportunity_number, 1, "Il mercato non consuma l'opportunità.")
+	assert_eq(run.round_number, 1, "Il mercato non consuma il round.")
 
 
 func test_mercato_del_cibo_in_unita_intere() -> void:
@@ -221,37 +221,53 @@ func test_l_energetico_vale_come_qualsiasi_colore_e_si_usa_per_ultimo() -> void:
 	assert_eq(sim.get_mana(BattleSim.SIDE_A, BattleSim.MANA_ENERGETICO), 1, "Poi l'energetico, solo quanto serve.")
 
 
-# --- Potenziamenti (GDD §6.5) ------------------------------------------------------
+# --- Potenziamenti: l'opzione Potenzia del Consiglio (GDD §6.5, v0.22) --------------
 
 func test_potenziare_una_truppa() -> void:
 	var run: RunState = _new_run()
 	var piece: BoardPiece = run.board.troops[0]
+	assert_false(run.upgrade_troop(0), "Senza consigliere non si potenzia.")
+	Aiuti.ascolta(run)
 	assert_false(run.upgrade_troop(0), "Serve Ferro.")
-	run.stock[Res.Type.FERRO] = 6
+	run.stock[Res.Type.FERRO] = 2
+	assert_eq(run.upgrade_cost_of(piece).ferro, 2, "Livello 2: 2 × era 1 Ferro.")
 	assert_true(run.upgrade_troop(0))
 	assert_eq(piece.level, 2)
 	assert_eq(run.effective_troop(piece).damage, 6, "4 danni +50%.")
+	run.stock[Res.Type.FERRO] = 3
+	assert_false(run.upgrade_troop(0), "Una sola volta per round.")
+	assert_eq(run.round_number, 1, "Potenzia non consuma la scelta del round.")
+	run.pass_round()
+	Aiuti.ascolta(run)
+	assert_eq(run.upgrade_cost_of(piece).ferro, 3, "Livello 3: 3 × era 1 Ferro.")
 	assert_true(run.upgrade_troop(0))
 	assert_eq(piece.level, 3)
 	assert_eq(run.effective_troop(piece).damage, 8)
 	assert_eq(run.stock[Res.Type.FERRO], 0)
+	run.pass_round()
+	run.stock[Res.Type.FERRO] = 10
+	Aiuti.ascolta(run)
 	assert_false(run.upgrade_troop(0), "Livello massimo.")
 
 
 func test_potenziare_un_edificio() -> void:
+	catalog.advisors = [farmer]
 	var run: RunState = _new_run()
 	run.board.buildings.append(BoardPiece.of_building(farm, 3))
+	Aiuti.ascolta(run)
 	run.stock[Res.Type.LEGNO] = 2
 	assert_true(run.upgrade_building(1))
 	var produced: Array[int] = run.building_production(run.board.buildings[1])
 	assert_eq(produced[Res.Type.CIBO], 30, "2 Cibo +1 per il livello 2, in decimi.")
-	assert_null(run.upgrade_cost_of(run.board.buildings[1]), "Non ci sono altri livelli nei dati.")
 
 
-func test_elementi_senza_costi_non_si_potenziano() -> void:
+func test_si_potenzia_solo_con_un_tipo_del_consigliere() -> void:
 	var run: RunState = _new_run()
-	assert_null(run.upgrade_cost_of(run.board.troops[1]))
+	Aiuti.ascolta(run)
+	run.stock[Res.Type.FERRO] = 10
+	assert_ne(run.upgrade_block_reason(run.board.troops[1]), "", "La truppa Fante non ha tipi del consigliere.")
 	assert_false(run.upgrade_troop(1))
+	assert_eq(run.upgrade_block_reason(run.board.troops[0]), "", "La truppa Fauna sì.")
 
 
 # --- Tipi (GDD §6.6) ------------------------------------------------------------

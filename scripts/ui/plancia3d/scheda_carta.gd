@@ -4,7 +4,7 @@ extends RefCounted
 ## Si costruisce dai dati veri del gioco (catalogo, plancia, offerte, incontri).
 ## Solo presentazione: legge i dati, non contiene regole di gioco.
 
-enum Genere { EDIFICIO, TRUPPA, AZIONE, INCONTRO, FANTASMA, VIA }
+enum Genere { EDIFICIO, TRUPPA, AZIONE, INCONTRO, FANTASMA, VIA, CONSIGLIERE }
 
 ## Le illustrazioni si cercano qui, con il nome dell'identificativo:
 ## edifici/<id>.png, truppe/<id>.png, azioni/<id>.png. Se mancano si usa il segnaposto.
@@ -40,6 +40,8 @@ var dettagli: String = ""
 var illustrazione: Texture2D
 ## false se l'offerta non si può pagare: la carta appare spenta.
 var disponibile: bool = true
+## Colore della categoria di un consigliere (solo grafica).
+var colore_consigliere: StringName = &""
 
 
 func colore_cornice() -> Color:
@@ -50,6 +52,8 @@ func colore_cornice() -> Color:
 			return StileVisivo.ORO_LUCE
 		Genere.INCONTRO, Genere.FANTASMA:
 			return StileVisivo.CORNICE_MINACCIA
+		Genere.CONSIGLIERE:
+			return StileVisivo.colore_mana_nome(colore_consigliere) if colore_consigliere != &"" else StileVisivo.ORO_LUCE
 	return StileVisivo.colore_cornice(era)
 
 
@@ -143,7 +147,10 @@ static func da_pezzo(run: RunState, pezzo: BoardPiece) -> SchedaCarta:
 	var malus_testo: String = ", ".join(nomi_malus)
 	if pezzo.building != null:
 		return da_edificio(run.effective_building(pezzo), pezzo.level, malus_testo)
-	return da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
+	var scheda: SchedaCarta = da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
+	if pezzo.enchant != null:
+		scheda.dettagli += "\n%s (già compreso nei valori)." % pezzo.enchant.display_name
+	return scheda
 
 
 static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
@@ -151,8 +158,19 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	match offerta.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
 			scheda = da_edificio(offerta.building)
+			scheda.sopratitolo = "Edificio"
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
 			scheda = da_truppa(offerta.troop)
+			scheda.sopratitolo = "Truppa"
+		OpportunityDef.Kind.PERK:
+			scheda = SchedaCarta.new()
+			scheda.genere = Genere.AZIONE
+			scheda.id = offerta.perk.id
+			scheda.titolo = offerta.perk.display_name
+			scheda.riga = "Perk"
+			scheda.dettagli = "%s\n%s" % [offerta.perk.description, offerta.opportunity.description]
+			scheda.illustrazione = _carica("perk/%s.png" % offerta.perk.id)
+			scheda.sopratitolo = "Perk"
 		_:
 			scheda = SchedaCarta.new()
 			scheda.genere = Genere.AZIONE
@@ -161,13 +179,40 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda.riga = _riassunto_azione(offerta.opportunity)
 			scheda.dettagli = offerta.opportunity.description
 			scheda.illustrazione = _carica("azioni/%s.png" % offerta.opportunity.id)
-	scheda.sopratitolo = offerta.opportunity.display_name
+			scheda.sopratitolo = "Azione"
 	scheda.costo = offerta.cost_text()
 	scheda.disponibile = run.can_afford(offerta)
 	if run.offer_needs_replacement(offerta):
 		scheda.dettagli += "\nPlancia piena: sceglierai quale elemento sostituire (ti torna metà del prezzo)."
 	elif not run.offer_choices(offerta).is_empty():
 		scheda.dettagli += "\nDopo averla presa scegli una voce."
+	return scheda
+
+
+## Un consigliere del round (GDD §4.2): categoria, tipi, risorsa di Potenzia e che cosa propone.
+static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.CONSIGLIERE
+	scheda.id = consigliere.id
+	scheda.titolo = consigliere.display_name
+	scheda.colore_consigliere = consigliere.color
+	scheda.sopratitolo = consigliere.category_name if consigliere.category_name != "" else "Consigliere speciale"
+	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
+	var righe: PackedStringArray = PackedStringArray()
+	righe.append(consigliere.description)
+	match consigliere.special:
+		AdvisorDef.Special.CLOWN:
+			scheda.riga = "5 colori"
+			righe.append("Ignora il tema del round. Non offre Potenzia; si rinnova solo in Oro.")
+		AdvisorDef.Special.ANZIANO:
+			scheda.riga = "Perk · neutri"
+			righe.append("Ignora il tema del round. Potenzia: solo edifici neutri, una volta all'anno, in Oro.")
+		_:
+			scheda.riga = "Potenzia: %s" % run.advisor_resource_text(consigliere)
+			righe.append("Tipi: %s." % ", ".join(consigliere.types))
+			righe.append("Potenzia e rinnovo con: %s." % run.advisor_resource_text(consigliere))
+	scheda.costo = "Ascolta"
+	scheda.dettagli = "\n".join(righe)
 	return scheda
 
 
@@ -301,6 +346,10 @@ static func _riassunto_azione(opportunita: OpportunityDef) -> String:
 			return " o ".join(nomi)
 		OpportunityDef.Kind.ACCORCIA_MALUS:
 			return "−%d anno a un malus" % opportunita.shorten_years
+		OpportunityDef.Kind.SPIONAGGIO:
+			return "Sabota il fantasma" if opportunita.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else "Rallenta il fantasma"
+		OpportunityDef.Kind.INCANTO:
+			return "Incanta una truppa"
 	return ""
 
 

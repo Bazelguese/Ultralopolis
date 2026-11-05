@@ -1,12 +1,17 @@
 [gd_resource type="Resource" script_class="AdvisorDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/ambasciata.tres" id="act_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/tributi_feudali.tres" id="act_1"]
 
 [resource]
 script = ExtResource("1_advdf")
 id = &"cancelliere"
 display_name = "Cancelliere"
+color = &"blu"
 category_name = "Stato"
 description = "Regge lo Stato: propone legge, patrioti, nobili e sapere di Stato."
 types = Array[StringName]([&"Legge", &"Patriota", &"Accademico", &"Nobile"])
 upgrade_resource = 8
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1")])

@@ -8,8 +8,6 @@ extends Resource
 @export var eras: Array[EraDef] = []
 @export var ghosts: Array[GhostDef] = []
 @export var encounters: Array[EncounterDef] = []
-## Tipi di opportunità che possono comparire fra le alternative (GDD §4.2).
-@export var opportunities: Array[OpportunityDef] = []
 ## Consiglieri del Consiglio, con le loro categorie (GDD §4.2, §4.2.4).
 @export var advisors: Array[AdvisorDef] = []
 ## Popoli, governi, credi, culture e perk fra cui scegliere (GDD §9).

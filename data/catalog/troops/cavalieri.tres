@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_18pbt"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_axl6g"]
-
-[sub_resource type="Resource" id="Resource_axl6g"]
-script = ExtResource("2_axl6g")
-legno = 4
-
-[sub_resource type="Resource" id="Resource_j7rf3"]
-script = ExtResource("2_axl6g")
-legno = 6
 
 [resource]
 script = ExtResource("1_18pbt")
@@ -23,4 +14,3 @@ mana_type = &"verde"
 mana_cost = 3
 cooldown_ms = 2000
 damage = 10
-upgrade_costs = Array[ExtResource("2_axl6g")]([SubResource("Resource_axl6g"), SubResource("Resource_j7rf3")])

@@ -1,6 +1,10 @@
 extends GutTest
 ## Verifiche del ciclo della run (GDD §3, §4, §5, §6, §10, §17).
 ## I numeri qui servono solo ai test e non sono valori di gioco.
+## Il Consiglio è ridotto a un solo consigliere che propone tutto (vedi aiuti_consiglio.gd);
+## il Consiglio vero si verifica in test_consiglio.gd.
+
+const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")
 
 
 # --- Costruzione di un catalogo di prova ------------------------------------
@@ -44,6 +48,7 @@ var era2_troop: TroopDef
 var killer: TroopDef
 
 var catalog: CatalogDef
+var advisor: AdvisorDef
 var architects: OpportunityDef
 var quartermaster: OpportunityDef
 var run_rules: RunRules
@@ -83,16 +88,8 @@ func before_each() -> void:
 	collectors.gain_gold = 3
 	var tribute: OpportunityDef = _opportunity(&"tributo", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE, 0)
 	tribute.gain_gold = 2
-	catalog.opportunities = [
-		_opportunity(&"costruttori", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, 0),
-		architects,
-		collectors,
-		_opportunity(&"reclutatori", OpportunityDef.Phase.PREPARAZIONE, OpportunityDef.Kind.RECLUTA_TRUPPA, 0),
-		quartermaster,
-		tribute,
-	]
-
 	run_rules = RunRules.new()
+	advisor = Aiuti.consiglio_semplice(catalog, run_rules, [architects, collectors, quartermaster, tribute])
 	run_rules.starting_gold = 5
 	run_rules.starting_prestige = 20
 	run_rules.wins_needed = 10
@@ -176,7 +173,7 @@ func _new_run(run_seed: int = 42) -> RunState:
 
 func _pass_all(run: RunState) -> void:
 	while run.is_shopping_phase():
-		run.pass_opportunity()
+		run.pass_round()
 
 
 ## Porta la run dalla Produzione alla Preparazione vincendo l'incontro facile.
@@ -218,6 +215,7 @@ func _offer_index(run: RunState, kind: OpportunityDef.Kind, def_id: StringName =
 
 ## Rinnova finché compare l'offerta cercata (con Oro abbondante).
 func _find_offer(run: RunState, kind: OpportunityDef.Kind, def_id: StringName = &"") -> int:
+	Aiuti.ascolta(run)
 	for attempt: int in range(200):
 		var index: int = _offer_index(run, kind, def_id)
 		if index >= 0:
@@ -234,9 +232,9 @@ func test_ingresso_in_fase_una_sola_raccolta() -> void:
 	var run: RunState = _new_run()
 	assert_eq(run.phase, RunState.Phase.PRODUZIONE)
 	assert_eq(run.gold, 7, "5 Oro iniziali + 2 della fattoria all'ingresso in Produzione.")
-	run.pass_opportunity()
-	run.pass_opportunity()
-	assert_eq(run.gold, 7, "Le opportunità non producono di nuovo.")
+	run.pass_round()
+	run.pass_round()
+	assert_eq(run.gold, 7, "I round non producono di nuovo.")
 
 
 func test_costruzione_in_produzione_produce_da_preparazione() -> void:
@@ -260,30 +258,44 @@ func test_risorse_conservate_fra_fasi_e_anni() -> void:
 	assert_eq(run.research, 2, "La Ricerca non spesa resta nel Magazzino.")
 
 
-# --- Opportunità e offerte (GDD §4.2) ---------------------------------------
+# --- Round e proposte (GDD §4.2) ---------------------------------------------
 
-func test_due_opportunita_con_tre_alternative() -> void:
-	run_rules.opportunities_per_phase = 2
+func test_round_con_tre_proposte() -> void:
 	var run: RunState = _new_run()
 	for n: int in range(1, 3):
-		assert_eq(run.opportunity_number, n)
-		assert_eq(run.offers.size(), 3, "Tre alternative per opportunità.")
-		run.pass_opportunity()
-	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO, "Dopo 2 opportunità arriva l'incontro.")
+		assert_eq(run.round_number, n)
+		assert_true(run.offers.is_empty(), "Prima si sceglie il consigliere.")
+		assert_true(run.choose_advisor(0))
+		assert_eq(run.offers.size(), 3, "Tre proposte del consigliere.")
+		run.pass_round()
+	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO, "Dopo i round della metà arriva l'incontro.")
 
 
-func test_offerte_della_fase_e_dell_era() -> void:
+func test_proposte_dell_era_in_entrambe_le_meta() -> void:
 	var run: RunState = _new_run()
+	Aiuti.ascolta(run)
+	var elements: int = 0
 	for attempt: int in range(30):
 		for offer: Offer in run.offers:
-			assert_eq(offer.opportunity.phase, OpportunityDef.Phase.PRODUZIONE, "Solo opportunità della Produzione.")
 			if offer.building != null:
+				elements += 1
 				assert_eq(offer.building.era, 1, "Solo offerte dell'era corrente.")
+			if offer.troop != null:
+				elements += 1
+				assert_eq(offer.troop.era, 1, "Solo offerte dell'era corrente.")
 		run.gold += run.reroll_cost()
 		run.reroll_offers()
+	assert_gt(elements, 0)
 	_to_preparation(run)
-	for offer: Offer in run.offers:
-		assert_eq(offer.opportunity.phase, OpportunityDef.Phase.PREPARAZIONE, "Solo opportunità della Preparazione.")
+	Aiuti.ascolta(run)
+	var buildings_in_preparation: bool = false
+	for attempt: int in range(30):
+		for offer: Offer in run.offers:
+			if offer.building != null:
+				buildings_in_preparation = true
+		run.gold += run.reroll_cost()
+		run.reroll_offers()
+	assert_true(buildings_in_preparation, "Edifici e truppe si ottengono in entrambe le metà (GDD §3.2).")
 
 
 func test_prendere_un_offerta_chiude_l_opportunita() -> void:
@@ -293,7 +305,7 @@ func test_prendere_un_offerta_chiude_l_opportunita() -> void:
 	assert_true(run.buy_offer(index))
 	assert_eq(run.gold, 17)
 	assert_eq(run.board.buildings.size(), 2)
-	assert_eq(run.opportunity_number, 2)
+	assert_eq(run.round_number, 2, "Prendere una proposta chiude il round.")
 
 
 func test_oro_insufficiente() -> void:
@@ -308,6 +320,7 @@ func test_oro_insufficiente() -> void:
 func test_rinnovo_costo_crescente_e_dimezzamento() -> void:
 	var run: RunState = _new_run()
 	run.gold = 100
+	Aiuti.ascolta(run)
 	var paid: Array[int] = []
 	for i: int in range(4):
 		paid.append(run.reroll_cost())
@@ -315,11 +328,11 @@ func test_rinnovo_costo_crescente_e_dimezzamento() -> void:
 	assert_eq(paid, [1, 2, 3, 4] as Array[int], "Il costo cresce a ogni rinnovo.")
 	assert_eq(run.reroll_cost(), 5)
 	assert_eq(run.gold, 90)
-	run.pass_opportunity()
-	assert_eq(run.reroll_cost(), 3, "Nuova opportunità: l'aumento +4 diventa +2.")
+	run.pass_round()
+	assert_eq(run.reroll_cost(), 3, "Nuovo round: l'aumento +4 diventa +2.")
 	_to_preparation(run)
 	assert_eq(run.reroll_cost(), 2, "Il costo continua fra le fasi: +2 diventa +1.")
-	run.pass_opportunity()
+	run.pass_round()
 	assert_eq(run.reroll_cost(), 1, "+1 diventa +0: costo iniziale.")
 	_play_year_rest(run)
 	assert_eq(run.reroll_cost(), 1, "Mai sotto il costo iniziale.")
@@ -331,6 +344,7 @@ func test_stesso_seme_stesse_offerte() -> void:
 	for target: Array[String] in [first, second]:
 		var run: RunState = _new_run(1234)
 		run.gold = 100
+		Aiuti.ascolta(run)
 		for i: int in range(5):
 			for offer: Offer in run.offers:
 				target.append(offer.describe())
@@ -402,7 +416,6 @@ func test_caserma_concede_uno_spazio_truppa() -> void:
 
 func test_acquisto_di_uno_spazio() -> void:
 	var run: RunState = _new_run()
-	run.pass_opportunity()  # La prima opportunità offre solo edifici.
 	var index: int = _find_offer(run, OpportunityDef.Kind.SPAZIO_EDIFICIO)
 	run.gold = architects.cost_gold
 	assert_true(run.buy_offer(index))
@@ -411,7 +424,7 @@ func test_acquisto_di_uno_spazio() -> void:
 
 func test_spazi_mai_oltre_il_massimo() -> void:
 	var run: RunState = _new_run()
-	run.pass_opportunity()  # La prima opportunità offre solo edifici.
+	Aiuti.ascolta(run)
 	run.board.base_building_slots = 10
 	for attempt: int in range(30):
 		run.gold += run.reroll_cost()
@@ -439,7 +452,7 @@ func test_passaggio_di_era() -> void:
 	assert_true(run.advance_era())
 	assert_eq(run.era, 2)
 	assert_eq(run.research, 2, "Ricerca pagata una volta, resto conservato.")
-	assert_eq(run.opportunity_number, 1, "Non consuma l'opportunità.")
+	assert_eq(run.round_number, 1, "Non consuma il round.")
 	assert_eq(run.board.building_capacity(), 5, "L'era concede uno spazio edificio.")
 	assert_eq(run.board.troop_capacity(), 4, "L'era concede uno spazio truppa.")
 	for offer: Offer in run.offers:
@@ -583,34 +596,57 @@ func test_replay_della_battaglia_identico() -> void:
 	assert_eq(replay.elapsed_ms, run.last_battle.elapsed_ms)
 
 
-# --- Opportunità dedicata, costi in altre risorse, rinnovo minimo ----------------
+# --- Temi del round, costi in altre risorse, rinnovo minimo -----------------------
 
-func test_prima_opportunita_solo_edifici_poi_tipi_diversi() -> void:
+func test_il_tema_del_round_decide_le_proposte() -> void:
+	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.EDIFICI, RunState.RoundTheme.TRUPPE])
 	var run: RunState = _new_run()
-	assert_true(run.is_dedicated_opportunity())
+	for n: int in range(2):
+		var theme: RunState.RoundTheme = run.round_theme
+		assert_true(theme == RunState.RoundTheme.EDIFICI or theme == RunState.RoundTheme.TRUPPE)
+		Aiuti.ascolta(run)
+		for attempt: int in range(15):
+			var ids: Array[StringName] = []
+			for offer: Offer in run.offers:
+				if theme == RunState.RoundTheme.EDIFICI:
+					assert_eq(offer.kind, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, "Round Edifici: solo edifici.")
+					assert_false(ids.has(offer.building.id), "Edifici diversi fra loro.")
+					ids.append(offer.building.id)
+				else:
+					assert_eq(offer.kind, OpportunityDef.Kind.RECLUTA_TRUPPA, "Round Truppe: solo truppe.")
+			run.gold += run.reroll_cost()
+			run.reroll_offers()
+		run.pass_round()
+
+
+func test_i_temi_della_meta_si_pescano_con_il_seme() -> void:
+	run_rules.rounds_per_half = 5
+	run_rules.half_themes = PackedInt32Array([0, 1, 2, 3, 3])
+	var orders: Array[Array] = []
+	for attempt: int in range(2):
+		var run: RunState = _new_run(77)
+		var themes: Array[int] = []
+		while run.phase == RunState.Phase.PRODUZIONE:
+			themes.append(run.round_theme)
+			run.pass_round()
+		orders.append(themes)
+		var sorted: Array[int] = themes.duplicate()
+		sorted.sort()
+		assert_eq(sorted, [0, 1, 2, 3, 3] as Array[int], "Un round Azioni, uno Edifici, uno Truppe e due Misti.")
+	assert_eq(orders[0], orders[1], "Stesso seme, stesso ordine dei temi.")
+
+
+func test_in_un_round_misto_almeno_un_azione() -> void:
+	var run: RunState = _new_run()
+	Aiuti.ascolta(run)
 	for attempt: int in range(20):
-		var ids: Array[StringName] = []
+		var actions: int = 0
 		for offer: Offer in run.offers:
-			assert_eq(offer.kind, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, "Solo edifici.")
-			assert_false(ids.has(offer.building.id), "Edifici diversi fra loro.")
-			ids.append(offer.building.id)
-		assert_eq(run.offers.size(), 3)
+			if not offer.is_element():
+				actions += 1
+		assert_gt(actions, 0, "Misto: azioni ed elementi.")
 		run.gold += run.reroll_cost()
 		run.reroll_offers()
-	run.pass_opportunity()
-	assert_false(run.is_dedicated_opportunity(), "La seconda opportunità ha tipi diversi.")
-	var kinds: Array[OpportunityDef.Kind] = []
-	for offer: Offer in run.offers:
-		assert_false(kinds.has(offer.kind))
-		kinds.append(offer.kind)
-
-
-func test_in_preparazione_la_prima_opportunita_offre_solo_truppe() -> void:
-	var run: RunState = _new_run()
-	_to_preparation(run)
-	assert_true(run.is_dedicated_opportunity())
-	for offer: Offer in run.offers:
-		assert_eq(offer.kind, OpportunityDef.Kind.RECLUTA_TRUPPA)
 
 
 func test_il_rinnovo_costa_almeno_1_oro() -> void:
@@ -633,8 +669,10 @@ func test_azione_pagata_con_altre_risorse() -> void:
 	var iron: ResourceAmounts = ResourceAmounts.new()
 	iron.ferro = 2
 	training.cost_resources = iron
-	catalog.opportunities = [training]
+	advisor.actions = [training]
 	var run: RunState = _new_run()
+	Aiuti.ascolta(run)
+	assert_eq(run.offers[0].opportunity, training, "In un round Misto la prima proposta è un'azione.")
 	assert_false(run.can_afford(run.offers[0]), "Serve Ferro, non Oro.")
 	run.stock[Res.Type.FERRO] = 2
 	var gold_before: int = run.gold

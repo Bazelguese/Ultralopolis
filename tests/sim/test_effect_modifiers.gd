@@ -120,7 +120,7 @@ func test_corruzione_e_sabotaggio_a_inizio_scontro() -> void:
 	net.amount = 3000
 	run.modifiers.apply(net, ActiveModifier.OriginKind.FANTASMA, "Prova", 0, run.board, RandomNumberGenerator.new())
 	while run.phase != RunState.Phase.SCONTRO_FANTASMA:
-		run.pass_opportunity()
+		run.pass_round()
 	run.fight_ghost()
 	var setup: BattleSideSetup = run.last_battle_setups()[0]
 	assert_eq(setup.start_corruption, 5)

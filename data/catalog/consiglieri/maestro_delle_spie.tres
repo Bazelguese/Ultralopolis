@@ -1,12 +1,19 @@
 [gd_resource type="Resource" script_class="AdvisorDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/spia_sabotaggio_veloce.tres" id="act_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/spia_sabotaggio_estremita.tres" id="act_1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/spia_inefficienza_edificio.tres" id="act_2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/spia_inefficienza_caso.tres" id="act_3"]
 
 [resource]
 script = ExtResource("1_advdf")
 id = &"maestro_delle_spie"
 display_name = "Maestro delle spie"
+color = &"viola"
 category_name = "Ombra"
 description = "I servizi segreti, quelli che fanno il lavoro sporco. Chiede Oro e una risorsa che cambia a ogni round."
 types = Array[StringName]([&"Criminale", &"Infrastruttura Strategica", &"Infrastruttura Bellica", &"Infrastruttura Segreta"])
 random_resource = true
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("act_2"), ExtResource("act_3")])

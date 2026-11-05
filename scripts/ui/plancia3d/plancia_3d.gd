@@ -7,7 +7,7 @@ extends Node3D
 
 enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
-enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA }
+enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE }
 
 const PASSO_TRUPPE: float = 1.75
 const PASSO_EDIFICI: float = 2.1
@@ -121,8 +121,9 @@ func _ready() -> void:
 
 func _collega_hud() -> void:
 	_hud.azione_principale.connect(_on_azione_principale)
-	_hud.rinnova.connect(func() -> void: _esegui(run.reroll_offers(), "Offerte rinnovate"))
-	_hud.passa.connect(func() -> void: _esegui(run.pass_opportunity(), "Opportunità passata"))
+	_hud.rinnova.connect(func() -> void: _esegui(run.reroll_offers(), "Proposte rinnovate"))
+	_hud.rinnova_risorsa.connect(func() -> void: _esegui(run.reroll_offers(true), "Proposte rinnovate"))
+	_hud.passa.connect(func() -> void: _esegui(run.pass_round(), "Round passato"))
 	_hud.nessuna_ricompensa.connect(func() -> void: _esegui(run.skip_reward()))
 	_hud.avanza_era.connect(_on_avanza_era)
 	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.run_rules.market_units_per_gold)))
@@ -565,10 +566,16 @@ func _costruisci_scelte() -> void:
 		fase = -1
 	match fase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-			tipo = TipoScelta.OFFERTA
-			for offerta: Offer in run.offers:
-				schede.append(SchedaCarta.da_offerta(run, offerta))
-				origini.append(offerta)
+			if run.chosen_advisor == null:
+				tipo = TipoScelta.CONSIGLIERE
+				for consigliere: AdvisorDef in run.advisor_choices:
+					schede.append(SchedaCarta.da_consigliere(run, consigliere))
+					origini.append(consigliere)
+			else:
+				tipo = TipoScelta.OFFERTA
+				for offerta: Offer in run.offers:
+					schede.append(SchedaCarta.da_offerta(run, offerta))
+					origini.append(offerta)
 		RunState.Phase.SCELTA_INCONTRO:
 			tipo = TipoScelta.INCONTRO
 			for incontro: EncounterDef in run.encounter_choices:
@@ -584,9 +591,11 @@ func _costruisci_scelte() -> void:
 				tipo = TipoScelta.FANTASMA
 				schede.append(SchedaCarta.da_fantasma(run, run.current_ghost))
 				origini.append(run.current_ghost)
-	var firma: String = "%d|%d|%d|%d" % [tipo, run.year, run.phase, run.opportunity_number]
+	var firma: String = "%d|%d|%d|%d" % [tipo, run.year, run.phase, run.round_number]
 	for origine: Object in origini:
 		firma += "|%d" % origine.get_instance_id()
+	if run.chosen_advisor != null:
+		firma += "|%s" % run.chosen_advisor.id
 	if firma == _firma_scelte and _scelte.size() == schede.size():
 		_aggiorna_scelte(schede)
 		return
@@ -712,11 +721,14 @@ func _unhandled_input(evento: InputEvent) -> void:
 func _clic_scelta(tessera: Tessera3D) -> void:
 	var i: int = tessera.indice
 	match _tipo_scelta:
+		TipoScelta.CONSIGLIERE:
+			var nome_consigliere: String = run.advisor_choices[i].display_name
+			_esegui(run.choose_advisor(i), "Ascolti: %s" % nome_consigliere)
 		TipoScelta.OFFERTA:
 			var offerta: Offer = run.offers[i]
 			var voci: Array[String] = run.offer_choices(offerta)
 			if not voci.is_empty():
-				_hud.mostra_scelte(offerta.describe(), offerta.opportunity.description, voci, func(voce: int) -> void: _esegui(run.buy_offer(i, voce)))
+				_hud.mostra_scelte(offerta.describe(), offerta.description(), voci, func(voce: int) -> void: _esegui(run.buy_offer(i, voce)))
 			elif run.offer_needs_replacement(offerta):
 				var truppa: bool = offerta.kind == OpportunityDef.Kind.RECLUTA_TRUPPA
 				var testo: String = "Plancia piena: clicca %s da sostituire con %s." % ["la truppa" if truppa else "l'edificio", tessera.scheda.titolo]
@@ -803,9 +815,14 @@ func _seleziona(truppa: bool, i: int) -> void:
 	if truppa:
 		azioni.append({"testo": "◀ Sposta", "attiva": i > 0, "clic": func() -> void: _sposta(i, i - 1)})
 		azioni.append({"testo": "Sposta ▶", "attiva": i < run.board.troops.size() - 1, "clic": func() -> void: _sposta(i, i + 1)})
-	var costo: ResourceAmounts = run.upgrade_cost_of(pezzo)
-	if costo != null:
-		azioni.append({"testo": "Potenzia · %s" % costo.describe(), "attiva": run.can_pay(costo), "clic": func() -> void: _potenzia(truppa, i)})
+	# Potenzia è un'opzione del consigliere scelto (GDD §6.5): se non si può, si dice perché (P4).
+	if run.is_shopping_phase() and pezzo.level < run.run_rules.max_level:
+		var motivo: String = run.upgrade_block_reason(pezzo)
+		var costo: ResourceAmounts = run.upgrade_cost_of(pezzo)
+		if motivo == "" and costo != null:
+			azioni.append({"testo": "Potenzia · %s" % costo.describe(), "attiva": run.can_pay(costo), "clic": func() -> void: _potenzia(truppa, i)})
+		else:
+			azioni.append({"testo": "Potenzia: %s" % motivo, "attiva": false, "clic": func() -> void: pass})
 	if pezzo.building == null or not pezzo.building.is_capital:
 		var vendibile: bool = truppa or run.board.can_sell_building(i)
 		azioni.append({"testo": "Vendi · +%d Oro" % RunState.half_down(pezzo.paid), "attiva": vendibile, "clic": func() -> void: _vendi(truppa, i)})

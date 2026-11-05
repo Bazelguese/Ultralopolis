@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_fxeqo"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_uam0p"]
-
-[sub_resource type="Resource" id="Resource_uam0p"]
-script = ExtResource("2_uam0p")
-ferro = 2
-
-[sub_resource type="Resource" id="Resource_7hxgt"]
-script = ExtResource("2_uam0p")
-ferro = 3
 
 [resource]
 script = ExtResource("1_fxeqo")
@@ -19,4 +10,3 @@ cost_gold = 4
 types = Array[StringName]([&"Fante", &"Patriota"])
 cooldown_ms = 2000
 damage = 2
-upgrade_costs = Array[ExtResource("2_uam0p")]([SubResource("Resource_uam0p"), SubResource("Resource_7hxgt")])
