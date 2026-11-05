@@ -44,6 +44,16 @@ description = "Per un anno le truppe Nobili ricaricano il 10% più in fretta."
 requires_types = Array[StringName]([&"Nobile"])
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+stabilita = 1
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Annuncio in piazza"
+description = "Ricevi 1 Stabilità."
+gain = SubResource("N100_gain")
+
 [resource]
 script = ExtResource("e1")
 id = &"erede_al_trono"
@@ -52,4 +62,4 @@ description = "È nato l'erede al trono: la corte aspetta un segnale."
 sphere = "Stato"
 color = &"blu"
 favored_by = Array[Resource]([ExtResource("e6")])
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7"), SubResource("N100")])

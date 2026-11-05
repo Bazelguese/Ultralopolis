@@ -51,6 +51,16 @@ requires_types = Array[StringName]([&"Criminale"])
 cost = SubResource("RA_8")
 gain = SubResource("RA_9")
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+documenti = 1
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Leggilo in biblioteca"
+description = "Ricevi 1 Documenti."
+gain = SubResource("N100_gain")
+
 [resource]
 script = ExtResource("e1")
 id = &"manoscritto_perduto"
@@ -59,4 +69,4 @@ description = "Un antico manoscritto è in vendita al mercato."
 sphere = "Conoscenza"
 color = &"viola"
 favored_by = Array[Resource]([ExtResource("e4")])
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7"), SubResource("N100")])

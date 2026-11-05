@@ -45,6 +45,16 @@ description = "Ricevi 2 Oro e 2 Influenza."
 requires_types = Array[StringName]([&"Infrastruttura Strategica"])
 gain = SubResource("RA_7")
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+oro = 1
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Passeggia fra i banchi"
+description = "Ricevi 1 Oro."
+gain = SubResource("N100_gain")
+
 [resource]
 script = ExtResource("e1")
 id = &"grande_fiera"
@@ -53,4 +63,4 @@ description = "Mercanti da ogni regione arrivano per la fiera."
 sphere = "Ricchezza"
 color = &"verde"
 favored_by = Array[Resource]([ExtResource("e4")])
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6"), SubResource("N100")])
