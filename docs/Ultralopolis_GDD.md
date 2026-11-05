@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.23
+## Game Design Document — v0.24
 
 **Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -282,7 +282,8 @@ Nei round, oltre ai consiglieri, possono comparire carte di altre famiglie, lega
 | Ogni carta ha una **sfera**: una delle 8 categorie (§4.2.4), che ne dà il tema e la cornice | Confermato |
 | Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo) | Confermato |
 | Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una carta con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione senza requisiti | Confermato |
-| Nessun evento arriva da solo senza essere scelto | Confermato per ora (gli eventi forzati sono uno spunto, Parte III) |
+| Nessun evento arriva da solo senza essere scelto, con una sola eccezione: la **Rivoluzione** (§9.4.2) | Confermato (eccezione dalla v0.24) |
+| Le opzioni possono anche **cambiare il governo** (Riforma, Rivoluzione) e far salire o scendere il **Malcontento** (§5.5) | Confermato (v0.24) |
 
 Il catalogo del prototipo (18 eventi, 6 fortune, 6 visitatori) è in `docs/Catalogo.md`.
 
@@ -382,6 +383,21 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 - Le truppe reclutate durante l’anno sono sazie fino al consumo successivo.
 - I fantasmi non soffrono la fame.
 
+### 5.5 Malcontento — Confermato (modifica del nucleo, v0.24)
+
+Il **Malcontento** è un contatore della nazione, distinto dal Magazzino. Insieme alla **Stabilità** forma un unico tema: il Malcontento è una **pressione** che sale da sola, la Stabilità è la **risorsa che si spende** per farlo scendere.
+
+| Regola | Stato |
+|---|---|
+| Sale con sconfitte, carestie (Cibo insufficiente), malus subiti e alcune opzioni degli eventi | Confermato |
+| Scende soprattutto spendendo **Stabilità** con un'azione del Cancelliere; anche con Fede (Sacerdote), Cibo (Fattore) e alcune opzioni degli eventi | Confermato nella forma; azioni Proposta |
+| Raggiunta una **soglia**, scatta la **Rivoluzione** (§9.4.2); dopo la rivoluzione si azzera | Confermato |
+| È sempre visibile con la sua soglia, e il gioco avverte quando la rivoluzione si avvicina (come P4) | Proposta |
+| Vive fuori dalla battaglia: non entra nella simulazione e non cambia la Resistenza | Proposta |
+| Non si vende al mercato; si conserva da un anno all'altro | Proposta |
+| Gli eventi possono avere come radice “Malcontento sopra una soglia” | Proposta |
+| Valori: quanto sale per ogni causa, quanto vale 1 Stabilità, la soglia | Da definire |
+
 ## 6. Plancia della nazione
 
 ### 6.1 Configurazione iniziale — Confermato
@@ -464,6 +480,10 @@ Ogni edificio e ogni truppa ha **uno o più tipi**, presi da **un’unica lista*
 | I tipi non hanno colore (§5.3) | Confermato |
 | Alcuni tipi valgono soprattutto per edifici (le Infrastrutture), altri soprattutto per truppe (Fante); la distinzione non è una regola | Confermato |
 | La Capitale ha un tipo proprio, **Capitale**, fuori da tutte le categorie | Proposta |
+| **Tipi d'identità** (v0.24): ogni elemento dell'identità (razza, governo, credo, cultura) ha un suo tipo, es. Pietrosangue, Monarchico, Solare. Stanno fuori da tutte le categorie: non decidono quali consiglieri propongono o potenziano una carta | Confermato (v0.24) |
+| Le carte esclusive di un elemento portano il suo tipo d'identità **più almeno un tipo di categoria**; al massimo 1-2 tipi di categoria più 1 tipo d'identità (**3 tipi**) | Confermato (v0.24) |
+| I tipi d'identità servono a perk e tratti, alle radici e ai requisiti degli eventi (§4.2.5) e, in futuro, a sinergie e tensioni. Una carta straniera porta in casa il suo tipo; se il governo cambia, le carte del vecchio governo tengono il loro | Confermato (v0.24) |
+| Tipi d'identità anche per le vie | Da definire |
 | Ogni carta ha **1 o 2 tipi**, 3 solo per carte speciali (esclusivi): un tipo dice che cosa fa la carta, l’eventuale secondo chi rappresenta. Con 3 tipi per carta ogni consigliere proporrebbe metà del catalogo | Proposta |
 
 | Tipo | Significato (placeholder) |
@@ -739,8 +759,8 @@ Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzio
 | Regola | Stato |
 |---|---|
 | Tutte e cinque le dimensioni sono presenti fin da subito | Confermato |
-| La nazione si crea **come in un GDR**: prima dell’anno 1 il giocatore vede tutte le opzioni e sceglie nome, un popolo, un governo, un credo, una cultura e alcuni perk iniziali; poi la run procede | Confermato |
-| Per ora popolo, governo, credo e cultura restano fissi durante la run; il loro cambiamento (riforme, conversioni, trasformazioni culturali) arriverà più avanti. L’identità però **cresce** con le vie scelte entrando nelle ere (§10.4) | Confermato / Direzione |
+| La nazione si crea **come in un GDR**: prima dell’anno 1 il giocatore vede tutte le opzioni **di partenza** e sceglie nome, un popolo, un governo, un credo, una cultura e alcuni perk iniziali; poi la run procede. I governi dei tier più alti non si scelgono alla creazione (la schermata può mostrarli bloccati: Proposta) | Confermato (v0.24) |
+| Il **governo** cambia durante la run per evoluzione o rivoluzione (§9.4.2). Popolo, credo e cultura restano fissi per ora. L’identità **cresce** anche con le vie scelte entrando nelle ere (§10.4) | Confermato (v0.24) |
 | Anche i fantasmi hanno un’identità, che vale per la loro Resistenza e per i loro tratti in battaglia | Confermato |
 | Le nazioni create **restano salvate** sul PC; si possono **modificare** o **eliminare** (con conferma). Da una nazione salvata si possono giocare più run | Confermato |
 
@@ -753,7 +773,10 @@ Popoli, governi, credi, culture e perk usano la stessa scheda. Ogni elemento pu�
 - indicare **una risorsa che la Capitale produce** a ogni fase (§6.2, v0.22): ogni popolo, governo, credo e cultura ne indica una;
 - rendere alcuni **consiglieri o proposte esclusivi o più frequenti** (§4.2);
 - concedere **edifici o truppe esclusivi**;
-- dare un **tratto permanente**, cioè un modificatore che dura tutta la run (§8).
+- dare un **tratto permanente**, cioè un modificatore che dura tutta la run (§8);
+- cambiare **il Consiglio**: consiglieri in più o in meno nel round, un consigliere sempre presente o escluso, proposte in più, Oro in più o in meno sulle proposte (v0.24);
+- cambiare **l'uso delle risorse**: tasso del mercato, costo delle azioni di un consigliere, costo di Potenzia (v0.24);
+- dare il suo **tipo d'identità** alle carte esclusive (§6.6, v0.24).
 
 Altri effetti verranno aggiunti man mano che le meccaniche si ampliano.
 
@@ -761,15 +784,58 @@ Altri effetti verranno aggiunti man mano che le meccaniche si ampliano.
 
 I perk funzionano come le abilità di The Bazaar: bonus passivi. Alcuni si scelgono alla creazione della nazione, altri si ottengono durante la run: come ricompense degli incontri del mondo (§3.3) e dall’Anziano del Consiglio (§4.2.2, v0.21). Numero dei perk iniziali: placeholder (§16.3).
 
-Catalogo del prototipo (placeholder): 3 popoli (Montanari, Popolo del delta, Popolo delle foreste), 3 governi (Monarchia, Repubblica, Teocrazia), 3 credi (Culto del Sole, Antichi spiriti, Ordine della Ragione), 3 culture (guerriera, mercantile, erudita), 6 perk.
+Catalogo del prototipo (placeholder, v0.24): 3 razze (Pietrosangue, Maremani, Cinerali), governi a tier (§9.4.2: Monarchia, Repubblica e Teocrazia alla creazione), 4 credi (Culto solare, Spiriti dei luoghi, Culto degli antenati, Culto del vuoto), 4 culture (mercantile, guerriera, erudita, artigiana), i perk. Il catalogo completo è in `docs/Proposta_identita.md` e andrà riportato nel Catalogo. Fino all'implementazione il gioco usa ancora il catalogo precedente (3 popoli, 3 governi, 3 credi con l'Ordine della Ragione, 3 culture).
 
-**Da definire:** incompatibilità fra elementi, livelli o rarità dei perk, altre fonti di perk.
+**Incompatibilità (v0.24):** nessuna per ora; **sinergie e tensioni** fra elementi sono una **Direzione**, da costruire sui tipi d'identità.
+
+**Da definire:** livelli o rarità dei perk, altre fonti di perk.
 
 L’identità dovrebbe influenzare opportunità, risposte agli eventi, strategie disponibili e, in futuro, abilità speciali (ad esempio i malus con nome, Parte III). Il modo in cui può cambiare durante la partita resta da progettare: riforme politiche, conversioni religiose e trasformazioni culturali sono possibilità, non regole. Le **vie delle ere** (§10.4) sono il primo modo confermato in cui l’identità cresce durante la run: usano la stessa scheda di §9.2 e si aggiungono agli elementi scelti alla creazione, senza sostituirli.
 
 **Proposta non adottata:** partire con un’identità ridotta e far emergere cultura e credo attraverso gli eventi. Il creatore ha scelto tutte le dimensioni fin dalla fondazione; l’idea resta fra gli spunti (Parte III).
 
 **Nota di portata:** cinque assi combinati moltiplicano il lavoro di contenuto e bilanciamento. È proposto di introdurli gradualmente, privilegiando assi che cambiano quali offerte e quali eventi compaiono, più che bonus percentuali.
+
+### 9.4 Identità del prototipo v0.24 — Confermato nella struttura, contenuti placeholder
+
+Ogni dimensione agisce su una parte diversa del gioco. Dettagli, catalogo e motivazioni: `docs/Proposta_identita.md` (approvata il 5 novembre 2026).
+
+| Dimensione | Su che cosa agisce |
+|---|---|
+| **Popolo** (razza fantasy) | Chi sei sulla plancia: Resistenza, esclusivi **in ogni era** (come le vie), un tratto, il tipo d'identità |
+| **Governo** (a tier) | Come decidi: il Consiglio (§9.2) |
+| **Credo** (tipo di fede) | Gli incanti: quelli comuni (§4.3) più 1-2 incanti esclusivi per credo, con le famiglie di effetti esistenti |
+| **Cultura** | Come usi le risorse e come influenzi i consiglieri |
+
+#### 9.4.1 Razze
+
+| Regola | Stato |
+|---|---|
+| Razze fantasy originali con esclusivi in ogni era; quelli di un'era passata escono dalle offerte | Confermato |
+| Prototipo: 3 razze, Pietrosangue (difesa), Maremani (economia), Cinerali (attacco rapido); sostituiscono Montanari, Popolo del delta e Popolo delle foreste, ed ereditano i loro esclusivi, eventi, fortune e visitatori | Confermato |
+| Aspetto delle razze sui pezzi | Da definire (rimandato) |
+
+#### 9.4.2 Governi a tier
+
+| Regola | Stato |
+|---|---|
+| Molte forme di governo, in **tier**; alla creazione si sceglie un governo del tier 1 | Confermato |
+| Il tier del governo non dipende dall'era (a differenza del livello del Consiglio, §4.2.1) | Confermato |
+| **Evoluzione:** solo in avanti, al tier successivo, scegliendo fra i rami. Viene proposta entrando in una nuova era (si può rifiutare) oppure arriva con la **Riforma**, un evento pagato con Influenza | Confermato |
+| **Rivoluzione:** causata dal Malcontento (§5.5); può portare a qualsiasi governo, anche di tier più basso. La causa del Malcontento decide quali governi sono possibili, il giocatore sceglie fra quelli; poi il Malcontento si azzera | Confermato |
+| La Rivoluzione è un evento che **arriva da solo**: raggiunta la soglia, il round successivo mostra solo la Rivoluzione | Confermato (prima eccezione, §4.2.5) |
+| Cambiando governo finisce il vecchio tratto e vale il nuovo; cambia la risorsa della Capitale; gli elementi sulla plancia restano | Proposta |
+| Albero dei governi e loro effetti sul Consiglio | Confermato come punto di partenza; placeholder |
+
+#### 9.4.3 Credi e culture
+
+| Regola | Stato |
+|---|---|
+| Ogni credo aggiunge 1-2 incanti esclusivi, offerti da Sacerdote e Pellegrini solo a quella nazione | Confermato |
+| L'**Ordine della Ragione** esce dai credi; il sapere passa alla Cultura erudita | Confermato |
+| Culture del prototipo: mercantile (mercato), guerriera (azioni del Generale), erudita (azioni dello Studioso), artigiana (Potenzia) | Confermato come punto di partenza |
+
+**Da definire:** tratti delle razze, evoluzione proposta prima o dopo la via, costo della Riforma, governo e evoluzione dei fantasmi generati.
 
 ## 10. Ricerca ed ere
 
@@ -880,7 +946,7 @@ Ottenere informazioni sull’avversario prima dello scontro e poter intervenire 
 
 Eventi e conseguenze dipendono dalle scelte fatte, dall’identità della nazione e dall’interazione con gli avversari. È parte della visione fondamentale, anche se non entra nel primo test del combattimento.
 
-Origini possibili: sviluppo economico, ingresso in una nuova era, decisioni politiche, vittoria o sconfitta, incontri del mondo, armi particolari di un fantasma.
+Origini possibili: sviluppo economico, ingresso in una nuova era, decisioni politiche, vittoria o sconfitta, incontri del mondo, armi particolari di un fantasma; dalla v0.24 anche il **Malcontento** (§5.5) e i **tipi d'identità** (§6.6).
 
 Gli incontri del mondo (§3.3) sono la prima forma concreta di evento: inizialmente scontri automatici, in futuro anche eventi a scelta.
 
@@ -956,7 +1022,7 @@ Idee annotate per il futuro. Non vanno implementate nella base; la base non deve
 | Spunto | Origine | Nota per l’introduzione |
 |---|---|---|
 | Truppa che elimina una truppa avversaria (Uccidi) | Creatore | Troppo forte all’inizio. Richiede regole su elementi eliminati, oggi assenti: è una modifica del nucleo. Candidata per ere avanzate (P2). |
-| Eventi forzati: arrivano da soli e chiedono solo come reagire | Creatore (v0.23) | Per ora no; dovranno rispettare P1 e P4 (§4.2.5). |
+| Eventi forzati: arrivano da soli e chiedono solo come reagire | Creatore (v0.23) | Per ora solo la Rivoluzione (§9.4.2); gli altri dovranno rispettare P1 e P4 (§4.2.5). |
 | Catene di eventi: una scelta sblocca un evento negli anni successivi | Proposta di Claude (v0.23) | Richiede che la nazione ricordi le scelte fatte. |
 | Personaggi ricorrenti: un visitatore che torna e ricorda i rapporti avuti | Proposta di Claude (v0.23) | Come le catene, con un nome proprio. |
 | Tratti acquisiti: un evento lascia un tratto permanente che diventa parte dell'identità | Proposta di Claude (v0.23) | Primo passo verso riforme e conversioni (§9.1). |
@@ -1183,7 +1249,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
 | Prima di ampliare la plancia | Quantità e prezzi degli spazi (§6.3); layout. |
 | Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
-| Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
+| Per la componente GDR | Valori del Malcontento; tratti delle razze; costo della Riforma; governi dei fantasmi; tipi d'identità delle vie. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
 | Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4). |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
@@ -1231,6 +1297,13 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.24 — 5 novembre 2026** (modifica del nucleo)
+- Approvata la proposta sull'identità (`docs/Proposta_identita.md`, bozza 2): razze fantasy, governi a tier con evoluzione e rivoluzione, credi con incanti esclusivi, culture che cambiano l'uso delle risorse (§9.4).
+- Nuovo contatore **Malcontento**, con la **Stabilità** come risorsa per farlo scendere (§5.5).
+- **Tipi d'identità** fuori dalle categorie, sulle carte esclusive; massimo 3 tipi per carta (§6.6).
+- La **Rivoluzione** è il primo evento che arriva da solo (§4.2.5); le opzioni possono cambiare governo e Malcontento.
+- Nuovi effetti della scheda dell'identità sul Consiglio e sulle risorse (§9.2).
 
 **v0.23 — 5 novembre 2026** (modifica del nucleo)
 - Nei round possono comparire **Eventi**, **Visitatori** e **Fortune** al posto di un consigliere: al massimo una carta per round, in media 1 round su 3 (§4.2.5).

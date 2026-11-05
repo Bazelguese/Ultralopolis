@@ -2,7 +2,7 @@
 
 **Versione:** bozza 2 — 5 novembre 2026
 **Riferimento:** Game Design Document v0.23 (`docs/Ultralopolis_GDD.md`), §9 Identità della civiltà
-**Stato:** **proposta, non approvata nel GDD.** Nomi ed effetti sono **placeholder**; i valori numerici vengono ignorati di proposito.
+**Stato:** **approvata da Davide il 5 novembre 2026 e riportata nel GDD v0.24.** Nomi ed effetti sono **placeholder**; i valori numerici vengono ignorati di proposito. Le voci rimaste **Proposta** sono dettagli non discussi uno per uno: nel GDD compaiono come Proposta.
 
 **Storia del documento.**
 - La bozza 1 è nata in un'altra sessione, sul ramo `claude/exciting-wright-ax675q`, partendo dal GDD v0.21.
@@ -44,7 +44,7 @@ Il GDD resta la fonte di verità. Questo documento non cambia il gioco: quando D
 | # | Punto del GDD (v0.23) | Oggi | Con questa proposta |
 |---|---|---|---|
 | A | **Nucleo: §5.3 e P5** | Non esiste un contatore di malcontento | Nuova risorsa della nazione: il **Malcontento** (§7). **Modifica del nucleo**, confermata da Davide. |
-| B | **§4.2.5, eventi forzati** | Nessun evento arriva da solo (gli eventi forzati sono uno spunto) | La **Rivoluzione** sarebbe il primo evento che arriva da solo (§4.3): va deciso (§10, domanda 1). |
+| B | **§4.2.5, eventi forzati** | Nessun evento arriva da solo (gli eventi forzati sono uno spunto) | La **Rivoluzione** è la **prima eccezione**: arriva da sola (§4.3). Deciso. |
 | C | **§4.2.5, effetti delle opzioni** | Risorse, carte, livelli, spazi, modificatori, spionaggio | Si aggiungono: **cambiare governo** e **far salire o scendere il Malcontento**. Toccano l'identità e la nuova risorsa, non la battaglia. |
 | D | **§6.6 e §4.2.4, tipi** | I tipi di una carta stanno nelle categorie (salvo Capitale) | Nascono i **tipi d'identità**, fuori dalle categorie (§8). |
 | E | **§9.1** | "Il giocatore vede **tutte** le opzioni e sceglie…" | "Tutte le opzioni **di partenza**". I governi dei tier più alti non si scelgono alla creazione; la schermata può mostrarli bloccati (Proposta). |
@@ -102,7 +102,7 @@ Come per le vie (GDD §10.4), gli esclusivi di una razza sono **diversi per ogni
 
 Gli esclusivi esistenti vanno rinominati per la nuova razza (es. "Arcieri delle ceneri" per i Cinerali).
 
-### 3.3 Che cosa si sposta dai vecchi popoli — Proposta
+### 3.3 Che cosa si sposta dai vecchi popoli — Deciso
 
 | Oggi è legato a | Passa a |
 |---|---|
@@ -134,7 +134,7 @@ Teocrazia          ──►  Ierocrazia                ──►  (da definire)
 
 Numero di tier, nomi e rami sono placeholder.
 
-### 4.2 Che cosa fa ogni governo — Proposta
+### 4.2 Che cosa fa ogni governo — Deciso come punto di partenza, valori placeholder
 
 Il governo cambia **come si usa il Consiglio** (GDD §4.2). Un tier più alto spinge più in là la stessa idea del suo ramo.
 
@@ -178,7 +178,7 @@ Ogni governo continua a dare una quota di Resistenza (GDD §7.1.1) e una risorsa
 | **Scelta mista**: la **causa** del Malcontento decide quali governi sono possibili; il **giocatore** sceglie fra quelli | Deciso |
 | Dopo la rivoluzione il Malcontento **si azzera** | Deciso |
 | La causa è la fonte che ha prodotto più Malcontento (es. molte sconfitte: governi militari; carestie: governi popolari) | Proposta |
-| È un Evento della v0.23: un'opzione per ogni governo possibile, tutte gratuite. Va deciso se arriva da solo (§10, domanda 1) | Proposta |
+| È un Evento della v0.23: un'opzione per ogni governo possibile, tutte gratuite. È la **prima eccezione** alla regola “nessun evento arriva da solo”: raggiunta la soglia, il round successivo mostra solo la Rivoluzione | Deciso |
 
 **Che cosa succede al vecchio governo — Proposta**
 
@@ -207,7 +207,7 @@ Ogni governo continua a dare una quota di Resistenza (GDD §7.1.1) e una risorsa
 | **Culto degli antenati** | Venerazione dei padri fondatori | Scudo più forte sulle truppe senza mana | — | Stabilità |
 | **Culto del vuoto** | Fede oscura nel nulla | Corruzione + Sabotaggio | — | Documenti |
 
-### 5.3 Dove va l'Ordine della Ragione — Proposta
+### 5.3 Dove va l'Ordine della Ragione — Deciso
 
 Non è una fede: esce dai credi, e la sua idea (il sapere) passa alla **Cultura erudita**. Oggi compare in dieci file dei dati (compreso il suo):
 
@@ -224,10 +224,10 @@ Non è una fede: esce dai credi, e la sua idea (il sapere) passa alla **Cultura 
 
 | Cultura (placeholder) | Idea | Stato |
 |---|---|---|
-| **Mercantile** | Tasso migliore al mercato delle risorse | Proposta |
-| **Guerriera** | Le azioni del Generale costano meno Ferro | Proposta |
-| **Erudita** | Le azioni dello Studioso costano meno o rendono di più (eredita l'Ordine della Ragione) | Proposta |
-| **Artigiana** | **Potenzia costa meno** (1 unità in meno per livello): con la v0.22 si potenzia solo con i consiglieri | Proposta |
+| **Mercantile** | Tasso migliore al mercato delle risorse | Deciso come punto di partenza |
+| **Guerriera** | Le azioni del Generale costano meno Ferro | Deciso come punto di partenza |
+| **Erudita** | Le azioni dello Studioso costano meno o rendono di più (eredita l'Ordine della Ragione) | Deciso come punto di partenza |
+| **Artigiana** | **Potenzia costa meno** (1 unità in meno per livello): con la v0.22 si potenzia solo con i consiglieri | Deciso come punto di partenza |
 
 Servono effetti nuovi della scheda dell'identità, tutti fuori dalla battaglia: tasso del mercato, costo delle azioni di un consigliere, costo di Potenzia.
 
@@ -264,15 +264,15 @@ La bozza 1 proponeva **etichette** per gli elementi dell'identità (es. "maritti
 
 | Regola | Stato |
 |---|---|
-| Ogni elemento dell'identità (razza, governo, credo, cultura) ha un **suo tipo**, es. Pietrosangue, Monarchico, Solare, Mercantile | Proposta |
-| I tipi d'identità **non stanno in nessuna categoria** (come il tipo Capitale): non decidono quali consiglieri propongono o potenziano una carta | Proposta |
-| Le carte esclusive di un elemento portano il suo tipo, **più almeno un tipo di categoria**, altrimenti nessun consigliere le proporrebbe | Proposta |
-| Limite: 1-2 tipi di categoria più al massimo 1 tipo d'identità, quindi **3 tipi** al massimo | Proposta |
-| Servono a: perk e tratti ("le carte Pietrosangue producono 1 scudo in più"), radici e requisiti degli eventi (un'opzione **[Monarchico]**), sinergie e tensioni future | Proposta |
-| Una carta esclusiva di un'altra nazione (comprata dal Contrabbandiere o dai Mercanti) porta in casa il suo **tipo straniero**, che può sbloccare eventi e opzioni di quella nazione | Proposta (conseguenza) |
-| Se cambia il governo, le carte del vecchio governo **tengono** il loro tipo | Proposta |
+| Ogni elemento dell'identità (razza, governo, credo, cultura) ha un **suo tipo**, es. Pietrosangue, Monarchico, Solare, Mercantile | Deciso |
+| I tipi d'identità **non stanno in nessuna categoria** (come il tipo Capitale): non decidono quali consiglieri propongono o potenziano una carta | Deciso |
+| Le carte esclusive di un elemento portano il suo tipo, **più almeno un tipo di categoria**, altrimenti nessun consigliere le proporrebbe | Deciso |
+| Limite: 1-2 tipi di categoria più al massimo 1 tipo d'identità, quindi **3 tipi** al massimo | Deciso |
+| Servono a: perk e tratti ("le carte Pietrosangue producono 1 scudo in più"), radici e requisiti degli eventi (un'opzione **[Monarchico]**), sinergie e tensioni future | Deciso |
+| Una carta esclusiva di un'altra nazione (comprata dal Contrabbandiere o dai Mercanti) porta in casa il suo **tipo straniero**, che può sbloccare eventi e opzioni di quella nazione | Deciso (conseguenza) |
+| Se cambia il governo, le carte del vecchio governo **tengono** il loro tipo | Deciso |
 | Anche le **vie** hanno un tipo d'identità sui loro esclusivi | Da definire |
-| Esclusivi per governi, credi e culture: oggi solo i popoli hanno carte esclusive. Proposta: **una carta esclusiva per ciascuno** (9 carte nuove), oltre agli incanti esclusivi dei credi | Proposta |
+| Esclusivi per governi, credi e culture: oggi solo i popoli hanno carte esclusive. Proposta: **una carta esclusiva per ciascuno** (9 carte nuove), oltre agli incanti esclusivi dei credi | Deciso |
 
 ---
 
@@ -292,9 +292,9 @@ Ogni passo funziona da solo e si può provare in Godot prima del successivo.
 
 ---
 
-## 10. Domande per Davide
+## 10. Risposte di Davide (5 novembre 2026)
 
-1. **La Rivoluzione arriva da sola?** Nella v0.23 avevi deciso che, per ora, nessun evento arriva senza essere scelto. La Rivoluzione per sua natura arriva comunque. Proposta: farne la **prima eccezione**. Raggiunta la soglia, all'inizio del round successivo il gioco mostra la Rivoluzione al posto delle carte del round, e il giocatore sceglie solo fra i governi possibili.
-2. **Tipi d'identità:** vanno bene le regole del §8, in particolare un tipo per elemento, il massimo di 3 tipi per carta e le 9 carte esclusive nuove?
-3. **Ordine della Ragione e vecchi popoli:** va bene come li ho ridistribuiti (§3.3, §5.3)?
-4. **Governi e culture:** gli effetti proposti (§4.2, §6) ti convincono come punto di partenza?
+1. **La Rivoluzione arriva da sola:** sì, è la prima eccezione alla regola della v0.23.
+2. **Tipi d'identità:** sì, un tipo per elemento, al massimo 3 tipi per carta, 9 carte esclusive nuove per governi, credi e culture.
+3. **Ordine della Ragione e vecchi popoli:** sì, ridistribuiti come in §3.3 e §5.3.
+4. **Effetti di governi e culture:** sì, come punto di partenza.
