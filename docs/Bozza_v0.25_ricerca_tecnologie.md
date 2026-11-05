@@ -30,13 +30,16 @@ Non serve una risorsa nuova, né una nuova famiglia di effetti (P5). Gli effetti
 | 11 | Le tecnologie completate valgono **per sempre** | Confermato |
 | 12 | Si può ricercare **tutto**: elementi (edifici e truppe), perk, miglioramenti del Consiglio e della nazione, dottrine sui tipi | Confermato |
 | 13 | Un elemento sbloccato appartiene a una **linea**: in ogni era la tecnologia offre la versione di quell’era. Se l’era nuova non ha una versione, resta quella precedente | Confermato |
-| 14 | Ogni via ha anche delle **tecnologie esclusive** | Confermato |
+| 14 | Ogni via ha anche delle **tecnologie esclusive** (dalla decisione 22, anche ogni razza) | Confermato |
 | 15 | Lo **Studioso** aiuta la ricerca: le sue azioni portano Ricerca alla tecnologia in corso, e un’azione nuova ripesca la mano | Confermato |
 | 16 | L’albero ha **4 rami, uno per colore di mana**, ciascuno con le due categorie a cui il colore tende (§5.3) | Confermato |
 | 17 | Le tecnologie costano **solo Ricerca**. Solo alcuni **progetti speciali** potranno chiedere anche una risorsa di categoria, per non legare una nazione a una sola risorsa | Confermato (progetti speciali: Direzione) |
 | 18 | **Carte dorate**: Eventi, Fortune e incontri del mondo possono dare una tecnologia già iniziata | Confermato |
 | 19 | **Sconto sulla carta scartata**: una tecnologia mostrata e non scelta ha metà probabilità di uscire nella mano successiva | Confermato |
 | 20 | I fantasmi generati ricevono a caso il numero di tecnologie richiesto per ogni era raggiunta | Confermato come convenzione provvisoria (§16.3) |
+| 21 | Costi di prova: **3 Ricerca** per la prima altezza di un’era, **4** per la seconda, poi a salire con le ere | Confermato come punto di partenza; placeholder |
+| 22 | Anche le **razze** hanno tecnologie esclusive, come le vie | Confermato |
+| 23 | I **progetti speciali** non entrano nel primo prototipo: arrivano dopo | Confermato |
 
 ---
 
@@ -67,7 +70,8 @@ Non serve una risorsa nuova, né una nuova famiglia di effetti (P5). Gli effetti
 | **Altezza dentro un ramo**: la seconda altezza di un’era si apre dopo **1 tecnologia** della prima altezza dello stesso ramo (in Stellaris servono 6 tecnologie del livello precedente) | Proposta; quantità placeholder |
 | **Prerequisiti precisi**: alcune tecnologie richiedono una tecnologia specifica, anche di un altro ramo (una freccia nell’albero) | Proposta |
 | L’albero è **tutto visibile**; ogni tecnologia mostra i prerequisiti che le mancano (P4) | Proposta |
-| Dimensione del prototipo: per era e per ramo, 2 tecnologie alla prima altezza e 1 alla seconda, cioè **12 tecnologie per era** (36 in tutto), più quelle esclusive delle vie | Proposta; placeholder |
+| Dimensione del prototipo: per era e per ramo, 2 tecnologie alla prima altezza e 1 alla seconda, cioè **12 tecnologie per era** (36 in tutto), più quelle esclusive delle vie e delle razze | Proposta; placeholder |
+| Le tecnologie esclusive di una via o di una razza stanno nel ramo della loro sfera e compaiono nella mano solo per chi ha quella via o razza (radice “richiede”). Proposta per il prototipo: 1 per via e 1 per razza in ogni era | Confermato (decisione 22); quantità Proposta |
 
 ### 2.3 La mano di carte
 
@@ -141,6 +145,8 @@ Tutti gli effetti usano il linguaggio del nucleo (P5).
 
 Alcune tecnologie (i “progetti speciali”) possono chiedere, oltre alla Ricerca, una risorsa di categoria (decisione 17). La maggior parte delle tecnologie costa solo Ricerca.
 
+Non entrano nel primo prototipo (decisione 23).
+
 **Da definire:** quali tecnologie sono progetti speciali, se sono più forti delle altre, quando si paga la risorsa. Proposta: un progetto speciale per ramo e per era, con la risorsa pagata quando lo si inizia.
 
 ---
@@ -183,8 +189,8 @@ Alcune tecnologie (i “progetti speciali”) possono chiedere, oltre alla Ricer
 
 ---
 
-## 6. Domande ancora aperte
+## 6. Domande risolte
 
-1. **Costi** (placeholder da tarare): proposta 3 Ricerca per l’altezza 1, 4 per l’altezza 2, poi a salire. Con Capitale e una Biblioteca (1 + 1 Ricerca per fase, cioè 4 all’anno) più il bottino (2 dal fantasma, 1-3 dall’incontro) arrivano circa 6-8 Ricerca all’anno: circa 2 tecnologie all’anno all’inizio, e l’era 2 (4 tecnologie) verso il secondo o terzo anno. Oggi l’era 2 costa 8 Ricerca, quindi il ritmo resterebbe simile.
-2. **Razze**: hanno esclusivi in ogni era (§9.4.1). Devono avere anche tecnologie esclusive, come le vie?
-3. **Progetti speciali** (§2.9): vanno già nel primo prototipo, o dopo?
+1. **Costi:** 3 Ricerca per la prima altezza, 4 per la seconda (decisione 21). Con Capitale e una Biblioteca (1 + 1 Ricerca per fase, cioè 4 all’anno) più il bottino (2 dal fantasma, 1-3 dall’incontro) arrivano circa 6-8 Ricerca all’anno: circa 2 tecnologie all’anno all’inizio, e l’era 2 (4 tecnologie) verso il secondo o terzo anno. Oggi l’era 2 costa 8 Ricerca, quindi il ritmo resta simile.
+2. **Razze:** sì, hanno tecnologie esclusive (decisione 22).
+3. **Progetti speciali:** dopo il primo prototipo (decisione 23).
