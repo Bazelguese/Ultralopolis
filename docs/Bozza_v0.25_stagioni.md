@@ -2,7 +2,7 @@
 ## L'anno in dodici mesi e quattro stagioni
 
 **Data:** 5 novembre 2026
-**Stato:** **bozza, da approvare.** Non cambia ancora né il GDD né il gioco.
+**Stato:** **bozza 3, domande chiuse; da approvare per il GDD.** Non cambia ancora né il GDD né il gioco.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.24
 
 Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Da definire** = nessuna regola ancora; **Spunto** = idea per il futuro, da non implementare.
@@ -20,10 +20,13 @@ Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = su
 | 1 | L'anno ha **12 round, uno per mese**, divisi in **4 stagioni da 3 round** | Confermato |
 | 2 | L'anno **comincia con l'inverno e finisce con l'autunno**: l'ultimo scontro dell'anno è il fantasma | Confermato |
 | 3 | **Primavera** ed **Estate** finiscono con un **incontro del mondo**; l'**Autunno** con il **fantasma**; d'**Inverno** non si combatte | Confermato |
-| 4 | Gli edifici producono **all'inizio di ogni stagione**; d'inverno producono **meno o niente Cibo** | Confermato nella forma; quantità Da definire (§4) |
+| 4 | Gli edifici producono **all'inizio di ogni stagione**; d'inverno **non producono Cibo** | Confermato |
 | 5 | L'inverno ha **eventi suoi** e più azioni "interne", meno carte militari | Confermato |
 | 6 | I **temi dei round** dipendono dalla stagione | Confermato |
 | 7 | **10 vittorie** contro i fantasmi e **20 di Prestigio** restano uguali | Confermato |
+| 8 | I **valori di produzione** restano quelli di oggi (placeholder) | Confermato |
+| 9 | I **temi delle stagioni** del §2.3 | Confermato |
+| 10 | Ogni round mostra il **nome del mese** | Confermato |
 
 ---
 
@@ -47,7 +50,7 @@ All'inizio di ogni stagione gli edifici producono (d'inverno senza Cibo).
 
 | Regola | Stato |
 |---|---|
-| Ogni round ha il nome del suo mese, visibile in alto (es. "Anno 2 · Estate · Agosto") | Proposta |
+| Ogni round ha il nome del suo mese, visibile in alto (es. "Anno 2 · Estate · Agosto") | Confermato |
 | Ogni incontro resta una scelta **fra 3** (facile, media, difficile), con le conseguenze di oggi: bottino e ricompensa se vinci; Oro dimezzato e +1 Malcontento se perdi; fine della run in ultima possibilità | Proposta |
 | L'incontro d'estate è più forte di quello di primavera (a metà strada fra un anno e il successivo) | Proposta |
 | Produzione e Preparazione spariscono come nomi di fase: le fasi sono le **stagioni** | Proposta |
@@ -58,8 +61,8 @@ All'inizio di ogni stagione gli edifici producono (d'inverno senza Cibo).
 | Regola | Stato |
 |---|---|
 | All'inizio di ogni stagione gli edifici depositano le loro risorse, come oggi all'inizio di ogni metà (§5.2). Un edificio costruito in una stagione produce dalla stagione successiva | Proposta |
-| **D'inverno nessun edificio produce Cibo** (nemmeno la Capitale); tutte le altre risorse sì | Proposta |
-| I valori di produzione **restano quelli di oggi**: le entrate dell'anno raddoppiano (4 produzioni invece di 2). Sono placeholder: il bilanciamento si rifà con le prove | Proposta |
+| **D'inverno nessun edificio produce Cibo** (nemmeno la Capitale); tutte le altre risorse sì | Confermato |
+| I valori di produzione **restano quelli di oggi**: le entrate dell'anno raddoppiano (4 produzioni invece di 2). Sono placeholder: il bilanciamento si rifà con le prove | Confermato |
 
 ### 2.2 Inverno
 
@@ -81,7 +84,7 @@ Oggi ogni metà ha un round Azioni, uno Edifici, uno Truppe e due Misti. Con le 
 | Estate | Truppe, Edifici, Misto | ci si arma per la stagione delle guerre |
 | Autunno | Truppe, Azioni, Misto | si prepara il fantasma (spionaggio, incanti, ultime truppe) |
 
-In un anno: 2 Azioni, 3 Edifici, 2 Truppe, 5 Misti (oggi 2, 2, 2, 4). I temi stanno nei file dati e si cambiano senza toccare il codice.
+In un anno: 2 Azioni, 3 Edifici, 2 Truppe, 5 Misti (oggi 2, 2, 2, 4). I temi stanno nei file dati e si cambiano senza toccare il codice. Stato: **Confermato** (Davide, 5 novembre).
 
 ### 2.4 Eventi e stagioni
 
@@ -117,12 +120,14 @@ In un anno: 2 Azioni, 3 Edifici, 2 Truppe, 5 Misti (oggi 2, 2, 2, 4). I temi sta
 
 ---
 
-## 4. Domande ancora aperte
+## 4. Domande chiuse (Davide, 5 novembre)
 
-1. **Cibo d'inverno:** niente Cibo (Proposta) o metà?
-2. **Valori di produzione:** restano quelli di oggi (Proposta, le entrate raddoppiano) o li dimezziamo subito?
-3. **Temi delle stagioni:** la tabella del §2.3 va bene?
-4. **Mesi visibili:** mostriamo il nome del mese (Proposta) o solo la stagione e il numero del round?
+1. **Cibo d'inverno:** niente Cibo.
+2. **Valori di produzione:** restano quelli di oggi.
+3. **Temi delle stagioni:** quelli del §2.3.
+4. **Mesi visibili:** sì, il nome del mese.
+
+Restano **Proposta** i dettagli non discussi uno per uno: i pesi dei consiglieri d'inverno, gli eventi legati alle stagioni e i tre eventi invernali nuovi, l'incontro d'estate più forte.
 
 ---
 
