@@ -41,3 +41,4 @@ description = "I coloni hanno raggiunto una valle disabitata oltre il confine."
 sphere = "Terra"
 color = &"verde"
 options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S4"), SubResource("S5")])
+seasons = PackedInt32Array(1)

@@ -1568,7 +1568,7 @@ func _draw_special_card() -> void:
 	if family == 1:
 		var visitor_weights: Array[int] = []
 		for visitor: AdvisorDef in visitors:
-			visitor_weights.append(_roots_weight(visitor.favored_by))
+			visitor_weights.append(_roots_weight(visitor.favored_by) + _season_bonus(visitor.favored_seasons))
 		var visitor_pick: AdvisorDef = visitors[_weighted_pick(visitor_weights)]
 		advisor_choices.append(visitor_pick)
 		seen_this_year.append(visitor_pick.id)
@@ -1576,7 +1576,7 @@ func _draw_special_card() -> void:
 	var pool: Array[EventDef] = events if family == 0 else fortunes
 	var event_weights: Array[int] = []
 	for event: EventDef in pool:
-		event_weights.append(_roots_weight(event.favored_by))
+		event_weights.append(_roots_weight(event.favored_by) + _season_bonus(event.favored_seasons))
 	event_choice = pool[_weighted_pick(event_weights)]
 	seen_events.append(event_choice.id)
 	seen_this_year.append(event_choice.id)
@@ -1591,6 +1591,8 @@ func _available_events(family: EventDef.Family) -> Array[EventDef]:
 		if family == EventDef.Family.EVENTO and not event.repeatable and seen_events.has(event.id):
 			continue
 		if not _roots_ok(event.requires_any, event.min_era, event.max_era, event.requires_types):
+			continue
+		if not event.seasons.is_empty() and not event.seasons.has(int(season)):
 			continue
 		if event.requires_stock != null and not can_pay(event.requires_stock):
 			continue
@@ -1615,6 +1617,8 @@ func _available_visitors() -> Array[AdvisorDef]:
 		if seen_this_year.has(visitor.id) or advisor_choices.has(visitor):
 			continue
 		if not _roots_ok(visitor.requires_any, visitor.min_era, visitor.max_era, visitor.requires_types):
+			continue
+		if not visitor.seasons.is_empty() and not visitor.seasons.has(int(season)):
 			continue
 		if _advisor_candidates(visitor).is_empty():
 			continue
@@ -1641,6 +1645,11 @@ func _roots_ok(requires_any: Array[Resource], min_era: int, max_era: int, requir
 
 
 ## Peso: 1, più 1 per ogni elemento dell'identità o via che favorisce la carta.
+## +1 di peso se la stagione in corso è fra quelle che favoriscono la carta (GDD §4.2.5, v0.25).
+func _season_bonus(favored: PackedInt32Array) -> int:
+	return 1 if favored.has(int(season)) else 0
+
+
 func _roots_weight(favored_by: Array[Resource]) -> int:
 	var weight: int = 1
 	for element: Resource in favored_by:
@@ -1663,6 +1672,10 @@ func _advisor_weight(advisor: AdvisorDef) -> int:
 			if def.favored_opportunities.has(action):
 				weight += 1
 				break
+	# Stagioni (GDD §4.2, v0.25): es. d'inverno più Cancelliere, meno Generale.
+	weight += _season_bonus(advisor.favored_seasons)
+	if advisor.disfavored_seasons.has(int(season)):
+		weight = maxi(1, half_down(weight))
 	return weight
 
 

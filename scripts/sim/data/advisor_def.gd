@@ -51,6 +51,13 @@ enum Foreign {
 @export var favored_by: Array[Resource] = []
 @export var min_era: int = 0
 @export var max_era: int = 0
+## Stagioni in cui la carta può comparire (GDD §4.2.5, v0.25): 0 inverno, 1 primavera, 2 estate,
+## 3 autunno. Vuoto = tutte.
+@export var seasons: PackedInt32Array = PackedInt32Array()
+## Stagioni in cui la carta è più probabile (+1 di peso ciascuna).
+@export var favored_seasons: PackedInt32Array = PackedInt32Array()
+## Solo consiglieri ordinari: stagioni in cui compaiono più di rado (peso dimezzato, almeno 1).
+@export var disfavored_seasons: PackedInt32Array = PackedInt32Array()
 @export var requires_types: Array[StringName] = []
 ## Propone carte di qualsiasi tipo (altrimenti solo quelle con un suo tipo).
 @export var any_type: bool = false

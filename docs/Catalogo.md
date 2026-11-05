@@ -380,7 +380,7 @@ Le azioni che fanno scendere il Malcontento compaiono solo se c'è Malcontento. 
 
 Compaiono nei round al posto di un consigliere. File dati: `data/catalog/eventi/` (eventi e fortune) e `data/catalog/visitatori/`. Ogni carta ha una sfera (una categoria del Consiglio) e delle radici; le opzioni fra parentesi quadre richiedono qualcosa alla nazione e, se manca, restano visibili ma spente.
 
-### Eventi (24 + Riforma, Tumulti e Rivoluzione)
+### Eventi (27 + Riforma, Tumulti e Rivoluzione)
 
 Notazione delle opzioni: **[requisito]** = opzione sbloccata solo con quel requisito. "Per un anno" segue §8.2.1. I valori seguono più o meno il budget del Catalogo (1 Oro ≈ 1 Ricerca ≈ 2 unità delle altre risorse).
 
@@ -569,6 +569,35 @@ Governi possibili nella Rivoluzione, secondo la causa principale (escluso il gov
 | Malus subiti | Teocrazia, Ierocrazia, Monarchia |
 | Scelte degli eventi | Oligarchia, Plutocrazia, Repubblica |
 
+## 6 quinquies. Stagioni (GDD §3.2, §4.2, §4.2.5; v0.25)
+
+L'anno va dall'inverno all'autunno, 3 round per stagione (uno per mese). Valori placeholder, tutti nei file dati.
+
+**Temi dei round** (`data/rules/run_rules.tres`, campo `season_themes`): inverno Azioni, Edifici, Misto · primavera Edifici, Misto, Misto · estate Truppe, Edifici, Misto · autunno Truppe, Azioni, Misto.
+
+**Consiglieri d'inverno** (campi `favored_seasons` e `disfavored_seasons`): Cancelliere, Sacerdote e Fattore +1 di peso; Generale peso dimezzato (almeno 1).
+
+**Eventi legati alle stagioni** (campi `seasons` e `favored_seasons`):
+
+| Evento | Stagioni |
+|---|---|
+| Un inverno lungo, Il passo innevato | solo inverno |
+| La piena del fiume, Le terre di confine | solo primavera |
+| Il torneo | solo estate |
+| Raccolto abbondante (fortuna) | estate e autunno |
+| La grande fiera | solo autunno |
+| La Riforma, Tumulti in piazza | tutte, più frequenti d'inverno (+1) |
+
+**Eventi invernali nuovi** (solo inverno):
+
+| Evento | Sfera | Opzioni |
+|---|---|---|
+| **La festa di mezzo inverno** | Stato | Accendi i falò: 2 Legno → Malcontento −2 · Banchetto al palazzo: 3 Oro → +2 Stabilità, Malcontento −1 · Lascia fare al popolo: +1 Stabilità · **[Patriota]** Canti dei padri: +2 Stabilità e +1 Influenza |
+| **Il gelo** | Terra | Rinforza le case: 2 Legno → +2 Stabilità · Taglia il ghiaccio: +2 Pietra, Malcontento +1 · Aspetta il disgelo: +1 Legno · **[Produzione]** Le scorte del granaio: +2 Cibo |
+| **Le veglie al focolare** | Conoscenza | Raccogli i racconti: +2 Documenti · Insegna a leggere: 2 Oro → +3 Ricerca · Ascolta e basta: +1 Ricerca · **[Accademico]** Lezioni dei sapienti: +2 Ricerca e +1 Documenti |
+
+**Incontri d'estate:** generati come a metà strada fra un anno e il successivo (Resistenza, truppe, edifici e ricompense). Gli incontri scritti a mano degli anni 1–3 sono quelli di primavera.
+
 ---
 
 ## 7. Questioni per Davide
@@ -599,4 +628,4 @@ Tutte le questioni della bozza 1 sono decise.
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
 | Azioni del Consiglio | 40 (di cui 6 esclusive dell’identità, compresi 4 incanti dei credi, e 3 dal livello Ministri) | | | 40 |
-| Eventi / Fortune / Visitatori | 27 (24 + Riforma, Tumulti, Rivoluzione) / 6 / 6 | | | 39 |
+| Eventi / Fortune / Visitatori | 30 (27 + Riforma, Tumulti, Rivoluzione) / 6 / 6 | | | 42 |

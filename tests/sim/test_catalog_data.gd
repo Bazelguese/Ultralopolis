@@ -343,7 +343,7 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
 		else:
 			events += 1
-	assert_eq(events, 26, "18 eventi, la Riforma, i Tumulti in piazza e 6 eventi senza costi (v0.24).")
+	assert_eq(events, 29, "18 eventi, la Riforma, i Tumulti in piazza, 6 eventi senza costi (v0.24) e 3 invernali (v0.25).")
 	assert_eq(revolutions, 1, "Una Rivoluzione.")
 	assert_eq(fortunes, 6)
 	assert_eq(catalog.visitors.size(), 6)

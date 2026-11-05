@@ -15,3 +15,4 @@ description = "Comanda l'esercito: propone fanti, guardiani, macchine d'assedio 
 types = Array[StringName]([&"Assedio", &"Infrastruttura Bellica", &"Fante", &"Guardiano"])
 upgrade_resource = 5
 actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1")])
+disfavored_seasons = PackedInt32Array(0)

@@ -24,3 +24,4 @@ description = "Guida il culto: propone elementi spirituali, patrioti, guardiani 
 types = Array[StringName]([&"Spirituale", &"Patriota", &"Fauna", &"Guardiano"])
 upgrade_resource = 6
 actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("act_2"), ExtResource("act_3"), ExtResource("act_4"), ExtResource("act_5"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5")])
+favored_seasons = PackedInt32Array(0)

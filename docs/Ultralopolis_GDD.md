@@ -1060,7 +1060,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Quattro stagioni con raccolta automatica all’ingresso e 3 round del Consiglio ciascuna (§3.2, v0.25; finché non è implementato, il prototipo usa ancora le due metà da 5 round della v0.21). Consiglio nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
+- Quattro stagioni con raccolta automatica all’ingresso e 3 round del Consiglio ciascuna, con il nome del mese (§3.2, v0.25). Consiglio nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
 - Riordino delle truppe fuori dal combattimento.
@@ -1193,7 +1193,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Rivoluzione: la causa principale è quella che ha prodotto più Malcontento dall'ultima rivoluzione (a parità vale l'ordine sconfitte, carestie, malus, eventi). Governi possibili per causa: sconfitte → Dittatura, Monarchia assoluta, Totalitarismo; carestie → Repubblica, Repubblica parlamentare, Monarchia costituzionale; malus → Teocrazia, Ierocrazia, Monarchia; scelte degli eventi → Oligarchia, Plutocrazia, Repubblica. Il governo attuale è escluso; se non resta nessuno, si sceglie fra i governi del tier 1 | Provvisoria (v0.24). |
 | Il Malcontento che sale per un'azione o un evento conta come causa "scelte degli eventi" | Provvisoria (v0.24). |
 | Incontro d'estate: forza a metà strada fra quella dell'anno e quella dell'anno successivo | Placeholder (v0.25). |
-| Finché le stagioni non sono implementate, il prototipo usa le due metà da 5 round della v0.21 | Provvisoria (v0.25). |
+| Stagioni nel prototipo: pesi d'inverno dei consiglieri, eventi stagionali e tre eventi invernali come nelle Proposte del §4.2 e del §4.2.5; valori in `docs/Catalogo.md` §6 quinquies | Placeholder (v0.25). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 

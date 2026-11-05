@@ -18,3 +18,4 @@ sphere = "Stato"
 color = &"blu"
 repeatable = true
 options = Array[ExtResource("x2")]([SubResource("S1")])
+favored_seasons = PackedInt32Array(0)

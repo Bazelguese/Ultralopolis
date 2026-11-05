@@ -60,3 +60,4 @@ sphere = "Terra"
 color = &"verde"
 favored_by = Array[Resource]([ExtResource("e6")])
 options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_5"), SubResource("N100")])
+seasons = PackedInt32Array(1)
