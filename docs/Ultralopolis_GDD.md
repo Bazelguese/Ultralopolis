@@ -784,7 +784,7 @@ Altri effetti verranno aggiunti man mano che le meccaniche si ampliano.
 
 I perk funzionano come le abilità di The Bazaar: bonus passivi. Alcuni si scelgono alla creazione della nazione, altri si ottengono durante la run: come ricompense degli incontri del mondo (§3.3) e dall’Anziano del Consiglio (§4.2.2, v0.21). Numero dei perk iniziali: placeholder (§16.3).
 
-Catalogo del prototipo (placeholder, v0.24): 3 razze (Pietrosangue, Maremani, Cinerali), governi a tier (§9.4.2: Monarchia, Repubblica e Teocrazia alla creazione), 4 credi (Culto solare, Spiriti dei luoghi, Culto degli antenati, Culto del vuoto), 4 culture (mercantile, guerriera, erudita, artigiana), i perk. Il catalogo completo è in `docs/Proposta_identita.md` e andrà riportato nel Catalogo. Fino all'implementazione il gioco usa ancora il catalogo precedente (3 popoli, 3 governi, 3 credi con l'Ordine della Ragione, 3 culture).
+Catalogo del prototipo (placeholder, v0.24): 3 razze (Pietrosangue, Maremani, Cinerali), governi a tier (§9.4.2: Monarchia, Repubblica e Teocrazia alla creazione), 4 credi (Culto solare, Spiriti dei luoghi, Culto degli antenati, Culto del vuoto), 4 culture (mercantile, guerriera, erudita, artigiana), i perk. Il catalogo completo è in `docs/Catalogo.md` (§6 quater) ed è implementato nel gioco.
 
 **Incompatibilità (v0.24):** nessuna per ora; **sinergie e tensioni** fra elementi sono una **Direzione**, da costruire sui tipi d'identità.
 
@@ -1166,6 +1166,21 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Valori di battaglia di un elemento: prima il livello (+50% a livello), poi le percentuali dei modificatori, poi le aggiunte fisse; le aggiunte fisse valgono solo per chi ha già quel valore (es. “chi cura cura 1 in più”) | Provvisoria (v0.18). |
 | I fantasmi generati scelgono a caso una via per ogni era raggiunta, fra quelle a loro consentite | Provvisoria (v0.18). |
 | I malus nuovi del Catalogo entrano anche fra i malus dei fantasmi generati | Provvisoria (v0.18). |
+| Identità (v0.24): nomi, tratti, Resistenza, carte esclusive e risorse della Capitale di razze, governi, credi e culture: vedi `docs/Catalogo.md` §6 quater | Placeholder (v0.24). |
+| Un requisito di tipo d'identità (es. [Cinerale]) chiede una carta di quel tipo sulla plancia, come i tipi di categoria; l'elemento dell'identità da solo non basta | Provvisoria (v0.24). |
+| Consigliere di corte della Monarchia: è il primo consigliere ordinario ascoltato nella run, e non cambia più | Provvisoria (v0.24). |
+| Effetti dei governi e delle culture sul Consiglio si sommano fra tutti gli elementi dell'identità; gli sconti sulle azioni tolgono unità da ogni risorsa del costo diversa dall'Oro, ma lasciano almeno 1; lo sconto su Potenzia lascia almeno 1 | Provvisoria (v0.24). |
+| Un consigliere sempre presente non viene sostituito dalla carta speciale del round; se tutti i posti sono di consiglieri sempre presenti, quel round non ha carta speciale | Provvisoria (v0.24). |
+| Repubblica: +1 Oro su ogni proposta che costa Oro; Mercantile: al mercato 1 unità per 1 Oro | Placeholder (v0.24). |
+| Incanti esclusivi dei credi: Mezzogiorno (danno + cura 2/3/4, 3 Fede), Linfa degli spiriti (cura 2/4/6 + Inefficienza 1/2/3 s, 3 Fede), Scudo degli avi (scudo 2/4/6, +50% sulle truppe senza mana, 2 Fede), Morso del nulla (Corruzione 1/2/3 + Sabotaggio 1/2/3 s, 3 Fede, viola) | Placeholder (v0.24). |
+| Entrando in un'era l'evoluzione del governo si propone **dopo** la via; nessun requisito per evolvere entrando in un'era (i requisiti dei rami valgono solo per la Riforma) | Provvisoria (v0.24). |
+| Riforma: 3 Influenza per ogni tier del governo da raggiungere; ripetibile; compare solo se il governo può evolvere | Placeholder (v0.24). |
+| Cambiando governo, il nuovo governo dà anche la sua dotazione (oggi nessun governo dei tier 2 e 3 ne ha); il consigliere di corte resta | Provvisoria (v0.24). |
+| Solo i governi del tier 1 hanno una carta esclusiva; quelli dei tier 2 e 3 per ora no | Provvisoria (v0.24). |
+| Valori del Malcontento: soglia 10, avviso da 7; +2 per un fantasma perso, +1 per un incontro perso, +1 per ogni truppa senza Cibo, +1 per ogni malus subito; Ordine pubblico 2 Stabilità → −3, Predica di pace 3 Fede → −2, Distribuzione di grano 3 Cibo → −2; Tumulti in piazza da 4 | Placeholder (v0.24). |
+| Il Malcontento può superare la soglia fra un round e l'altro (es. a fine anno): la Rivoluzione arriva al primo round successivo | Provvisoria (v0.24). |
+| Rivoluzione: la causa principale è quella che ha prodotto più Malcontento dall'ultima rivoluzione (a parità vale l'ordine sconfitte, carestie, malus, eventi). Governi possibili per causa: sconfitte → Dittatura, Monarchia assoluta, Totalitarismo; carestie → Repubblica, Repubblica parlamentare, Monarchia costituzionale; malus → Teocrazia, Ierocrazia, Monarchia; scelte degli eventi → Oligarchia, Plutocrazia, Repubblica. Il governo attuale è escluso; se non resta nessuno, si sceglie fra i governi del tier 1 | Provvisoria (v0.24). |
+| Il Malcontento che sale per un'azione o un evento conta come causa "scelte degli eventi" | Provvisoria (v0.24). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 

@@ -1,10 +1,12 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 4 — 5 novembre 2026
-**Riferimento:** Game Design Document v0.22 (`docs/Ultralopolis_GDD.md`)
+**Versione:** bozza 5 — 5 novembre 2026
+**Riferimento:** Game Design Document v0.24 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `consiglieri/`, `opportunities/` per le azioni, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
 
 **Bozza 4 (GDD v0.22):** le etichette diventano **tipi** (1–2 per carta), i colori del mana sono **quattro** (viola nuovo), le risorse cambiano (via la Fauna, nuove **Stabilità** e **Documenti**), i potenziamenti si fanno con l’opzione **Potenzia** del Consiglio. Il Consiglio è in §6 bis.
+
+**Bozza 5 (GDD v0.24):** nuova identità della nazione (§6 quater): tre razze, governi a tier, quattro credi con incanti esclusivi, quattro culture, tipi d'identità, carte esclusive per razze, governi, credi e culture, Malcontento e Rivoluzione. I vecchi popoli e l'Ordine della Ragione sono stati ridistribuiti.
 
 Il GDD resta la fonte di verità per le regole. Questo documento contiene solo **contenuti**; dove un contenuto richiederebbe una regola nuova è segnalato in §7.
 
@@ -228,10 +230,10 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 | Via | Favorita da | Offerte più frequenti | Tratto permanente | Bonus immediato |
 |---|---|---|---|---|
-| Via del Commercio | Cultura mercantile, Popolo del delta, Repubblica | Tesoriere, Mercante | +1 Oro per fase da ogni edificio Economico | +6 Oro |
-| Via della Guerra | Cultura guerriera, Montanari, Monarchia | Generale, Addestramento | Le truppe Fante ricaricano il 10% più in fretta | +1 spazio truppa |
-| Via della Fede | Teocrazia, Culto del Sole, Antichi spiriti | Ambasciata, Fortificazioni | +1 Fede per fase da ogni edificio Spirituale | +4 Fede |
-| Via del Sapere | Cultura erudita, Ordine della Ragione | Studiosi | +1 Ricerca per fase da ogni edificio Accademico | +5 Ricerca |
+| Via del Commercio | Cultura mercantile, Maremani, Repubblica | Tesoriere, Mercante | +1 Oro per fase da ogni edificio Economico | +6 Oro |
+| Via della Guerra | Cultura guerriera, Pietrosangue, Monarchia | Generale, Addestramento | Le truppe Fante ricaricano il 10% più in fretta | +1 spazio truppa |
+| Via della Fede | Teocrazia, Culto solare, Spiriti dei luoghi | Ambasciata, Fortificazioni | +1 Fede per fase da ogni edificio Spirituale | +4 Fede |
+| Via del Sapere | Cultura erudita | Studiosi | +1 Ricerca per fase da ogni edificio Accademico | +5 Ricerca |
 
 **Esclusivi delle vie dell’era 2**
 
@@ -247,10 +249,10 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | Via | Favorita da | Offerte più frequenti | Tratto permanente | Bonus immediato |
 |---|---|---|---|---|
 | Via dell’Impero | Via della Guerra, Monarchia | Quartiermastro, Generale | +10 Resistenza in ogni scontro | +1 spazio truppa, +1 spazio edificio |
-| Via dell’Oro | Via del Commercio, Repubblica, Popolo del delta | Esattori, Mercante | Rinnovare le offerte costa 1 Oro in meno | +10 Oro |
-| Via della Rivelazione | Via della Fede, Teocrazia, Culto del Sole | Ambasciata | Gli edifici Spirituali producono il 10% più in fretta | +6 Fede |
-| Via dell’Ombra | Via del Sapere, Ordine della Ragione, Repubblica | Studiosi, Ambasciata | Inefficienza e Sabotaggio inflitti durano 1 s in più (§7 questione D) | +5 Influenza |
-| Via degli Spiriti *(esclusiva: solo con Antichi spiriti)* | Popolo delle foreste | Esattori | +1 Cibo per fase da ogni edificio Fauna o di Produzione | +4 Legno |
+| Via dell’Oro | Via del Commercio, Repubblica, Maremani | Esattori, Mercante | Rinnovare le offerte costa 1 Oro in meno | +10 Oro |
+| Via della Rivelazione | Via della Fede, Teocrazia, Culto solare | Ambasciata | Gli edifici Spirituali producono il 10% più in fretta | +6 Fede |
+| Via dell’Ombra | Via del Sapere, Culto del vuoto, Repubblica | Studiosi, Ambasciata | Inefficienza e Sabotaggio inflitti durano 1 s in più (§7 questione D) | +5 Influenza |
+| Via degli Spiriti *(esclusiva: solo con Spiriti dei luoghi)* | Cinerali | Esattori | +1 Cibo per fase da ogni edificio Fauna o di Produzione | +4 Legno |
 
 **Esclusivi delle vie dell’era 3**
 
@@ -293,24 +295,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 ### 5.1 Elementi dell’identità
 
-Esclusivi dell’identità (era 1, +1 punto di budget):
-
-| Esclusivo | Identità | Tipi | Colore | Valori | Punti |
-|---|---|---|---|---|---:|
-| Porto fluviale (edificio) | Popolo del delta | Economico, Infrastruttura Strategica | verde | Oro 2, Cibo 2; 1 mana ogni 2 s | 5 |
-| Arcieri dei boschi (truppa) | Popolo delle foreste | Guardiano | verde 2, 1,2 s | Danno 5 | 5 |
-| Guardie delle vette (truppa) | Montanari | Guardiano, Patriota | nessun mana, 3 s | Danno 2, Scudo 2 (gente “dura a cedere”) | 4 |
-
-**Risorsa della Capitale (GDD §6.2, v0.22).** Ogni popolo, governo, credo e cultura indica una risorsa che la Capitale produce in più (+1 a fase); risorse uguali si sommano. Placeholder:
-
-| Elemento | Risorsa | Elemento | Risorsa |
-|---|---|---|---|
-| Montanari | Pietra | Culto del Sole | Fede |
-| Popolo del delta | Influenza | Antichi spiriti | Legno |
-| Popolo delle foreste | Legno | Ordine della Ragione | Ricerca |
-| Monarchia | Stabilità | Cultura guerriera | Ferro |
-| Repubblica | Influenza | Cultura mercantile | Oro |
-| Teocrazia | Fede | Cultura erudita | Documenti |
+Dalla bozza 5 l'identità completa (razze, governi, credi, culture, esclusivi, risorse della Capitale) è in **§6 quater**.
 
 ### 5.2 Perk esistenti
 
@@ -344,7 +329,7 @@ I sei malus esistenti restano (Ricerca dimezzata, Oro dimezzato, Inefficienza, T
 
 ---
 
-## 6 bis. Il Consiglio (GDD §4.2, v0.21–v0.22)
+## 6 bis. Il Consiglio (GDD §4.2, v0.21–v0.24)
 
 Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File dati: `data/catalog/consiglieri/`. Ogni consigliere propone le carte dell’era che hanno almeno un suo tipo, più le sue azioni (file in `data/catalog/opportunities/`).
 
@@ -352,14 +337,16 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 |---|---|---|---|
 | Generale | Militare · rosso | Ferro | Quartiermastro (5 Oro, spazio truppa) · Addestramento (2 Ferro) |
 | Architetto | Opera · rosso | Pietra | Architetti (6 Oro, spazio edificio) · Fortificazioni (2 Pietra) |
-| Fattore | Terra · verde | Legno | Scorte (2 Legno → 3 Cibo) · Razioni (2 Legno: per un anno le truppe mangiano la metà) |
+| Fattore | Terra · verde | Legno | Scorte (2 Legno → 3 Cibo) · Razioni (2 Legno: per un anno le truppe mangiano la metà) · Distribuzione di grano (3 Cibo → −2 Malcontento, v0.24) |
 | Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Mercante (2 Ricerca → 4 Oro) · Assemblea (+50% Oro o Ricerca per un anno) · *Ministri:* Grandi esattori (+6 Oro) |
 | Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) · *Ministri:* Trattati (4 Legno → 5 Ricerca) |
-| Sacerdote | Fede · blu | Fede | Cinque incanti (2 Fede ciascuno) · Processione (2 Fede, solo Teocrazia) |
-| Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Decreto fiscale (2 Stabilità → 4 Oro) · Censimento (2 Stabilità: per un anno ogni consigliere mostra una proposta in più) · Tributi feudali (+5 Oro, solo Monarchia) |
+| Sacerdote | Fede · blu | Fede | Cinque incanti (2 Fede ciascuno) · Processione (2 Fede, solo Teocrazia) · Predica di pace (3 Fede → −2 Malcontento, v0.24) · un incanto esclusivo per credo (§6 quater.3) |
+| Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Decreto fiscale (2 Stabilità → 4 Oro) · Censimento (2 Stabilità: per un anno ogni consigliere mostra una proposta in più) · Tributi feudali (+5 Oro, solo Monarchia) · Ordine pubblico (2 Stabilità → −3 Malcontento, v0.24) |
 | Maestro delle spie | Ombra · viola | Oro + una risorsa casuale | Sei spionaggi (2 Documenti ciascuno) · *Ministri:* Rete di sabotatori (3 Documenti) |
 | Clown | — | — (non potenzia) | Un elemento per colore (rosso, verde, blu, viola) e un edificio neutro |
 | Anziano | — | Oro (solo edifici neutri, una volta all’anno) | Consiglio degli anziani: un perk (2 Fede + 2 Influenza) · edifici neutri |
+
+Le azioni che fanno scendere il Malcontento compaiono solo se c'è Malcontento. Governi e culture possono cambiare quanti consiglieri compaiono, quali, e quanto costano proposte, azioni e Potenzia (§6 quater).
 
 **Livelli del Consiglio** (GDD §4.2.1): Funzionari nell’era 1, Ministri nell’era 2, Gran Consiglieri nell’era 3. Le azioni in *corsivo* compaiono solo dal livello indicato (campo `min_level` dell’azione). Livelli e azioni di livello arrivano dal lavoro sul Consiglio v0.21.
 
@@ -393,7 +380,7 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 
 Compaiono nei round al posto di un consigliere. File dati: `data/catalog/eventi/` (eventi e fortune) e `data/catalog/visitatori/`. Ogni carta ha una sfera (una categoria del Consiglio) e delle radici; le opzioni fra parentesi quadre richiedono qualcosa alla nazione e, se manca, restano visibili ma spente.
 
-### Eventi (18)
+### Eventi (18 + Riforma, Tumulti e Rivoluzione)
 
 Notazione delle opzioni: **[requisito]** = opzione sbloccata solo con quel requisito. "Per un anno" segue §8.2.1. I valori seguono più o meno il budget del Catalogo (1 Oro ≈ 1 Ricerca ≈ 2 unità delle altre risorse).
 
@@ -401,15 +388,15 @@ Notazione delle opzioni: **[requisito]** = opzione sbloccata solo con quel requi
 
 | Evento | Sfera | Radici | Opzioni |
 |---|---|---|---|
-| **Il passo innevato** | Opera | favorito da Montanari | Spala la neve: 2 Pietra → 3 Ferro · Aspetta il disgelo: per un anno la Capitale produce 1 Pietra in più · **[Guardiano]** Le guardie aprono la strada: +2 Ferro |
-| **La piena del fiume** | Terra | favorito da Popolo del delta | Alza gli argini: 3 Legno → +2 Stabilità · Lascia allagare i campi: per un anno +1 Cibo per fase dagli edifici di Produzione · **[Economico]** I mercanti noleggiano chiatte: +4 Oro |
-| **Il cervo bianco** | Terra | favorito da Popolo delle foreste | Caccialo: +3 Cibo e +1 Legno · Lascialo libero: +2 Fede · **[truppa Fauna]** Addomesticalo: una truppa Fauna sale di livello |
+| **Il passo innevato** | Opera | favorito da Pietrosangue | Spala la neve: 2 Pietra → 3 Ferro · Aspetta il disgelo: per un anno la Capitale produce 1 Pietra in più · **[Guardiano]** Le guardie aprono la strada: +2 Ferro · **[Pietrosangue]** La roccia viva apre il passo: +3 Pietra e +2 Ferro |
+| **La piena del fiume** | Terra | favorito da Maremani | Alza gli argini: 3 Legno → +2 Stabilità · Lascia allagare i campi: per un anno +1 Cibo per fase dagli edifici di Produzione · **[Economico]** I mercanti noleggiano chiatte: +4 Oro · **[Maremano]** I barcaioli salvano il raccolto: +3 Cibo e +2 Influenza |
+| **La montagna si sveglia** | Terra | favorito da Cinerali | Evacua i villaggi: 2 Cibo → +3 Stabilità · Raccogli l'ossidiana: +3 Ferro e +1 Pietra · **[edificio di Produzione]** Forgia nella lava: un edificio di Produzione sale di livello · **[Cinerale]** Volano sopra la cenere: +3 Ferro e +2 Documenti |
 | **L'erede al trono** | Stato | favorito da Monarchia | Festa di corte: 3 Oro → +3 Stabilità · Matrimonio politico: 2 Stabilità → +4 Influenza · **[Nobile]** Il giuramento dei nobili: per un anno le truppe Nobili ricaricano il 10% più in fretta |
 | **Le elezioni** | Stato | favorito da Repubblica | Campagna generosa: 3 Oro → per un anno ogni consigliere mostra una proposta in più · Lascia decidere il popolo: +2 Stabilità · **[Legge]** Riforma delle leggi: 2 Documenti → +3 Stabilità e +2 Influenza |
 | **Il concilio dei sacerdoti** | Fede | favorito da Teocrazia | Dottrina severa: 2 Fede → +10 Resistenza nel prossimo scontro con il fantasma · Apertura al popolo: +2 Influenza · **[Spirituale]** Grande processione: +3 Fede |
-| **L'eclissi** | Fede | favorito da Culto del Sole | Rito di riparazione: 3 Fede → +5 Oro · Presagio di guerra: fino al prossimo fantasma le truppe ricaricano il 10% più in fretta · **[Accademico]** Gli astronomi la spiegano: +3 Ricerca |
-| **Il bosco che sussurra** | Fede | favorito da Antichi spiriti | Offerta agli spiriti: 2 Cibo → +3 Fede · Abbatti il bosco: +4 Legno · **[Guardiano]** I guardiani del bosco: ricevi gli Esploratori (se c'è spazio) |
-| **La disputa dei dotti** | Conoscenza | favorito da Ordine della Ragione | Finanzia la scuola: 3 Oro → +3 Ricerca · Pubblica gli atti: 2 Documenti → +3 Influenza · **[Accademico]** Il trattato fondamentale: +2 Ricerca e +2 Documenti |
+| **L'eclissi** | Fede | favorito da Culto solare | Rito di riparazione: 3 Fede → +5 Oro · Presagio di guerra: fino al prossimo fantasma le truppe ricaricano il 10% più in fretta · **[Accademico]** Gli astronomi la spiegano: +3 Ricerca |
+| **Il bosco che sussurra** | Fede | favorito da Spiriti dei luoghi | Offerta agli spiriti: 2 Cibo → +3 Fede · Abbatti il bosco: +4 Legno · **[Guardiano]** I guardiani del bosco: ricevi gli Esploratori (se c'è spazio) |
+| **La disputa dei dotti** | Conoscenza | favorito da Cultura erudita | Finanzia la scuola: 3 Oro → +3 Ricerca · Pubblica gli atti: 2 Documenti → +3 Influenza · **[Accademico]** Il trattato fondamentale: +2 Ricerca e +2 Documenti |
 | **Il torneo** | Militare | favorito da Cultura guerriera | Premi ricchi: 3 Oro → per un anno una truppa a scelta fa il 25% di danno in più · Torneo modesto: 1 Ferro → +2 Stabilità · **[Fante]** Il campione: una truppa Fante a scelta sale di livello |
 | **La grande fiera** | Ricchezza | favorito da Cultura mercantile | Fiera delle meraviglie: 4 Oro → ricevi un edificio Economico dell'era, a caso · Banchi per tutti: 2 Influenza → +5 Oro · **[Infrastruttura Strategica]** Le strade portano mercanti: +2 Oro e +2 Influenza |
 | **Il manoscritto perduto** | Conoscenza | favorito da Cultura erudita | Compralo: 4 Oro → +4 Documenti · Fallo copiare: 2 Documenti → +3 Ricerca · **[Criminale]** Rubalo: 1 Stabilità → +4 Documenti |
@@ -425,16 +412,24 @@ Notazione delle opzioni: **[requisito]** = opzione sbloccata solo con quel requi
 | **La grande opera** | Opera | era 3 | Costruiscila: 5 Pietra → +1 spazio edificio · Rimandala: +2 Pietra · **[Infrastruttura Strategica]** Ingegneri esperti: 3 Pietra → +1 spazio edificio |
 | **Congiura a corte** | Ombra | era 3 | Reprimi: 3 Stabilità → +10 Resistenza nel prossimo scontro con il fantasma · Infiltra i congiurati: 3 Documenti → la truppa più veloce del fantasma parte sabotata per 5 s · **[Legge]** Processo pubblico: +4 Stabilità |
 
+**Governo e Malcontento (v0.24)**
+
+| Evento | Sfera | Radici | Opzioni |
+|---|---|---|---|
+| **La Riforma** | Stato | solo se il governo può evolvere; ripetibile | Un'opzione per ramo: "Verso: …" costa 3 Influenza per tier e chiede il requisito del ramo (es. **[Nobile]** per la Monarchia assoluta) · Rimanda: nulla |
+| **Tumulti in piazza** | Stato | Malcontento almeno 4; ripetibile | Reprimi i tumulti: 2 Ferro → −3 Malcontento · Concedi pane e feste: 3 Oro → −2 · **[Legge]** Processi esemplari: −4 Malcontento e +1 Documenti · Lascia correre: +1 Malcontento |
+| **La Rivoluzione** | Stato | **arriva da sola** quando il Malcontento tocca la soglia; non si può passare | Un'opzione gratuita per ogni governo legato alla causa principale del Malcontento (§6 quater.5); poi il Malcontento si azzera |
+
 ### Visitatori (6)
 
 | Visitatore | Sfera | Radici | Che cosa propone (3 alla volta) | Prezzi |
 |---|---|---|---|---|
-| **Mercanti del delta** | Ricchezza | favoriti da Popolo del delta e Via del Commercio | Edifici Economici dell'era, compresi gli esclusivi di altre nazioni (Porto fluviale, Fondaco…) | Oro +1 |
+| **Mercanti delle lagune** | Ricchezza | favoriti da Maremani e Via del Commercio | Edifici Economici dell'era, compresi gli esclusivi di altre nazioni (Porto lagunare, Emporio…) | Oro +1 |
 | **Compagnia di ventura** | Militare | favorita da Cultura guerriera e Via della Guerra | Truppe Fante dell'era e di quella successiva | Oro +1; +3 per l'era successiva |
-| **Pellegrini** | Fede | favoriti da Teocrazia e dai credi | Incanti del Sacerdote ed elementi Spirituali dell'era | come il Sacerdote |
+| **Pellegrini** | Fede | favoriti da Teocrazia e dai credi | Incanti del Sacerdote (compresi quelli esclusivi del proprio credo) ed elementi Spirituali dell'era | come il Sacerdote |
 | **Ambasciatore straniero** | Stato | dall'era 2; favorito da Monarchia e Repubblica | Ambasciata, Decreto fiscale, Dono diplomatico (+3 Influenza) | come il Cancelliere |
-| **Contrabbandiere** | Ombra | richiede una carta Criminale sulla plancia o la Via dell'Ombra | Carte Criminali ed esclusivi di altre identità (Arcieri dei boschi, Guardie delle vette…) | Oro −1 e 1 Documenti |
-| **Inventore errante** | Conoscenza | favorito da Ordine della Ragione e Cultura erudita; non nell'ultima era | Carte dell'era successiva, in anteprima | Oro +3 |
+| **Contrabbandiere** | Ombra | richiede una carta Criminale sulla plancia o la Via dell'Ombra | Carte Criminali ed esclusivi di altre identità (Arcieri delle ceneri, Guardie delle vette…) | Oro −1 e 1 Documenti |
+| **Inventore errante** | Conoscenza | favorito da Cultura erudita; non nell'ultima era | Carte dell'era successiva, in anteprima | Oro +3 |
 
 ### Fortune (6)
 
@@ -442,14 +437,118 @@ I valori crescono con l'era: il numero indicato va moltiplicato per l'era corren
 
 | Fortuna | Sfera | Favorita da | Dono |
 |---|---|---|---|
-| **Raccolto abbondante** | Terra | Popolo del delta, Antichi spiriti | +3 Cibo |
-| **Una vena d'argento** | Opera | Montanari | +2 Ferro e +2 Oro |
-| **Visione sacra** | Fede | Culto del Sole, Teocrazia | +3 Fede |
-| **La biblioteca ritrovata** | Conoscenza | Cultura erudita, Ordine della Ragione | +2 Documenti e +1 Ricerca |
+| **Raccolto abbondante** | Terra | Maremani, Spiriti dei luoghi | +3 Cibo |
+| **Una vena d'argento** | Opera | Pietrosangue | +2 Ferro e +2 Oro |
+| **Visione sacra** | Fede | Culto solare, Teocrazia | +3 Fede |
+| **La biblioteca ritrovata** | Conoscenza | Cultura erudita | +2 Documenti e +1 Ricerca |
 | **Festa del popolo** | Stato | Repubblica, Monarchia | +2 Stabilità e +1 Influenza |
 | **Bottino dimenticato** | Militare | Cultura guerriera | +3 Ferro |
 
 Nota: il Contrabbandiere richiede una carta Criminale sulla plancia ed è favorito dalla Via dell'Ombra (§16.3 del GDD).
+
+## 6 quater. Identità della nazione (GDD §9, v0.24)
+
+File dati: `data/catalog/identita/`, `data/catalog/buildings/esclusivi/`, `data/catalog/troops/esclusive/`, `data/catalog/opportunities/esclusive/`. Ogni elemento ha un **tipo d'identità** (fuori dalle categorie) e dà +1 a fase di una risorsa alla Capitale. Le carte esclusive portano il tipo dell'elemento più 1-2 tipi di categoria.
+
+### 6 quater.1 Razze
+
+| Razza | Tipo | Resistenza | Tratto e dotazione | Esclusivi (era) | Capitale |
+|---|---|---:|---|---|---|
+| **Pietrosangue** | Pietrosangue | 8 | Parte con i Lancieri | Guardie delle vette (1) · Bastione di roccia viva (2) · Colossi di pietra (3) | Pietra |
+| **Maremani** | Maremano | 2 | +3 Oro iniziale; Mercante ed Esattori più frequenti | Porto lagunare (1) · Cantori delle maree (2) · Darsena delle lagune (3) | Influenza |
+| **Cinerali** | Cinerale | 4 | Le truppe ricaricano il 10% più in fretta | Arcieri delle ceneri (1) · Falchi di cenere (2) · Lame del vulcano (3) | Ferro |
+
+### 6 quater.2 Governi a tier
+
+Alla creazione si sceglie un governo del tier 1. Entrando in un'era (dopo la via) il governo può evolvere al tier successivo, oppure restare com'è; si evolve anche con la Riforma (§6 ter).
+
+```
+TIER 1                 TIER 2                         TIER 3
+Monarchia      ──►  Monarchia assoluta        ──►  Totalitarismo
+               └─►  Monarchia costituzionale  ──►  Repubblica parlamentare
+Repubblica     ──►  Oligarchia                ──►  Plutocrazia
+               └─►  Dittatura                 ──►  Totalitarismo
+Teocrazia      ──►  Ierocrazia
+```
+
+| Governo | Tier | Tipo | Resistenza | Effetto sul Consiglio | Requisito della Riforma | Capitale |
+|---|---:|---|---:|---|---|---|
+| **Monarchia** | 1 | Monarchico | 6 | Il primo consigliere ascoltato diventa il consigliere di corte (+2 peso); Fortificazioni più frequenti; Tributi feudali esclusivi | — | Stabilità |
+| **Repubblica** | 1 | Repubblicano | 2 | 4 consiglieri per round; proposte +1 Oro; rinnovo −1 Oro | — | Influenza |
+| **Teocrazia** | 1 | Teocratico | 4 | Il Sacerdote è sempre presente; Ambasciata più frequente; Processione esclusiva | — | Fede |
+| **Monarchia assoluta** | 2 | Assolutista | 7 | Il consigliere di corte è sempre presente | Nobile | Stabilità |
+| **Monarchia costituzionale** | 2 | Costituzionale | 5 | Cancelliere più frequente; Ambasciata −1 Stabilità | Legge | Influenza |
+| **Oligarchia** | 2 | Oligarchico | 3 | Tesoriere e Cancelliere più frequenti; Visitatori più frequenti (+2 peso) | Economico | Oro |
+| **Dittatura** | 2 | Dittatoriale | 6 | 2 consiglieri, ma quello scelto offre una proposta in più | Patriota | Ferro |
+| **Ierocrazia** | 2 | Ierocratico | 6 | Sacerdote sempre presente; le sue azioni −1 Fede | Spirituale | Fede |
+| **Totalitarismo** | 3 | Totalitario | 8 | Come la Dittatura; Maestro delle spie più frequente; spionaggi +1 s; il Clown non compare | Criminale | Documenti |
+| **Repubblica parlamentare** | 3 | Parlamentare | 4 | 4 consiglieri senza sovrapprezzo; rinnovo −1 Oro | Legge | Influenza |
+| **Plutocrazia** | 3 | Plutocratico | 3 | Proposte −1 Oro; Visitatori molto più frequenti (+4 peso); Tesoriere più frequente | Nobile | Oro |
+
+Esclusivi dei governi del tier 1: Castello del re (Monarchia, era 2), Foro (Repubblica, era 1), Guardie del tempio (Teocrazia, era 2).
+
+### 6 quater.3 Credi e incanti esclusivi
+
+| Credo | Tipo | Resistenza | Tratto | Incanto esclusivo | Carta esclusiva | Capitale |
+|---|---|---:|---|---|---|---|
+| **Culto solare** | Solare | 2 | +20% Oro prodotto | Mezzogiorno: danno + cura 2/3/4, 3 Fede | Altare del sole (1) | Fede |
+| **Spiriti dei luoghi** | Animista | 2 | Mana degli edifici il 10% più in fretta | Linfa degli spiriti: cura 2/4/6 + Inefficienza 1/2/3 s, 3 Fede | Bosco sacro (2) | Legno |
+| **Culto degli antenati** | Ancestrale | 3 | 3 di scudo a inizio scontro | Scudo degli avi: scudo 2/4/6, +50% sulle truppe senza mana, 2 Fede | Ossario degli avi (3) | Stabilità |
+| **Culto del vuoto** | Abissale | 1 | Corruzione inflitta +20% | Morso del nulla: Corruzione 1/2/3 + Sabotaggio 1/2/3 s, 3 Fede, viola | Adepti del vuoto (2) | Documenti |
+
+Gli incanti esclusivi li offrono il Sacerdote e i Pellegrini, solo alla nazione che ha quel credo.
+
+### 6 quater.4 Culture
+
+| Cultura | Tipo | Resistenza | Effetto | Carta esclusiva | Capitale |
+|---|---|---:|---|---|---|
+| **Mercantile** | Mercantile | 0 | +4 Oro iniziale; al mercato 1 unità → 1 Oro; Tesoriere più frequente | Emporio (1) | Oro |
+| **Guerriera** | Guerriero | 3 | Parte con una Milizia; azioni del Generale −1 Ferro; Generale e Addestramento più frequenti | Campioni del clan (2) | Ferro |
+| **Erudita** | Erudito | 0 | +3 Ricerca iniziale; +25% Ricerca prodotta (eredità dell'Ordine della Ragione); azioni dello Studioso −1; Studiosi più frequenti | Collegio dei saggi (2) | Ricerca |
+| **Artigiana** | Artigiano | 1 | Potenzia −1 unità; +2 Legno e +2 Pietra iniziali; Architetto più frequente | Gilda dei mastri (2) | Pietra |
+
+Gli sconti lasciano sempre almeno 1 unità.
+
+### 6 quater.5 Carte esclusive nuove
+
+| Carta | Elemento | Era | Tipi | Colore | Valori | Oro |
+|---|---|---:|---|---|---|---:|
+| Bastione di roccia viva (edificio) | Pietrosangue | 2 | Guardiano, Pietrosangue | neutro | Scudo 6 ogni 3 s | 7 |
+| Colossi di pietra (truppa) | Pietrosangue | 3 | Assedio, Pietrosangue | rosso 6, 4 s | Danno 16, Scudo 4, Assedio 14; 1 Cibo | 10 |
+| Cantori delle maree (truppa) | Maremani | 2 | Spirituale, Maremano | blu 3, 2 s | Cura 6 | 7 |
+| Darsena delle lagune (edificio) | Maremani | 3 | Produzione, Economico, Maremano | verde | Oro 5, Cibo 4; 1 mana ogni 2 s | 10 |
+| Falchi di cenere (truppa) | Cinerali | 2 | Fante, Cinerale | verde 2, 1,2 s | Danno 4, Inefficienza 2 s | 7 |
+| Lame del vulcano (truppa) | Cinerali | 3 | Fante, Cinerale | rosso 3, 1,2 s | Danno 9 | 10 |
+| Castello del re (edificio) | Monarchia | 2 | Nobile, Guardiano, Monarchico | neutro | Stabilità 2; Scudo 4 ogni 3 s | 7 |
+| Foro (edificio) | Repubblica | 1 | Legge, Repubblicano | blu | Influenza 2; 1 mana ogni 2 s | 4 |
+| Guardie del tempio (truppa) | Teocrazia | 2 | Spirituale, Guardiano, Teocratico | blu 3, 2,5 s | Scudo 5, Cura 3 | 7 |
+| Altare del sole (edificio) | Culto solare | 1 | Spirituale, Solare | blu | Oro 1, Fede 1; 1 mana ogni 2 s | 4 |
+| Bosco sacro (edificio) | Spiriti dei luoghi | 2 | Fauna, Animista | verde | Cibo 2; Cura 2; 1 mana ogni 1,5 s | 7 |
+| Ossario degli avi (edificio) | Culto degli antenati | 3 | Guardiano, Spirituale, Ancestrale | neutro | Stabilità 2; Scudo 5, Cura 2 ogni 2 s | 10 |
+| Adepti del vuoto (truppa) | Culto del vuoto | 2 | Criminale, Abissale | viola 3, 3 s | Corruzione 7 | 7 |
+| Emporio (edificio) | Cultura mercantile | 1 | Economico, Mercantile | verde | Oro 3; 1 mana ogni 1,5 s | 5 |
+| Campioni del clan (truppa) | Cultura guerriera | 2 | Fante, Patriota, Guerriero | rosso 3, 2 s | Danno 9 | 7 |
+| Collegio dei saggi (edificio) | Cultura erudita | 2 | Accademico, Erudito | viola | Ricerca 3, Documenti 1; 1 mana ogni 2 s | 7 |
+| Gilda dei mastri (edificio) | Cultura artigiana | 2 | Produzione, Infrastruttura Strategica, Artigiano | rosso | Legno 1, Pietra 1; 1 mana ogni 1,5 s | 7 |
+
+Gli esclusivi dell'era 1 che esistevano già sono stati rinominati: Porto lagunare (era Porto fluviale), Arcieri delle ceneri (erano Arcieri dei boschi, ora Fante invece di Guardiano).
+
+### 6 quater.6 Malcontento e Rivoluzione
+
+| Voce | Valore (placeholder) |
+|---|---|
+| Soglia della Rivoluzione / avviso | 10 / da 7 |
+| Sale | +2 fantasma perso · +1 incontro perso · +1 per truppa senza Cibo · +1 per malus subito · alcune opzioni degli eventi |
+| Scende | Ordine pubblico (Cancelliere): 2 Stabilità → −3 · Predica di pace (Sacerdote): 3 Fede → −2 · Distribuzione di grano (Fattore): 3 Cibo → −2 · Tumulti in piazza |
+
+Governi possibili nella Rivoluzione, secondo la causa principale (escluso il governo attuale):
+
+| Causa | Governi |
+|---|---|
+| Sconfitte | Dittatura, Monarchia assoluta, Totalitarismo |
+| Carestie | Repubblica, Repubblica parlamentare, Monarchia costituzionale |
+| Malus subiti | Teocrazia, Ierocrazia, Monarchia |
+| Scelte degli eventi | Oligarchia, Plutocrazia, Repubblica |
 
 ---
 
@@ -476,9 +575,9 @@ Tutte le questioni della bozza 1 sono decise.
 | Truppe base | 10 | 10 | 10 | 30 |
 | Vie | — | 4 | 4 + 1 esclusiva | 9 |
 | Esclusivi delle vie | — | 4 | 9 | 13 |
-| Esclusivi dell’identità | 3 | — | — | 3 |
+| Esclusivi dell’identità | 6 | 10 | 4 | 20 |
 | Perk | 11 (7 esistenti + 4 nuovi) | | | 11 |
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
-| Azioni del Consiglio | 33 (di cui 2 esclusive dell’identità e 3 dal livello Ministri) | | | 33 |
-| Eventi / Fortune / Visitatori | 18 / 6 / 6 | | | 30 |
+| Azioni del Consiglio | 40 (di cui 6 esclusive dell’identità, compresi 4 incanti dei credi, e 3 dal livello Ministri) | | | 40 |
+| Eventi / Fortune / Visitatori | 21 (18 + Riforma, Tumulti, Rivoluzione) / 6 / 6 | | | 33 |
