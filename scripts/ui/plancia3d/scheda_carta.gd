@@ -336,6 +336,10 @@ static func _riassunto_azione(opportunita: OpportunityDef) -> String:
 				ricevi.append("%d Oro" % opportunita.gain_gold)
 			if opportunita.gain_research > 0:
 				ricevi.append("%d Ricerca" % opportunita.gain_research)
+			if opportunita.cost_resources != null and not opportunita.cost_resources.is_empty():
+				dai.append(opportunita.cost_resources.describe())
+			if opportunita.gain_resources != null and not opportunita.gain_resources.is_empty():
+				ricevi.append(opportunita.gain_resources.describe())
 			if dai.is_empty():
 				return "+" + " +".join(ricevi)
 			return "%s → %s" % [" + ".join(dai), " + ".join(ricevi)]
