@@ -375,7 +375,7 @@ func test_i_fantasmi_generati_hanno_le_tecnologie_delle_ere_passate() -> void:
 	assert_eq(again.technologies, ghost.technologies, "Uguali a parità di seme.")
 
 
-# --- I dati veri del catalogo (Catalogo §6 quater) --------------------------------------
+# --- I dati veri del catalogo (Catalogo §6 quinquies) --------------------------------------
 
 func test_il_catalogo_delle_tecnologie_rispetta_le_regole() -> void:
 	var real: CatalogDef = load("res://data/catalog/catalog.tres")

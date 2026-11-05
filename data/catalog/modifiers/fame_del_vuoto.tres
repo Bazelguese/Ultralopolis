@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_m"]
+
+[resource]
+script = ExtResource("1_m")
+id = &"fame_del_vuoto"
+display_name = "Fame del vuoto"
+description = "Il nulla divora: la Corruzione inflitta da edifici e truppe è il 20% più forte."
+is_malus = false
+effect = 10
+battle_value = 3
+amount = 20
+duration_kind = 2
+stacking = 1

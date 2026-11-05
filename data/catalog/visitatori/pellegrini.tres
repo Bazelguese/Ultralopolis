@@ -8,9 +8,14 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_corruzione.tres" id="v6"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_inefficienza.tres" id="v7"]
 [ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="v8"]
-[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="v9"]
-[ext_resource type="Resource" path="res://data/catalog/identita/antichi_spiriti.tres" id="v10"]
-[ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="v11"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_solare.tres" id="v9"]
+[ext_resource type="Resource" path="res://data/catalog/identita/spiriti_dei_luoghi.tres" id="v10"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_degli_antenati.tres" id="v11"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_vuoto.tres" id="v12"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_mezzogiorno.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_linfa.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_scudo_degli_avi.tres" id="p3"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_morso_del_nulla.tres" id="p4"]
 
 [resource]
 script = ExtResource("v1")
@@ -21,5 +26,5 @@ color = &"blu"
 category_name = "Fede"
 description = "In cammino verso i santuari: offrono incanti ed elementi Spirituali dell'era."
 types = Array[StringName]([&"Spirituale"])
-actions = Array[ExtResource("v2")]([ExtResource("v3"), ExtResource("v4"), ExtResource("v5"), ExtResource("v6"), ExtResource("v7")])
-favored_by = Array[Resource]([ExtResource("v8"), ExtResource("v9"), ExtResource("v10"), ExtResource("v11")])
+actions = Array[ExtResource("v2")]([ExtResource("v3"), ExtResource("v4"), ExtResource("v5"), ExtResource("v6"), ExtResource("v7"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4")])
+favored_by = Array[Resource]([ExtResource("v8"), ExtResource("v9"), ExtResource("v10"), ExtResource("v11"), ExtResource("v12")])

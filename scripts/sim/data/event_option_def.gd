@@ -57,3 +57,7 @@ enum PieceKind {
 @export var give_tech: TechDef
 @export var give_random_tech: bool = false
 @export var give_tech_sphere: String = ""
+## Nuovo governo della nazione (IdentityDef), per la Riforma e la Rivoluzione (GDD §9.4, v0.24).
+@export var change_government: Resource
+## Malcontento in più (o, se negativo, in meno) (GDD §5.5, v0.24).
+@export var malcontent_change: int = 0

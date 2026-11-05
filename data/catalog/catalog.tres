@@ -50,10 +50,10 @@
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="34_uymuy"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="35_fp2ii"]
 [ext_resource type="Resource" path="res://data/rules/generator_rules.tres" id="35_hkuyl"]
-[ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="35_tye5o"]
-[ext_resource type="Resource" path="res://data/catalog/identita/popolo_del_delta.tres" id="36_2n8s1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/pietrosangue.tres" id="35_tye5o"]
+[ext_resource type="Resource" path="res://data/catalog/identita/maremani.tres" id="36_2n8s1"]
 [ext_resource type="Resource" path="res://data/catalog/troops/milizia.tres" id="36_03c6b"]
-[ext_resource type="Resource" path="res://data/catalog/identita/popolo_delle_foreste.tres" id="37_fp2ii"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cinerali.tres" id="37_fp2ii"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arcieri.tres" id="37_rvnac"]
 [ext_resource type="Resource" path="res://data/catalog/identita/monarchia.tres" id="38_03c6b"]
 [ext_resource type="Resource" path="res://data/catalog/troops/lancieri.tres" id="38_cd6s8"]
@@ -61,17 +61,19 @@
 [ext_resource type="Resource" path="res://data/catalog/identita/repubblica.tres" id="39_rvnac"]
 [ext_resource type="Resource" path="res://data/catalog/troops/frombolieri.tres" id="40_7tkbw"]
 [ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="40_cd6s8"]
-[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="41_hkuyl"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_solare.tres" id="41_hkuyl"]
 [ext_resource type="Resource" path="res://data/catalog/troops/cavalieri.tres" id="41_rht80"]
-[ext_resource type="Resource" path="res://data/catalog/identita/antichi_spiriti.tres" id="42_7tkbw"]
+[ext_resource type="Resource" path="res://data/catalog/identita/spiriti_dei_luoghi.tres" id="42_7tkbw"]
 [ext_resource type="Resource" path="res://data/catalog/troops/balestrieri.tres" id="42_ynrp2"]
-[ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="43_rht80"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_degli_antenati.tres" id="43_rht80"]
 [ext_resource type="Resource" path="res://data/catalog/troops/guardie.tres" id="43_v1cj4"]
 [ext_resource type="Resource" path="res://data/catalog/troops/arieti.tres" id="44_dt2h5"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_guerriera.tres" id="44_ynrp2"]
 [ext_resource type="Resource" path="res://data/catalog/troops/catapulte.tres" id="45_nc1ak"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_mercantile.tres" id="45_v1cj4"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="46_dt2h5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_vuoto.tres" id="id_vuoto"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_artigiana.tres" id="id_artigiana"]
 [ext_resource type="Resource" path="res://data/catalog/troops/paladini.tres" id="46_hcct1"]
 [ext_resource type="Resource" path="res://data/catalog/troops/moschettieri.tres" id="47_6hmn4"]
 [ext_resource type="Resource" path="res://data/catalog/perk/mura_antiche.tres" id="47_nc1ak"]
@@ -129,7 +131,7 @@
 [ext_resource type="Resource" path="res://data/catalog/eventi/biblioteca_ritrovata.tres" id="ev_1"]
 [ext_resource type="Resource" path="res://data/catalog/eventi/bosco_che_sussurra.tres" id="ev_2"]
 [ext_resource type="Resource" path="res://data/catalog/eventi/bottino_dimenticato.tres" id="ev_3"]
-[ext_resource type="Resource" path="res://data/catalog/eventi/cervo_bianco.tres" id="ev_4"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/montagna_si_sveglia.tres" id="ev_4"]
 [ext_resource type="Resource" path="res://data/catalog/eventi/concilio_dei_sacerdoti.tres" id="ev_5"]
 [ext_resource type="Resource" path="res://data/catalog/eventi/congiura_a_corte.tres" id="ev_6"]
 [ext_resource type="Resource" path="res://data/catalog/eventi/disputa_dei_dotti.tres" id="ev_7"]
@@ -153,8 +155,26 @@
 [ext_resource type="Resource" path="res://data/catalog/visitatori/compagnia_di_ventura.tres" id="vi_1"]
 [ext_resource type="Resource" path="res://data/catalog/visitatori/contrabbandiere.tres" id="vi_2"]
 [ext_resource type="Resource" path="res://data/catalog/visitatori/inventore_errante.tres" id="vi_3"]
-[ext_resource type="Resource" path="res://data/catalog/visitatori/mercanti_del_delta.tres" id="vi_4"]
+[ext_resource type="Resource" path="res://data/catalog/visitatori/mercanti_delle_lagune.tres" id="vi_4"]
 [ext_resource type="Resource" path="res://data/catalog/visitatori/pellegrini.tres" id="vi_5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/monarchia_assoluta.tres" id="gov_monarchia_assoluta"]
+[ext_resource type="Resource" path="res://data/catalog/identita/monarchia_costituzionale.tres" id="gov_monarchia_costituzionale"]
+[ext_resource type="Resource" path="res://data/catalog/identita/oligarchia.tres" id="gov_oligarchia"]
+[ext_resource type="Resource" path="res://data/catalog/identita/dittatura.tres" id="gov_dittatura"]
+[ext_resource type="Resource" path="res://data/catalog/identita/ierocrazia.tres" id="gov_ierocrazia"]
+[ext_resource type="Resource" path="res://data/catalog/identita/totalitarismo.tres" id="gov_totalitarismo"]
+[ext_resource type="Resource" path="res://data/catalog/identita/repubblica_parlamentare.tres" id="gov_repubblica_parlamentare"]
+[ext_resource type="Resource" path="res://data/catalog/identita/plutocrazia.tres" id="gov_plutocrazia"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/riforma.tres" id="ev_riforma"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/rivoluzione.tres" id="ev_rivoluzione"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/tumulti_in_piazza.tres" id="ev_tumulti"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/pellegrino_cieco.tres" id="ev_pellegrino_cieco"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/cometa.tres" id="ev_cometa"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/carovana_smarrita.tres" id="ev_carovana_smarrita"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/disertore.tres" id="ev_disertore"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/terre_di_confine.tres" id="ev_terre_di_confine"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/cantastorie.tres" id="ev_cantastorie"]
+
 
 [ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="tec_script"]
 [ext_resource type="Resource" path="res://data/catalog/tecnologie/era_1/disciplina.tres" id="tec_0"]
@@ -212,9 +232,9 @@
 [ext_resource type="Resource" path="res://data/catalog/tecnologie/era_1/chiatte.tres" id="tec_52"]
 [ext_resource type="Resource" path="res://data/catalog/tecnologie/era_2/canali.tres" id="tec_53"]
 [ext_resource type="Resource" path="res://data/catalog/tecnologie/era_3/porto_franco.tres" id="tec_54"]
-[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_1/sentieri_nascosti.tres" id="tec_55"]
-[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_2/erbe_dei_boschi.tres" id="tec_56"]
-[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_3/spiriti_del_bosco.tres" id="tec_57"]
+[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_1/vedette_delle_scogliere.tres" id="tec_55"]
+[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_2/forgia_vulcanica.tres" id="tec_56"]
+[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_3/pioggia_di_cenere.tres" id="tec_57"]
 
 [resource]
 script = ExtResource("34_2n8s1")
@@ -224,8 +244,8 @@ eras = Array[ExtResource("26_7jtq1")]([ExtResource("27_6fg57"), ExtResource("28_
 ghosts = Array[ExtResource("30_75gny")]([ExtResource("31_mpbka"), ExtResource("32_uymuy"), ExtResource("33_tye5o")])
 encounters = Array[ExtResource("16_eg6f4")]([ExtResource("17_p5yub"), ExtResource("18_eicds"), ExtResource("19_7hwyi"), ExtResource("20_5hcq5"), ExtResource("21_mleo8"), ExtResource("22_3lga0"), ExtResource("23_su3wr"), ExtResource("24_16be3"), ExtResource("25_fb16c")])
 technologies = Array[ExtResource("tec_script")]([ExtResource("tec_0"), ExtResource("tec_1"), ExtResource("tec_2"), ExtResource("tec_3"), ExtResource("tec_4"), ExtResource("tec_5"), ExtResource("tec_6"), ExtResource("tec_7"), ExtResource("tec_8"), ExtResource("tec_9"), ExtResource("tec_10"), ExtResource("tec_11"), ExtResource("tec_12"), ExtResource("tec_13"), ExtResource("tec_14"), ExtResource("tec_15"), ExtResource("tec_16"), ExtResource("tec_17"), ExtResource("tec_18"), ExtResource("tec_19"), ExtResource("tec_20"), ExtResource("tec_21"), ExtResource("tec_22"), ExtResource("tec_23"), ExtResource("tec_24"), ExtResource("tec_25"), ExtResource("tec_26"), ExtResource("tec_27"), ExtResource("tec_28"), ExtResource("tec_29"), ExtResource("tec_30"), ExtResource("tec_31"), ExtResource("tec_32"), ExtResource("tec_33"), ExtResource("tec_34"), ExtResource("tec_35"), ExtResource("tec_36"), ExtResource("tec_37"), ExtResource("tec_38"), ExtResource("tec_39"), ExtResource("tec_40"), ExtResource("tec_41"), ExtResource("tec_42"), ExtResource("tec_43"), ExtResource("tec_44"), ExtResource("tec_45"), ExtResource("tec_46"), ExtResource("tec_47"), ExtResource("tec_48"), ExtResource("tec_49"), ExtResource("tec_50"), ExtResource("tec_51"), ExtResource("tec_52"), ExtResource("tec_53"), ExtResource("tec_54"), ExtResource("tec_55"), ExtResource("tec_56"), ExtResource("tec_57")])
-identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8"), ExtResource("68_1w4xj"), ExtResource("69_wrjoy"), ExtResource("70_jdf2v"), ExtResource("71_h1k3v")])
+identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("id_vuoto"), ExtResource("id_artigiana"), ExtResource("gov_monarchia_assoluta"), ExtResource("gov_monarchia_costituzionale"), ExtResource("gov_oligarchia"), ExtResource("gov_dittatura"), ExtResource("gov_ierocrazia"), ExtResource("gov_totalitarismo"), ExtResource("gov_repubblica_parlamentare"), ExtResource("gov_plutocrazia"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8"), ExtResource("68_1w4xj"), ExtResource("69_wrjoy"), ExtResource("70_jdf2v"), ExtResource("71_h1k3v")])
 generator = ExtResource("35_hkuyl")
 advisors = Array[ExtResource("adv_script")]([ExtResource("adv_0"), ExtResource("adv_1"), ExtResource("adv_2"), ExtResource("adv_3"), ExtResource("adv_4"), ExtResource("adv_5"), ExtResource("adv_6"), ExtResource("adv_7"), ExtResource("adv_8"), ExtResource("adv_9")])
-events = Array[ExtResource("ev_script")]([ExtResource("ev_0"), ExtResource("ev_1"), ExtResource("ev_2"), ExtResource("ev_3"), ExtResource("ev_4"), ExtResource("ev_5"), ExtResource("ev_6"), ExtResource("ev_7"), ExtResource("ev_8"), ExtResource("ev_9"), ExtResource("ev_10"), ExtResource("ev_11"), ExtResource("ev_12"), ExtResource("ev_13"), ExtResource("ev_14"), ExtResource("ev_15"), ExtResource("ev_16"), ExtResource("ev_17"), ExtResource("ev_18"), ExtResource("ev_19"), ExtResource("ev_20"), ExtResource("ev_21"), ExtResource("ev_22"), ExtResource("ev_23")])
+events = Array[ExtResource("ev_script")]([ExtResource("ev_0"), ExtResource("ev_1"), ExtResource("ev_2"), ExtResource("ev_3"), ExtResource("ev_4"), ExtResource("ev_5"), ExtResource("ev_6"), ExtResource("ev_7"), ExtResource("ev_8"), ExtResource("ev_9"), ExtResource("ev_10"), ExtResource("ev_11"), ExtResource("ev_12"), ExtResource("ev_13"), ExtResource("ev_14"), ExtResource("ev_15"), ExtResource("ev_16"), ExtResource("ev_17"), ExtResource("ev_18"), ExtResource("ev_19"), ExtResource("ev_20"), ExtResource("ev_21"), ExtResource("ev_22"), ExtResource("ev_23"), ExtResource("ev_riforma"), ExtResource("ev_rivoluzione"), ExtResource("ev_tumulti"), ExtResource("ev_pellegrino_cieco"), ExtResource("ev_cometa"), ExtResource("ev_carovana_smarrita"), ExtResource("ev_disertore"), ExtResource("ev_terre_di_confine"), ExtResource("ev_cantastorie")])
 visitors = Array[ExtResource("adv_script")]([ExtResource("vi_0"), ExtResource("vi_1"), ExtResource("vi_2"), ExtResource("vi_3"), ExtResource("vi_4"), ExtResource("vi_5")])

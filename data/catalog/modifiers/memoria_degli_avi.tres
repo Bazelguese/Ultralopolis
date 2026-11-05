@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_m"]
+
+[resource]
+script = ExtResource("1_m")
+id = &"memoria_degli_avi"
+display_name = "Memoria degli avi"
+description = "Gli antenati vegliano: la nazione inizia ogni scontro con 3 di scudo."
+is_malus = false
+effect = 12
+amount = 3
+duration_kind = 2
+stacking = 1

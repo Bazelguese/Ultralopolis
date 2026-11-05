@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"colossi_di_pietra"
+display_name = "Colossi di pietra"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Assedio", &"Pietrosangue"])
+food_tenths = 10
+mana_type = &"rosso"
+mana_cost = 6
+cooldown_ms = 4000
+damage = 16
+shield = 4
+siege_damage = 14

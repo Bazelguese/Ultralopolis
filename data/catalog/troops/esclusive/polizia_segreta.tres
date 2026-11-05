@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"polizia_segreta"
+display_name = "Polizia segreta"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Criminale", &"Legge", &"Totalitario"])
+mana_type = &"viola"
+mana_cost = 4
+cooldown_ms = 3000
+damage = 6
+inefficiency_ms = 3000

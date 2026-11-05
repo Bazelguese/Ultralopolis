@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
 [ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
-[ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="e4"]
 
 [sub_resource type="Resource" id="RA_2"]
 script = ExtResource("e3")
@@ -49,6 +49,16 @@ gain = SubResource("RA_8")
 give_random_tech = true
 give_tech_sphere = "Conoscenza"
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+ricerca = 1
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Ascolta entrambi"
+description = "Ricevi 1 Ricerca."
+gain = SubResource("N100_gain")
+
 [resource]
 script = ExtResource("e1")
 id = &"disputa_dei_dotti"
@@ -57,4 +67,4 @@ description = "Due scuole di pensiero si contendono la capitale."
 sphere = "Conoscenza"
 color = &"viola"
 favored_by = Array[Resource]([ExtResource("e4")])
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7"), SubResource("N100")])

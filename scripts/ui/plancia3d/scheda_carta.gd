@@ -234,6 +234,15 @@ static func da_evento(run: RunState, evento: EventDef) -> SchedaCarta:
 	scheda.riga = "Un dono" if fortuna else "%d scelte" % evento.options.size()
 	var righe: PackedStringArray = PackedStringArray()
 	righe.append(evento.description)
+	if evento.special == EventDef.Special.RIVOLUZIONE:
+		scheda.riga = "Arriva da sola"
+		for governo: IdentityDef in run.revolution_targets():
+			righe.append("• Verso: %s" % governo.display_name)
+		righe.append("Causa principale del Malcontento: %s." % IdentityDef.GRIEVANCE_NAMES[run.main_grievance()])
+	elif evento.special == EventDef.Special.RIFORMA:
+		scheda.riga = "%d scelte" % (run.evolution_targets().size() + evento.options.size())
+		for governo: IdentityDef in run.evolution_targets():
+			righe.append("• Verso: %s" % governo.display_name)
 	for opzione: EventOptionDef in evento.options:
 		var requisito: String = run.option_requirement(opzione)
 		righe.append("• %s%s" % ["[%s] " % requisito if requisito != "" else "", opzione.label])
@@ -301,6 +310,32 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	scheda.riga = "Scegli questa via"
 	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: offerte, elementi esclusivi, un tratto permanente e un bonus immediato."
 	scheda.illustrazione = _carica("vie/%s.png" % via.id)
+	return scheda
+
+
+## Un governo a cui la nazione può evolvere entrando nell'era (GDD §9.4, v0.24).
+static func da_governo(governo: IdentityDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.VIA
+	scheda.id = governo.id
+	scheda.titolo = governo.display_name
+	scheda.sopratitolo = "Governo · tier %d" % governo.tier
+	scheda.riga = "Evolvi verso questo governo"
+	scheda.costo = "Evolvi"
+	scheda.dettagli = governo.description + "\nIl tratto del governo attuale finisce e vale questo; le carte sulla plancia restano."
+	scheda.illustrazione = _carica("identita/%s.png" % governo.id)
+	return scheda
+
+
+## La carta per rifiutare l'evoluzione del governo.
+static func da_resta(governo: IdentityDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.VIA
+	scheda.titolo = "Resta com'è"
+	scheda.sopratitolo = "Governo"
+	scheda.riga = "Rifiuta l'evoluzione"
+	scheda.costo = "Resta"
+	scheda.dettagli = "Il governo resta %s. Potrai evolvere entrando nella prossima era, o con una Riforma." % (governo.display_name if governo != null else "com'è")
 	return scheda
 
 
@@ -384,6 +419,8 @@ static func _riassunto_azione(opportunita: OpportunityDef) -> String:
 				dai.append(opportunita.cost_resources.describe())
 			if opportunita.gain_resources != null and not opportunita.gain_resources.is_empty():
 				ricevi.append(opportunita.gain_resources.describe())
+			if opportunita.malcontent_change != 0:
+				ricevi.append("%+d Malcontento" % opportunita.malcontent_change)
 			if dai.is_empty():
 				return "+" + " +".join(ricevi)
 			return "%s → %s" % [" + ".join(dai), " + ".join(ricevi)]

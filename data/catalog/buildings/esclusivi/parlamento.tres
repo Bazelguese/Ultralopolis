@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"parlamento"
+display_name = "Parlamento"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Legge", &"Infrastruttura Strategica", &"Parlamentare"])
+influence_per_phase = 3
+stability_per_phase = 2
+mana_type = &"blu"
+mana_amount = 2
+mana_interval_ms = 2000

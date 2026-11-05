@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"ossario_degli_avi"
+display_name = "Ossario degli avi"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Guardiano", &"Spirituale", &"Ancestrale"])
+stability_per_phase = 2
+mana_type = &"neutro"
+mana_interval_ms = 2000
+shield = 5
+heal = 2

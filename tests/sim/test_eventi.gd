@@ -312,3 +312,24 @@ func test_il_visitatore_propone_carte_straniere_e_dell_era_successiva() -> void:
 	assert_true(run.buy_offer(porto))
 	assert_eq(run.stock[Res.Type.DOCUMENTI], 0)
 	assert_eq(run.board.buildings[-1].building, foreign)
+
+
+func test_un_tipo_d_identita_straniero_sblocca_l_opzione() -> void:
+	# GDD §6.6 (v0.24): una carta esclusiva di un'altra nazione porta in casa il suo tipo
+	# d'identità, che sblocca le opzioni di quella nazione.
+	var archers: TroopDef = TroopDef.new()
+	archers.id = &"arcieri"
+	archers.display_name = "Arcieri"
+	archers.types = [&"Fante", &"Cinerale"]
+	archers.cooldown_ms = 1000
+	var free_option: EventOptionDef = _option("Sempre", {"oro": 1})
+	var by_identity_type: EventOptionDef = _option("Volano sopra la cenere", {"ferro": 3})
+	by_identity_type.requires_types = [&"Cinerale"]
+	catalog.events = [_event(&"montagna", [free_option, by_identity_type])]
+	var run: RunState = _run()
+	assert_true(run.choose_event())
+	assert_string_contains(run.option_block_reason(by_identity_type), "Cinerale")
+	run.board.troops.append(BoardPiece.of_troop(archers, 0))
+	assert_eq(run.option_block_reason(by_identity_type), "", "La carta straniera porta il suo tipo.")
+	assert_true(run.take_event_option(1))
+	assert_eq(run.stock[Res.Type.FERRO], 3)

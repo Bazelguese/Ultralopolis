@@ -187,6 +187,11 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 	while not run.is_over() and guard < 1000:
 		guard += 1
 		match run.phase:
+			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE when run.is_revolution_round():
+				# La Rivoluzione arriva da sola: si sceglie il primo governo possibile (GDD §9.4.2).
+				if run.chosen_event == null:
+					run.choose_event()
+				assert_true(run.take_event_option(0), run.last_error)
 			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
 				# Ascolta il primo consigliere, potenzia se può, compra la prima proposta che si può
 				# pagare senza sostituzioni e senza scelte, altrimenti passa.
@@ -253,12 +258,19 @@ func test_ogni_tipo_delle_carte_sta_in_una_categoria() -> void:
 			cards.append([def.id, def.types])
 		for def: TroopDef in identity.exclusive_troops:
 			cards.append([def.id, def.types])
+	# I tipi d'identità stanno fuori dalle categorie (GDD §6.6, v0.24).
+	var identity_types: Array[StringName] = IdentityRules.identity_types(catalog)
 	for card: Array in cards:
 		var card_types: Array[StringName] = card[1]
 		assert_between(card_types.size(), 1, 3, "1–3 tipi per %s" % card[0])
+		var category_types: int = 0
 		for card_type: StringName in card_types:
 			used[card_type] = true
+			if identity_types.has(card_type):
+				continue
+			category_types += 1
 			assert_true(in_categories.has(card_type), "Il tipo %s di %s sta in una categoria" % [card_type, card[0]])
+		assert_gt(category_types, 0, "%s ha almeno un tipo di categoria" % card[0])
 	for card_type: StringName in in_categories:
 		assert_true(used.has(card_type), "Il tipo %s è usato da almeno una carta" % card_type)
 
@@ -303,7 +315,7 @@ func test_ogni_consigliere_ha_edifici_truppe_e_azioni_in_ogni_era() -> void:
 
 
 func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
-	# Bozza v0.23: 18 eventi, 6 fortune, 6 visitatori; ogni evento ha un'opzione senza requisiti.
+	# Bozza v0.23: 18 eventi, 6 fortune, 6 visitatori; ogni evento ha un'opzione gratuita senza requisiti.
 	var catalog: CatalogDef = _catalog()
 	var categories: Array[String] = []
 	for advisor: AdvisorDef in catalog.advisors:
@@ -311,22 +323,113 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 			categories.append(advisor.category_name)
 	var events: int = 0
 	var fortunes: int = 0
+	var revolutions: int = 0
 	for event: EventDef in catalog.events:
 		assert_true(categories.has(event.sphere), "La sfera di %s è una categoria" % event.id)
+		# La Rivoluzione arriva da sola e costruisce le sue opzioni dai governi (GDD §9.4.2).
+		if event.special == EventDef.Special.RIVOLUZIONE:
+			revolutions += 1
+			continue
 		assert_false(event.options.is_empty(), "Opzioni di %s" % event.id)
 		var free: bool = false
 		for option: EventOptionDef in event.options:
-			if option.requires_identity.is_empty() and option.requires_types.is_empty():
+			# Si può sempre scegliere qualcosa, anche senza risorse né carte adatte (Davide, 5 novembre).
+			if option.requires_identity.is_empty() and option.requires_types.is_empty() \
+					and (option.cost == null or option.cost.is_empty()):
 				free = true
-		assert_true(free, "%s ha un'opzione senza requisiti" % event.id)
+		assert_true(free, "%s ha un'opzione gratuita e senza requisiti" % event.id)
 		if event.family == EventDef.Family.FORTUNA:
 			fortunes += 1
 			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
 		else:
 			events += 1
-	assert_eq(events, 18)
+	assert_eq(events, 26, "18 eventi, la Riforma, i Tumulti in piazza e 6 eventi senza costi (v0.24).")
+	assert_eq(revolutions, 1, "Una Rivoluzione.")
 	assert_eq(fortunes, 6)
 	assert_eq(catalog.visitors.size(), 6)
 	for visitor: AdvisorDef in catalog.visitors:
 		assert_eq(visitor.special, AdvisorDef.Special.VISITATORE, "%s è un visitatore" % visitor.id)
 		assert_true(categories.has(visitor.category_name), "La sfera di %s è una categoria" % visitor.id)
+
+
+func test_identita_del_prototipo_v024() -> void:
+	# GDD §9.3 (v0.24): 3 razze, 3 governi alla creazione, 4 credi, 4 culture.
+	# L'Ordine della Ragione non è più un credo: il sapere passa alla Cultura erudita.
+	var catalog: CatalogDef = _catalog()
+	var expected: Dictionary[IdentityDef.Dimension, Array] = {
+		IdentityDef.Dimension.POPOLO: [&"pietrosangue", &"maremani", &"cinerali"],
+		IdentityDef.Dimension.GOVERNO: [&"monarchia", &"repubblica", &"teocrazia"],
+		IdentityDef.Dimension.CREDO: [&"culto_solare", &"spiriti_dei_luoghi", &"culto_degli_antenati", &"culto_del_vuoto"],
+		IdentityDef.Dimension.CULTURA: [&"cultura_mercantile", &"cultura_guerriera", &"cultura_erudita", &"cultura_artigiana"],
+	}
+	for dimension: IdentityDef.Dimension in expected:
+		var ids: Array[StringName] = []
+		for def: IdentityDef in IdentityRules.options(catalog, dimension):
+			ids.append(def.id)
+		for wanted: StringName in expected[dimension]:
+			assert_true(ids.has(wanted), "%s fra le opzioni" % wanted)
+		assert_eq(ids.size(), expected[dimension].size(), "Numero di opzioni per %s" % IdentityDef.DIMENSION_NAMES[dimension])
+
+
+func test_tipi_d_identita() -> void:
+	# GDD §6.6 (v0.24): un tipo per elemento, fuori dalle categorie; le carte esclusive
+	# dell'elemento lo portano, con al massimo 1 tipo d'identità per carta.
+	var catalog: CatalogDef = _catalog()
+	var categories: Dictionary[StringName, bool] = {}
+	for advisor: AdvisorDef in catalog.advisors:
+		for card_type: StringName in advisor.types:
+			categories[card_type] = true
+	var identity_types: Array[StringName] = IdentityRules.identity_types(catalog)
+	var seen: Dictionary[StringName, bool] = {}
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == IdentityDef.Dimension.PERK:
+			continue
+		assert_ne(def.identity_type, &"", "Tipo d'identità di %s" % def.id)
+		assert_false(seen.has(def.identity_type), "Tipo ripetuto: %s" % def.identity_type)
+		seen[def.identity_type] = true
+		assert_false(categories.has(def.identity_type), "%s sta fuori dalle categorie" % def.identity_type)
+		var cards: Array[Array] = []
+		for card: BuildingDef in def.exclusive_buildings:
+			cards.append([card.id, card.types])
+		for card: TroopDef in def.exclusive_troops:
+			cards.append([card.id, card.types])
+		for card: Array in cards:
+			var card_types: Array[StringName] = card[1]
+			assert_true(card_types.has(def.identity_type), "%s porta il tipo %s" % [card[0], def.identity_type])
+			var count: int = 0
+			for card_type: StringName in card_types:
+				if identity_types.has(card_type):
+					count += 1
+			assert_eq(count, 1, "Un solo tipo d'identità su %s" % card[0])
+
+
+func test_esclusivi_dell_identita() -> void:
+	# GDD §9.3, §6.6 (v0.24): le razze hanno esclusivi in ogni era; ogni governo (di qualunque
+	# tier), credo e cultura ha almeno una carta esclusiva.
+	var catalog: CatalogDef = _catalog()
+	for def: IdentityDef in catalog.identities:
+		var eras: Dictionary[int, bool] = {}
+		for card: BuildingDef in def.exclusive_buildings:
+			eras[card.era] = true
+		for card: TroopDef in def.exclusive_troops:
+			eras[card.era] = true
+		match def.dimension:
+			IdentityDef.Dimension.POPOLO:
+				for era: int in range(1, catalog.eras.size() + 1):
+					assert_true(eras.has(era), "%s: esclusivo nell'era %d" % [def.id, era])
+			IdentityDef.Dimension.GOVERNO, IdentityDef.Dimension.CREDO, IdentityDef.Dimension.CULTURA:
+				assert_false(eras.is_empty(), "%s ha una carta esclusiva" % def.id)
+
+
+func test_ogni_governo_ha_una_causa_di_rivoluzione_e_ogni_causa_dei_governi() -> void:
+	# GDD §9.4.2 (v0.24): la causa del Malcontento decide quali governi sono possibili.
+	var catalog: CatalogDef = _catalog()
+	var per_cause: Dictionary[int, int] = {}
+	for def: IdentityDef in catalog.identities:
+		if def.dimension != IdentityDef.Dimension.GOVERNO:
+			continue
+		assert_false(def.revolution_causes.is_empty(), "%s ha una causa" % def.id)
+		for cause: int in def.revolution_causes:
+			per_cause[cause] = per_cause.get(cause, 0) + 1
+	for cause: IdentityDef.Grievance in IdentityDef.GRIEVANCE_NAMES:
+		assert_gte(per_cause.get(cause, 0), 2, "Almeno due governi per %s" % IdentityDef.GRIEVANCE_NAMES[cause])

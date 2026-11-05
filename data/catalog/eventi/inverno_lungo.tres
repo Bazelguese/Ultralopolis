@@ -43,6 +43,17 @@ description = "Ricevi 3 Cibo."
 requires_types = Array[StringName]([&"Produzione"])
 gain = SubResource("RA_7")
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+legno = 2
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Taglia i boschi del re"
+description = "Ricevi 2 Legno, ma il Malcontento sale di 1."
+gain = SubResource("N100_gain")
+malcontent_change = 1
+
 [resource]
 script = ExtResource("e1")
 id = &"inverno_lungo"
@@ -52,4 +63,4 @@ sphere = "Terra"
 color = &"verde"
 min_era = 1
 max_era = 1
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6"), SubResource("N100")])

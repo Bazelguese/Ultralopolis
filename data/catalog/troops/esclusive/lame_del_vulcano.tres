@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"lame_del_vulcano"
+display_name = "Lame del vulcano"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Fante", &"Cinerale"])
+mana_type = &"rosso"
+mana_cost = 3
+cooldown_ms = 1200
+damage = 9

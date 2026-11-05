@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"adepti_del_vuoto"
+display_name = "Adepti del vuoto"
+era = 2
+cost_gold = 7
+types = Array[StringName]([&"Criminale", &"Abissale"])
+mana_type = &"viola"
+mana_cost = 3
+cooldown_ms = 3000
+corruption = 7

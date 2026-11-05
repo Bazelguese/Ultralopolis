@@ -91,9 +91,7 @@ func test_le_carte_corrispondono_alla_plancia_ai_consiglieri_e_alle_proposte() -
 	assert_eq(_carte("_edifici", 0).size(), run.board.buildings.size(), "Una carta per ogni edificio.")
 	var scelte: Array = _scena.get("_scelte")
 	assert_gt(run.advisor_choices.size(), 0, "Ci sono consiglieri nel primo round.")
-	# Un Evento o una Fortuna del round ha la sua carta accanto ai consiglieri (GDD §4.2.5).
-	var carte_round: int = run.advisor_choices.size() + (1 if run.event_choice != null else 0)
-	assert_eq(scelte.size(), carte_round, "Prima del round: una carta per ogni consigliere (e per l'evento).")
+	assert_eq(scelte.size(), _carte_del_round(run), "Prima del round: una carta per ogni consigliere e per l'evento.")
 	_scena.call("_clic_scelta", scelte[0])
 	assert_not_null(run.chosen_advisor, "Cliccando la carta si ascolta il consigliere.")
 	scelte = _scena.get("_scelte")
@@ -107,7 +105,7 @@ func test_passare_il_round_aggiorna_le_carte() -> void:
 	hud.passa.emit()
 	assert_ne(run.round_number, numero, "Si passa al round successivo.")
 	var scelte: Array = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.advisor_choices.size() + (1 if run.event_choice != null else 0))
+	assert_eq(scelte.size(), _carte_del_round(run))
 
 
 func test_potenzia_dal_pannello_della_carta() -> void:
@@ -157,10 +155,7 @@ func test_uno_scontro_si_rigioca_fino_all_esito() -> void:
 
 func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	var run: RunState = _run()
-	# Le tecnologie dell'era 1 richieste per l'era 2 (GDD §10.3, v0.25).
-	for def: TechDef in run.catalog.technologies:
-		if def.era == 1 and run.techs_done_in_era(1) < run.next_era_techs_needed():
-			run.techs_done.append(def)
+	_completa_tecnologie_dell_era(run)
 	assert_true(run.advance_era(), "Si può avanzare di era.")
 	_scena.call("_aggiorna_tutto")
 	if run.way_choices.is_empty():
@@ -171,7 +166,32 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
 	scelte = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.advisor_choices.size() + (1 if run.event_choice != null else 0), "Dopo la via tornano i consiglieri del round.")
+	# Dopo la via il governo può evolvere (GDD §9.4, v0.24): una carta per ramo più "Resta com'è".
+	if not run.government_choices.is_empty():
+		var governo: IdentityDef = run.government()
+		assert_eq(scelte.size(), run.government_choices.size() + 1, "Una carta per ramo e una per restare.")
+		_scena.call("_clic_scelta", scelte[scelte.size() - 1])
+		assert_true(run.government_choices.is_empty(), "L'ultima carta rifiuta l'evoluzione.")
+		assert_eq(run.government(), governo, "Il governo resta com'è.")
+		scelte = _scena.get("_scelte")
+	assert_eq(scelte.size(), _carte_del_round(run), "Dopo la via tornano i consiglieri del round.")
+
+
+func test_entrando_in_una_nuova_era_il_governo_puo_evolvere() -> void:
+	var run: RunState = _run()
+	_completa_tecnologie_dell_era(run)
+	assert_true(run.advance_era())
+	while not run.way_choices.is_empty():
+		run.choose_way(0)
+	_scena.call("_aggiorna_tutto")
+	if run.government_choices.is_empty():
+		pass_test("Il governo di prova non evolve.")
+		return
+	var nuovo: IdentityDef = run.government_choices[0]
+	var scelte: Array = _scena.get("_scelte")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_eq(run.government(), nuovo, "Cliccando la carta il governo evolve.")
+	assert_true(run.government_choices.is_empty())
 
 
 ## Cambiare qualcosa sulla plancia non rifà le offerte: restano le stesse carte, senza nuova entrata.
@@ -234,6 +254,39 @@ func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	assert_almost_eq(float(larghezze[0]), attesa, 0.001)
 	var plancia: Node3D = _scena.get("_plancia")
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
+
+
+## Le tecnologie dell'era corrente richieste per la prossima era (GDD §10.3, v0.25).
+func _completa_tecnologie_dell_era(run: RunState) -> void:
+	for def: TechDef in run.catalog.technologies:
+		if def.era == run.era and run.techs_done_in_era(run.era) < run.next_era_techs_needed():
+			run.techs_done.append(def)
+
+
+## Carte attese prima di scegliere: i consiglieri del round più l'evento, se c'è (GDD §4.2.5).
+func _carte_del_round(run: RunState) -> int:
+	return run.advisor_choices.size() + (1 if run.event_choice != null else 0)
+
+
+func test_la_rivoluzione_occupa_il_tavolo_e_non_si_puo_passare() -> void:
+	# GDD §5.5, §9.4.2 (v0.24): raggiunta la soglia il round mostra solo la Rivoluzione.
+	var run: RunState = _run()
+	run.malcontent = run.run_rules.malcontent_threshold
+	run.pass_round()
+	_scena.call("_aggiorna_tutto")
+	assert_true(run.is_revolution_round(), "Arriva la Rivoluzione.")
+	var scelte: Array = _scena.get("_scelte")
+	assert_eq(scelte.size(), 1, "Sul tavolo solo la Rivoluzione.")
+	var hud: HudPlancia = _scena.get("_hud")
+	assert_false((hud.get("_pulsante_passa") as Button).visible, "Non si può passare.")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_not_null(run.chosen_event, "Cliccando si apre la Rivoluzione.")
+	scelte = _scena.get("_scelte")
+	assert_eq(scelte.size(), run.revolution_targets().size(), "Una carta per ogni governo possibile.")
+	var nuovo: IdentityDef = run.revolution_targets()[0]
+	_scena.call("_clic_scelta", scelte[0])
+	assert_eq(run.government(), nuovo)
+	assert_eq(run.malcontent, 0)
 
 
 ## La Ricerca si sceglie dal pannello (GDD §10.5, §14.3): la mano mostra le carte vere della run

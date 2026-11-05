@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"collegio_dei_sacerdoti"
+display_name = "Collegio dei sacerdoti"
+era = 2
+cost_gold = 7
+types = Array[StringName]([&"Spirituale", &"Legge", &"Ierocratico"])
+faith_per_phase = 2
+mana_type = &"blu"
+mana_amount = 1
+mana_interval_ms = 2000
+heal = 2

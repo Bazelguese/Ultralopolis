@@ -5,11 +5,11 @@
 [ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_7b624"]
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="4_1iylq"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="5_jyrfm"]
-[ext_resource type="Resource" path="res://data/catalog/identita/popolo_delle_foreste.tres" id="6_570nj"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cinerali.tres" id="6_570nj"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/esattori.tres" id="7_jrftg"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="8_kyp4d"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_spiriti_cibo.tres" id="9_pvh4n"]
-[ext_resource type="Resource" path="res://data/catalog/identita/antichi_spiriti.tres" id="10_kvkrr"]
+[ext_resource type="Resource" path="res://data/catalog/identita/spiriti_dei_luoghi.tres" id="10_kvkrr"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="10_kx25f"]
 
 [sub_resource type="Resource" id="Resource_asojx"]
@@ -20,7 +20,7 @@ legno = 4
 script = ExtResource("10_kx25f")
 id = &"via_degli_spiriti"
 display_name = "Via degli Spiriti"
-description = "Esclusiva di chi segue gli Antichi spiriti. +1 Cibo per fase da ogni edificio Fauna o di Produzione; Esattori più frequenti. Bonus: +4 Legno."
+description = "Esclusiva di chi segue gli Spiriti dei luoghi. +1 Cibo per fase da ogni edificio Fauna o di Produzione; Esattori più frequenti. Bonus: +4 Legno."
 dimension = 5
 extra_resources = SubResource("Resource_asojx")
 favored_opportunities = Array[ExtResource("3_7b624")]([ExtResource("7_jrftg")])

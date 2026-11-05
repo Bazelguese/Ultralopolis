@@ -2,7 +2,7 @@
 
 **Versione:** bozza 2 — 5 novembre 2026
 **Riferimento:** Game Design Document v0.23 (`docs/Ultralopolis_GDD.md`), §9 Identità della civiltà
-**Stato:** **approvata da Davide il 5 novembre 2026 e riportata nel GDD v0.24.** Nomi ed effetti sono **placeholder**; i valori numerici vengono ignorati di proposito. Le voci rimaste **Proposta** sono dettagli non discussi uno per uno: nel GDD compaiono come Proposta.
+**Stato:** **approvata da Davide il 5 novembre 2026, riportata nel GDD v0.24 e implementata nel gioco (le 7 tappe del §9; catalogo in `docs/Catalogo.md` §6 quater).** Nomi ed effetti sono **placeholder**; i valori numerici vengono ignorati di proposito. Le voci rimaste **Proposta** sono dettagli non discussi uno per uno: nel GDD compaiono come Proposta.
 
 **Storia del documento.**
 - La bozza 1 è nata in un'altra sessione, sul ramo `claude/exciting-wright-ax675q`, partendo dal GDD v0.21.

@@ -16,6 +16,8 @@ var hungry: bool = false
 var enchant: OpportunityDef
 ## Quantità dell'effetto dell'incanto, fissata quando la truppa viene incantata.
 var enchant_amount: int = 0
+## Quantità del secondo effetto, per gli incanti esclusivi che ne hanno due (GDD §9.4, v0.24).
+var enchant_amount_2: int = 0
 
 
 static func of_building(def: BuildingDef, p_paid: int) -> BoardPiece:

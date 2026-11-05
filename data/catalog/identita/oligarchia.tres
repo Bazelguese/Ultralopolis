@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/plutocrazia.tres" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/tesoriere.tres" id="x4"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/cancelliere.tres" id="x5"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x6"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_oligarchia_oro.tres" id="x7"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/banco_delle_famiglie.tres" id="p2"]
+
+[resource]
+script = ExtResource("x1")
+id = &"oligarchia"
+display_name = "Oligarchia"
+description = "Poche famiglie tengono le redini. Tesoriere e Cancelliere più frequenti; i Visitatori compaiono più spesso. Carta esclusiva: Banco delle famiglie (era 2). Capitale: +1 Oro."
+dimension = 1
+identity_type = &"Oligarchico"
+resistance_bonus = 3
+tier = 2
+evolves_to = Array[Resource]([ExtResource("x2")])
+reform_requires_types = Array[StringName]([&"Economico"])
+visitor_weight_change = 2
+favored_advisors = Array[ExtResource("x3")]([ExtResource("x4"), ExtResource("x5")])
+permanent_modifiers = Array[ExtResource("x6")]([ExtResource("x7")])
+revolution_causes = Array[int]([3])
+exclusive_buildings = Array[ExtResource("p1")]([ExtResource("p2")])

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/totalitarismo.tres" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/pugno_di_ferro.tres" id="x4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_dittatura_ferro.tres" id="x5"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/milizia_del_regime.tres" id="p2"]
+
+[resource]
+script = ExtResource("x1")
+id = &"dittatura"
+display_name = "Dittatura"
+description = "Un solo uomo al comando. Compaiono 2 consiglieri, ma quello scelto offre una proposta in più. Carta esclusiva: Milizia del regime (era 2). Capitale: +1 Ferro."
+dimension = 1
+identity_type = &"Dittatoriale"
+resistance_bonus = 6
+tier = 2
+evolves_to = Array[Resource]([ExtResource("x2")])
+reform_requires_types = Array[StringName]([&"Patriota"])
+advisors_change = -1
+permanent_modifiers = Array[ExtResource("x3")]([ExtResource("x4"), ExtResource("x5")])
+revolution_causes = Array[int]([0])
+exclusive_troops = Array[ExtResource("p1")]([ExtResource("p2")])

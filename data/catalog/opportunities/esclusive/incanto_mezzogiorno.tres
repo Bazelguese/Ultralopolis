@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+fede = 3
+
+[resource]
+script = ExtResource("x1")
+id = &"incanto_mezzogiorno"
+display_name = "Incanto: mezzogiorno"
+description = "Esclusivo del Culto solare. Paghi 3 Fede: una truppa a tua scelta, una sola volta, fa danno in più e cura in più (2/3/4 ciascuno secondo l'era) e chiede 2 mana in più, blu se prima non ne chiedeva."
+kind = 8
+cost_resources = SubResource("S1")
+enchant_value = 0
+enchant_amounts = PackedInt32Array(2, 3, 4)
+enchant_color = &"blu"
+enchant_value_2 = 2
+enchant_amounts_2 = PackedInt32Array(2, 3, 4)

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/tesoriere.tres" id="x3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_plutocrazia_oro.tres" id="x5"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/mercenari_dei_magnati.tres" id="p2"]
+
+[resource]
+script = ExtResource("x1")
+id = &"plutocrazia"
+display_name = "Plutocrazia"
+description = "Governa chi paga. Le proposte costano 1 Oro in meno, i Visitatori compaiono molto più spesso, Tesoriere più frequente. Carta esclusiva: Mercenari dei magnati (era 3). Capitale: +1 Oro."
+dimension = 1
+identity_type = &"Plutocratico"
+resistance_bonus = 3
+tier = 3
+reform_requires_types = Array[StringName]([&"Nobile"])
+proposal_gold_change = -1
+visitor_weight_change = 4
+favored_advisors = Array[ExtResource("x2")]([ExtResource("x3")])
+permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5")])
+revolution_causes = Array[int]([3])
+exclusive_troops = Array[ExtResource("p1")]([ExtResource("p2")])

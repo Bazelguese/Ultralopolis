@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/disgelo.tres" id="e5"]
-[ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="e6"]
+[ext_resource type="Resource" path="res://data/catalog/identita/pietrosangue.tres" id="e6"]
 
 [sub_resource type="Resource" id="RA_2"]
 script = ExtResource("e3")
@@ -39,6 +39,18 @@ description = "Ricevi 2 Ferro."
 requires_types = Array[StringName]([&"Guardiano"])
 gain = SubResource("RA_6")
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+pietra = 3
+ferro = 2
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "La roccia viva apre il passo"
+description = "Ricevi 3 Pietra e 2 Ferro."
+gain = SubResource("N100_gain")
+requires_types = Array[StringName]([&"Pietrosangue"])
+
 [resource]
 script = ExtResource("e1")
 id = &"passo_innevato"
@@ -47,4 +59,4 @@ description = "La neve ha chiuso il passo che porta alle miniere."
 sphere = "Opera"
 color = &"rosso"
 favored_by = Array[Resource]([ExtResource("e6")])
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_5")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_5"), SubResource("N100")])

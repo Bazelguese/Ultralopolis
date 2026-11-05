@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
 [ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
-[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_solare.tres" id="e4"]
 [ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="e5"]
 
 [sub_resource type="Resource" id="RA_2"]

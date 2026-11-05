@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"rivoluzione"
+display_name = "La Rivoluzione"
+description = "Il Malcontento è esploso: il popolo prende le piazze e rovescia il governo. La causa del Malcontento decide quali governi sono possibili; scegli tu quale."
+special = 2
+sphere = "Stato"
+color = &"rosso"
+repeatable = true

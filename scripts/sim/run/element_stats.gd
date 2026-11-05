@@ -41,24 +41,30 @@ static func _with_enchant(def: TroopDef, piece: BoardPiece) -> TroopDef:
 	if result.mana_cost <= 0:
 		result.mana_type = spell.enchant_color
 	result.mana_cost = maxi(0, result.mana_cost) + spell.enchant_mana
-	match spell.enchant_value:
+	_add_enchant_value(result, spell.enchant_value, piece.enchant_amount)
+	if not spell.enchant_amounts_2.is_empty():
+		_add_enchant_value(result, spell.enchant_value_2, piece.enchant_amount_2)
+	return result
+
+
+static func _add_enchant_value(result: TroopDef, value: ModifierDef.BattleValue, amount: int) -> void:
+	match value:
 		ModifierDef.BattleValue.DANNO:
-			result.damage += piece.enchant_amount
+			result.damage += amount
 		ModifierDef.BattleValue.SCUDO:
-			result.shield += piece.enchant_amount
+			result.shield += amount
 		ModifierDef.BattleValue.CURA:
-			result.heal += piece.enchant_amount
+			result.heal += amount
 		ModifierDef.BattleValue.CORRUZIONE:
-			result.corruption += piece.enchant_amount
+			result.corruption += amount
 		ModifierDef.BattleValue.INEFFICIENZA:
 			if result.inefficiency_ms <= 0:
 				result.inefficiency_target = TimerTarget.Kind.TRUPPE
-			result.inefficiency_ms += piece.enchant_amount
+			result.inefficiency_ms += amount
 		ModifierDef.BattleValue.SABOTAGGIO:
-			result.sabotage_ms += piece.enchant_amount
+			result.sabotage_ms += amount
 		ModifierDef.BattleValue.ASSEDIO:
-			result.siege_damage += piece.enchant_amount
-	return result
+			result.siege_damage += amount
 
 
 static func building(def: BuildingDef, piece: BoardPiece, mods: Modifiers, level: int, rules: RunRules) -> BuildingDef:

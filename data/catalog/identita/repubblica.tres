@@ -8,13 +8,22 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/mercato_libero.tres" id="6_4t4p0"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_repubblica_influenza.tres" id="7_5y0vq"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_jtfog"]
+[ext_resource type="Resource" path="res://data/catalog/identita/oligarchia.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/dittatura.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/foro.tres" id="p3"]
 
 [resource]
 script = ExtResource("7_jtfog")
 id = &"repubblica"
 display_name = "Repubblica"
-description = "Il potere a un consiglio eletto. Rinnovare le offerte costa 1 Oro in meno; Assemblea più frequente. Capitale: +1 Influenza."
+description = "Il potere a un consiglio eletto. In ogni round compaiono 4 consiglieri, ma le proposte costano 1 Oro in più; rinnovare le offerte costa 1 Oro in meno. Carta esclusiva: Foro. Capitale: +1 Influenza."
 dimension = 1
+identity_type = &"Repubblicano"
 resistance_bonus = 2
 favored_opportunities = Array[ExtResource("2_5y0vq")]([ExtResource("4_4sdoy")])
 permanent_modifiers = Array[ExtResource("5_uvpq4")]([ExtResource("6_4t4p0"), ExtResource("7_5y0vq")])
+advisors_change = 1
+proposal_gold_change = 1
+evolves_to = Array[Resource]([ExtResource("p1"), ExtResource("p2")])
+exclusive_buildings = Array[ExtResource("1_lyxgt")]([ExtResource("p3")])
+revolution_causes = Array[int]([1, 3])
