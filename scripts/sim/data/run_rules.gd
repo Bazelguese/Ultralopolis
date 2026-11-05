@@ -45,6 +45,8 @@ extends Resource
 @export var building_production_per_level: int = 1
 
 @export_group("Consiglio")
+## Nomi dei livelli del Consiglio, uno per era (GDD §4.2.1, nomi placeholder).
+@export var council_level_names: PackedStringArray = PackedStringArray(["Funzionari", "Ministri", "Gran Consiglieri"])
 ## Round in ogni metà dell'anno (GDD §3.2: 5).
 @export var rounds_per_half: int = 5
 ## Consiglieri pescati in ogni round, diversi fra loro (GDD §4.2: 3).

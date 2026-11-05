@@ -43,6 +43,8 @@ enum SpyEffect {
 ## Non più usata (vedi Phase).
 @export var phase: Phase = Phase.PRODUZIONE
 @export var kind: Kind = Kind.COSTRUISCI_EDIFICIO
+## Livello minimo del Consiglio perché l'azione compaia (GDD §4.2.1): il livello è l'era corrente.
+@export_range(1, 10) var min_level: int = 1
 
 @export_group("Costo")
 ## Oro da pagare (le azioni non costano Oro, salvo gli spazi: GDD §4.2).

@@ -301,3 +301,36 @@ func test_l_incanto_aggiunge_effetto_e_mana_una_sola_volta() -> void:
 	assert_eq(plain_troop.heal, 0, "La scheda del catalogo non cambia.")
 	Aiuti.ascolta(run)
 	assert_true(run.advisor_choices.is_empty() or run.offers.is_empty(), "Una truppa si incanta una sola volta.")
+
+
+# --- Livelli del Consiglio (GDD §4.2.1) ----------------------------------------------
+
+func test_le_azioni_di_livello_alto_arrivano_con_l_era() -> void:
+	var small: OpportunityDef = OpportunityDef.new()
+	small.id = &"esattori"
+	small.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
+	small.gain_gold = 1
+	var big: OpportunityDef = OpportunityDef.new()
+	big.id = &"grandi_esattori"
+	big.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
+	big.gain_gold = 6
+	big.min_level = 2
+	soldier.actions = [small, big]
+	var era2: EraDef = EraDef.new()
+	era2.research_cost = 1
+	catalog.eras = [EraDef.new(), era2]
+	rules.half_themes = _themes(RunState.RoundTheme.AZIONI, 3)
+	var run: RunState = _run()
+	assert_eq(run.council_level(), 1)
+	assert_eq(run.council_level_name(), "Funzionari")
+	Aiuti.ascolta(run)
+	for offer: Offer in run.offers:
+		assert_ne(offer.opportunity, big, "Al livello 1 le azioni di livello 2 non compaiono.")
+	run.research = 1
+	assert_true(run.advance_era())
+	assert_eq(run.council_level(), 2, "Entrando nell'era 2 tutto il Consiglio sale di livello.")
+	var seen: bool = false
+	for offer: Offer in run.offers:
+		if offer.opportunity == big:
+			seen = true
+	assert_true(seen, "Le proposte vengono ripescate e compare l'azione di livello 2.")

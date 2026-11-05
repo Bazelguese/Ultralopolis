@@ -353,13 +353,15 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 | Generale | Militare · rosso | Ferro | Quartiermastro (5 Oro, spazio truppa) · Addestramento (2 Ferro) |
 | Architetto | Opera · rosso | Pietra | Architetti (6 Oro, spazio edificio) · Fortificazioni (2 Pietra) |
 | Fattore | Terra · verde | Legno | Scorte (2 Legno → 3 Cibo) · Razioni (2 Legno: per un anno le truppe mangiano la metà) |
-| Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Mercante (2 Ricerca → 4 Oro) · Assemblea (+50% Oro o Ricerca per un anno) |
-| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) |
+| Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Mercante (2 Ricerca → 4 Oro) · Assemblea (+50% Oro o Ricerca per un anno) · *Ministri:* Grandi esattori (+6 Oro) |
+| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) · *Ministri:* Trattati (4 Legno → 5 Ricerca) |
 | Sacerdote | Fede · blu | Fede | Cinque incanti (2 Fede ciascuno) · Processione (2 Fede, solo Teocrazia) |
 | Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Decreto fiscale (2 Stabilità → 4 Oro) · Censimento (2 Stabilità: per un anno ogni consigliere mostra una proposta in più) · Tributi feudali (+5 Oro, solo Monarchia) |
-| Maestro delle spie | Ombra · viola | Oro + una risorsa casuale | Quattro spionaggi (2 Documenti ciascuno) |
+| Maestro delle spie | Ombra · viola | Oro + una risorsa casuale | Sei spionaggi (2 Documenti ciascuno) · *Ministri:* Rete di sabotatori (3 Documenti) |
 | Clown | — | — (non potenzia) | Un elemento per colore (rosso, verde, blu, viola) e un edificio neutro |
 | Anziano | — | Oro (solo edifici neutri, una volta all’anno) | Consiglio degli anziani: un perk (2 Fede + 2 Influenza) · edifici neutri |
+
+**Livelli del Consiglio** (GDD §4.2.1): Funzionari nell’era 1, Ministri nell’era 2, Gran Consiglieri nell’era 3. Le azioni in *corsivo* compaiono solo dal livello indicato (campo `min_level` dell’azione). Livelli e azioni di livello arrivano dal lavoro sul Consiglio v0.21.
 
 **Incanti del Sacerdote** (GDD §4.3): una sola volta per truppa; aggiungono un effetto e 2 mana. Se la truppa non chiedeva mana, lo chiede del colore dell’incanto.
 
@@ -379,6 +381,9 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 | Colpo all’avanguardia | Sabotaggio 5 s | la truppa più a destra (la prima ad agire) |
 | Rifornimenti avvelenati | Inefficienza 10 s | l’edificio più veloce |
 | Infiltrati | Inefficienza 10 s | un elemento a caso |
+| Doppio gioco | Sabotaggio 5 s | la truppa più lenta |
+| Veleno nei pozzi | Inefficienza 10 s | la truppa più veloce |
+| Rete di sabotatori *(dal livello Ministri)* | Sabotaggio 8 s | l’elemento più veloce (truppa o edificio) |
 
 **Copertura (bozza 4).** Ogni consigliere ordinario ha almeno due azioni comuni e, in ogni era, almeno un edificio e una truppa con un suo tipo (lo verifica un test automatico). Per riempire i buchi sono state aggiunte: Tribunale, Prefettura e Palazzo del governo (Stato); Covo, Mercato nero e Arsenale clandestino (Ombra); Acciaieria (Opera, era 3); Zappatori (Assedio dell’era 1, per l’Architetto); Tagliagole (Ombra, era 1); Guardia reale (Stato, era 3); le azioni Archivisti, Manuali tecnici, Decreto fiscale e Censimento. In seguito sono arrivati Armeria, Campo d’addestramento e Torre di guardia per il Generale, Contrabbandieri, Avvelenatori e Lame nere per il Maestro delle spie: ora entrambi hanno almeno 2 truppe e 3 edifici in ogni era.
 
@@ -411,4 +416,4 @@ Tutte le questioni della bozza 1 sono decise.
 | Perk | 11 (7 esistenti + 4 nuovi) | | | 11 |
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
-| Azioni del Consiglio | 27 (di cui 2 esclusive dell’identità) | | | 27 |
+| Azioni del Consiglio | 32 (di cui 2 esclusive dell’identità e 3 dal livello Ministri) | | | 32 |

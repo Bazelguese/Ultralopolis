@@ -197,6 +197,7 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	scheda.titolo = consigliere.display_name
 	scheda.colore_consigliere = consigliere.color
 	scheda.sopratitolo = consigliere.category_name if consigliere.category_name != "" else "Consigliere speciale"
+	scheda.sopratitolo += " · %s" % run.council_level_name()
 	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
 	var righe: PackedStringArray = PackedStringArray()
 	righe.append(consigliere.description)

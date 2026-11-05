@@ -216,6 +216,19 @@ func next_era_cost() -> int:
 	return catalog.eras[era].research_cost
 
 
+## Livello del Consiglio: quello dell'era corrente (GDD §4.2.1). Un livello più alto
+## aggiunge azioni (OpportunityDef.min_level).
+func council_level() -> int:
+	return clampi(era, 1, maxi(run_rules.council_level_names.size(), 1))
+
+
+func council_level_name() -> String:
+	var index: int = council_level() - 1
+	if index < run_rules.council_level_names.size():
+		return run_rules.council_level_names[index]
+	return "Livello %d" % council_level()
+
+
 func theme_name(theme: RoundTheme = round_theme) -> String:
 	return THEME_NAMES[theme]
 
@@ -1290,6 +1303,8 @@ func _action_offer(advisor: AdvisorDef, opportunity: OpportunityDef) -> Offer:
 ## in quel momento non ha senso non compare (GDD §4.2).
 func _action_available(opportunity: OpportunityDef) -> bool:
 	if _is_exclusive_action(opportunity) and not _has_exclusive_action(opportunity):
+		return false
+	if opportunity.min_level > council_level():
 		return false
 	match opportunity.kind:
 		OpportunityDef.Kind.SPAZIO_EDIFICIO:
