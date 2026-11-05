@@ -252,7 +252,7 @@ Una **categoria** è un insieme di tipi (§6.6) ed è il campo di un consigliere
 | La risorsa della categoria vale solo per Potenzia; le azioni si pagano come in §4.2.3 | Confermato |
 | **Ombra** chiede Oro più una **risorsa casuale**, pescata fra Ferro, Pietra, Legno, Influenza, Fede, Stabilità e Documenti (escluse Ricerca e Cibo) | Confermato |
 | La risorsa casuale di Ombra si pesca con il seme della run quando il Maestro delle spie compare fra i consiglieri del round, è **visibile prima di sceglierlo** e resta la stessa per tutto il round | Confermato |
-| Costo del Potenzia dell’Anziano (che non ha categoria) | Da definire |
+| Costo del Potenzia dell’Anziano (che non ha categoria) | Da definire; nel prototipo Oro (§16.3) |
 
 | Categoria | Tipi | Consigliere | Risorsa di Potenzia | Colore tendenziale (§5.3) |
 |---|---|---|---|---|
@@ -467,7 +467,7 @@ Ogni edificio e ogni truppa ha **uno o più tipi**, presi da **un’unica lista*
 | Spirituale | Fede, culto, cura. |
 | Patriota | Amore per la nazione, milizie e legioni. |
 
-L’assegnazione dei tipi e dei colori alle carte del prototipo è una proposta in `docs/Bozza_v0.22_tipi_consiglio_mana.md` (Appendice A), da riportare nel Catalogo.
+L’assegnazione dei tipi e dei colori alle carte del prototipo è nel Catalogo (`docs/Catalogo.md`, bozza 4) e nei dati del gioco.
 
 ## 7. Combattimento automatico
 
@@ -961,7 +961,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Due macrofasi con raccolta automatica all’ingresso e 2 opportunità ciascuna, da 3 alternative. In sviluppo (v0.21): 5 round per metà con il Consiglio (§4.2).
+- Due macrofasi con raccolta automatica all’ingresso e 5 round del Consiglio ciascuna (§4.2): nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio.
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
 - Riordino delle truppe fuori dal combattimento.
@@ -1038,7 +1038,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
 | Almeno 1 proposta per consigliere (prima del Consiglio: 1 alternativa per opportunità) | Provvisoria. |
-| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; spionaggio in Documenti (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
+| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; Scorte 2 Legno → 3 Cibo; Razioni 2 Legno; incanti 2 Fede; spionaggi 2 Documenti; perk dell’Anziano 2 Fede + 2 Influenza (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
 | Bottino dei nemici sconfitti: fantasma 3 Oro e 2 Ricerca; incontri facile 2 Oro e 1 Ricerca, media 3 e 2, difficile 4 e 3 | Placeholder (v0.21). |
 | Un consigliere o una proposta favoriti da un elemento dell’identità hanno peso +1 per ogni elemento che li favorisce (peso base 1) | Provvisoria (estesa ai consiglieri, v0.21). |
@@ -1049,6 +1049,15 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se si arriva alla creazione da Gioca (nessuna nazione salvata), dopo il salvataggio si torna alla lista delle nazioni | Provvisoria. |
 | Tasso del mercato: 2 unità di una risorsa → 1 Oro, uguale per tutte | Placeholder. |
 | Ogni uso di Potenzia sale di un livello | Provvisoria (v0.22). |
+| Costo di Potenzia: livello 2 = 2 × era della carta, livello 3 = 3 × era, in unità della risorsa della categoria; il Maestro delle spie chiede la stessa quantità di Oro e della risorsa casuale; l’Anziano chiede Oro | Placeholder (v0.22). |
+| La Capitale non si potenzia: il suo tipo (Capitale) non sta in nessuna categoria | Provvisoria (v0.22); da decidere con Davide. |
+| In un round Misto almeno una proposta è un’azione, se il consigliere ne ha | Provvisoria (v0.22). |
+| Clown e Anziano compaiono in qualsiasi round, con lo stesso peso degli altri consiglieri | Provvisoria (v0.22). |
+| Un consigliere è favorito (+1) da ogni elemento dell’identità che lo indica o che favorisce una sua azione | Provvisoria (v0.22). |
+| Entrando in un’era (o scegliendo una via) prima di aver scelto il consigliere, si ripescano i consiglieri del round | Provvisoria (v0.22). |
+| Spionaggio: il bersaglio si sceglie quando si compra, sul fantasma dell’anno; “estremità” = la truppa più a destra; a parità, l’elemento più a destra | Provvisoria (v0.22). |
+| Incanti: Furia (danno), Egida (scudo), Grazia (cura) 2/4/6 secondo l’era della truppa; Maledizione (Corruzione) 1/3/4; Torpore (Inefficienza su truppe) 2/4/6 s; colori rosso, blu, blu, viola, viola | Placeholder (v0.22). |
+| Risorsa della Capitale per elemento dell’identità e produzioni di Stabilità e Documenti: vedi `docs/Catalogo.md` | Placeholder (v0.22). |
 | Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto; gli edifici anche +1 a ogni risorsa che producono per fase. Il mana prodotto non cambia | Placeholder. |
 | I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |

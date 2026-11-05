@@ -1,8 +1,10 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 3 — 4 novembre 2026
-**Riferimento:** Game Design Document v0.16 (`docs/Ultralopolis_GDD.md`)
-**Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
+**Versione:** bozza 4 — 5 novembre 2026
+**Riferimento:** Game Design Document v0.22 (`docs/Ultralopolis_GDD.md`)
+**Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `consiglieri/`, `opportunities/` per le azioni, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
+
+**Bozza 4 (GDD v0.22):** le etichette diventano **tipi** (1–2 per carta), i colori del mana sono **quattro** (viola nuovo), le risorse cambiano (via la Fauna, nuove **Stabilità** e **Documenti**), i potenziamenti si fanno con l’opzione **Potenzia** del Consiglio. Il Consiglio è in §6 bis.
 
 Il GDD resta la fonte di verità per le regole. Questo documento contiene solo **contenuti**; dove un contenuto richiederebbe una regola nuova è segnalato in §7.
 
@@ -60,7 +62,7 @@ Il budget si spende in effetti (§1.2). Una truppa lenta o costosa in mana fa di
 
 Esempio: Frombolieri, era 1, ricarica 2 s, 3 mana → 1 × (2 + 4,5) = 6,5 → **6 punti** → 6 di danno.
 
-**Cibo:** 0,5 per tutte; 1 per Cavalleria e Assedio.
+**Cibo:** 0,5 per tutte; 1 per le truppe a cavallo (Esploratori, Cavalieri, Arcieri a cavallo, Corazzieri) e per le truppe Assedio.
 
 ### 1.4 Edifici
 
@@ -82,13 +84,13 @@ Gli esclusivi (delle vie e dell’identità) hanno **+1 punto** di budget rispet
 
 ### 1.6 Potenziamenti
 
-Costi: livello 2 = 2 × era, livello 3 = 3 × era unità della risorsa di famiglia (edifici: Legno, Pietra se Difensivi; truppe: Ferro, Fauna se Cavalleria o Fauna, Fede se Sacre).
+Si potenzia con l’opzione **Potenzia** del consigliere scelto (GDD §6.5, v0.22): la carta deve avere almeno un tipo della sua categoria. Costi: livello 2 = 2 × era della carta, livello 3 = 3 × era unità della **risorsa della categoria** (GDD §4.2.4). Il Maestro delle spie chiede la stessa quantità di Oro e della sua risorsa casuale; l’Anziano chiede Oro. I valori stanno nelle regole della run (`upgrade_cost_per_era`).
 
 Effetti (GDD §6.5): ogni livello dà **+50% a tutti i valori d’effetto**, durate comprese, arrotondato per difetto; gli edifici anche +1 a ogni risorsa per fase. Il mana prodotto non cambia.
 
 ### 1.7 Colori del mana
 
-Il colore segue la famiglia (§5.3 del GDD): **rosso** Militare, Estrattivo, Difensivo; **verde** Commerciale, Agricolo, Fauna; **blu** Sapere, Sacro. Ogni era ha truppe di tutti e tre i colori, così ogni famiglia di edifici serve anche in battaglia.
+Quattro colori (GDD §5.3, v0.22). Il colore non dipende dai tipi: è una **tendenza** per scrivere il catalogo, legata alle categorie dei consiglieri: **rosso** Militare e Opera; **verde** Terra e Ricchezza; **blu** Fede e Stato; **viola** Conoscenza e Ombra. Ogni era ha truppe di tutti e quattro i colori, così ogni colore di edificio serve anche in battaglia. Le eccezioni sono volute: per esempio Segheria e Cantiere sono verdi, i tiratori mercenari (Frombolieri, Balestrieri, Moschettieri) verdi, l’Università blu.
 
 Un edificio **senza mana è neutro**: non ha colore (§5.3 del GDD). Come ogni altro edificio può essere disponibile a tutti (Palizzata, Bastioni) oppure esclusivo di certe nazioni (Reliquiario).
 
@@ -100,45 +102,45 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 
 ### 2.1 Era 1 — budget 4, costo base 4 Oro (11 edifici)
 
-| Edificio | Etichette | Colore | Per fase | In battaglia | Extra | Punti |
+| Edificio | Tipi | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
-| Fattoria | Agricolo | verde | Oro 1, Cibo 2 | 1 mana ogni 4 s | — | 3 |
-| Segheria | Estrattivo | verde | Oro 1, Legno 2 | 1 mana ogni 2 s | — | 4 |
-| Miniera | Estrattivo | rosso | Pietra 1, Ferro 2 | 1 mana ogni 1,5 s | — | 4,2 |
-| Mercato | Commerciale | verde | Oro 2, Influenza 1 | 1 mana ogni 1,5 s | — | 5,2 |
-| Biblioteca | Sapere | blu | Ricerca 2 | 1 mana ogni 2 s | — | 4 |
-| Santuario | Sacro | blu | Fede 2 | 1 mana + 1 cura ogni 2 s | — | 4,5 |
-| Caserma | Militare | rosso | Ferro 1 | 1 mana ogni 3 s | +1 spazio truppa | 3,8 |
-| Palizzata | Difensivo | **neutro** | Pietra 1, Legno 1 | 3 scudo ogni 3 s (nessun mana) | — | 4 |
-| Cava | Estrattivo | rosso | Pietra 3 | 1 mana ogni 1,5 s | — | 4,2 |
-| Consolato | Commerciale | blu | Oro 1, Influenza 2 | 1 mana ogni 2 s | — | 4 |
-| Stalle | Fauna, Agricolo | verde | Cibo 1, Fauna 2 | 1 mana ogni 1,5 s | — | 4,2 |
+| Fattoria | Produzione | verde | Oro 1, Cibo 2 | 1 mana ogni 4 s | — | 3 |
+| Segheria | Produzione | verde | Oro 1, Legno 2 | 1 mana ogni 2 s | — | 4 |
+| Miniera | Produzione | rosso | Pietra 1, Ferro 2 | 1 mana ogni 1,5 s | — | 4,2 |
+| Mercato | Economico | verde | Oro 2, Influenza 1 | 1 mana ogni 1,5 s | — | 5,2 |
+| Biblioteca | Accademico | viola | Ricerca 1, Documenti 2 | 1 mana ogni 2 s | — | 4 |
+| Santuario | Spirituale | blu | Fede 2 | 1 mana + 1 cura ogni 2 s | — | 4,5 |
+| Caserma | Infrastruttura Bellica | rosso | Ferro 1 | 1 mana ogni 3 s | +1 spazio truppa | 3,8 |
+| Palizzata | Guardiano | **neutro** | Legno 1, Pietra 1 | 3 scudo ogni 3 s (nessun mana) | — | 4 |
+| Cava | Produzione | rosso | Pietra 3 | 1 mana ogni 1,5 s | — | 4,2 |
+| Consolato | Nobile, Legge | blu | Oro 1, Stabilità 2 | 1 mana ogni 2 s | — | 4 |
+| Stalle | Fauna, Produzione | verde | Cibo 2, Legno 1 | 1 mana ogni 1,5 s | — | 4,2 |
 
 ### 2.2 Era 2 — budget 6, costo base 7 Oro
 
-| Edificio | Etichette | Colore | Per fase | In battaglia | Extra | Punti |
+| Edificio | Tipi | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
-| Accademia | Sapere | blu | Ricerca 4 | 1 mana ogni 2 s | — | 6 |
-| Bottega | Commerciale | verde | Oro 4 | 1 mana ogni 2 s | — | 6 |
-| Cantiere | Estrattivo | verde | Legno 2, Pietra 2 | 1 mana ogni 2 s | +1 spazio edificio | 6 |
-| Fortezza | Difensivo, Militare | rosso | Pietra 1 | 1 mana + 2 scudo ogni 3 s | +1 spazio truppa | 5,8 |
-| Tempio | Sacro | blu | Fede 2 | 1 mana + 2 cura ogni 2 s | — | 6 |
-| Granaio | Agricolo | verde | Cibo 4, Oro 1 | 1 mana ogni 1,5 s | — | 5,7 |
-| Fonderia | Estrattivo | rosso | Ferro 3, Oro 1 | 1 mana ogni 1 s | — | 6,5 |
-| Loggia segreta | Sapere | blu | Ricerca 1, Influenza 1 | 1 mana + 2 Corruzione ogni 3 s | — | 5,8 |
+| Accademia | Accademico | viola | Ricerca 3, Documenti 2 | 1 mana ogni 2 s | — | 6 |
+| Bottega | Economico | verde | Oro 4 | 1 mana ogni 2 s | — | 6 |
+| Cantiere | Produzione, Infrastruttura Strategica | verde | Legno 2, Pietra 2 | 1 mana ogni 2 s | +1 spazio edificio | 6 |
+| Fortezza | Infrastruttura Bellica | rosso | Pietra 1 | 1 mana + 2 scudo ogni 3 s | +1 spazio truppa | 5,8 |
+| Tempio | Spirituale | blu | Fede 2 | 1 mana + 2 cura ogni 2 s | — | 6 |
+| Granaio | Produzione, Economico | verde | Oro 1, Cibo 4 | 1 mana ogni 1,5 s | — | 5,7 |
+| Fonderia | Produzione | rosso | Oro 1, Ferro 3 | 1 mana ogni 1 s | — | 6,5 |
+| Loggia segreta | Infrastruttura Segreta, Criminale | viola | Influenza 1, Documenti 2 | 1 mana + 2 Corruzione ogni 3 s | — | 5,8 |
 
 ### 2.3 Era 3 — budget 8, costo base 10 Oro
 
-| Edificio | Etichette | Colore | Per fase | In battaglia | Extra | Punti |
+| Edificio | Tipi | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
-| Università | Sapere | blu | Ricerca 6 | 1 mana ogni 2 s | — | 8 |
-| Banca | Commerciale | verde | Oro 6, Influenza 1 | 1 mana ogni 1,5 s | — | 9,2 |
-| Cattedrale | Sacro | blu | Fede 4, Oro 1 | 3 mana ogni 2 s | — | 9 |
-| Cittadella | Difensivo, Militare | rosso | Ferro 1 | 1 mana + 1 scudo ogni 2 s | +2 spazi truppa | 8 |
-| Arsenale | Militare | rosso | Oro 1, Ferro 2 | 3 mana ogni 2 s | — | 8 |
-| Bastioni | Difensivo | **neutro** | Pietra 2 | 7 scudo ogni 3 s (nessun mana) | — | 8 |
-| Ospedale | Sapere | blu | Ricerca 1 | 1 mana + 3 cura ogni 2 s | — | 7,5 |
-| Rete di informatori | Commerciale | verde | Oro 2, Influenza 3 | 1 mana + Sabotaggio 2 s (truppe) ogni 4 s | — | 7,5 |
+| Università | Accademico | blu | Ricerca 5, Stabilità 2 | 1 mana ogni 2 s | — | 8 |
+| Banca | Economico, Nobile | verde | Oro 6, Influenza 1 | 1 mana ogni 1,5 s | — | 9,2 |
+| Cattedrale | Spirituale | blu | Oro 1, Fede 4 | 3 mana ogni 2 s | — | 9 |
+| Cittadella | Infrastruttura Bellica | rosso | Ferro 1 | 1 mana + 1 scudo ogni 2 s | +2 spazi truppa | 8 |
+| Arsenale | Infrastruttura Bellica | rosso | Oro 1, Ferro 2 | 3 mana ogni 2 s | — | 8 |
+| Bastioni | Guardiano | **neutro** | Pietra 2 | 7 scudo ogni 3 s (nessun mana) | — | 8 |
+| Ospedale | Spirituale | blu | Ricerca 1 | 1 mana + 3 cura ogni 2 s | — | 7,5 |
+| Rete di informatori | Infrastruttura Segreta, Criminale | viola | Oro 2, Influenza 1, Documenti 2 | 1 mana + Sabotaggio 2 s (truppe) ogni 4 s | — | 7,5 |
 
 ### 2.4 Capitale
 
@@ -152,42 +154,42 @@ Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “E
 
 ### 3.1 Era 1 — moltiplicatore ×1, costo base 4 Oro
 
-| Truppa | Etichette | Mana | Ricarica | Effetti | Cibo | Punti |
+| Truppa | Tipi | Mana | Ricarica | Effetti | Cibo | Punti |
 |---|---|---|---:|---|---:|---:|
-| Milizia | Fanteria | nessuno | 2 s | Danno 2 | 0,5 | 2 |
-| Lancieri | Fanteria | nessuno | 3 s | Danno 1, Scudo 1 | 0,5 | 2 |
-| Arcieri | Tiratori | rosso 2 | 1,5 s | Danno 4 | 0,5 | 4 |
-| Scudieri | Fanteria | rosso 2 | 2,5 s | Scudo 5 | 0,5 | 5 |
-| Frombolieri | Tiratori | verde 3 | 2 s | Danno 7 | 0,5 | 7 |
-| Esploratori | Cavalleria, Fauna | verde 1 | 1 s | Danno 2 | 1 | 2 |
-| Erboristi | Sacro | blu 2 | 2 s | Cura 5 | 0,5 | 5 |
-| Sobillatori | Fanteria | blu 2 | 3 s | Corruzione 4 | 0,5 | 6 |
+| Milizia | Fante, Patriota | nessuno | 2 s | Danno 2 | 0,5 | 2 |
+| Lancieri | Fante | nessuno | 3 s | Danno 1, Scudo 1 | 0,5 | 2 |
+| Arcieri | Fante | rosso 2 | 1,5 s | Danno 4 | 0,5 | 4 |
+| Scudieri | Fante, Guardiano | rosso 2 | 2,5 s | Scudo 5 | 0,5 | 5 |
+| Frombolieri | Fante | verde 3 | 2 s | Danno 7 | 0,5 | 7 |
+| Esploratori | Fauna | verde 1 | 1 s | Danno 2 | 1 | 2 |
+| Erboristi | Spirituale | blu 2 | 2 s | Cura 5 | 0,5 | 5 |
+| Sobillatori | Criminale | viola 2 | 3 s | Corruzione 4 | 0,5 | 6 |
 
 ### 3.2 Era 2 — moltiplicatore ×1,5, costo base 7 Oro
 
-| Truppa | Etichette | Mana | Ricarica | Effetti | Cibo | Punti |
+| Truppa | Tipi | Mana | Ricarica | Effetti | Cibo | Punti |
 |---|---|---|---:|---|---:|---:|
-| Guardie | Fanteria | nessuno | 2,5 s | Scudo 2 | 0,5 | 2 |
-| Balestrieri | Tiratori | rosso 2 | 1,5 s | Danno 6 | 0,5 | 6 |
+| Guardie | Legge | nessuno | 2,5 s | Scudo 2 | 0,5 | 2 |
+| Balestrieri | Fante | verde 2 | 1,5 s | Danno 6 | 0,5 | 6 |
 | Arieti | Assedio | rosso 4 | 3 s | Danno agli scudi 10, Danno 8 | 1 | 13 |
-| Guastatori | Fanteria | rosso 3 | 3 s | Danno 7, Inefficienza 4 s (edifici) | 0,5 | 11 |
-| Cavalieri | Cavalleria, Fauna | verde 3 | 2 s | Danno 10 | 1 | 10 |
-| Arcieri a cavallo | Cavalleria, Tiratori, Fauna | verde 2 | 1,5 s | Danno 4, Inefficienza 2 s (truppe) | 1 | 6 |
-| Confraternita | Sacro | blu 3 | 2,5 s | Cura 6, Scudo 4 | 0,5 | 10 |
-| Predicatori | Sacro | blu 3 | 3 s | Corruzione 6, Danno 2 | 0,5 | 11 |
+| Guastatori | Fante, Criminale | viola 3 | 3 s | Danno 7, Inefficienza 4 s (edifici) | 0,5 | 11 |
+| Cavalieri | Fauna, Nobile | verde 3 | 2 s | Danno 10 | 1 | 10 |
+| Arcieri a cavallo | Fauna, Fante | verde 2 | 1,5 s | Danno 4, Inefficienza 2 s (truppe) | 1 | 6 |
+| Confraternita | Spirituale, Guardiano | blu 3 | 2,5 s | Cura 6, Scudo 4 | 0,5 | 10 |
+| Predicatori | Spirituale | blu 3 | 3 s | Corruzione 6, Danno 2 | 0,5 | 11 |
 
 ### 3.3 Era 3 — moltiplicatore ×2, costo base 10 Oro
 
-| Truppa | Etichette | Mana | Ricarica | Effetti | Cibo | Punti |
+| Truppa | Tipi | Mana | Ricarica | Effetti | Cibo | Punti |
 |---|---|---|---:|---|---:|---:|
-| Moschettieri | Tiratori | rosso 2 | 2,5 s | Danno 10 | 0,5 | 10 |
-| Granatieri | Fanteria, Assedio | rosso 5 | 3 s | Danno 15, Danno agli scudi 12 | 1 | 21 |
+| Moschettieri | Fante | verde 2 | 2,5 s | Danno 10 | 0,5 | 10 |
+| Granatieri | Fante, Assedio | rosso 5 | 3 s | Danno 15, Danno agli scudi 12 | 1 | 21 |
 | Catapulte | Assedio | rosso 6 | 3,5 s | Danno agli scudi 16, Danno 17 | 1 | 25 |
 | Bombarde | Assedio | rosso 8 | 4 s | Danno agli scudi 12, Danno 27 | 1 | 33 |
-| Corazzieri | Cavalleria, Fauna | verde 4 | 2,5 s | Danno 12, Scudo 5 | 1 | 17 |
-| Spie | Fanteria | verde 4 | 4 s | Sabotaggio 4 s (truppe), Corruzione 8 | 0,5 | 20 |
-| Paladini | Fanteria, Sacro | blu 4 | 2 s | Danno 10, Cura 6 | 0,5 | 16 |
-| Inquisitori | Sacro | blu 4 | 3 s | Corruzione 12 | 0,5 | 18 |
+| Corazzieri | Fauna | verde 4 | 2,5 s | Danno 12, Scudo 5 | 1 | 17 |
+| Spie | Criminale | viola 4 | 4 s | Sabotaggio 4 s (truppe), Corruzione 8 | 0,5 | 20 |
+| Paladini | Spirituale, Guardiano | blu 4 | 2 s | Danno 10, Cura 6 | 0,5 | 16 |
+| Inquisitori | Spirituale, Legge | blu 4 | 3 s | Corruzione 12 | 0,5 | 18 |
 
 ### 3.4 Quando compaiono gli effetti — deciso con Davide
 
@@ -204,16 +206,16 @@ Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “E
 
 Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive di certe identità. Ogni via ha **un elemento esclusivo per ogni era** dalla sua in poi. Gli esclusivi seguono la regola di §1.5.
 
-“Favorita da” indica gli elementi dell’identità o le vie precedenti che aumentano la probabilità che la via compaia (peso +1 ciascuno, §16.3 del GDD).
+“Favorita da” indica gli elementi dell’identità o le vie precedenti che aumentano la probabilità che la via compaia (peso +1 ciascuno, §16.3 del GDD). “Offerte più frequenti” indica consiglieri e azioni che la via rende più probabili: un’azione favorita rende più frequente anche il suo consigliere.
 
 ### 4.1 Vie dell’era 2
 
 | Via | Favorita da | Offerte più frequenti | Tratto permanente | Bonus immediato |
 |---|---|---|---|---|
-| Via del Commercio | Cultura mercantile, Popolo del delta, Repubblica | Costruttori, Mercante | +1 Oro per fase da ogni edificio Commerciale | +6 Oro |
-| Via della Guerra | Cultura guerriera, Montanari, Monarchia | Reclutatori, Addestramento | Le truppe Fanteria ricaricano il 10% più in fretta | +1 spazio truppa |
-| Via della Fede | Teocrazia, Culto del Sole, Antichi spiriti | Ambasciata, Fortificazioni | +1 Fede per fase da ogni edificio Sacro | +4 Fede |
-| Via del Sapere | Cultura erudita, Ordine della Ragione | Studiosi | +1 Ricerca per fase da ogni edificio Sapere | +5 Ricerca |
+| Via del Commercio | Cultura mercantile, Popolo del delta, Repubblica | Tesoriere, Mercante | +1 Oro per fase da ogni edificio Economico | +6 Oro |
+| Via della Guerra | Cultura guerriera, Montanari, Monarchia | Generale, Addestramento | Le truppe Fante ricaricano il 10% più in fretta | +1 spazio truppa |
+| Via della Fede | Teocrazia, Culto del Sole, Antichi spiriti | Ambasciata, Fortificazioni | +1 Fede per fase da ogni edificio Spirituale | +4 Fede |
+| Via del Sapere | Cultura erudita, Ordine della Ragione | Studiosi | +1 Ricerca per fase da ogni edificio Accademico | +5 Ricerca |
 
 **Esclusivi delle vie dell’era 2**
 
@@ -228,11 +230,11 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 | Via | Favorita da | Offerte più frequenti | Tratto permanente | Bonus immediato |
 |---|---|---|---|---|
-| Via dell’Impero | Via della Guerra, Monarchia | Quartiermastro, Reclutatori | +10 Resistenza in ogni scontro | +1 spazio truppa, +1 spazio edificio |
+| Via dell’Impero | Via della Guerra, Monarchia | Quartiermastro, Generale | +10 Resistenza in ogni scontro | +1 spazio truppa, +1 spazio edificio |
 | Via dell’Oro | Via del Commercio, Repubblica, Popolo del delta | Esattori, Mercante | Rinnovare le offerte costa 1 Oro in meno | +10 Oro |
-| Via della Rivelazione | Via della Fede, Teocrazia, Culto del Sole | Ambasciata | Gli edifici Sacri producono il 10% più in fretta | +6 Fede |
+| Via della Rivelazione | Via della Fede, Teocrazia, Culto del Sole | Ambasciata | Gli edifici Spirituali producono il 10% più in fretta | +6 Fede |
 | Via dell’Ombra | Via del Sapere, Ordine della Ragione, Repubblica | Studiosi, Ambasciata | Inefficienza e Sabotaggio inflitti durano 1 s in più (§7 questione D) | +5 Influenza |
-| Via degli Spiriti *(esclusiva: solo con Antichi spiriti)* | Popolo delle foreste | Esattori | +1 Cibo per fase da ogni edificio Fauna o Agricolo | +4 Fauna |
+| Via degli Spiriti *(esclusiva: solo con Antichi spiriti)* | Popolo delle foreste | Esattori | +1 Cibo per fase da ogni edificio Fauna o di Produzione | +4 Legno |
 
 **Esclusivi delle vie dell’era 3**
 
@@ -248,26 +250,26 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 **Edifici** (budget dell’era +1)
 
-| Edificio | Via | Era | Etichette | Colore | Per fase | In battaglia | Punti |
+| Edificio | Via | Era | Tipi | Colore | Per fase | In battaglia | Punti |
 |---|---|---:|---|---|---|---|---:|
-| Fondaco | Commercio | 2 | Commerciale | verde | Oro 4, Influenza 1 | 1 mana ogni 1,5 s | 7,2 |
-| Monastero | Fede | 2 | Sacro | blu | Fede 2, Ricerca 1 | 1 mana + 2 cura ogni 2 s | 7 |
-| Osservatorio | Sapere | 2 | Sapere | blu | Ricerca 5 | 1 mana ogni 2 s | 7 |
-| Compagnia commerciale | Commercio | 3 | Commerciale | verde | Oro 5 | 2 mana ogni 2 s | 9 |
-| Borsa | Oro | 3 | Commerciale | verde | Oro 7 | 1 mana ogni 2 s | 9 |
-| Reliquiario | Rivelazione | 3 | Sacro | **neutro** | Fede 2 | 2 cura + 2 Corruzione ogni 2 s (nessun mana) | 8,5 |
-| Totem degli antenati | Spiriti | 3 | Sacro, Fauna | verde | Fauna 2 | 2 mana + 2 scudo + 1 cura ogni 2 s | 9,5 |
+| Fondaco | Commercio | 2 | Economico, Infrastruttura Strategica | verde | Oro 4, Influenza 1 | 1 mana ogni 1,5 s | 7,2 |
+| Monastero | Fede | 2 | Spirituale | blu | Ricerca 1, Fede 2 | 1 mana + 2 cura ogni 2 s | 7 |
+| Osservatorio | Sapere | 2 | Accademico | viola | Ricerca 4, Documenti 2 | 1 mana ogni 2 s | 7 |
+| Compagnia commerciale | Commercio | 3 | Economico, Infrastruttura Strategica | verde | Oro 5 | 2 mana ogni 2 s | 9 |
+| Borsa | Oro | 3 | Economico | verde | Oro 7 | 1 mana ogni 2 s | 9 |
+| Reliquiario | Rivelazione | 3 | Spirituale, Guardiano | **neutro** | Fede 2 | 2 cura + 2 Corruzione ogni 2 s (nessun mana) | 8,5 |
+| Totem degli antenati | Spiriti | 3 | Fauna, Spirituale | verde | Fede 2 | 2 mana + 2 scudo + 1 cura ogni 2 s | 9,5 |
 
 **Truppe** (budget dell’era +1)
 
-| Truppa | Via | Era | Etichette | Mana | Ricarica | Effetti | Cibo | Punti |
+| Truppa | Via | Era | Tipi | Mana | Ricarica | Effetti | Cibo | Punti |
 |---|---|---:|---|---|---:|---|---:|---:|
-| Veterani | Guerra | 2 | Fanteria | rosso 3 | 2 s | Danno 7, Scudo 3 | 0,5 | 10 |
-| Guardia d’élite | Guerra | 3 | Fanteria | rosso 4 | 2 s | Danno 12, Scudo 5 | 0,5 | 17 |
-| Crociati | Fede | 3 | Fanteria, Sacro | blu 4 | 2,5 s | Danno 10, Cura 4, Scudo 4 | 0,5 | 18 |
-| Ingegneri militari | Sapere | 3 | Assedio | rosso 5 | 3 s | Danno agli scudi 14, Danno 10, Inefficienza 5 s (edifici) | 1 | 22 |
-| Legione | Impero | 3 | Fanteria | rosso 5 | 2,5 s | Danno 14, Scudo 7 | 0,5 | 21 |
-| Assassini | Ombra | 3 | Fanteria | verde 4 | 3 s | Sabotaggio 4 s (truppe), Corruzione 6, Danno 2 | 0,5 | 19 |
+| Veterani | Guerra | 2 | Fante | rosso 3 | 2 s | Danno 7, Scudo 3 | 0,5 | 10 |
+| Guardia d’élite | Guerra | 3 | Fante | rosso 4 | 2 s | Danno 12, Scudo 5 | 0,5 | 17 |
+| Crociati | Fede | 3 | Spirituale, Patriota | blu 4 | 2,5 s | Danno 10, Cura 4, Scudo 4 | 0,5 | 18 |
+| Ingegneri militari | Sapere | 3 | Assedio, Accademico | viola 5 | 3 s | Danno agli scudi 14, Danno 10, Inefficienza 5 s (edifici) | 1 | 22 |
+| Legione | Impero | 3 | Fante, Patriota | rosso 5 | 2,5 s | Danno 14, Scudo 7 | 0,5 | 21 |
+| Assassini | Ombra | 3 | Criminale | viola 4 | 3 s | Sabotaggio 4 s (truppe), Corruzione 6, Danno 2 | 0,5 | 19 |
 
 ---
 
@@ -275,17 +277,28 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 ### 5.1 Elementi dell’identità
 
-Popoli, governi, credi e culture restano come oggi. Cambiano solo gli esclusivi, ricalcolati con la regola di budget (era 1, +1 punto):
+Esclusivi dell’identità (era 1, +1 punto di budget):
 
-| Esclusivo | Identità | Oggi | Proposta | Punti |
-|---|---|---|---|---:|
-| Porto fluviale (edificio, Commerciale, verde) | Popolo del delta | Oro 4, Cibo 1; 1 mana ogni 3 s | Oro 2, Cibo 2; 1 mana ogni 2 s | 5 |
-| Arcieri dei boschi (truppa, Tiratori, verde 2, 1,2 s) | Popolo delle foreste | Danno 4 | Danno 5 | 5 |
-| Guardie delle vette (truppa, Fanteria, nessun mana, 3 s) | Montanari | Danno 6 | Danno 2, Scudo 2 (gente “dura a cedere”) | 4 |
+| Esclusivo | Identità | Tipi | Colore | Valori | Punti |
+|---|---|---|---|---|---:|
+| Porto fluviale (edificio) | Popolo del delta | Economico, Infrastruttura Strategica | verde | Oro 2, Cibo 2; 1 mana ogni 2 s | 5 |
+| Arcieri dei boschi (truppa) | Popolo delle foreste | Guardiano | verde 2, 1,2 s | Danno 5 | 5 |
+| Guardie delle vette (truppa) | Montanari | Guardiano, Patriota | nessun mana, 3 s | Danno 2, Scudo 2 (gente “dura a cedere”) | 4 |
+
+**Risorsa della Capitale (GDD §6.2, v0.22).** Ogni popolo, governo, credo e cultura indica una risorsa che la Capitale produce in più (+1 a fase); risorse uguali si sommano. Placeholder:
+
+| Elemento | Risorsa | Elemento | Risorsa |
+|---|---|---|---|
+| Montanari | Pietra | Culto del Sole | Fede |
+| Popolo del delta | Influenza | Antichi spiriti | Legno |
+| Popolo delle foreste | Legno | Ordine della Ragione | Ricerca |
+| Monarchia | Stabilità | Cultura guerriera | Ferro |
+| Repubblica | Influenza | Cultura mercantile | Oro |
+| Teocrazia | Fede | Cultura erudita | Documenti |
 
 ### 5.2 Perk esistenti
 
-Restano invariati: Allevatori, Biblioteca reale, Consiglio allargato, Contrattatori, Fabbri esperti, Mulini, Mura antiche.
+Restano invariati: Biblioteca reale, Consiglio allargato, Contrattatori, Fabbri esperti, Mulini, Mura antiche. **Allevatori** (v0.22): le truppe **Fauna** ricaricano del 15% più in fretta (prima: Cavalleria).
 
 ### 5.3 Perk nuovi
 
@@ -296,7 +309,7 @@ Usano gli effetti nuovi. Disponibili alla creazione e come ricompense degli inco
 | Veleni sottili | Gli elementi che infliggono Corruzione ne infliggono 1 in più. |
 | Erboristi di corte | Gli elementi che curano curano 1 in più. |
 | Genio militare | Le truppe Assedio fanno il 25% di danno agli scudi in più. |
-| Mura di pietra | Gli edifici Difensivi producono 1 scudo in più. |
+| Mura di pietra | Gli elementi Guardiani che producono scudo ne producono 1 in più. |
 
 ---
 
@@ -312,6 +325,46 @@ I sei malus esistenti restano (Ricerca dimezzata, Oro dimezzato, Inefficienza, T
 | Rete compromessa | In ogni scontro un edificio a caso parte sabotato per 3 s (§7 questione C). | non dipendere da un solo edificio |
 | Scorte avariate | Il Cibo prodotto è dimezzato. | comprare Cibo o tenere meno truppe |
 | Diserzioni | Una truppa a caso consuma il doppio del Cibo. | rivedere l’ordine di consumo |
+
+---
+
+## 6 bis. Il Consiglio (GDD §4.2, v0.21–v0.22)
+
+Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File dati: `data/catalog/consiglieri/`. Ogni consigliere propone le carte dell’era che hanno almeno un suo tipo, più le sue azioni (file in `data/catalog/opportunities/`).
+
+| Consigliere | Categoria · colore | Risorsa di Potenzia | Azioni (costo) |
+|---|---|---|---|
+| Generale | Militare · rosso | Ferro | Quartiermastro (5 Oro, spazio truppa) · Addestramento (2 Ferro) |
+| Architetto | Opera · rosso | Pietra | Architetti (6 Oro, spazio edificio) · Fortificazioni (2 Pietra) |
+| Fattore | Terra · verde | Legno | Scorte (2 Legno → 3 Cibo) · Razioni (2 Legno: per un anno le truppe mangiano la metà) |
+| Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Mercante (2 Ricerca → 4 Oro) · Assemblea (+50% Oro o Ricerca per un anno) |
+| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) |
+| Sacerdote | Fede · blu | Fede | Cinque incanti (2 Fede ciascuno) · Processione (2 Fede, solo Teocrazia) |
+| Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Tributi feudali (+5 Oro, solo Monarchia) |
+| Maestro delle spie | Ombra · viola | Oro + una risorsa casuale | Quattro spionaggi (2 Documenti ciascuno) |
+| Clown | — | — (non potenzia) | Un elemento per colore (rosso, verde, blu, viola) e un edificio neutro |
+| Anziano | — | Oro (solo edifici neutri, una volta all’anno) | Consiglio degli anziani: un perk (2 Fede + 2 Influenza) · edifici neutri |
+
+**Incanti del Sacerdote** (GDD §4.3): una sola volta per truppa; aggiungono un effetto e 2 mana. Se la truppa non chiedeva mana, lo chiede del colore dell’incanto.
+
+| Incanto | Effetto aggiunto (era 1 / 2 / 3 della truppa) | Colore se la truppa non usava mana |
+|---|---|---|
+| Furia | Danno 2 / 4 / 6 | rosso |
+| Egida | Scudo 2 / 4 / 6 | blu |
+| Grazia | Cura 2 / 4 / 6 | blu |
+| Maledizione | Corruzione 1 / 3 / 4 | viola |
+| Torpore | Inefficienza 2 / 4 / 6 s su una truppa nemica | viola |
+
+**Spionaggi del Maestro delle spie** (GDD §12): valgono per lo scontro con il fantasma dell’anno.
+
+| Spionaggio | Effetto | Bersaglio |
+|---|---|---|
+| Sicari nell’ombra | Sabotaggio 5 s | la truppa più veloce |
+| Colpo all’avanguardia | Sabotaggio 5 s | la truppa più a destra (la prima ad agire) |
+| Rifornimenti avvelenati | Inefficienza 10 s | l’edificio più veloce |
+| Infiltrati | Inefficienza 10 s | un elemento a caso |
+
+**Buchi noti** (da coprire con carte o azioni nuove): l’Architetto non ha truppe nell’era 1; Studioso e Cancelliere hanno una sola azione comune; Stato e Ombra hanno pochi edifici propri.
 
 ---
 
@@ -341,3 +394,5 @@ Tutte le questioni della bozza 1 sono decise.
 | Esclusivi dell’identità | 3 | — | — | 3 |
 | Perk | 11 (7 esistenti + 4 nuovi) | | | 11 |
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
+| Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
+| Azioni del Consiglio | 23 (di cui 2 esclusive dell’identità) | | | 23 |
