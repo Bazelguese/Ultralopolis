@@ -109,6 +109,11 @@ var _half_themes: Array[int] = []
 var advisor_choices: Array[AdvisorDef] = []
 ## Il consigliere ascoltato in questo round; null finché non lo si sceglie.
 var chosen_advisor: AdvisorDef
+## Consigliere di corte (GDD §9.4, v0.24): il primo consigliere ordinario ascoltato nella run
+## (convenzione provvisoria, §16.3). Conta solo se un elemento dell'identità lo favorisce.
+var court_advisor: AdvisorDef
+## Quanti dei consiglieri del round sono sempre presenti (la carta speciale non li sostituisce).
+var _mandatory_count: int = 0
 ## Risorsa casuale chiesta da Ombra in questo round, pescata quando il consigliere compare (GDD §4.2.4).
 var shadow_resource: Res.Type = Res.Type.FERRO
 ## true se Potenzia è già stato usato in questo round (GDD §6.5).
@@ -404,6 +409,7 @@ func upgrade_cost_of(piece: BoardPiece) -> ResourceAmounts:
 		return null
 	var card_era: int = piece.building.era if piece.building != null else piece.troop.era
 	var quantity: int = run_rules.upgrade_cost_per_era[index] * maxi(1, card_era)
+	quantity = maxi(1, quantity - _identity_int(&"upgrade_discount"))
 	var amounts: ResourceAmounts = ResourceAmounts.new()
 	if chosen_advisor.special == AdvisorDef.Special.ANZIANO:
 		amounts.add(Res.Type.ORO, quantity)
@@ -490,12 +496,17 @@ func _upgrade(piece: BoardPiece) -> bool:
 
 ## Vende risorse in cambio di Oro, a tasso fisso. units: unità intere da vendere
 ## (multiplo del tasso). Si può fare in Produzione e Preparazione, senza consumare l'opportunità.
+## Unità da vendere al mercato per 1 Oro: la cultura può migliorare il tasso (GDD §9.2, v0.24).
+func market_rate() -> int:
+	return maxi(1, run_rules.market_units_per_gold - _identity_int(&"market_rate_change"))
+
+
 func sell_resource(type: Res.Type, units: int) -> bool:
 	if not _require_shopping():
 		return false
 	if type == Res.Type.ORO:
 		return _fail("L'Oro non si vende.")
-	var rate: int = run_rules.market_units_per_gold
+	var rate: int = market_rate()
 	if units <= 0 or units % rate != 0:
 		return _fail("Si vende a gruppi di %d." % rate)
 	var internal_amount: int = units * Res.scale(type)
@@ -665,6 +676,10 @@ func choose_advisor(index: int) -> bool:
 		return _fail("Consigliere non valido.")
 	chosen_advisor = advisor_choices[index]
 	_log("Round %d (%s): ascolti %s." % [round_number, theme_name(), chosen_advisor.display_name])
+	if court_advisor == null and chosen_advisor.special == AdvisorDef.Special.NESSUNO:
+		court_advisor = chosen_advisor
+		if _has_court():
+			_log("%s diventa il consigliere di corte." % court_advisor.display_name)
 	_draw_offers()
 	return true
 
@@ -1337,13 +1352,23 @@ func _end_shopping_phase() -> void:
 func _draw_advisors() -> void:
 	var pool: Array[AdvisorDef] = []
 	var weights: Array[int] = []
+	var excluded: Array[AdvisorDef] = _excluded_advisors()
 	for advisor: AdvisorDef in catalog.advisors:
-		if not _advisor_has_proposals(advisor):
+		if excluded.has(advisor) or not _advisor_has_proposals(advisor):
 			continue
 		pool.append(advisor)
 		weights.append(_advisor_weight(advisor))
 	advisor_choices = []
-	for i: int in range(mini(run_rules.advisors_per_round, pool.size())):
+	var wanted: int = advisors_per_round()
+	# Prima i consiglieri che il governo vuole sempre presenti (GDD §9.4, v0.24).
+	for advisor: AdvisorDef in _mandatory_advisors():
+		var at: int = pool.find(advisor)
+		if at != -1 and advisor_choices.size() < wanted:
+			advisor_choices.append(advisor)
+			pool.remove_at(at)
+			weights.remove_at(at)
+	_mandatory_count = advisor_choices.size()
+	while advisor_choices.size() < wanted and not pool.is_empty():
 		var pick: int = _weighted_pick(weights)
 		advisor_choices.append(pool[pick])
 		pool.remove_at(pick)
@@ -1371,16 +1396,20 @@ func _draw_special_card() -> void:
 	if not events.is_empty() and run_rules.event_weight > 0:
 		families.append(0)
 		weights.append(run_rules.event_weight)
-	if not visitors.is_empty() and run_rules.visitor_weight > 0:
+	var visitor_weight: int = run_rules.visitor_weight + _identity_int(&"visitor_weight_change")
+	if not visitors.is_empty() and visitor_weight > 0:
 		families.append(1)
-		weights.append(run_rules.visitor_weight)
+		weights.append(visitor_weight)
 	if not fortunes.is_empty() and run_rules.fortune_weight > 0:
 		families.append(2)
 		weights.append(run_rules.fortune_weight)
 	if families.is_empty():
 		return
+	# La carta speciale non prende il posto di un consigliere sempre presente.
+	if advisor_choices.size() >= advisors_per_round() and advisor_choices.size() <= _mandatory_count:
+		return
 	var family: int = families[_weighted_pick(weights)]
-	if advisor_choices.size() >= run_rules.advisors_per_round:
+	if advisor_choices.size() >= advisors_per_round():
 		advisor_choices.pop_back()
 	if family == 1:
 		var visitor_weights: Array[int] = []
@@ -1463,6 +1492,8 @@ func _roots_weight(favored_by: Array[Resource]) -> int:
 ## direttamente o che favorisce una delle sue azioni.
 func _advisor_weight(advisor: AdvisorDef) -> int:
 	var weight: int = 1
+	if advisor == court_advisor:
+		weight += _identity_int(&"court_advisor_weight")
 	for def: IdentityDef in identity:
 		if def.favored_advisors.has(advisor):
 			weight += 1
@@ -1677,6 +1708,7 @@ func _element_offer(advisor: AdvisorDef, building: BuildingDef, troop: TroopDef)
 		offer.kind = OpportunityDef.Kind.RECLUTA_TRUPPA
 		offer.troop = troop
 		offer.price = troop.cost_gold
+	offer.price = maxi(0, offer.price + _identity_int(&"proposal_gold_change"))
 	return offer
 
 
@@ -1703,9 +1735,32 @@ func _action_offer(advisor: AdvisorDef, opportunity: OpportunityDef) -> Offer:
 	offer.opportunity = opportunity
 	offer.kind = opportunity.kind
 	offer.price = opportunity.cost_gold
+	if offer.price > 0:
+		offer.price = maxi(0, offer.price + _identity_int(&"proposal_gold_change"))
 	offer.research_price = opportunity.cost_research
-	offer.other_cost = opportunity.cost_resources
+	offer.other_cost = _discounted_action_cost(advisor, opportunity)
 	return offer
+
+
+## Costo in risorse di un'azione, con lo sconto della cultura o del governo (GDD §9.2, v0.24):
+## ogni risorsa diversa dall'Oro costa le unità dello sconto in meno, ma almeno 1.
+func _discounted_action_cost(advisor: AdvisorDef, opportunity: OpportunityDef) -> ResourceAmounts:
+	var original: ResourceAmounts = opportunity.cost_resources
+	if original == null:
+		return null
+	var discount: int = 0
+	for def: IdentityDef in identity:
+		if def.cheaper_advisors.has(advisor) or def.cheaper_actions.has(opportunity):
+			discount += def.action_discount
+	if discount <= 0:
+		return original
+	var cheaper: ResourceAmounts = ResourceAmounts.new()
+	for type: Res.Type in Res.NAMES:
+		var amount: int = original.whole(type)
+		if amount > 0 and type != Res.Type.ORO:
+			amount = maxi(1, amount - discount)
+		cheaper.add(type, amount)
+	return cheaper
 
 
 ## Un'azione esclusiva di un elemento dell'identità compare solo a chi lo ha; una proposta che
@@ -2165,6 +2220,47 @@ func _adopt_identity(def: IdentityDef) -> void:
 			_log("Nessuno spazio per %s." % troop.display_name)
 	for modifier: ModifierDef in def.permanent_modifiers:
 		_log(modifiers.apply(modifier, ActiveModifier.OriginKind.IDENTITA, def.display_name, year, board, _rng))
+
+
+## Somma di un effetto numerico della scheda fra tutti gli elementi dell'identità (GDD §9.2).
+func _identity_int(property: StringName) -> int:
+	var total: int = 0
+	for def: IdentityDef in identity:
+		total += int(def.get(property))
+	return total
+
+
+## Consiglieri per round: quelli delle regole, più o meno quelli del governo (almeno 1).
+func advisors_per_round() -> int:
+	return maxi(1, run_rules.advisors_per_round + _identity_int(&"advisors_change"))
+
+
+func _has_court() -> bool:
+	if _identity_int(&"court_advisor_weight") > 0:
+		return true
+	for def: IdentityDef in identity:
+		if def.court_advisor_always:
+			return true
+	return false
+
+
+## Consiglieri che compaiono sempre: quelli indicati dall'identità e il consigliere di corte,
+## se il governo lo vuole sempre presente.
+func _mandatory_advisors() -> Array[AdvisorDef]:
+	var found: Array[AdvisorDef] = []
+	for def: IdentityDef in identity:
+		if def.always_present_advisor != null and not found.has(def.always_present_advisor):
+			found.append(def.always_present_advisor)
+		if def.court_advisor_always and court_advisor != null and not found.has(court_advisor):
+			found.append(court_advisor)
+	return found
+
+
+func _excluded_advisors() -> Array[AdvisorDef]:
+	var found: Array[AdvisorDef] = []
+	for def: IdentityDef in identity:
+		found.append_array(def.excluded_advisors)
+	return found
 
 
 static func _identity_resistance(elements: Array[IdentityDef]) -> int:

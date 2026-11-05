@@ -518,7 +518,7 @@ func aggiorna_partita(run: RunState) -> void:
 		_pulsante_era.disabled = not comprando or run.research < costo_era
 	else:
 		_pulsante_era.visible = false
-	var lotto: int = run.run_rules.market_units_per_gold
+	var lotto: int = run.market_rate()
 	for tipo: int in _righe_magazzino:
 		_righe_magazzino[tipo].text = "%s  %s" % [Res.NAMES[tipo], run.stock_text(tipo)]
 		if _vendite.has(tipo):

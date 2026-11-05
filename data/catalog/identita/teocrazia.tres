@@ -8,15 +8,17 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="6_euifu"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_5el4a"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_teocrazia_fede.tres" id="7_v0ri3"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/sacerdote.tres" id="p1"]
 
 [resource]
 script = ExtResource("7_5el4a")
 id = &"teocrazia"
 display_name = "Teocrazia"
-description = "Governano i sacerdoti. Ambasciata più frequente e Processione esclusiva. Capitale: +1 Fede."
+description = "Governano i sacerdoti. Il Sacerdote è sempre fra i consiglieri del round; Ambasciata più frequente e Processione esclusiva. Capitale: +1 Fede."
 dimension = 1
 identity_type = &"Teocratico"
 resistance_bonus = 4
 exclusive_opportunities = Array[ExtResource("2_v0ri3")]([ExtResource("3_kalu3")])
 favored_opportunities = Array[ExtResource("2_v0ri3")]([ExtResource("5_0jdl3")])
 permanent_modifiers = Array[ExtResource("6_euifu")]([ExtResource("7_v0ri3")])
+always_present_advisor = ExtResource("p1")

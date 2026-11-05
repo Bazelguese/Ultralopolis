@@ -66,6 +66,34 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 ## Consiglieri che compaiono più spesso nei round (peso +1 ciascuno, GDD §4.2).
 @export var favored_advisors: Array[AdvisorDef] = []
 
+@export_group("Consiglio")
+## Effetti sul Consiglio e sulle risorse (GDD §9.2, v0.24): valgono fuori dalla battaglia e si
+## sommano fra tutti gli elementi dell'identità.
+## Consiglieri in più (o in meno) in ogni round.
+@export var advisors_change: int = 0
+## Consigliere che compare sempre fra quelli del round.
+@export var always_present_advisor: AdvisorDef
+## Consiglieri che non compaiono mai.
+@export var excluded_advisors: Array[AdvisorDef] = []
+## Peso in più del consigliere di corte (Monarchia). Convenzione provvisoria (GDD §16.3):
+## il consigliere di corte è il primo consigliere ordinario ascoltato nella run.
+@export var court_advisor_weight: int = 0
+## Se vero, il consigliere di corte compare sempre fra quelli del round (Monarchia assoluta).
+@export var court_advisor_always: bool = false
+## Oro in più (o in meno) su ogni proposta che costa Oro.
+@export var proposal_gold_change: int = 0
+## Peso in più dei Visitatori fra le carte speciali (GDD §4.2.5).
+@export var visitor_weight_change: int = 0
+## Le azioni di questi consiglieri, e queste azioni, costano action_discount unità in meno di
+## ogni risorsa del costo (Oro escluso), ma almeno 1.
+@export var cheaper_advisors: Array[AdvisorDef] = []
+@export var cheaper_actions: Array[OpportunityDef] = []
+@export var action_discount: int = 0
+## Unità in meno da vendere al mercato per 1 Oro (minimo 1).
+@export var market_rate_change: int = 0
+## Unità in meno a ogni Potenzia (minimo 1 per risorsa).
+@export var upgrade_discount: int = 0
+
 @export_group("Elementi esclusivi")
 ## Edifici offerti dai Costruttori solo a questa nazione (nella loro era).
 @export var exclusive_buildings: Array[BuildingDef] = []

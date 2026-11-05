@@ -126,7 +126,7 @@ func _collega_hud() -> void:
 	_hud.passa.connect(func() -> void: _esegui(run.pass_round(), "Round passato"))
 	_hud.nessuna_ricompensa.connect(func() -> void: _esegui(run.skip_reward()))
 	_hud.avanza_era.connect(_on_avanza_era)
-	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.run_rules.market_units_per_gold)))
+	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.market_rate())))
 	_hud.ricomincia.connect(_nuova_run)
 	_hud.menu.connect(func() -> void: GameSession.go(GameSession.MENU_SCENE))
 	_hud.pausa.connect(_on_pausa)

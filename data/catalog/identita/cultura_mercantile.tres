@@ -12,9 +12,10 @@
 script = ExtResource("6_0qo2s")
 id = &"cultura_mercantile"
 display_name = "Cultura mercantile"
-description = "Si costruisce per commerciare: +4 Oro iniziale, Tesoriere più frequente. Capitale: +1 Oro."
+description = "Si costruisce per commerciare: +4 Oro iniziale, al mercato basta 1 unità per 1 Oro, Tesoriere più frequente. Capitale: +1 Oro."
 dimension = 3
 identity_type = &"Mercantile"
 extra_gold = 4
 permanent_modifiers = Array[ExtResource("5_osjtt")]([ExtResource("6_7crgb")])
 favored_advisors = Array[ExtResource("adv_s")]([ExtResource("adv_tes")])
+market_rate_change = 1
