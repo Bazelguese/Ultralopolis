@@ -11,7 +11,7 @@
 [resource]
 script = ExtResource("1_pvj5x")
 display_name = "Ascesa"
-research_cost = 16
+techs_required = 5
 bonus_building_slots = 1
 bonus_troop_slots = 2
 ways = Array[ExtResource("2_m8wts")]([ExtResource("3_xqiv8"), ExtResource("4_qymsg"), ExtResource("5_3lm4h"), ExtResource("6_yo0fk"), ExtResource("7_vhfqc")])

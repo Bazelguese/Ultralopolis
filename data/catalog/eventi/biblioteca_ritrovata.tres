@@ -14,8 +14,10 @@ ricerca = 1
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Prendi il dono"
-description = "Ricevi 2 Documenti, 1 Ricerca, moltiplicati per l'era."
+description = "Ricevi 2 Documenti, 1 Ricerca, moltiplicati per l'era, e una tecnologia di Conoscenza già iniziata a metà."
 gain = SubResource("RA_2")
+give_random_tech = true
+give_tech_sphere = "Conoscenza"
 
 [resource]
 script = ExtResource("e1")

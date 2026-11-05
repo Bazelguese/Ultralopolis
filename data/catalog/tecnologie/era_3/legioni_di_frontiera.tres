@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_impero.tres" id="3_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_legioni_di_frontiera"
+display_name = "Legioni di frontiera"
+description = "+10 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 10
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"legioni_di_frontiera"
+display_name = "Legioni di frontiera"
+description = "+10 Resistenza in ogni scontro."
+sphere = "Militare"
+era = 3
+cost = 7
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])
+requires_any = Array[Resource]([ExtResource("3_x")])

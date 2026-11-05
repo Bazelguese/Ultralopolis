@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_bassifondi"
+display_name = "Bassifondi"
+description = "Le truppe Criminali ricaricano il 10% più in fretta."
+is_malus = false
+effect = 3
+target_type = &"Criminale"
+amount = -10
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"bassifondi"
+display_name = "Bassifondi"
+description = "Le truppe Criminali ricaricano il 10% più in fretta."
+sphere = "Ombra"
+cost = 3
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_bld"]
+
+[resource]
+script = ExtResource("1_bld")
+id = &"ateneo"
+display_name = "Ateneo"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Accademico"])
+research_per_phase = 3
+documents_per_phase = 3
+mana_type = &"viola"
+mana_amount = 1
+mana_interval_ms = 1000
