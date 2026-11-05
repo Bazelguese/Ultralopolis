@@ -6,13 +6,15 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x4"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/passo_leggero.tres" id="x5"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_cinerali_ferro.tres" id="x6"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/falchi_di_cenere.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/lame_del_vulcano.tres" id="p2"]
 
 [resource]
 script = ExtResource("x1")
 id = &"cinerali"
 display_name = "Cinerali"
-description = "Popolo alato delle scogliere vulcaniche, rapido a colpire. Le truppe ricaricano del 10% più in fretta; può reclutare gli Arcieri delle ceneri. Capitale: +1 Ferro."
+description = "Popolo alato delle scogliere vulcaniche, rapido a colpire. Le truppe ricaricano del 10% più in fretta; può reclutare gli Arcieri delle ceneri. Poi i Falchi di cenere (era 2) e le Lame del vulcano (era 3). Capitale: +1 Ferro."
 identity_type = &"Cinerale"
 resistance_bonus = 4
-exclusive_troops = Array[ExtResource("x2")]([ExtResource("x3")])
+exclusive_troops = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("p1"), ExtResource("p2")])
 permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5"), ExtResource("x6")])

@@ -8,12 +8,14 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_cultura_erudita_ricerca.tres" id="x6"]
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="p1"]
 [ext_resource type="Resource" path="res://data/catalog/consiglieri/studioso.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/collegio_dei_saggi.tres" id="p3"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p4"]
 
 [resource]
 script = ExtResource("x1")
 id = &"cultura_erudita"
 display_name = "Cultura erudita"
-description = "Scuole e archivi, eredi dell'antico Ordine della Ragione: +3 Ricerca iniziale, +25% Ricerca prodotta, le azioni dello Studioso costano 1 unità in meno (almeno 1), Studiosi più frequenti. Capitale: +1 Ricerca."
+description = "Scuole e archivi, eredi dell'antico Ordine della Ragione: +3 Ricerca iniziale, +25% Ricerca prodotta, le azioni dello Studioso costano 1 unità in meno (almeno 1), Studiosi più frequenti. Carta esclusiva: Collegio dei saggi (era 2). Capitale: +1 Ricerca."
 dimension = 3
 identity_type = &"Erudito"
 extra_research = 3
@@ -21,3 +23,4 @@ favored_opportunities = Array[ExtResource("x2")]([ExtResource("x3")])
 permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5"), ExtResource("x6")])
 cheaper_advisors = Array[ExtResource("p1")]([ExtResource("p2")])
 action_discount = 1
+exclusive_buildings = Array[ExtResource("p4")]([ExtResource("p3")])

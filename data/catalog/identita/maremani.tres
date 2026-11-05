@@ -8,15 +8,19 @@
 [ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/porto_lagunare.tres" id="x6"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x7"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_maremani_influenza.tres" id="x8"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/darsena_delle_lagune.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/troops/esclusive/cantori_delle_maree.tres" id="p2"]
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="p3"]
 
 [resource]
 script = ExtResource("x1")
 id = &"maremani"
 display_name = "Maremani"
-description = "Anfibi delle lagune, barcaioli e commercianti. +3 Oro iniziale, Mercante ed Esattori più frequenti, può costruire il Porto lagunare. Capitale: +1 Influenza."
+description = "Anfibi delle lagune, barcaioli e commercianti. +3 Oro iniziale, Mercante ed Esattori più frequenti, può costruire il Porto lagunare. Poi i Cantori delle maree (era 2) e la Darsena delle lagune (era 3). Capitale: +1 Influenza."
 identity_type = &"Maremano"
 resistance_bonus = 2
 extra_gold = 3
 favored_opportunities = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
-exclusive_buildings = Array[ExtResource("x5")]([ExtResource("x6")])
+exclusive_buildings = Array[ExtResource("x5")]([ExtResource("x6"), ExtResource("p1")])
 permanent_modifiers = Array[ExtResource("x7")]([ExtResource("x8")])
+exclusive_troops = Array[ExtResource("p3")]([ExtResource("p2")])

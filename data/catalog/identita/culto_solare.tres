@@ -6,14 +6,17 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_culto_solare_fede.tres" id="x4"]
 [ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="p1"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_mezzogiorno.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/altare_del_sole.tres" id="p3"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p4"]
 
 [resource]
 script = ExtResource("x1")
 id = &"culto_solare"
 display_name = "Culto solare"
-description = "Adorazione del sole e della luce, che benedice i raccolti: +20% Oro prodotto. Capitale: +1 Fede."
+description = "Adorazione del sole e della luce, che benedice i raccolti: +20% Oro prodotto. Carta esclusiva: Altare del sole; incanto esclusivo: Mezzogiorno. Capitale: +1 Fede."
 dimension = 2
 identity_type = &"Solare"
 resistance_bonus = 2
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
 exclusive_opportunities = Array[ExtResource("p1")]([ExtResource("p2")])
+exclusive_buildings = Array[ExtResource("p4")]([ExtResource("p3")])

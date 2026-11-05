@@ -388,3 +388,24 @@ func test_tipi_d_identita() -> void:
 				if identity_types.has(card_type):
 					count += 1
 			assert_eq(count, 1, "Un solo tipo d'identità su %s" % card[0])
+
+
+func test_esclusivi_dell_identita() -> void:
+	# GDD §9.3, §6.6 (v0.24): le razze hanno esclusivi in ogni era; ogni governo di partenza,
+	# credo e cultura ha almeno una carta esclusiva.
+	var catalog: CatalogDef = _catalog()
+	for def: IdentityDef in catalog.identities:
+		var eras: Dictionary[int, bool] = {}
+		for card: BuildingDef in def.exclusive_buildings:
+			eras[card.era] = true
+		for card: TroopDef in def.exclusive_troops:
+			eras[card.era] = true
+		match def.dimension:
+			IdentityDef.Dimension.POPOLO:
+				for era: int in range(1, catalog.eras.size() + 1):
+					assert_true(eras.has(era), "%s: esclusivo nell'era %d" % [def.id, era])
+			IdentityDef.Dimension.CREDO, IdentityDef.Dimension.CULTURA:
+				assert_false(eras.is_empty(), "%s ha una carta esclusiva" % def.id)
+			IdentityDef.Dimension.GOVERNO:
+				if def.tier == 1:
+					assert_false(eras.is_empty(), "%s ha una carta esclusiva" % def.id)
