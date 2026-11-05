@@ -11,5 +11,6 @@ id = &"culto_solare"
 display_name = "Culto solare"
 description = "Adorazione del sole e della luce, che benedice i raccolti: +20% Oro prodotto. Capitale: +1 Fede."
 dimension = 2
+identity_type = &"Solare"
 resistance_bonus = 2
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])

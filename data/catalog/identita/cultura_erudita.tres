@@ -13,6 +13,7 @@ id = &"cultura_erudita"
 display_name = "Cultura erudita"
 description = "Scuole e archivi, eredi dell'antico Ordine della Ragione: +3 Ricerca iniziale, +25% Ricerca prodotta, Studiosi più frequenti. Capitale: +1 Ricerca."
 dimension = 3
+identity_type = &"Erudito"
 extra_research = 3
 favored_opportunities = Array[ExtResource("x2")]([ExtResource("x3")])
 permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5"), ExtResource("x6")])

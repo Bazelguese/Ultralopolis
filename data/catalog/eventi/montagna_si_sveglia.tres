@@ -42,6 +42,18 @@ upgrade = true
 upgrade_types = Array[StringName]([&"Produzione"])
 upgrade_kind = 1
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("x2")
+ferro = 3
+documenti = 2
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("x3")
+label = "Volano sopra la cenere"
+description = "Ricevi 3 Ferro e 2 Documenti: le mappe dall'alto."
+gain = SubResource("N100_gain")
+requires_types = Array[StringName]([&"Cinerale"])
+
 [resource]
 script = ExtResource("x1")
 id = &"montagna_si_sveglia"
@@ -50,4 +62,4 @@ description = "Il vulcano delle scogliere ha ripreso a fumare: cenere e lava sce
 sphere = "Terra"
 color = &"rosso"
 favored_by = Array[Resource]([ExtResource("x4")])
-options = Array[ExtResource("x3")]([SubResource("S3"), SubResource("S5"), SubResource("S6")])
+options = Array[ExtResource("x3")]([SubResource("S3"), SubResource("S5"), SubResource("S6"), SubResource("N100")])

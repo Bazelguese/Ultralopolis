@@ -32,6 +32,12 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export_multiline var description: String = ""
 @export var dimension: Dimension = Dimension.POPOLO
 
+@export_group("Tipo d'identità")
+## Tipo d'identità dell'elemento, es. "Pietrosangue" o "Monarchico" (GDD §6.6, v0.24).
+## Sta fuori da tutte le categorie: lo portano le carte esclusive dell'elemento, insieme ad
+## almeno un tipo di categoria, e lo leggono perk, tratti ed eventi.
+@export var identity_type: StringName = &""
+
 @export_group("Resistenza")
 ## Quota di Resistenza in ogni scontro (GDD §7.1.1).
 @export var resistance_bonus: int = 0

@@ -15,6 +15,7 @@ id = &"teocrazia"
 display_name = "Teocrazia"
 description = "Governano i sacerdoti. Ambasciata più frequente e Processione esclusiva. Capitale: +1 Fede."
 dimension = 1
+identity_type = &"Teocratico"
 resistance_bonus = 4
 exclusive_opportunities = Array[ExtResource("2_v0ri3")]([ExtResource("3_kalu3")])
 favored_opportunities = Array[ExtResource("2_v0ri3")]([ExtResource("5_0jdl3")])

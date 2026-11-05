@@ -11,5 +11,6 @@ id = &"culto_degli_antenati"
 display_name = "Culto degli antenati"
 description = "Venerazione dei padri fondatori: la nazione inizia ogni scontro con 3 di scudo. Capitale: +1 Stabilità."
 dimension = 2
+identity_type = &"Ancestrale"
 resistance_bonus = 3
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])

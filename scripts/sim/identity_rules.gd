@@ -40,3 +40,12 @@ static func validate(catalog: CatalogDef, rules: RunRules, choices: Array[Identi
 				return "Scegli %d perk." % wanted
 			return "Scegli un elemento per: %s." % IdentityDef.DIMENSION_NAMES[dimension]
 	return ""
+
+
+## Tipi d'identità del catalogo (GDD §6.6, v0.24): stanno fuori dalle categorie dei consiglieri.
+static func identity_types(catalog: CatalogDef) -> Array[StringName]:
+	var found: Array[StringName] = []
+	for def: IdentityDef in catalog.identities:
+		if def.identity_type != &"" and not found.has(def.identity_type):
+			found.append(def.identity_type)
+	return found

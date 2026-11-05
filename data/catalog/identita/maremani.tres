@@ -14,6 +14,7 @@ script = ExtResource("x1")
 id = &"maremani"
 display_name = "Maremani"
 description = "Anfibi delle lagune, barcaioli e commercianti. +3 Oro iniziale, Mercante ed Esattori più frequenti, può costruire il Porto lagunare. Capitale: +1 Influenza."
+identity_type = &"Maremano"
 resistance_bonus = 2
 extra_gold = 3
 favored_opportunities = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])

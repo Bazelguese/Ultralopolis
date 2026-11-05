@@ -253,12 +253,19 @@ func test_ogni_tipo_delle_carte_sta_in_una_categoria() -> void:
 			cards.append([def.id, def.types])
 		for def: TroopDef in identity.exclusive_troops:
 			cards.append([def.id, def.types])
+	# I tipi d'identità stanno fuori dalle categorie (GDD §6.6, v0.24).
+	var identity_types: Array[StringName] = IdentityRules.identity_types(catalog)
 	for card: Array in cards:
 		var card_types: Array[StringName] = card[1]
 		assert_between(card_types.size(), 1, 3, "1–3 tipi per %s" % card[0])
+		var category_types: int = 0
 		for card_type: StringName in card_types:
 			used[card_type] = true
+			if identity_types.has(card_type):
+				continue
+			category_types += 1
 			assert_true(in_categories.has(card_type), "Il tipo %s di %s sta in una categoria" % [card_type, card[0]])
+		assert_gt(category_types, 0, "%s ha almeno un tipo di categoria" % card[0])
 	for card_type: StringName in in_categories:
 		assert_true(used.has(card_type), "Il tipo %s è usato da almeno una carta" % card_type)
 
@@ -349,3 +356,35 @@ func test_identita_del_prototipo_v024() -> void:
 		for wanted: StringName in expected[dimension]:
 			assert_true(ids.has(wanted), "%s fra le opzioni" % wanted)
 		assert_eq(ids.size(), expected[dimension].size(), "Numero di opzioni per %s" % IdentityDef.DIMENSION_NAMES[dimension])
+
+
+func test_tipi_d_identita() -> void:
+	# GDD §6.6 (v0.24): un tipo per elemento, fuori dalle categorie; le carte esclusive
+	# dell'elemento lo portano, con al massimo 1 tipo d'identità per carta.
+	var catalog: CatalogDef = _catalog()
+	var categories: Dictionary[StringName, bool] = {}
+	for advisor: AdvisorDef in catalog.advisors:
+		for card_type: StringName in advisor.types:
+			categories[card_type] = true
+	var identity_types: Array[StringName] = IdentityRules.identity_types(catalog)
+	var seen: Dictionary[StringName, bool] = {}
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == IdentityDef.Dimension.PERK:
+			continue
+		assert_ne(def.identity_type, &"", "Tipo d'identità di %s" % def.id)
+		assert_false(seen.has(def.identity_type), "Tipo ripetuto: %s" % def.identity_type)
+		seen[def.identity_type] = true
+		assert_false(categories.has(def.identity_type), "%s sta fuori dalle categorie" % def.identity_type)
+		var cards: Array[Array] = []
+		for card: BuildingDef in def.exclusive_buildings:
+			cards.append([card.id, card.types])
+		for card: TroopDef in def.exclusive_troops:
+			cards.append([card.id, card.types])
+		for card: Array in cards:
+			var card_types: Array[StringName] = card[1]
+			assert_true(card_types.has(def.identity_type), "%s porta il tipo %s" % [card[0], def.identity_type])
+			var count: int = 0
+			for card_type: StringName in card_types:
+				if identity_types.has(card_type):
+					count += 1
+			assert_eq(count, 1, "Un solo tipo d'identità su %s" % card[0])

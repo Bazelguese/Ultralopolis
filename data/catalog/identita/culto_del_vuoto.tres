@@ -11,5 +11,6 @@ id = &"culto_del_vuoto"
 display_name = "Culto del vuoto"
 description = "Fede oscura nel nulla: la Corruzione inflitta è il 20% più forte. Capitale: +1 Documenti."
 dimension = 2
+identity_type = &"Abissale"
 resistance_bonus = 1
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
