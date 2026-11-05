@@ -141,7 +141,7 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | Ricompense per la vittoria: edifici, truppe, perk o risorse. Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (i perk entrano quando esisteranno, §9) |
 | Una vittoria (anche un pareggio) dà inoltre un **bottino fisso** di Oro e Ricerca, più alto per gli incontri più difficili | Confermato (v0.21); valori placeholder (§16.3) |
 | Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
-| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17); regole di crescita placeholder (§16.3) |
+| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) per ogni incontro dell'anno, dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17; due volte all'anno dalla v0.25); regole di crescita placeholder (§16.3) |
 
 ### 3.4 Vittoria e fine della run — Base adottata
 
@@ -1118,7 +1118,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Pescata delle 3 vie: peso base 1, +1 per ogni elemento dell’identità o via già scelta che la favorisce; se il pool ha meno di 3 vie valide, si mostrano tutte | Provvisoria, come per le opportunità. |
 | Entrando in una nuova era, le proposte del round in corso vengono ripescate gratis dalla nuova era (prima del Consiglio: le alternative dell’opportunità) | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
-| Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
+| Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno e per quella stagione (primavera o estate), non pescati a caso | Accettata dal creatore (stagione dalla v0.25). |
 | Senza regole di generazione nei dati, se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
 | Pool di offerte basato solo sull’era (l’identità non esiste ancora) | Semplificazione del prototipo. |
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
