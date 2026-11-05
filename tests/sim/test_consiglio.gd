@@ -303,6 +303,43 @@ func test_l_incanto_aggiunge_effetto_e_mana_una_sola_volta() -> void:
 	assert_true(run.advisor_choices.is_empty() or run.offers.is_empty(), "Una truppa si incanta una sola volta.")
 
 
+
+func test_l_incanto_esclusivo_del_credo_ha_due_effetti_e_solo_quel_credo_lo_vede() -> void:
+	# GDD §4.3, §9.4 (v0.24): 1-2 incanti esclusivi per credo, anche con due effetti insieme.
+	var spell: OpportunityDef = OpportunityDef.new()
+	spell.id = &"incanto_doppio"
+	spell.display_name = "Incanto: mezzogiorno"
+	spell.kind = OpportunityDef.Kind.INCANTO
+	spell.enchant_value = ModifierDef.BattleValue.DANNO
+	spell.enchant_amounts = PackedInt32Array([2, 3, 4])
+	spell.enchant_value_2 = ModifierDef.BattleValue.CURA
+	spell.enchant_amounts_2 = PackedInt32Array([4, 5, 6])
+	spell.enchant_no_mana_bonus_percent = 50
+	var creed: IdentityDef = IdentityDef.new()
+	creed.id = &"culto"
+	creed.dimension = IdentityDef.Dimension.CREDO
+	creed.exclusive_opportunities = [spell]
+	var other_creed: IdentityDef = IdentityDef.new()
+	other_creed.id = &"altro_culto"
+	other_creed.dimension = IdentityDef.Dimension.CREDO
+	catalog.identities = [creed, other_creed]
+	rules.starting_perks = 0
+	var priest: AdvisorDef = Aiuti.consigliere(&"sacerdote", [&"Spirituale"], [spell], Res.Type.FEDE)
+	catalog.advisors = [priest]
+	rules.half_themes = _themes(RunState.RoundTheme.AZIONI, 3)
+	var outsider: RunState = _run()
+	assert_true(outsider.found_nation("Altri", [other_creed]))
+	assert_true(outsider.advisor_choices.is_empty(), "Senza il credo l'incanto esclusivo non compare.")
+	var run: RunState = _run()
+	assert_true(run.found_nation("Fedeli", [creed]))
+	Aiuti.ascolta(run)
+	assert_eq(run.offers.size(), 1)
+	assert_true(run.buy_offer(0))
+	var stats: TroopDef = run.effective_troop(run.board.troops[0])
+	assert_eq(stats.damage, plain_troop.damage + 3, "Primo effetto, +50% perché la truppa non chiedeva mana.")
+	assert_eq(stats.heal, 6, "Secondo effetto, +50%.")
+	assert_eq(stats.mana_cost, 2)
+
 # --- Livelli del Consiglio (GDD §4.2.1) ----------------------------------------------
 
 func test_le_azioni_di_livello_alto_arrivano_con_l_era() -> void:

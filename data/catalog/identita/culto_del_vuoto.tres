@@ -4,6 +4,8 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x2"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/fame_del_vuoto.tres" id="x3"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_culto_del_vuoto_documenti.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_morso_del_nulla.tres" id="p2"]
 
 [resource]
 script = ExtResource("x1")
@@ -14,3 +16,4 @@ dimension = 2
 identity_type = &"Abissale"
 resistance_bonus = 1
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
+exclusive_opportunities = Array[ExtResource("p1")]([ExtResource("p2")])

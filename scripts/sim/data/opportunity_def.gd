@@ -83,3 +83,9 @@ enum SpyEffect {
 @export var enchant_mana: int = 2
 ## Colore del mana se la truppa prima non ne chiedeva (GDD §4.3).
 @export var enchant_color: StringName = &"blu"
+## Secondo effetto, solo per gli incanti esclusivi dei credi (GDD §4.3, §9.4; v0.24).
+## Vuoto = nessun secondo effetto.
+@export var enchant_value_2: ModifierDef.BattleValue = ModifierDef.BattleValue.CURA
+@export var enchant_amounts_2: PackedInt32Array = PackedInt32Array()
+## Percentuale in più sugli effetti se la truppa prima non chiedeva mana (es. Scudo degli avi).
+@export var enchant_no_mana_bonus_percent: int = 0

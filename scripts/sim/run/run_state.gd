@@ -612,6 +612,15 @@ func offer_choices(offer: Offer) -> Array[String]:
 
 
 ## Truppe che si possono ancora incantare: ognuna una sola volta (GDD §4.3).
+## Quantità di un effetto dell'incanto per l'era della truppa, con l'eventuale percentuale in più.
+static func _enchant_amount(amounts: PackedInt32Array, troop_era: int, bonus_percent: int) -> int:
+	if amounts.is_empty():
+		return 0
+	var amount: int = amounts[clampi(troop_era, 1, amounts.size()) - 1]
+	@warning_ignore("integer_division")
+	return amount + amount * bonus_percent / 100
+
+
 func _enchantable_troops() -> Array[BoardPiece]:
 	var found: Array[BoardPiece] = []
 	for piece: BoardPiece in board.troops:
@@ -781,8 +790,9 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			var enchanted: BoardPiece = troops[choice]
 			var spell: OpportunityDef = offer.opportunity
 			enchanted.enchant = spell
-			var amounts: PackedInt32Array = spell.enchant_amounts
-			enchanted.enchant_amount = amounts[clampi(enchanted.troop.era, 1, amounts.size()) - 1] if not amounts.is_empty() else 0
+			var bonus: int = spell.enchant_no_mana_bonus_percent if enchanted.troop.mana_cost <= 0 else 0
+			enchanted.enchant_amount = _enchant_amount(spell.enchant_amounts, enchanted.troop.era, bonus)
+			enchanted.enchant_amount_2 = _enchant_amount(spell.enchant_amounts_2, enchanted.troop.era, bonus)
 			_log("%s: %s è incantata (%s)." % [source, enchanted.display_name(), spell.description])
 		OpportunityDef.Kind.PERK:
 			if identity.has(offer.perk):
