@@ -2,7 +2,7 @@
 ## Ricerca e albero delle tecnologie
 
 **Data:** 5 novembre 2026
-**Stato:** bozza da approvare. Il GDD non è ancora stato modificato.
+**Stato:** **approvata da Davide il 5 novembre 2026 e riportata nel GDD v0.25** (§10). Questo file resta come memoria della discussione; le regole segnate “Proposta” sono state approvate tutte.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.24
 
 Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Direzione** = obiettivo, da progettare; **Da definire** = manca una regola; **Spunto** = idea per il futuro, da non implementare.

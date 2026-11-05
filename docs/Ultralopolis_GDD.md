@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.24
+## Game Design Document — v0.25
 
 **Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -131,7 +131,7 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | La sconfitta ha **conseguenze leggere** | Confermato |
 | Conseguenza della sconfitta: l’**Oro del Magazzino viene dimezzato** (arrotondato per difetto); **nessuna perdita di Prestigio** | Confermato; entità da tarare nel playtest |
 | Una sconfitta durante l’ultima possibilità **termina la run** | Confermato |
-| Ricompense per la vittoria: edifici, truppe, perk o risorse. Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (i perk entrano quando esisteranno, §9) |
+| Ricompense per la vittoria: edifici, truppe, perk, risorse o **tecnologie già iniziate** (carte dorate, §10.5.6, v0.25). Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (le tecnologie dalla v0.25) |
 | Una vittoria (anche un pareggio) dà inoltre un **bottino fisso** di Oro e Ricerca, più alto per gli incontri più difficili | Confermato (v0.21); valori placeholder (§16.3) |
 | Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
 | Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17); regole di crescita placeholder (§16.3) |
@@ -220,11 +220,11 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 
 | Consigliere | Categoria | Azioni | Paga le azioni con |
 |---|---|---|---|
-| Tesoriere | Ricchezza | Esattori: Oro subito · Mercante: Ricerca in Oro · Assemblea: +50% Oro o Ricerca per un anno | Ricerca, Influenza |
+| Tesoriere | Ricchezza | Esattori: Oro subito · Assemblea: +50% Oro o Ricerca per un anno (il Mercante, Ricerca in Oro, è stato tolto nella v0.25) | Influenza |
 | Fattore | Terra | Scorte: Cibo in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno |
 | Architetto | Opera | Architetti: spazio edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | Pietra, Legno (lo spazio in Oro) |
 | Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
-| Studioso | Conoscenza | Studiosi: Legno in Ricerca · Archivisti: Documenti in Ricerca · Manuali tecnici: per un anno una truppa fa più danno | Legno, Documenti |
+| Studioso | Conoscenza | Studiosi: Legno in Ricerca · Archivisti: Documenti in Ricerca · Manuali tecnici: per un anno una truppa fa più danno · Revisione dei piani: ripesca la mano delle tecnologie (v0.25, §10.5.3). La Ricerca che dà va nella tecnologia in corso | Legno, Documenti |
 | Sacerdote | Fede | Incanta una truppa (§4.3), un’azione per ogni effetto | Fede |
 | Cancelliere (ex Diplomatico) | Stato | Ambasciata: accorcia un malus attivo · Decreto fiscale: Stabilità in Oro · Censimento: per un anno una proposta in più | Stabilità |
 | Maestro delle spie | Ombra | Sabotaggio o rallentamento del fantasma (§12) | Documenti |
@@ -326,12 +326,12 @@ Un edificio costruito durante una fase non produce retroattivamente: inizia a pr
 
 Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; le altre servono a **specializzarsi**: potenziamenti, azioni del Consiglio, mantenimento.
 
-Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è quella con cui il consigliere fa pagare Potenzia (§6.5). Tre risorse restano fuori dalle categorie: l’Oro (moneta), la Ricerca (ere e tecnologie) e il Cibo (mantenimento).
+Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è quella con cui il consigliere fa pagare Potenzia (§6.5). Tre risorse restano fuori dalle categorie: l’Oro (moneta), la Ricerca (tecnologie, e con esse le ere) e il Cibo (mantenimento).
 
 | Risorsa | Impiego | Prodotta soprattutto da |
 |---|---|---|
 | Oro | Moneta comune: edifici, truppe, spazi, rinnovi delle offerte; Potenzia del Maestro delle spie, insieme a una risorsa casuale (§4.2.4). | edifici Economici |
-| Ricerca | Passaggio di era; in futuro le tecnologie (§10.5). Non è la risorsa di nessuna categoria. | edifici Accademici |
+| Ricerca | Tecnologie, e con esse il passaggio di era (§10.5, v0.25). **Non sta nel Magazzino**: va nella tecnologia in corso. Non è la risorsa di nessuna categoria. | edifici Accademici |
 | Cibo | Mantenimento delle truppe (§5.4). | edifici di Produzione agricola |
 | Ferro | Potenzia del Generale (Militare). | edifici di Produzione e Infrastrutture Belliche |
 | Pietra | Potenzia dell’Architetto (Opera). | edifici di Produzione |
@@ -344,14 +344,14 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 - La **Fauna** non è più una risorsa (v0.22): resta solo come tipo (§6.6).
 - Le **azioni** dei consiglieri non seguono la risorsa della categoria: si pagano come indicato in §4.2.3 — Confermato (v0.22).
 - **Altri impieghi — Confermato (v0.22).** Le risorse di categoria non servono solo a Potenzia: pagano anche il **rinnovo** delle proposte del proprio consigliere (§4.2) e **almeno un’azione** del Consiglio (§4.2.3). Così restano utili anche quando le carte sono al livello massimo.
-- **Direzione (v0.22):** gli eventi a scelta (§13) e le tecnologie (§10.5) potranno chiedere risorse, comprese quelle di categoria.
+- **Direzione (v0.22):** gli eventi a scelta (§13) potranno chiedere risorse, comprese quelle di categoria. Le tecnologie costano solo Ricerca; solo alcuni progetti speciali potranno chiedere una risorsa di categoria (§10.5.7, v0.25).
 - La colonna “Prodotta soprattutto da” è una tendenza per il catalogo, non una regola.
 
-- Tutte le risorse stanno nel **Magazzino**, senza limite di capacità.
+- Tutte le risorse stanno nel **Magazzino**, senza limite di capacità, tranne la **Ricerca**, che va nella tecnologia in corso (§10.5.1, v0.25).
 - Un edificio può produrre più risorse a ogni fase.
 - I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
 
-**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Il mercato funziona **solo in vendita**: con l’Oro non si comprano risorse, così l’Oro raccoglie le eccedenze ma non sostituisce la specializzazione (confermato in v0.22). Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
+**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Il mercato funziona **solo in vendita**: con l’Oro non si comprano risorse, così l’Oro raccoglie le eccedenze ma non sostituisce la specializzazione (confermato in v0.22). Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. La Ricerca non si vende (v0.25). Tasso: placeholder (§16.3).
 
 **Mana — Confermato.** Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia. Mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
 
@@ -812,6 +812,7 @@ Ogni dimensione agisce su una parte diversa del gioco. Dettagli, catalogo e moti
 | Regola | Stato |
 |---|---|
 | Razze fantasy originali con esclusivi in ogni era; quelli di un'era passata escono dalle offerte | Confermato |
+| Ogni razza ha anche **tecnologie esclusive** in ogni era (§10.5.2) | Confermato (v0.25) |
 | Prototipo: 3 razze, Pietrosangue (difesa), Maremani (economia), Cinerali (attacco rapido); sostituiscono Montanari, Popolo del delta e Popolo delle foreste, ed ereditano i loro esclusivi, eventi, fortune e visitatori | Confermato |
 | Aspetto delle razze sui pezzi | Da definire (rimandato) |
 
@@ -837,35 +838,46 @@ Ogni dimensione agisce su una parte diversa del gioco. Dettagli, catalogo e moti
 
 **Da definire:** tratti delle razze, evoluzione proposta prima o dopo la via, costo della Riforma, governo e evoluzione dei fantasmi generati.
 
-## 10. Ricerca ed ere
+## 10. Ricerca, tecnologie ed ere
+
+Dalla v0.25 la Ricerca serve a un **albero delle tecnologie**, e le ere si raggiungono completando tecnologie. Le regole di dettaglio sono state discusse in `docs/Bozza_v0.25_ricerca_tecnologie.md`, approvata da Davide il 5 novembre 2026. Valori placeholder (§16.3).
+
+Le tecnologie si esprimono con il linguaggio del nucleo (P5): i loro effetti sono modificatori permanenti (§8.2) o perk (§9.3). L’unico concetto nuovo è la **linea** di elementi (§10.5.5), un modo di scrivere il catalogo.
 
 ### 10.1 Avanzamento asimmetrico — Confermato
 
 Le ere dipendono dall’investimento in Ricerca, non da un calendario uguale per tutti: una civiltà può entrare in una nuova era prima di un’altra.
 
-La **Ricerca si conserva e viene spesa** per avanzare quando il giocatore può pagare il costo. Il passaggio non avviene automaticamente al raggiungimento di una soglia.
+Fino alla v0.24 la Ricerca si conservava nel Magazzino e si spendeva per pagare l’era. Dalla v0.25 riempie le tecnologie un po’ alla volta, e l’era si raggiunge con un numero di tecnologie (§10.3).
 
-### 10.2 Che cosa fa un’era — Confermato (v0.15)
+### 10.2 Che cosa fa un’era — Confermato (v0.15; aggiornato in v0.25)
 
 | Effetto dell’ingresso in un’era | Riferimento |
 |---|---|
-| Sblocca il catalogo di offerte dell’era; quelle delle ere precedenti non restano disponibili | §10.3 |
+| Sblocca il catalogo di offerte dell’era; quelle delle ere precedenti non restano disponibili (salvo l’eccezione delle linee, §10.5.5) | §10.5.5 |
 | Concede spazi edificio e truppa, nella quantità indicata nei dati dell’era | §6.3 |
 | Alza la quota di Resistenza dovuta all’era | §7.1.1 |
 | Dalla seconda era in poi, chiede di **scegliere una via** | §10.4 |
+| Fa salire di livello il Consiglio e può proporre l’evoluzione del governo | §4.2.1, §9.4.2 |
+| Apre le tecnologie della nuova era e ripesca gratis la mano | §10.5.3 |
 | Rende disponibili gli effetti più forti (P2a) | §2 |
 
 Gli elementi posseduti restano utilizzabili e non migliorano automaticamente: il vantaggio tecnologico richiede anche la capacità economica di acquistare ciò che viene sbloccato.
 
-La struttura è **lineare**: ere in sequenza, senza albero tecnologico. La scelta e la specializzazione passano per le vie (§10.4). La Ricerca serve, per ora, solo a passare d’era; in futuro servirà anche alle tecnologie (Direzione, §10.5).
+La scelta e la specializzazione passano sia per le tecnologie (§10.5) sia per le vie (§10.4). Fino alla v0.24 la struttura era lineare, senza albero tecnologico.
 
-**Costo — Confermato nella forma:** ogni era costa più Ricerca della precedente, senza meccanismi di recupero per chi è rimasto indietro. Valori placeholder.
+**Numero di ere — Da definire:** il prototipo ne usa 3 (“Fondazione”, “Sviluppo”, “Ascesa”, nomi placeholder); il numero della run completa si decide dopo i playtest. Ogni era in più richiede un catalogo base, nuove vie con i loro esclusivi e una nuova fascia dell’albero.
 
-**Numero di ere — Da definire:** il prototipo ne usa 3 (“Fondazione”, “Sviluppo”, “Ascesa”, nomi placeholder); il numero della run completa si decide dopo i playtest. Ogni era in più richiede un catalogo base e nuove vie con i loro esclusivi (§10.4).
+### 10.3 Regole del passaggio — Confermato (rivisto in v0.25)
 
-### 10.3 Regole del passaggio — Confermato
+| Regola | Stato |
+|---|---|
+| Per entrare nell’era successiva servono **N tecnologie dell’era corrente**; non si paga più l’era con la Ricerca | Confermato (v0.25) |
+| Valori di prova: 4 tecnologie dell’era 1 per l’era 2; 5 dell’era 2 per l’era 3 | Placeholder |
+| Raggiunto il numero, il passaggio **non è automatico**: il giocatore entra quando vuole, in entrambe le metà, senza consumare il round | Confermato (v0.25) |
+| Ogni era successiva richiede più tecnologie della precedente, senza meccanismi di recupero per chi è rimasto indietro | Confermato nella forma; valori placeholder |
 
-L’avanzamento si può pagare in entrambe le metà dell’anno e non consuma il round. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili, salvo l’eccezione delle linee (§10.5.5).
 
 ### 10.4 Le vie — Confermato (v0.15)
 
@@ -877,7 +889,7 @@ Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una 
 | Si sceglie **fra 3 vie** | Confermato |
 | Ogni era ha un **pool di vie**. Le 3 proposte sono pescate dal pool, con più probabilità per le vie coerenti con l’identità e con le vie già scelte; alcune vie possono essere esclusive di certe identità o di certe vie precedenti | Confermato |
 | Una via usa la **stessa scheda degli elementi dell’identità** (§9.2) | Confermato |
-| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi; dare un tratto permanente (§8), anche una risorsa in più prodotta dalla Capitale (§6.2, v0.22); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
+| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi e **tecnologie esclusive** (§10.5.2, v0.25); dare un tratto permanente (§8), anche una risorsa in più prodotta dalla Capitale (§6.2, v0.22); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
 | Gli effetti sono **liberi**: possono riferirsi a tipi o a elementi specifici, caso per caso nel catalogo | Confermato |
 | Gli **elementi esclusivi** di una via sono **diversi per ogni era**: una via scelta nell’era 2 ha esclusivi propri per l’era 2, per l’era 3 e per le successive. Gli esclusivi di un’era passata spariscono come le altre offerte | Confermato |
 | Le vie si accumulano: nessuna sostituisce le precedenti o gli elementi scelti alla creazione | Confermato |
@@ -886,14 +898,95 @@ Nota per il catalogo: un effetto legato a un elemento specifico perde valore qua
 
 Le vie sono nel prototipo dalla v0.18, con il catalogo di `docs/Catalogo.md`.
 
-### 10.5 Questioni aperte
+### 10.5 Tecnologie — Confermato (modifica del nucleo, v0.25)
+
+#### 10.5.1 La Ricerca
+
+| Regola | Stato |
+|---|---|
+| La ricerca **non è istantanea**: il giocatore sceglie una tecnologia e la Ricerca che la nazione guadagna la riempie un po’ alla volta | Confermato |
+| Tutta la Ricerca guadagnata (produzione, bottino, azioni, eventi, fortune) va nella **tecnologia in corso** e **non entra nel Magazzino**: non si vende al mercato e non paga azioni | Confermato |
+| Se non c’è una tecnologia in corso (all’inizio della run, o dopo averne completata una senza sceglierne un’altra), la Ricerca resta **in attesa** e passa alla prima tecnologia scelta | Confermato |
+| Una tecnologia si completa **appena** raggiunge il suo costo, anche a metà di una fase | Confermato |
+| La Ricerca in più a una tecnologia completata **non va persa**: passa alla tecnologia successiva | Confermato |
+| Si può **cambiare tecnologia a metà**: i progressi su quella lasciata restano salvati | Confermato |
+| La tecnologia da studiare si sceglie **in qualunque momento** fuori dalla battaglia e **non consuma il round** | Confermato |
+| Le tecnologie completate valgono **per sempre** | Confermato |
+| Le tecnologie costano **solo Ricerca**. Costi di prova: 3 Ricerca per la prima altezza di un’era, 4 per la seconda, poi a salire con le ere | Confermato; valori placeholder |
+| La produzione arriva solo all’inizio delle due metà (§5.2): le tecnologie si completano a blocchi, circa due volte all’anno, più bottino, azioni ed eventi | Confermato (conseguenza) |
+
+#### 10.5.2 L’albero
+
+| Regola | Stato |
+|---|---|
+| Esiste un **vero albero**, con prerequisiti, **unico** per tutta la run | Confermato |
+| **4 rami**, uno per colore di mana, ciascuno con le due categorie a cui il colore tende (§5.3): **rosso** Militare e Opera; **verde** Terra e Ricchezza; **blu** Fede e Stato; **viola** Conoscenza e Ombra | Confermato |
+| Ogni tecnologia ha una **sfera**: una delle 8 categorie, come gli eventi (§4.2.5). La sfera dice di che cosa parla e in quale ramo sta | Confermato |
+| Ogni era occupa due **altezze**: l’era 1 le altezze 1 e 2, l’era 2 le altezze 3 e 4, l’era 3 le altezze 5 e 6 | Confermato |
+| Si ricercano solo tecnologie della **propria era o di ere passate**, mai di ere future | Confermato |
+| La seconda altezza di un’era si apre, in un ramo, dopo **1 tecnologia** della prima altezza dello stesso ramo | Confermato; quantità placeholder |
+| Alcune tecnologie hanno un **prerequisito preciso**, anche di un altro ramo | Confermato |
+| L’albero è **tutto visibile**; ogni tecnologia mostra i prerequisiti che le mancano (P4) | Confermato |
+| Prototipo: per era e per ramo 2 tecnologie alla prima altezza e 1 alla seconda, cioè **12 tecnologie per era**, più le esclusive | Confermato; placeholder |
+| **Tecnologie esclusive**: ogni via e ogni razza ne hanno, nel ramo della loro sfera; compaiono solo per chi ha quella via o razza. Prototipo: 1 per via e 1 per razza in ogni era | Confermato; quantità placeholder |
+
+#### 10.5.3 La mano di carte, come in Stellaris
+
+| Regola | Stato |
+|---|---|
+| Il gioco mostra una **mano di 3 tecnologie**; il giocatore ne sceglie una da studiare | Confermato |
+| Si pesca fra le tecnologie **disponibili** (prerequisiti completati, era non futura, non ancora completate) dell’**altezza più bassa** ancora aperta e di quella **subito sopra** | Confermato |
+| **Peso**: base 1, +1 per ogni radice “favorita da” che la nazione possiede; una radice “richiede” la fa comparire solo se la nazione ce l’ha. Le radici sono quelle degli eventi (§4.2.5) | Confermato |
+| **Sconto sulla carta scartata**: una tecnologia mostrata e non scelta ha il peso dimezzato nella mano successiva; lo sconto si accumula a ogni scarto fino a un minimo e si azzera quando la tecnologia viene scelta | Confermato; minimo placeholder |
+| Una nuova mano si pesca **ogni volta che si completa una tecnologia** ed entrando in una nuova era | Confermato |
+| Le tecnologie **iniziate e non finite** e le **carte dorate** (§10.5.6) compaiono sempre, in più rispetto alle 3 carte | Confermato |
+| La pescata usa il seme della run | Convenzione tecnica (§16.3) |
+
+#### 10.5.4 Che cosa si ricerca
+
+| Famiglia | Esempio (placeholder) | Come si esprime |
+|---|---|---|
+| **Linea di elementi** | Una nuova linea di truppe Fante | Modificatore permanente sulle offerte (§8.2), vedi §10.5.5 |
+| **Perk** | Un perk come quelli dell’Anziano | Perk (§9.3) |
+| **Consiglio** | Una proposta in più da un consigliere; rinnovo o Potenzia meno cari | Modificatore permanente sulle offerte o sui costi (come §9.2) |
+| **Nazione** | Uno spazio edificio o truppa; +1 di una risorsa prodotta dalla Capitale | Modificatore permanente sugli spazi o sulla produzione |
+| **Dottrina sui tipi** | “Le truppe Fante ricaricano più in fretta” | Modificatore permanente sui valori di battaglia (§16.3, ordine dei calcoli) |
+
+Ogni tecnologia ha un **solo effetto principale**, facile da leggere. Gli effetti più forti stanno nelle altezze alte e nelle ere avanzate (P2a) — Confermato.
+
+#### 10.5.5 Le linee di elementi
+
+| Regola | Stato |
+|---|---|
+| Una **linea** è una serie di elementi, uno per era, con lo stesso ruolo (esempio: una linea di tiratori fatta come Frombolieri, Balestrieri, Moschettieri) | Confermato |
+| La tecnologia sblocca la **linea**: in ogni era fa comparire fra le proposte la versione dell’era corrente | Confermato |
+| Se una linea non ha una versione per l’era corrente, resta disponibile l’**ultima versione precedente**: è l’unica eccezione alla regola per cui le offerte delle ere passate spariscono (§10.2) | Confermato |
+| Gli elementi delle linee **non** sono nel catalogo base: si ottengono solo con la tecnologia o come ricompensa | Confermato |
+| Entrano nelle proposte dei consiglieri secondo i loro **tipi**, come ogni altra carta (§4.2.4); il Clown li può proporre | Confermato |
+
+#### 10.5.6 Carte dorate
+
+| Regola | Stato |
+|---|---|
+| Un’opzione di un Evento, una Fortuna o la ricompensa di un incontro del mondo (§3.3) possono dare una **tecnologia già iniziata** | Confermato |
+| La carta dorata ha già **metà** del costo pagata e compare sempre nella mano finché non è completata | Confermato; quota placeholder |
+| Può essere una tecnologia di un’altezza che la nazione non potrebbe ancora pescare, ma mai di un’era futura | Confermato |
+
+#### 10.5.7 Progetti speciali — Direzione
+
+Alcune tecnologie, i **progetti speciali**, potranno chiedere oltre alla Ricerca una risorsa di categoria. La maggior parte delle tecnologie costa solo Ricerca, così una nazione non resta legata a una sola risorsa. Non entrano nel primo prototipo.
+
+**Da definire:** quali tecnologie sono progetti speciali, se sono più forti delle altre, quando si paga la risorsa (proposta: un progetto speciale per ramo e per era, pagato quando lo si inizia).
+
+### 10.6 Questioni aperte
 
 **Da definire:**
 
-- Costi definitivi delle ere e andamento fra un’era e la successiva.
+- Costi definitivi delle tecnologie e numero di tecnologie richiesto da ogni era.
 - Numero definitivo di ere (§10.2).
 - Catalogo delle vie e dei loro esclusivi.
-- **Tecnologie — Direzione (v0.22):** la Ricerca servirà anche per le tecnologie, un sistema ancora da introdurre. Per questo la Ricerca non è la risorsa di nessuna categoria del Consiglio (§4.2.4).
+- Catalogo dell’albero, delle linee e delle tecnologie esclusive di vie e razze.
+- Progetti speciali (§10.5.7).
 
 ## 11. Fantasmi e asincronia
 
@@ -917,7 +1010,7 @@ Per il prototipo si usano avversari locali (§16.3); non costituiscono multiplay
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
-Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi e versione delle regole. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
+Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi (comprese le tecnologie che agiscono in battaglia, v0.25) e versione delle regole. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
 
 È proposto di salvare le **statistiche complete** degli elementi e non solo il loro identificativo: se in seguito un elemento viene ribilanciato, la copia continua a combattere com’era stata registrata.
 
@@ -995,7 +1088,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Economia | Risorse nel Magazzino; produzione prevista per fase. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
-| Ricerca | Costo della prossima era e risorsa disponibile. |
+| Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.25). |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
 | Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa, elementi rallentati o sabotati con durata residua e origine. |
 | Esito | Risultato, perdita di Prestigio, vittorie, conseguenze. |
@@ -1052,7 +1145,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
 - Due macrofasi con raccolta automatica all’ingresso e 5 round del Consiglio ciascuna (§4.2): nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
-- Ricerca spendibile per avanzare di era.
+- Albero delle tecnologie con la mano di 3 carte; ere raggiunte con le tecnologie (v0.25).
 - Riordino delle truppe fuori dal combattimento.
 - Fantasma locale fissato per l’anno.
 - Produzione di mana e attivazioni automatiche.
@@ -1166,6 +1259,12 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Valori di battaglia di un elemento: prima il livello (+50% a livello), poi le percentuali dei modificatori, poi le aggiunte fisse; le aggiunte fisse valgono solo per chi ha già quel valore (es. “chi cura cura 1 in più”) | Provvisoria (v0.18). |
 | I fantasmi generati scelgono a caso una via per ogni era raggiunta, fra quelle a loro consentite | Provvisoria (v0.18). |
 | I malus nuovi del Catalogo entrano anche fra i malus dei fantasmi generati | Provvisoria (v0.18). |
+| Tecnologie: 3 Ricerca alla prima altezza di un’era e 4 alla seconda, poi a salire con le ere; 4 tecnologie dell’era 1 per l’era 2, 5 dell’era 2 per l’era 3 | Placeholder (v0.25). |
+| Albero del prototipo: per era e per ramo 2 tecnologie alla prima altezza e 1 alla seconda (12 per era); 1 tecnologia esclusiva per via e per razza in ogni era; la seconda altezza si apre con 1 tecnologia della prima nello stesso ramo | Placeholder (v0.25). |
+| Sconto sulla carta scartata: peso dimezzato a ogni scarto, fino a un minimo di 1/8 | Placeholder (v0.25). |
+| Carta dorata: metà del costo già pagata | Placeholder (v0.25). |
+| Revisione dei piani (Studioso): 2 Documenti, ripesca la mano delle tecnologie | Placeholder (v0.25). |
+| I fantasmi generati ricevono a caso, con il seme della run, il numero di tecnologie richiesto per ogni era raggiunta; in battaglia valgono solo quelle che agiscono in battaglia | Provvisoria (v0.25). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -1178,7 +1277,16 @@ Criteri di accettazione proposti per il prototipo:
 | Ingresso in una fase | Una sola raccolta dagli edifici già presenti. |
 | Costruzione durante Produzione | Nessuna raccolta retroattiva; prima produzione in Preparazione. |
 | Risorse non spese | Conservate al cambio fase e al cambio anno. |
-| Passaggio di era | Ricerca pagata una volta; resto conservato; offerte coerenti con l’era. |
+| Ricerca guadagnata | Va tutta nella tecnologia in corso, oppure resta in attesa se non ce n’è una; non entra nel Magazzino. |
+| Tecnologia completata | Si completa appena raggiunge il costo; la Ricerca in più passa alla successiva; si pesca una nuova mano. |
+| Cambio di tecnologia | I progressi su quella lasciata restano salvati; la tecnologia iniziata ricompare sempre nella mano. |
+| Mano | 3 tecnologie disponibili, dall’altezza più bassa aperta e da quella sopra, mai di un’era futura; con lo stesso seme è sempre la stessa. |
+| Carta scartata | Peso dimezzato nella mano successiva; torna normale quando viene scelta. |
+| Seconda altezza | Si apre in un ramo dopo 1 tecnologia della prima altezza dello stesso ramo. |
+| Passaggio di era | Possibile solo con N tecnologie dell’era corrente; non automatico; nessuna Ricerca spesa; offerte coerenti con l’era. |
+| Linea di elementi | Propone la versione dell’era corrente; senza versione nell’era nuova resta l’ultima precedente. |
+| Carta dorata | Arriva con metà del costo pagata e compare sempre nella mano finché non è completata. |
+| Tecnologie esclusive | Compaiono solo per chi ha la via o la razza. |
 | Ingresso in un’era | Spazi e quota di Resistenza dell’era concessi; dalla seconda era, scelta obbligatoria fra 3 vie. |
 | Vie | Le 3 proposte vengono dal pool dell’era, pesate da identità e vie precedenti; la via scelta applica bonus immediato e tratto permanente. |
 | Esclusivi delle vie | Compaiono fra le offerte solo nell’era a cui appartengono e solo per chi ha la via. |
@@ -1248,7 +1356,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 |---|---|
 | Prima di sviluppare il catalogo | Riserva, miglioramenti; criterio dei rapporti fra le due funzioni degli edifici (P3). |
 | Prima di ampliare la plancia | Quantità e prezzi degli spazi (§6.3); layout. |
-| Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
+| Prima di ampliare la ricerca | Numero definitivo delle ere; costi delle tecnologie e numero richiesto per ogni era; catalogo delle vie, dei loro esclusivi e dell’albero; progetti speciali (§10.4, §10.5). |
 | Per la componente GDR | Valori del Malcontento; tratti delle razze; costo della Riforma; governi dei fantasmi; tipi d'identità delle vie. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
 | Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4). |
@@ -1289,7 +1397,12 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Attacco d’assedio | Danno che colpisce solo lo scudo; proprio delle truppe Assedio. |
 | Prestigio | Risorsa che determina la sopravvivenza della run dopo le sconfitte. |
 | Fantasma | Copia di una nazione avversaria usata per uno scontro asincrono. |
-| Era | Livello di sviluppo tecnologico raggiunto spendendo Ricerca. |
+| Era | Livello di sviluppo raggiunto completando un certo numero di tecnologie (v0.25). |
+| Tecnologia | Carta dell’albero che si completa con la Ricerca e dà un effetto permanente (§10.5). |
+| Altezza | Livello di una tecnologia nell’albero; ogni era ne occupa due. |
+| Mano | Le 3 tecnologie proposte, fra cui si sceglie quella da studiare. |
+| Linea | Serie di elementi, uno per era, sbloccata da una tecnologia. |
+| Carta dorata | Tecnologia già iniziata, ottenuta da eventi, fortune o incontri. |
 | Modificatore | Effetto con bersaglio, durata, origine e regole di cumulo. |
 | Origine | Fonte di un modificatore; permette in futuro i malus con nome. |
 | Conseguenza | Modifica dello stato della run che persiste dopo un evento o uno scontro. |
@@ -1297,6 +1410,16 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.25 — 5 novembre 2026** (modifica del nucleo)
+- Approvata la bozza `docs/Bozza_v0.25_ricerca_tecnologie.md`: la Ricerca serve a un **albero delle tecnologie** (§10.5).
+- La Ricerca non sta più nel Magazzino: riempie la tecnologia in corso un po’ alla volta; non si vende e non paga azioni. Tolto il Mercante; il Tesoriere paga in Influenza (§4.2.3, §5.3).
+- Albero unico a **4 rami** per colore, ognuno con due categorie; due altezze per era; mano di **3 carte** come in Stellaris, con sconto sulla carta scartata; tecnologie iniziate e carte dorate sempre nella mano (§10.5.2, §10.5.3).
+- Si ricercano linee di elementi, perk, miglioramenti del Consiglio e della nazione, dottrine sui tipi; tutte valgono per sempre (§10.5.4). Le **linee** propongono la versione dell’era corrente, o l’ultima precedente (§10.5.5).
+- Le ere si raggiungono con **N tecnologie** dell’era corrente, quando lo decide il giocatore; non si paga più l’era con la Ricerca (§10.3). Superate “la Ricerca si conserva e viene spesa” e la struttura lineare.
+- **Carte dorate** da eventi, fortune e incontri del mondo (§3.3, §10.5.6); tecnologie esclusive di vie e razze (§10.4, §9.4.1); azione Revisione dei piani dello Studioso (§4.2.3).
+- Progetti speciali con risorsa di categoria: Direzione, dopo il primo prototipo (§10.5.7).
+- Aggiornati informazioni da mostrare, prototipo, convenzioni, verifica, decisioni e glossario (§14.3, §15.2, §16.3, §17, §18, §19).
 
 **v0.24 — 5 novembre 2026** (modifica del nucleo)
 - Approvata la proposta sull'identità (`docs/Proposta_identita.md`, bozza 2): razze fantasy, governi a tier con evoluzione e rivoluzione, credi con incanti esclusivi, culture che cambiano l'uso delle risorse (§9.4).
