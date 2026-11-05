@@ -91,7 +91,9 @@ func test_le_carte_corrispondono_alla_plancia_ai_consiglieri_e_alle_proposte() -
 	assert_eq(_carte("_edifici", 0).size(), run.board.buildings.size(), "Una carta per ogni edificio.")
 	var scelte: Array = _scena.get("_scelte")
 	assert_gt(run.advisor_choices.size(), 0, "Ci sono consiglieri nel primo round.")
-	assert_eq(scelte.size(), run.advisor_choices.size(), "Prima del round: una carta per ogni consigliere.")
+	# Un Evento o una Fortuna del round ha la sua carta accanto ai consiglieri (GDD §4.2.5).
+	var carte_round: int = run.advisor_choices.size() + (1 if run.event_choice != null else 0)
+	assert_eq(scelte.size(), carte_round, "Prima del round: una carta per ogni consigliere (e per l'evento).")
 	_scena.call("_clic_scelta", scelte[0])
 	assert_not_null(run.chosen_advisor, "Cliccando la carta si ascolta il consigliere.")
 	scelte = _scena.get("_scelte")
@@ -105,7 +107,7 @@ func test_passare_il_round_aggiorna_le_carte() -> void:
 	hud.passa.emit()
 	assert_ne(run.round_number, numero, "Si passa al round successivo.")
 	var scelte: Array = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.advisor_choices.size())
+	assert_eq(scelte.size(), run.advisor_choices.size() + (1 if run.event_choice != null else 0))
 
 
 func test_potenzia_dal_pannello_della_carta() -> void:
@@ -155,7 +157,10 @@ func test_uno_scontro_si_rigioca_fino_all_esito() -> void:
 
 func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	var run: RunState = _run()
-	run.stock[Res.Type.RICERCA] += run.next_era_cost()
+	# Le tecnologie dell'era 1 richieste per l'era 2 (GDD §10.3, v0.25).
+	for def: TechDef in run.catalog.technologies:
+		if def.era == 1 and run.techs_done_in_era(1) < run.next_era_techs_needed():
+			run.techs_done.append(def)
 	assert_true(run.advance_era(), "Si può avanzare di era.")
 	_scena.call("_aggiorna_tutto")
 	if run.way_choices.is_empty():
@@ -166,7 +171,7 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_true(run.way_choices.is_empty(), "Cliccando la carta la via viene scelta.")
 	scelte = _scena.get("_scelte")
-	assert_eq(scelte.size(), run.advisor_choices.size(), "Dopo la via tornano i consiglieri del round.")
+	assert_eq(scelte.size(), run.advisor_choices.size() + (1 if run.event_choice != null else 0), "Dopo la via tornano i consiglieri del round.")
 
 
 ## Cambiare qualcosa sulla plancia non rifà le offerte: restano le stesse carte, senza nuova entrata.
@@ -229,3 +234,21 @@ func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	assert_almost_eq(float(larghezze[0]), attesa, 0.001)
 	var plancia: Node3D = _scena.get("_plancia")
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
+
+
+## La Ricerca si sceglie dal pannello (GDD §10.5, §14.3): la mano mostra le carte vere della run
+## e la scelta passa dal segnale dell'interfaccia, senza consumare il round.
+func test_dal_pannello_della_ricerca_si_sceglie_la_tecnologia() -> void:
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var carte: Array[TechDef] = run.tech_hand_cards()
+	assert_eq(carte.size(), run.run_rules.tech_hand_size, "La mano ha 3 carte.")
+	var mano: HBoxContainer = hud.get("_mano_ricerca")
+	assert_eq(mano.get_child_count(), carte.size(), "Una carta del pannello per ogni tecnologia della mano.")
+	var round_prima: int = run.round_number
+	hud.scegli_tecnologia.emit(0)
+	assert_eq(run.current_tech, carte[0], "La carta scelta è in studio.")
+	assert_eq(run.round_number, round_prima, "Non consuma il round.")
+	var pulsante_era: Button = hud.get("_pulsante_era")
+	assert_true(pulsante_era.disabled, "Senza le tecnologie richieste non si entra nell'era.")
+	assert_string_contains(pulsante_era.text, "0/%d" % run.next_era_techs_needed())
