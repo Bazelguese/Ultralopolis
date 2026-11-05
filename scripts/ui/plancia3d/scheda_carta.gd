@@ -89,7 +89,7 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 		righe.append("+%d spazio truppa." % def.extra_troop_slots)
 	if def.is_capital:
 		righe.append("Non si può vendere né sostituire.")
-	righe.append(_riga_etichette(def.tags, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello))
 	if p_malus != "":
 		righe.append("Colpito da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
@@ -127,7 +127,7 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 	righe.append("Mangia %s Cibo a inizio anno." % Res.format(Res.Type.CIBO, def.food_tenths))
 	if p_affamata:
 		righe.append("Affamata: ricarica più lenta fino al prossimo pasto.")
-	righe.append(_riga_etichette(def.tags, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello))
 	if p_malus != "":
 		righe.append("Colpita da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
@@ -267,11 +267,11 @@ static func _righe_effetti(scudo_v: int, cura_v: int, corruzione_v: int, assedio
 	return righe
 
 
-static func _riga_etichette(etichette: Array[StringName], p_livello: int) -> String:
+static func _riga_tipi(tipi: Array[StringName], p_livello: int) -> String:
 	var nomi: PackedStringArray = PackedStringArray()
-	for etichetta: StringName in etichette:
-		nomi.append(String(etichetta))
-	return "Livello %d di 3 · %s" % [p_livello, ", ".join(nomi) if not nomi.is_empty() else "nessuna etichetta"]
+	for tipo: StringName in tipi:
+		nomi.append(String(tipo))
+	return "Livello %d di 3 · Tipi: %s" % [p_livello, ", ".join(nomi) if not nomi.is_empty() else "nessuno"]
 
 
 static func _riassunto_azione(opportunita: OpportunityDef) -> String:

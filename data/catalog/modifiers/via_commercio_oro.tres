@@ -6,10 +6,10 @@
 script = ExtResource("1_1lpuq")
 id = &"via_commercio_oro"
 display_name = "Via del Commercio"
-description = "+1 Oro per fase da ogni edificio Commerciale."
+description = "+1 Oro per fase da ogni edificio Economico."
 is_malus = false
 effect = 8
-target_tag = &"Commerciale"
+target_type = &"Economico"
 amount = 1
 duration_kind = 2
 stacking = 1

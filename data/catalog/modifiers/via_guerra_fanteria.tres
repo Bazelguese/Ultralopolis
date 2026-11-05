@@ -6,10 +6,10 @@
 script = ExtResource("1_6ecmj")
 id = &"via_guerra_fanteria"
 display_name = "Via della Guerra"
-description = "Le truppe Fanteria ricaricano il 10% più in fretta."
+description = "Le truppe Fante ricaricano il 10% più in fretta."
 is_malus = false
 effect = 3
-target_tag = &"Fanteria"
+target_type = &"Fante"
 amount = -10
 duration_kind = 2
 stacking = 1

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+
+[resource]
+script = ExtResource("1_advdf")
+id = &"generale"
+display_name = "Generale"
+category_name = "Militare"
+description = "Comanda l'esercito: propone fanti, guardiani, macchine d'assedio e infrastrutture belliche."
+types = Array[StringName]([&"Assedio", &"Infrastruttura Bellica", &"Fante", &"Guardiano"])
+upgrade_resource = 5

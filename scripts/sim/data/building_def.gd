@@ -11,8 +11,9 @@ extends Resource
 @export_range(1, 10) var era: int = 1
 ## Prezzo in Oro.
 @export var cost_gold: int = 0
-## Etichette (GDD §6.6), es. &"Agricolo", &"Sacro".
-@export var tags: Array[StringName] = []
+## Tipi (GDD §6.6, v0.22), es. &"Produzione", &"Spirituale". Decidono quali consiglieri
+## propongono e potenziano l'edificio e a quali perk e modificatori risponde.
+@export var types: Array[StringName] = []
 ## La Capitale non si può vendere né sostituire (GDD §6.2).
 @export var is_capital: bool = false
 

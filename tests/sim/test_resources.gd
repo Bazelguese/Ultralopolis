@@ -1,5 +1,5 @@
 extends GutTest
-## Risorse, mercato, Cibo, Capitale, mana a colori, potenziamenti ed etichette (GDD v0.12).
+## Risorse, mercato, Cibo, Capitale, mana a colori, potenziamenti e tipi (GDD v0.12, v0.22).
 ## Numeri solo di prova.
 
 var capital: BuildingDef
@@ -16,13 +16,13 @@ func before_each() -> void:
 	capital.id = &"capitale"
 	capital.display_name = "Capitale"
 	capital.is_capital = true
-	capital.tags = [&"Capitale"]
+	capital.types = [&"Capitale"]
 	for field: String in ["gold_per_phase", "research_per_phase", "food_per_phase", "wood_per_phase", "stone_per_phase", "iron_per_phase", "faith_per_phase", "influence_per_phase", "stability_per_phase", "documents_per_phase"]:
 		capital.set(field, 1)
 	farm = BuildingDef.new()
 	farm.id = &"fattoria"
 	farm.display_name = "Fattoria"
-	farm.tags = [&"Agricolo"]
+	farm.types = [&"Produzione"]
 	farm.food_per_phase = 2
 	farm.cost_gold = 3
 	var cost: ResourceAmounts = ResourceAmounts.new()
@@ -33,13 +33,13 @@ func before_each() -> void:
 	slow.display_name = "Lenta"
 	slow.cooldown_ms = 3000
 	slow.damage = 10
-	slow.tags = [&"Fanteria"]
+	slow.types = [&"Fante"]
 	fast = TroopDef.new()
 	fast.id = &"veloce"
 	fast.display_name = "Veloce"
 	fast.cooldown_ms = 1000
 	fast.damage = 4
-	fast.tags = [&"Cavalleria"]
+	fast.types = [&"Fauna"]
 	var iron: ResourceAmounts = ResourceAmounts.new()
 	iron.ferro = 2
 	var more_iron: ResourceAmounts = ResourceAmounts.new()
@@ -254,23 +254,23 @@ func test_elementi_senza_costi_non_si_potenziano() -> void:
 	assert_false(run.upgrade_troop(1))
 
 
-# --- Etichette (GDD §6.6) ------------------------------------------------------------
+# --- Tipi (GDD §6.6) ------------------------------------------------------------
 
-func test_un_modificatore_con_etichetta_vale_solo_per_quell_etichetta() -> void:
+func test_un_modificatore_con_un_tipo_vale_solo_per_quel_tipo() -> void:
 	var run: RunState = _new_run()
 	var bonus: ModifierDef = ModifierDef.new()
 	bonus.id = &"cavalleria_rapida"
 	bonus.is_malus = false
 	bonus.effect = ModifierDef.Effect.RICARICA_TRUPPA
 	bonus.amount = -50
-	bonus.target_tag = &"Cavalleria"
+	bonus.target_type = &"Fauna"
 	bonus.duration_kind = ModifierDef.Duration.PERMANENTE
 	run.modifiers.apply(bonus, ActiveModifier.OriginKind.ALTRO, "Prova", run.year, run.board, RandomNumberGenerator.new())
-	assert_eq(run.effective_troop(run.board.troops[0]).cooldown_ms, 500, "La Cavalleria accelera.")
-	assert_eq(run.effective_troop(run.board.troops[1]).cooldown_ms, 3000, "La Fanteria no.")
+	assert_eq(run.effective_troop(run.board.troops[0]).cooldown_ms, 500, "La truppa Fauna accelera.")
+	assert_eq(run.effective_troop(run.board.troops[1]).cooldown_ms, 3000, "La truppa Fante no.")
 
 
-func test_produzione_extra_per_gli_edifici_con_etichetta() -> void:
+func test_produzione_extra_per_gli_edifici_con_un_tipo() -> void:
 	var run: RunState = _new_run()
 	var bonus: ModifierDef = ModifierDef.new()
 	bonus.id = &"capitale_ricca"
@@ -278,7 +278,7 @@ func test_produzione_extra_per_gli_edifici_con_etichetta() -> void:
 	bonus.effect = ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO
 	bonus.resource = Res.Type.FEDE
 	bonus.amount = 2
-	bonus.target_tag = &"Capitale"
+	bonus.target_type = &"Capitale"
 	bonus.duration_kind = ModifierDef.Duration.PERMANENTE
 	run.modifiers.apply(bonus, ActiveModifier.OriginKind.ALTRO, "Prova", run.year, run.board, RandomNumberGenerator.new())
 	assert_eq(run.production_per_phase()[Res.Type.FEDE], 3, "1 di base + 2 sulla Capitale.")

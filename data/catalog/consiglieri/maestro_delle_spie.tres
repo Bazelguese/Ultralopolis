@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+
+[resource]
+script = ExtResource("1_advdf")
+id = &"maestro_delle_spie"
+display_name = "Maestro delle spie"
+category_name = "Ombra"
+description = "I servizi segreti, quelli che fanno il lavoro sporco. Chiede Oro e una risorsa che cambia a ogni round."
+types = Array[StringName]([&"Criminale", &"Infrastruttura Strategica", &"Infrastruttura Bellica", &"Infrastruttura Segreta"])
+random_resource = true

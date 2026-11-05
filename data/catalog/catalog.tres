@@ -109,6 +109,17 @@
 [ext_resource type="Resource" path="res://data/catalog/troops/corazzieri.tres" id="106_5o45o"]
 [ext_resource type="Resource" path="res://data/catalog/troops/spie.tres" id="107_ij48a"]
 [ext_resource type="Resource" path="res://data/catalog/troops/inquisitori.tres" id="109_8aigl"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="adv_script"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/generale.tres" id="adv_0"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/architetto.tres" id="adv_1"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/fattore.tres" id="adv_2"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/tesoriere.tres" id="adv_3"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/studioso.tres" id="adv_4"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/sacerdote.tres" id="adv_5"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/cancelliere.tres" id="adv_6"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/maestro_delle_spie.tres" id="adv_7"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/clown.tres" id="adv_8"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/anziano.tres" id="adv_9"]
 
 [resource]
 script = ExtResource("34_2n8s1")
@@ -120,3 +131,4 @@ encounters = Array[ExtResource("16_eg6f4")]([ExtResource("17_p5yub"), ExtResourc
 opportunities = Array[ExtResource("34_0738x")]([ExtResource("35_p4jue"), ExtResource("36_5do7l"), ExtResource("37_eg6f4"), ExtResource("38_p5yub"), ExtResource("39_eicds"), ExtResource("40_7hwyi"), ExtResource("41_5hcq5"), ExtResource("42_mleo8"), ExtResource("43_3lga0"), ExtResource("44_su3wr"), ExtResource("45_16be3")])
 identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8"), ExtResource("68_1w4xj"), ExtResource("69_wrjoy"), ExtResource("70_jdf2v"), ExtResource("71_h1k3v")])
 generator = ExtResource("35_hkuyl")
+advisors = Array[ExtResource("adv_script")]([ExtResource("adv_0"), ExtResource("adv_1"), ExtResource("adv_2"), ExtResource("adv_3"), ExtResource("adv_4"), ExtResource("adv_5"), ExtResource("adv_6"), ExtResource("adv_7"), ExtResource("adv_8"), ExtResource("adv_9")])

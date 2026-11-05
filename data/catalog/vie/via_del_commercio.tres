@@ -18,7 +18,7 @@
 script = ExtResource("13_c7dkq")
 id = &"via_del_commercio"
 display_name = "Via del Commercio"
-description = "+1 Oro per fase da ogni edificio Commerciale; Costruttori e Mercante più frequenti. Bonus: +6 Oro."
+description = "+1 Oro per fase da ogni edificio Economico; Costruttori e Mercante più frequenti. Bonus: +6 Oro."
 dimension = 5
 extra_gold = 6
 favored_opportunities = Array[ExtResource("4_mkm4t")]([ExtResource("9_t5u3e"), ExtResource("10_cg87v")])

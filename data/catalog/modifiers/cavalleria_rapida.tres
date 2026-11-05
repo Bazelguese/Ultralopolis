@@ -6,10 +6,10 @@
 script = ExtResource("1_f8u0n")
 id = &"cavalleria_rapida"
 display_name = "Cavalleria rapida"
-description = "Le truppe Cavalleria ricaricano del 15% più in fretta."
+description = "Le truppe Fauna ricaricano del 15% più in fretta."
 is_malus = false
 effect = 3
-target_tag = &"Cavalleria"
+target_type = &"Fauna"
 amount = -15
 duration_kind = 2
 stacking = 2

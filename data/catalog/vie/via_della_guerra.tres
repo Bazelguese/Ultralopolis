@@ -18,7 +18,7 @@
 script = ExtResource("13_clnc3")
 id = &"via_della_guerra"
 display_name = "Via della Guerra"
-description = "Le truppe Fanteria ricaricano il 10% più in fretta; Reclutatori e Addestramento più frequenti. Bonus: +1 spazio truppa."
+description = "Le truppe Fante ricaricano il 10% più in fretta; Reclutatori e Addestramento più frequenti. Bonus: +1 spazio truppa."
 dimension = 5
 extra_troop_slots = 1
 favored_opportunities = Array[ExtResource("2_fidwm")]([ExtResource("9_v2brq"), ExtResource("10_4q663")])

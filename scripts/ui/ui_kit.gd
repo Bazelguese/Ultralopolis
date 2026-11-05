@@ -92,8 +92,8 @@ static func building_details(def: BuildingDef, produced: Array[int] = []) -> Str
 		text += "\n+%d spazio edificio" % def.extra_building_slots
 	if def.extra_troop_slots > 0:
 		text += "\n+%d spazio truppa" % def.extra_troop_slots
-	if not def.tags.is_empty():
-		text += "\n[%s]" % ", ".join(def.tags)
+	if not def.types.is_empty():
+		text += "\n[%s]" % ", ".join(def.types)
 	return text
 
 
@@ -101,8 +101,8 @@ static func troop_details(def: TroopDef) -> String:
 	var cost: String = "senza mana" if def.mana_cost == 0 else "%d mana %s" % [def.mana_cost, def.mana_type]
 	var effects: String = troop_effects(def)
 	var text: String = "%s\n%s · Ricarica %s · Cibo %s" % [effects if effects != "" else "Nessun effetto", cost, seconds(def.cooldown_ms), Res.format(Res.Type.CIBO, def.food_tenths)]
-	if not def.tags.is_empty():
-		text += "\n[%s]" % ", ".join(def.tags)
+	if not def.types.is_empty():
+		text += "\n[%s]" % ", ".join(def.types)
 	return text
 
 

@@ -16,7 +16,7 @@
 script = ExtResource("11_7fj4r")
 id = &"via_del_sapere"
 display_name = "Via del Sapere"
-description = "+1 Ricerca per fase da ogni edificio Sapere; Studiosi più frequenti. Bonus: +5 Ricerca."
+description = "+1 Ricerca per fase da ogni edificio Accademico; Studiosi più frequenti. Bonus: +5 Ricerca."
 dimension = 5
 extra_research = 5
 favored_opportunities = Array[ExtResource("3_cebbi")]([ExtResource("8_37dqk")])

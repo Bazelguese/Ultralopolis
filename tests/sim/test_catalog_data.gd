@@ -50,7 +50,7 @@ func test_identificativi_unici_e_valori_validi() -> void:
 		assert_between(def.era, 1, catalog.eras.size(), "Era di %s" % def.id)
 
 
-func test_colori_etichette_e_capitale() -> void:
+func test_colori_tipi_e_capitale() -> void:
 	var catalog: CatalogDef = _catalog()
 	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
 	for def: BuildingDef in catalog.buildings:
@@ -58,11 +58,11 @@ func test_colori_etichette_e_capitale() -> void:
 			assert_eq(def.mana_type, BattleSim.MANA_NEUTRO, "Senza mana l'edificio è neutro (%s)" % def.id)
 		else:
 			assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
-		assert_false(def.tags.is_empty(), "Etichette di %s" % def.id)
+		assert_false(def.types.is_empty(), "Tipi di %s" % def.id)
 		assert_false(def.is_capital, "La Capitale non è fra le offerte (%s)" % def.id)
 	for def: TroopDef in catalog.troops:
 		assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
-		assert_false(def.tags.is_empty(), "Etichette di %s" % def.id)
+		assert_false(def.types.is_empty(), "Tipi di %s" % def.id)
 		assert_eq(def.upgrade_costs.size(), rules.max_level - 1, "Costi di potenziamento di %s" % def.id)
 	assert_eq(rules.starting_buildings.size(), 1)
 	assert_true(rules.starting_buildings[0].is_capital, "Si parte dalla Capitale.")
@@ -83,7 +83,7 @@ func test_ogni_elemento_dell_identita_indica_una_risorsa_della_capitale() -> voi
 			continue
 		var capital_bonus: int = 0
 		for modifier: ModifierDef in def.permanent_modifiers:
-			if modifier.effect == ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO and modifier.target_tag == &"Capitale":
+			if modifier.effect == ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO and modifier.target_type == &"Capitale":
 				capital_bonus += 1
 				assert_eq(modifier.amount, 1, "+1 a fase (%s)" % def.id)
 		assert_eq(capital_bonus, 1, "Una sola risorsa della Capitale per %s" % def.id)
@@ -97,7 +97,7 @@ func test_catalogo_bozza_3() -> void:
 	assert_eq(catalog.eras[2].ways.size(), 5, "4 vie più l'esclusiva nell'era 3.")
 	for def: TroopDef in catalog.troops:
 		if def.siege_damage > 0:
-			assert_true(def.tags.has(&"Assedio"), "Solo le truppe Assedio hanno l'attacco d'assedio (%s)." % def.id)
+			assert_true(def.types.has(&"Assedio"), "Solo le truppe Assedio hanno l'attacco d'assedio (%s)." % def.id)
 	var perks: int = IdentityRules.options(catalog, IdentityDef.Dimension.PERK).size()
 	assert_eq(perks, 11, "7 perk esistenti + 4 nuovi.")
 	assert_eq(catalog.generator.ghost_malus_pool.size(), 12, "6 malus esistenti + 6 nuovi.")
@@ -197,3 +197,36 @@ func test_bottino_dei_nemici() -> void:
 	var generati: Array[EncounterDef] = OpponentGenerator.generate_encounters(catalog, catalog.generator, rules, 5, 1, 3)
 	assert_eq(generati[0].loot_gold, 2, "Facile: 2 Oro.")
 	assert_eq(generati[2].loot_research, 3, "Difficile: 3 Ricerca.")
+
+
+func test_ogni_tipo_delle_carte_sta_in_una_categoria() -> void:
+	# GDD §4.2.4, §6.6 (v0.22): i tipi delle carte formano le categorie dei consiglieri.
+	var catalog: CatalogDef = _catalog()
+	var in_categories: Dictionary[StringName, bool] = {}
+	var ordinary: int = 0
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special == AdvisorDef.Special.NESSUNO:
+			ordinary += 1
+			assert_false(advisor.types.is_empty(), "Tipi della categoria %s" % advisor.category_name)
+		for card_type: StringName in advisor.types:
+			in_categories[card_type] = true
+	assert_eq(ordinary, 8, "8 categorie (GDD §4.2.4).")
+	var used: Dictionary[StringName, bool] = {}
+	var cards: Array[Array] = []
+	for def: BuildingDef in catalog.buildings:
+		cards.append([def.id, def.types])
+	for def: TroopDef in catalog.troops:
+		cards.append([def.id, def.types])
+	for identity: IdentityDef in catalog.identities:
+		for def: BuildingDef in identity.exclusive_buildings:
+			cards.append([def.id, def.types])
+		for def: TroopDef in identity.exclusive_troops:
+			cards.append([def.id, def.types])
+	for card: Array in cards:
+		var card_types: Array[StringName] = card[1]
+		assert_between(card_types.size(), 1, 3, "1–3 tipi per %s" % card[0])
+		for card_type: StringName in card_types:
+			used[card_type] = true
+			assert_true(in_categories.has(card_type), "Il tipo %s di %s sta in una categoria" % [card_type, card[0]])
+	for card_type: StringName in in_categories:
+		assert_true(used.has(card_type), "Il tipo %s è usato da almeno una carta" % card_type)

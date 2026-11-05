@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+
+[resource]
+script = ExtResource("1_advdf")
+id = &"anziano"
+display_name = "Anziano"
+category_name = ""
+description = "Propone perk ed edifici neutri; una volta all'anno potenzia un edificio neutro."
+special = 2
