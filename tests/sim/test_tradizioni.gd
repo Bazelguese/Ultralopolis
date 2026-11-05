@@ -1,5 +1,5 @@
 extends GutTest
-## Verifiche delle tradizioni delle vie e delle ascensioni (GDD §10.4.1, §10.4.2, §17; v0.26).
+## Verifiche delle tradizioni delle vie e delle ascensioni (GDD §10.4.1, §10.4.2, §17; v0.27).
 ## I numeri qui servono solo ai test e non sono valori di gioco.
 
 const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")

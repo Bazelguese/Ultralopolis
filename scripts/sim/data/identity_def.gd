@@ -27,10 +27,10 @@ enum Dimension {
 	CULTURA,
 	PERK,  ## Abilità passive, come quelle di The Bazaar: alcune all'inizio, altre durante la run.
 	VIA,   ## Direzione scelta entrando in un'era, dalla seconda in poi (GDD §10.4).
-	ASCENSIONE,  ## Scelta completando l'albero di una via (GDD §10.4.2, v0.26).
+	ASCENSIONE,  ## Scelta completando l'albero di una via (GDD §10.4.2, v0.27).
 }
 
-## Regole del nucleo che un'ascensione del livello 2 cambia (GDD §10.4.2, v0.26).
+## Regole del nucleo che un'ascensione del livello 2 cambia (GDD §10.4.2, v0.27).
 enum Rule {
 	NESSUNA,
 	SECONDA_NATURA,    ## Ogni truppa si incanta due volte (§4.3).

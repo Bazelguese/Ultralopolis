@@ -1,6 +1,6 @@
 class_name TraditionDef
 extends Resource
-## Un passo dell'albero di una via, cioè una tradizione (GDD §10.4.1, v0.26).
+## Un passo dell'albero di una via, cioè una tradizione (GDD §10.4.1, v0.27).
 ## Si completa da solo quando riesce la sua impresa; l'effetto vale subito e per sempre,
 ## con il linguaggio del nucleo (P5).
 

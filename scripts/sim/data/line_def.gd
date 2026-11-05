@@ -1,6 +1,6 @@
 class_name LineDef
 extends Resource
-## Una linea di elementi (GDD §10.5.5, v0.25): una serie di edifici o truppe, uno per era, con lo
+## Una linea di elementi (GDD §10.5.5, v0.26): una serie di edifici o truppe, uno per era, con lo
 ## stesso ruolo. Una tecnologia la sblocca; in ogni era compare fra le proposte la versione
 ## dell'era corrente, oppure, se manca, l'ultima versione precedente.
 ## Le versioni non stanno nel catalogo base (CatalogDef.buildings e troops).

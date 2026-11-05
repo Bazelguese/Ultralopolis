@@ -256,7 +256,7 @@ func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
 
 
-## Le tecnologie dell'era corrente richieste per la prossima era (GDD §10.3, v0.25).
+## Le tecnologie dell'era corrente richieste per la prossima era (GDD §10.3, v0.26).
 func _completa_tecnologie_dell_era(run: RunState) -> void:
 	for def: TechDef in run.catalog.technologies:
 		if def.era == run.era and run.techs_done_in_era(run.era) < run.next_era_techs_needed():

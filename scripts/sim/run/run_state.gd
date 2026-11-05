@@ -12,7 +12,7 @@ extends RefCounted
 ## In ogni round compaiono 3 consiglieri; se ne ascolta uno e si prende una sua proposta
 ## (GDD §4.2). Il consigliere scelto offre anche Potenzia (GDD §6.5).
 ##
-## Ricerca e tecnologie (GDD §10.5, v0.25): la Ricerca guadagnata va nella tecnologia in corso;
+## Ricerca e tecnologie (GDD §10.5, v0.26): la Ricerca guadagnata va nella tecnologia in corso;
 ## se non ce n'è una resta in attesa nella casella RICERCA di stock, che quindi non è un Magazzino
 ## da spendere ma la Ricerca in attesa. Le ere si raggiungono con un numero di tecnologie.
 
@@ -216,7 +216,7 @@ var tech_discards: Dictionary[StringName, int] = {}
 ## Generatore dedicato alla mano, così le tecnologie non cambiano le altre pescate della run.
 var _tech_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
-## Passi delle vie completati (GDD §10.4.1, v0.26).
+## Passi delle vie completati (GDD §10.4.1, v0.27).
 var traditions_done: Array[TraditionDef] = []
 ## Avanzamento delle imprese, per id del passo: quante volte è riuscito un traguardo, oppure
 ## la produzione più alta raccolta da quando la via è adottata.
@@ -1214,7 +1214,7 @@ func reroll_offers(with_resource: bool = false) -> bool:
 	return true
 
 
-## Entra nella prossima era, se le tecnologie richieste sono completate (GDD §10.3, v0.25).
+## Entra nella prossima era, se le tecnologie richieste sono completate (GDD §10.3, v0.26).
 ## Non è automatico, non costa Ricerca e non consuma il round.
 func advance_era() -> bool:
 	if not _require_shopping():
@@ -1257,7 +1257,7 @@ func _redraw_round() -> void:
 		_draw_advisors()
 
 
-# --- Ricerca e tecnologie (GDD §10.5, v0.25) ----------------------------------------
+# --- Ricerca e tecnologie (GDD §10.5, v0.26) ----------------------------------------
 
 ## Ricerca in attesa: guadagnata senza una tecnologia in corso, passa alla prima scelta.
 func research_waiting() -> int:
@@ -1517,7 +1517,7 @@ static func _identity_names(elements: Array[Resource]) -> String:
 	return ", ".join(names)
 
 
-# --- Tradizioni e ascensioni (GDD §10.4.1, §10.4.2, v0.26) --------------------------------
+# --- Tradizioni e ascensioni (GDD §10.4.1, §10.4.2, v0.27) --------------------------------
 
 ## true se la nazione ha un'ascensione che cambia questa regola.
 func has_rule(rule: IdentityDef.Rule) -> bool:

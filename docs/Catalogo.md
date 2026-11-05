@@ -1,7 +1,7 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 7 — 5 novembre 2026 (identità v0.24, tecnologie v0.25, tradizioni v0.26)
-**Riferimento:** Game Design Document v0.26 (`docs/Ultralopolis_GDD.md`)
+**Versione:** bozza 7 — 5 novembre 2026 (identità v0.24, tecnologie v0.26, tradizioni v0.27)
+**Riferimento:** Game Design Document v0.27 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `consiglieri/`, `opportunities/` per le azioni, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
 
 **Bozza 4 (GDD v0.22):** le etichette diventano **tipi** (1–2 per carta), i colori del mana sono **quattro** (viola nuovo), le risorse cambiano (via la Fauna, nuove **Stabilità** e **Documenti**), i potenziamenti si fanno con l’opzione **Potenzia** del Consiglio. Il Consiglio è in §6 bis.
@@ -291,7 +291,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 ---
 
-### 4.4 Tradizioni delle vie (GDD §10.4.1, v0.26)
+### 4.4 Tradizioni delle vie (GDD §10.4.1, v0.27)
 
 **Stato: placeholder.** Ogni via ha 4 passi; ognuno si completa con la sua impresa e dà un effetto permanente. File dati: i passi sono dentro i file delle vie (`data/catalog/vie/`).
 
@@ -341,7 +341,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | | Antenati | Scegli 2 Eventi di Terra o di Fede | +8 Resistenza in ogni scontro |
 | | Grande madre | Raccogli almeno 10 Cibo in una sola produzione | +1 Cibo per fase da ogni edificio Fauna o di Produzione |
 
-### 4.5 Ascensioni (GDD §10.4.2, v0.26)
+### 4.5 Ascensioni (GDD §10.4.2, v0.27)
 
 **Stato: placeholder.** File dati: `data/catalog/ascensioni/`.
 
@@ -419,7 +419,7 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 | Architetto | Opera · rosso | Pietra | Architetti (6 Oro, spazio edificio) · Fortificazioni (2 Pietra) |
 | Fattore | Terra · verde | Legno | Scorte (2 Legno → 3 Cibo) · Razioni (2 Legno: per un anno le truppe mangiano la metà) · Distribuzione di grano (3 Cibo → −2 Malcontento, v0.24) |
 | Tesoriere | Ricchezza · verde | Influenza | Esattori (+3 Oro) · Assemblea (+50% Oro o Ricerca per un anno) · *Ministri:* Grandi esattori (+6 Oro) |
-| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) · *Ministri:* Trattati (4 Legno → 5 Ricerca) · Revisione dei piani (2 Documenti: ripesca la mano delle tecnologie, v0.25) |
+| Studioso | Conoscenza · viola | Documenti | Studiosi (3 Legno → 3 Ricerca) · Archivisti (2 Documenti → 3 Ricerca) · Manuali tecnici (2 Documenti: per un anno una truppa a scelta fa il 25% di danno in più) · *Ministri:* Trattati (4 Legno → 5 Ricerca) · Revisione dei piani (2 Documenti: ripesca la mano delle tecnologie, v0.26) |
 | Sacerdote | Fede · blu | Fede | Cinque incanti (2 Fede ciascuno) · Processione (2 Fede, solo Teocrazia) · Predica di pace (3 Fede → −2 Malcontento, v0.24) · un incanto esclusivo per credo (§6 quater.3) |
 | Cancelliere | Stato · blu | Stabilità | Ambasciata (2 Stabilità) · Decreto fiscale (2 Stabilità → 4 Oro) · Censimento (2 Stabilità: per un anno ogni consigliere mostra una proposta in più) · Tributi feudali (+5 Oro, solo Monarchia) · Ordine pubblico (2 Stabilità → −3 Malcontento, v0.24) |
 | Maestro delle spie | Ombra · viola | Oro + una risorsa casuale | Sei spionaggi (2 Documenti ciascuno) · *Ministri:* Rete di sabotatori (3 Documenti) |
@@ -546,7 +546,7 @@ File dati: `data/catalog/identita/`, `data/catalog/buildings/esclusivi/`, `data/
 | Razza | Tipo | Resistenza | Tratto e dotazione | Esclusivi (era) | Capitale |
 |---|---|---:|---|---|---|
 | **Pietrosangue** | Pietrosangue | 8 | Parte con i Lancieri | Guardie delle vette (1) · Bastione di roccia viva (2) · Colossi di pietra (3) | Pietra |
-| **Maremani** | Maremano | 2 | +3 Oro iniziale; Esattori più frequenti (il Mercante è tolto nella v0.25) | Porto lagunare (1) · Cantori delle maree (2) · Darsena delle lagune (3) | Influenza |
+| **Maremani** | Maremano | 2 | +3 Oro iniziale; Esattori più frequenti (il Mercante è tolto nella v0.26) | Porto lagunare (1) · Cantori delle maree (2) · Darsena delle lagune (3) | Influenza |
 | **Cinerali** | Cinerale | 4 | Le truppe ricaricano il 10% più in fretta | Arcieri delle ceneri (1) · Falchi di cenere (2) · Lame del vulcano (3) | Ferro |
 
 ### 6 quater.2 Governi a tier
@@ -651,7 +651,7 @@ Governi possibili nella Rivoluzione, secondo la causa principale (escluso il gov
 
 ---
 
-## 6 quinquies. Tecnologie (GDD §10.5, v0.25)
+## 6 quinquies. Tecnologie (GDD §10.5, v0.26)
 
 **Stato: proposta di Claude, tutta placeholder** (nomi, effetti e costi). File dati: `data/catalog/tecnologie/` e, per le linee, `data/catalog/linee/`.
 
@@ -784,7 +784,7 @@ Una linea ha una versione per era (GDD §10.5.5). Le versioni **non sono nel cat
 ### 6 quinquies.6 Studioso e carte dorate
 
 - **Revisione dei piani** (Studioso, nuova): 2 Documenti, ripesca la mano delle tecnologie.
-- Il **Mercante** del Tesoriere (2 Ricerca → 4 Oro) è tolto (GDD v0.25). Dove le vie e i Maremani lo rendevano più frequente, ora rendono più frequenti gli **Esattori**.
+- Il **Mercante** del Tesoriere (2 Ricerca → 4 Oro) è tolto (GDD v0.26). Dove le vie e i Maremani lo rendevano più frequente, ora rendono più frequenti gli **Esattori**.
 - **Carte dorate** (GDD §10.5.6), primi esempi: l’evento **La disputa dei dotti** e la fortuna **La biblioteca ritrovata** danno, oltre ai loro effetti, una tecnologia di Conoscenza già iniziata a metà; gli incontri del mondo generati possono offrire fra le ricompense una tecnologia già iniziata.
 
 ---
@@ -816,7 +816,7 @@ Tutte le questioni della bozza 1 sono decise.
 | Perk | 11 (7 esistenti + 4 nuovi) | | | 11 |
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
-| Azioni del Consiglio | 40 (senza il Mercante e con Revisione dei piani, v0.25; di cui 6 esclusive dell’identità, compresi 4 incanti dei credi, e 3 dal livello Ministri) | | | 40 |
+| Azioni del Consiglio | 40 (senza il Mercante e con Revisione dei piani, v0.26; di cui 6 esclusive dell’identità, compresi 4 incanti dei credi, e 3 dal livello Ministri) | | | 40 |
 | Eventi / Fortune / Visitatori | 27 (24 + Riforma, Tumulti, Rivoluzione) / 6 / 6 | | | 39 |
 | Tecnologie base | 12 | 12 | 12 | 36 |
 | Tecnologie esclusive (vie / razze) | 0 / 3 | 4 / 3 | 9 / 3 | 13 / 9 |

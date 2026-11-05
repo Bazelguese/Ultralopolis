@@ -79,7 +79,7 @@ static func generate_ghost(catalog: CatalogDef, rules: GeneratorRules, run_rules
 	return ghost
 
 
-## Tradizioni di un fantasma generato (convenzione §16.3, v0.26): tutti i passi delle vie delle
+## Tradizioni di un fantasma generato (convenzione §16.3, v0.27): tutti i passi delle vie delle
 ## ere passate e metà di quelli della via dell'era corrente, a caso; un'ascensione per ogni
 ## albero completo (la prima del livello 1, poi del livello 2).
 static func _pick_traditions(catalog: CatalogDef, ghost: GhostDef, rng: RandomNumberGenerator) -> void:
@@ -111,7 +111,7 @@ static func _pick_traditions(catalog: CatalogDef, ghost: GhostDef, rng: RandomNu
 			ghost.identity.append(options[rng.randi_range(0, options.size() - 1)])
 
 
-## Tecnologie di un fantasma generato (convenzione §16.3, v0.25): per ogni era da cui è uscito,
+## Tecnologie di un fantasma generato (convenzione §16.3, v0.26): per ogni era da cui è uscito,
 ## a caso, il numero di tecnologie che serviva per entrare nella successiva. Prima le tecnologie
 ## della prima altezza, poi della seconda, rispettando i prerequisiti quando si può.
 static func _pick_technologies(catalog: CatalogDef, ghost_era: int, identity: Array[IdentityDef],
@@ -268,7 +268,7 @@ static func _rewards(catalog: CatalogDef, rules: GeneratorRules, era: int, year:
 			troop.kind = RewardDef.Kind.TRUPPA
 			troop.troop = troops[rng.randi_range(0, troops.size() - 1)]
 			rewards.append(troop)
-		# Carta dorata (GDD §10.5.6, v0.25): una tecnologia già iniziata, scelta quando la si prende.
+		# Carta dorata (GDD §10.5.6, v0.26): una tecnologia già iniziata, scelta quando la si prende.
 		if not catalog.technologies.is_empty():
 			var tech: RewardDef = RewardDef.new()
 			tech.kind = RewardDef.Kind.TECNOLOGIA

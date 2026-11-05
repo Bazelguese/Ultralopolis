@@ -29,7 +29,7 @@ extends Resource
 @export var max_building_slots: int = 10
 @export var max_troop_slots: int = 12
 
-@export_group("Tecnologie (GDD §10.5, v0.25)")
+@export_group("Tecnologie (GDD §10.5, v0.26)")
 ## Carte della mano delle tecnologie (GDD §10.5.3: 3).
 @export var tech_hand_size: int = 3
 ## Sconto sulla carta scartata: il peso si dimezza a ogni scarto, fino a 1 / 2^tech_discard_max_halvings

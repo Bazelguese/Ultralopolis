@@ -3,7 +3,7 @@ extends Resource
 ## Un'era (GDD §10). Nomi e valori placeholder.
 
 @export var display_name: String = ""
-## Tecnologie dell'era precedente da completare per entrare in quest'era (GDD §10.3, v0.25).
+## Tecnologie dell'era precedente da completare per entrare in quest'era (GDD §10.3, v0.26).
 ## Ignorato per la prima era. Zero = nessuna tecnologia richiesta.
 @export var techs_required: int = 0
 ## Spazi edificio guadagnati entrando in quest'era (GDD §6.3).

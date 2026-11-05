@@ -74,7 +74,7 @@ class SideState:
 	var troop_sabotage_ms: Array[int] = []
 	## Sacchetti della rotazione dei bersagli, uno per tipo di effetto e categoria (GDD §7.7.2).
 	var bags: Dictionary[String, Array] = {}
-	## Regole cambiate dalle ascensioni (GDD §10.4.2, v0.26).
+	## Regole cambiate dalle ascensioni (GDD §10.4.2, v0.27).
 	var last_stand: bool = false
 	var last_stand_used: bool = false
 	var reserve_mana: bool = false

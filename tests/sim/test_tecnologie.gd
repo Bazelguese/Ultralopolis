@@ -1,5 +1,5 @@
 extends GutTest
-## Verifiche della ricerca e dell'albero delle tecnologie (GDD §10.3, §10.5, §17; v0.25).
+## Verifiche della ricerca e dell'albero delle tecnologie (GDD §10.3, §10.5, §17; v0.26).
 ## I numeri qui servono solo ai test e non sono valori di gioco.
 
 const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")

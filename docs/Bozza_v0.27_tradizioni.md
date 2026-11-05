@@ -1,9 +1,9 @@
-# ULTRALOPOLIS — Bozza di aggiornamento del GDD (v0.26)
+# ULTRALOPOLIS — Bozza di aggiornamento del GDD (v0.27)
 ## Tradizioni e ascensioni: le vie diventano alberi
 
 **Data:** 5 novembre 2026
-**Stato:** **approvata da Davide il 5 novembre 2026 e riportata nel GDD v0.26** (§10.4.1, §10.4.2) e nel Catalogo (§4.4, §4.5). Questo file resta come memoria della discussione.
-**Riferimento:** `docs/Ultralopolis_GDD.md` v0.25
+**Stato:** **approvata da Davide il 5 novembre 2026 e riportata nel GDD v0.27** (§10.4.1, §10.4.2) e nel Catalogo (§4.4, §4.5). Questo file resta come memoria della discussione.
+**Riferimento:** `docs/Ultralopolis_GDD.md` v0.26
 
 Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Da definire** = manca una regola; **Spunto** = idea per il futuro, da non implementare.
 

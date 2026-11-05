@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.26
+## Game Design Document — v0.27
 
 **Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -94,25 +94,31 @@ Ogni partita è una nuova storia di una civiltà. “Campagna” descrive eventu
 
 Gli elementi posseduti e le conseguenze persistono all’interno della run. Progressione permanente fra run, sblocchi di account o ricompense collezionabili non sono definiti.
 
-### 3.2 Anni e scontri — Confermato (struttura dei round v0.21)
+### 3.2 Anni e stagioni — Confermato (modifica del nucleo, v0.25)
 
-La run è divisa in anni. Ogni anno ha due metà separate dall’incontro del mondo e si chiude con uno scontro contro un fantasma:
+La run è divisa in anni. Ogni anno ha **12 round, uno per mese**, divisi in **quattro stagioni da 3 round**. L'anno comincia con l'**inverno** e si chiude con lo **scontro contro un fantasma** alla fine dell'autunno:
 
-1. **Prima metà (Produzione)**: 5 round di scelte.
-2. **Scontro di mezzo**: l’incontro del mondo (§3.3).
-3. **Seconda metà (Preparazione)**: 5 round di scelte.
-4. **Scontro automatico contro un fantasma**, seguito dall’esito e dalle eventuali conseguenze.
+| Stagione | Mesi | Si chiude con |
+|---|---|---|
+| **Inverno** | gennaio, febbraio, marzo | nessuno scontro |
+| **Primavera** | aprile, maggio, giugno | un **incontro del mondo** (§3.3) |
+| **Estate** | luglio, agosto, settembre | un secondo **incontro del mondo** |
+| **Autunno** | ottobre, novembre, dicembre | lo **scontro con il fantasma**, che chiude l'anno |
 
-In ogni round il giocatore ascolta uno dei consiglieri della nazione (§4.2). Edifici e truppe si ottengono in **entrambe le metà**: la divisione fra una fase di sola costruzione e una di sola disposizione non vale più.
+In ogni round il giocatore ascolta uno dei consiglieri della nazione (§4.2). Edifici e truppe si ottengono in **tutte le stagioni**.
 
 | Regola | Stato |
 |---|---|
-| 5 round, scontro di mezzo, 5 round, scontro con il fantasma | Confermato (v0.21) |
-| Edifici e truppe disponibili in entrambe le metà | Confermato (v0.21) |
-| La produzione resta all’inizio delle due metà (§5.2); l’economia non cambia | Confermato (v0.21) |
-| Le due metà mantengono i nomi Produzione e Preparazione | Confermato (v0.21) per ora; i nomi si possono rivedere |
+| 12 round all'anno, uno per mese, in 4 stagioni da 3 | Confermato (v0.25) |
+| L'anno va dall'inverno all'autunno: l'ultimo scontro dell'anno è il fantasma | Confermato (v0.25) |
+| Primavera ed estate finiscono con un incontro del mondo, l'autunno con il fantasma; d'inverno non si combatte | Confermato (v0.25) |
+| La produzione avviene all'inizio di ogni stagione; d'inverno gli edifici non producono Cibo (§5.2) | Confermato (v0.25) |
+| L'inverno è la stagione della politica interna: eventi suoi, più azioni "interne", meno carte militari (§4.2, §4.2.5) | Confermato (v0.25) |
+| Ogni round mostra il **nome del mese** (es. "Anno 2 · Estate · Agosto") | Confermato (v0.25) |
+| Edifici e truppe disponibili in tutte le stagioni | Confermato (v0.21) |
+| Le stagioni sostituiscono le due metà Produzione e Preparazione (5 round, incontro, 5 round, fantasma) della v0.21 | Confermato (v0.25) |
 
-La durata in minuti della run non è ancora fissata.
+La durata in minuti della run non è ancora fissata. Con 12 round e 3 scontri un anno dura circa un quarto in più della v0.24.
 
 ### 3.3 Incontri del mondo — Confermato nella funzione, Da definire nei dettagli
 
@@ -125,16 +131,17 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | In futuro, misto di scontri automatici ed eventi a scelta (testo e opzioni) | Direzione |
 | Lo scontro usa la stessa simulazione del combattimento contro i fantasmi; la plancia generata ha la stessa struttura di una plancia giocatore | Proposta |
 | Le 10 vittorie della run restano legate agli scontri contro i fantasmi; gli incontri del mondo non le modificano | Proposta |
-| Un incontro per anno, in un **momento fisso** fra Produzione e Preparazione (struttura ispirata allo scontro con i mostri a metà giornata di The Bazaar) | Confermato come base provvisoria |
+| **Due incontri per anno**, in momenti fissi: alla fine della primavera e alla fine dell'estate (§3.2; struttura ispirata agli scontri con i mostri di The Bazaar) | Confermato (v0.25) |
+| L'incontro d'estate è più forte di quello di primavera: a metà strada fra un anno e il successivo | Proposta (v0.25) |
 | Il giocatore sceglie **fra 3 incontri** diversi (es. tre minacce di difficoltà e ricompensa diverse) | Confermato |
 | Presenza nel primo prototipo | Confermato |
 | La sconfitta ha **conseguenze leggere** | Confermato |
 | Conseguenza della sconfitta: l’**Oro del Magazzino viene dimezzato** (arrotondato per difetto); **nessuna perdita di Prestigio** | Confermato; entità da tarare nel playtest |
 | Una sconfitta durante l’ultima possibilità **termina la run** | Confermato |
-| Ricompense per la vittoria: edifici, truppe, perk, risorse o **tecnologie già iniziate** (carte dorate, §10.5.6, v0.25). Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (le tecnologie dalla v0.25) |
+| Ricompense per la vittoria: edifici, truppe, perk, risorse o **tecnologie già iniziate** (carte dorate, §10.5.6, v0.26). Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (le tecnologie dalla v0.26) |
 | Una vittoria (anche un pareggio) dà inoltre un **bottino fisso** di Oro e Ricerca, più alto per gli incontri più difficili | Confermato (v0.21); valori placeholder (§16.3) |
 | Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
-| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17); regole di crescita placeholder (§16.3) |
+| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) per ogni incontro dell'anno, dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17; due volte all'anno dalla v0.25); regole di crescita placeholder (§16.3) |
 
 ### 3.4 Vittoria e fine della run — Base adottata
 
@@ -163,15 +170,14 @@ Non sono previste per ora regole per recuperare Prestigio o ricompense speciali 
 
 | Passaggio | Comportamento |
 |---|---|
-| Nuovo anno | Conservazione della nazione, del Magazzino e dei modificatori attivi; aggiornamento delle durate. |
-| Selezione del fantasma | L’avversario dell’anno viene fissato. |
-| Inizio Produzione | Tutti gli edifici già costruiti producono le rispettive risorse. |
-| Round 1–5 | In ogni round si sceglie un consigliere e una sua proposta (§4.2). |
-| Incontro del mondo | Scelta fra 3 incontri e scontro automatico contro una plancia generata (§3.3). |
-| Inizio Preparazione | Tutti gli edifici già costruiti producono di nuovo. |
-| Round 6–10 | Come nella prima metà; lo spionaggio (§12) agisce sul fantasma già fissato. |
+| Nuovo anno (gennaio) | Conservazione della nazione, del Magazzino e dei modificatori attivi; aggiornamento delle durate; consumo di Cibo (§5.4). |
+| Selezione degli avversari | Il fantasma dell'anno e i due incontri vengono fissati. |
+| Inverno | Gli edifici producono, senza Cibo (§5.2); round 1–3 (gennaio, febbraio, marzo). Nessuno scontro. |
+| Primavera | Gli edifici producono; round 4–6 (aprile, maggio, giugno); **incontro del mondo** (§3.3). |
+| Estate | Gli edifici producono; round 7–9 (luglio, agosto, settembre); secondo **incontro del mondo**. |
+| Autunno | Gli edifici producono; round 10–12 (ottobre, novembre, dicembre). Lo spionaggio (§12) agisce sul fantasma già fissato. |
 | Combattimento contro il fantasma | Produzione di mana e attivazione automatica delle truppe. |
-| Esito | Vittoria o sconfitta, bottino, aggiornamento della run ed eventuali conseguenze. |
+| Esito | Vittoria o sconfitta, bottino, aggiornamento della run ed eventuali conseguenze. L'anno finisce. |
 
 Il fantasma va fissato **prima dei round** (e quindi delle proposte di spionaggio) e non cambia dopo che il giocatore ha investito per ottenere informazioni su di esso — Confermato.
 
@@ -179,17 +185,18 @@ Il fantasma va fissato **prima dei round** (e quindi delle proposte di spionaggi
 
 Al posto dei mercanti di The Bazaar la nazione ha un **Consiglio**: consiglieri di tipo diverso (economico, agricolo, costruttore, comandante, spionaggio…). Ogni consigliere ha un proprio pool di proposte: **azioni** (tutto ciò che non è l’acquisto di un elemento) ed **edifici e truppe a lui affini**. Il Consiglio dà una direzione al giocatore: prima sceglie a chi dare ascolto, poi che cosa fare.
 
-La produzione di risorse avviene all’inizio delle **due metà**, non a ogni round (§5.2).
+La produzione di risorse avviene all’inizio di ogni **stagione**, non a ogni round (§5.2).
 
 | Regola | Stato |
 |---|---|
 | In ogni round compaiono **3 consiglieri** pescati a caso, diversi fra loro; al massimo uno può essere sostituito da un Evento, un Visitatore o una Fortuna (§4.2.5) | Confermato (v0.23) |
 | Il giocatore ne sceglie **uno**; la scelta è definitiva per il round | Confermato |
-| Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato; eccezione: l'ascensione *Doppio ascolto* (§10.4.2, v0.26) |
+| Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato; eccezione: l'ascensione *Doppio ascolto* (§10.4.2, v0.27) |
 | Il pool di un consigliere è dato dalla sua **categoria** (§4.2.4): propone gli edifici e le truppe che hanno almeno un tipo della categoria | Confermato (v0.22) |
 | Oltre alle proposte, ogni consigliere ordinario offre l’opzione **Potenzia** (§6.5): non consuma la scelta del round e si usa una volta per round | Confermato (v0.22) |
 | Ogni round ha un **tema**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
-| In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tema è visibile prima di scegliere il consigliere | Confermato (v0.21) |
+| Ogni stagione ha i suoi tre temi, in ordine pescato a caso con il seme della run: **inverno** Azioni, Edifici, Misto (nessun round Truppe); **primavera** Edifici, Misto, Misto; **estate** Truppe, Edifici, Misto; **autunno** Truppe, Azioni, Misto. Il tema è visibile prima di scegliere il consigliere | Confermato (v0.25; nella v0.21 ogni metà aveva Azioni, Edifici, Truppe e due Misti) |
+| D'inverno Cancelliere, Sacerdote e Fattore compaiono più spesso (+1 di peso), il Generale meno (peso dimezzato, almeno 1) | Proposta (v0.25) |
 | Un consigliere che non ha niente da proporre per il tema del round non viene pescato in quel round | Confermato (v0.21) |
 | Si può **passare**: senza scegliere un consigliere, oppure dopo averlo scelto senza prendere nulla. Passare non dà nulla | Confermato (v0.21) |
 | Il **rinnovo** a pagamento ripesca le proposte del consigliere scelto | Confermato (v0.21) |
@@ -220,11 +227,11 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 
 | Consigliere | Categoria | Azioni | Paga le azioni con |
 |---|---|---|---|
-| Tesoriere | Ricchezza | Esattori: Oro subito · Assemblea: +50% Oro o Ricerca per un anno (il Mercante, Ricerca in Oro, è stato tolto nella v0.25) | Influenza |
+| Tesoriere | Ricchezza | Esattori: Oro subito · Assemblea: +50% Oro o Ricerca per un anno (il Mercante, Ricerca in Oro, è stato tolto nella v0.26) | Influenza |
 | Fattore | Terra | Scorte: Cibo in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno |
 | Architetto | Opera | Architetti: spazio edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | Pietra, Legno (lo spazio in Oro) |
 | Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
-| Studioso | Conoscenza | Studiosi: Legno in Ricerca · Archivisti: Documenti in Ricerca · Manuali tecnici: per un anno una truppa fa più danno · Revisione dei piani: ripesca la mano delle tecnologie (v0.25, §10.5.3). La Ricerca che dà va nella tecnologia in corso | Legno, Documenti |
+| Studioso | Conoscenza | Studiosi: Legno in Ricerca · Archivisti: Documenti in Ricerca · Manuali tecnici: per un anno una truppa fa più danno · Revisione dei piani: ripesca la mano delle tecnologie (v0.26, §10.5.3). La Ricerca che dà va nella tecnologia in corso | Legno, Documenti |
 | Sacerdote | Fede | Incanta una truppa (§4.3), un’azione per ogni effetto | Fede |
 | Cancelliere (ex Diplomatico) | Stato | Ambasciata: accorcia un malus attivo · Decreto fiscale: Stabilità in Oro · Censimento: per un anno una proposta in più | Stabilità |
 | Maestro delle spie | Ombra | Sabotaggio o rallentamento del fantasma (§12) | Documenti |
@@ -280,7 +287,8 @@ Nei round, oltre ai consiglieri, possono comparire carte di altre famiglie, lega
 | Non offrono Potenzia (un'opzione può però potenziare una carta); un Visitatore si rinnova solo in Oro | Confermato |
 | Un Evento compare una sola volta per run, salvo quelli ripetibili; Visitatori e Fortune possono tornare, ma non nello stesso anno | Confermato |
 | Ogni carta ha una **sfera**: una delle 8 categorie (§4.2.4), che ne dà il tema e la cornice | Confermato |
-| Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo) | Confermato |
+| Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo); dalla v0.25 anche le **stagioni** in cui la carta può comparire | Confermato |
+| Eventi legati alle stagioni: *Un inverno lungo* e *Il passo innevato* d'inverno, *La piena del fiume* e *Le terre di confine* in primavera, *Il torneo* d'estate, *Raccolto abbondante* d'estate o d'autunno, *La grande fiera* d'autunno; nuovi eventi invernali; d'inverno la Riforma e i Tumulti in piazza sono più frequenti (+1 di peso) | Proposta (v0.25) |
 | Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una carta con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione **gratuita e senza requisiti**, così si può sempre scegliere qualcosa (v0.24) | Confermato |
 | Nessun evento arriva da solo senza essere scelto, con una sola eccezione: la **Rivoluzione** (§9.4.2) | Confermato (eccezione dalla v0.24) |
 | Le opzioni possono anche **cambiare il governo** (Riforma, Rivoluzione) e far salire o scendere il **Malcontento** (§5.5) | Confermato (v0.24) |
@@ -296,7 +304,7 @@ Il Sacerdote può **incantare** una truppa: le aggiunge un effetto in battaglia 
 | Effetti possibili: quelli esistenti, cioè danno, scudo, cura, Corruzione e rallentamento (§7.6, §7.7) | Confermato |
 | Solo le truppe si possono incantare, non gli edifici | Confermato |
 | Una truppa che non usava mana, dopo l’incanto ne richiede | Confermato |
-| Ogni truppa si può incantare **una sola volta** | Confermato; eccezione: con l'ascensione *Seconda natura* due volte (§10.4.2, v0.26) |
+| Ogni truppa si può incantare **una sola volta** | Confermato; eccezione: con l'ascensione *Seconda natura* due volte (§10.4.2, v0.27) |
 | Il mana richiesto è del colore della truppa; se la truppa non usava mana, è del colore dell’incanto. Costo in più: 2 mana | Confermato (v0.21); valori placeholder |
 | Valore dell’effetto: circa metà del danno di una truppa dell’era; cresce con i potenziamenti come gli altri valori (§6.5) | Confermato (v0.21); valori placeholder |
 | L’incanto resta sulla truppa per tutta la run e si perde se la truppa viene venduta o sostituita | Confermato (v0.21) |
@@ -314,13 +322,15 @@ Nel linguaggio degli effetti (§8) un incanto è un modificatore permanente sull
 
 La scelta di un edificio incide quindi su entrambi i momenti di gioco. Gli edifici persistono durante la run: non si ricostruisce l’economia da zero ogni anno. Il criterio con cui differenziare gli edifici è proposto in P3.
 
-### 5.2 Produzione per fase — Confermato
+### 5.2 Produzione per stagione — Confermato (v0.25)
 
-All’inizio di Produzione e Preparazione, gli edifici presenti depositano automaticamente le rispettive risorse nel Magazzino, una volta per ingresso nella fase.
+All’inizio di ogni stagione gli edifici presenti depositano automaticamente le rispettive risorse nel Magazzino, una volta per stagione. **D'inverno nessun edificio produce Cibo**, nemmeno la Capitale; tutte le altre risorse sì.
 
-Un edificio costruito durante una fase non produce retroattivamente: inizia a produrre dalla fase successiva.
+Un edificio costruito durante una stagione non produce retroattivamente: inizia a produrre dalla stagione successiva.
 
-**Esempio senza valori:** una biblioteca costruita durante Produzione fornisce la prima Ricerca all’inizio della Preparazione dello stesso anno, e produce di nuovo all’inizio della Produzione dell’anno seguente.
+I valori di produzione restano quelli della v0.24: con quattro produzioni all'anno invece di due le entrate raddoppiano. Sono placeholder e il bilanciamento si rifà con le prove (Confermato, v0.25).
+
+**Esempio senza valori:** una biblioteca costruita in primavera fornisce la prima Ricerca all’inizio dell’estate, e produce di nuovo all’inizio dell’autunno e dell’inverno successivo. Una fattoria costruita in autunno produce Cibo dalla primavera dell'anno dopo: d'inverno non ne dà.
 
 ### 5.3 Risorse — Confermato (modifica del nucleo, v0.12; riviste in v0.22)
 
@@ -331,7 +341,7 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 | Risorsa | Impiego | Prodotta soprattutto da |
 |---|---|---|
 | Oro | Moneta comune: edifici, truppe, spazi, rinnovi delle offerte; Potenzia del Maestro delle spie, insieme a una risorsa casuale (§4.2.4). | edifici Economici |
-| Ricerca | Tecnologie, e con esse il passaggio di era (§10.5, v0.25). **Non sta nel Magazzino**: va nella tecnologia in corso. Non è la risorsa di nessuna categoria. | edifici Accademici |
+| Ricerca | Tecnologie, e con esse il passaggio di era (§10.5, v0.26). **Non sta nel Magazzino**: va nella tecnologia in corso. Non è la risorsa di nessuna categoria. | edifici Accademici |
 | Cibo | Mantenimento delle truppe (§5.4). | edifici di Produzione agricola |
 | Ferro | Potenzia del Generale (Militare). | edifici di Produzione e Infrastrutture Belliche |
 | Pietra | Potenzia dell’Architetto (Opera). | edifici di Produzione |
@@ -344,14 +354,14 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 - La **Fauna** non è più una risorsa (v0.22): resta solo come tipo (§6.6).
 - Le **azioni** dei consiglieri non seguono la risorsa della categoria: si pagano come indicato in §4.2.3 — Confermato (v0.22).
 - **Altri impieghi — Confermato (v0.22).** Le risorse di categoria non servono solo a Potenzia: pagano anche il **rinnovo** delle proposte del proprio consigliere (§4.2) e **almeno un’azione** del Consiglio (§4.2.3). Così restano utili anche quando le carte sono al livello massimo.
-- **Direzione (v0.22):** gli eventi a scelta (§13) potranno chiedere risorse, comprese quelle di categoria. Le tecnologie costano solo Ricerca; solo alcuni progetti speciali potranno chiedere una risorsa di categoria (§10.5.7, v0.25).
+- **Direzione (v0.22):** gli eventi a scelta (§13) potranno chiedere risorse, comprese quelle di categoria. Le tecnologie costano solo Ricerca; solo alcuni progetti speciali potranno chiedere una risorsa di categoria (§10.5.7, v0.26).
 - La colonna “Prodotta soprattutto da” è una tendenza per il catalogo, non una regola.
 
-- Tutte le risorse stanno nel **Magazzino**, senza limite di capacità, tranne la **Ricerca**, che va nella tecnologia in corso (§10.5.1, v0.25).
+- Tutte le risorse stanno nel **Magazzino**, senza limite di capacità, tranne la **Ricerca**, che va nella tecnologia in corso (§10.5.1, v0.26).
 - Un edificio può produrre più risorse a ogni fase.
 - I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
 
-**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Il mercato funziona **solo in vendita**: con l’Oro non si comprano risorse, così l’Oro raccoglie le eccedenze ma non sostituisce la specializzazione (confermato in v0.22). Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. La Ricerca non si vende (v0.25). Tasso: placeholder (§16.3).
+**Mercato delle risorse — Confermato.** In ogni round il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Il mercato funziona **solo in vendita**: con l’Oro non si comprano risorse, così l’Oro raccoglie le eccedenze ma non sostituisce la specializzazione (confermato in v0.22). Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. La Ricerca non si vende (v0.26). Tasso: placeholder (§16.3).
 
 **Mana — Confermato.** Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia. Mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
 
@@ -371,15 +381,15 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 - Con 4 colori la plancia iniziale non può coprirli tutti: si sceglie presto una direzione. Da osservare nel playtest.
 - Un edificio **senza mana** è **neutro**: non ha colore. Come ogni altro edificio, può essere disponibile a tutti oppure peculiare di certe nazioni, come esclusivo dell’identità o di una via (§9.2, §10.4) — Confermato (modifica del nucleo, v0.16).
 - Ogni truppa chiede mana di un colore, oppure nessuno.
-- Una truppa paga **prima con il proprio colore e poi con l’energetico**. Eccezione: con l'ascensione *Mana unito* paga poi anche con gli altri colori (§10.4.2, v0.26).
+- Una truppa paga **prima con il proprio colore e poi con l’energetico**. Eccezione: con l'ascensione *Mana unito* paga poi anche con gli altri colori (§10.4.2, v0.27).
 
 ### 5.4 Cibo e mantenimento — Confermato
 
 - Ogni truppa consuma di base **0,5 Cibo**; alcune truppe possono chiederne di più.
-- Il consumo avviene **all’inizio di ogni anno, a partire dall’anno 2**: nel primo anno le truppe non mangiano.
+- Il consumo avviene **all’inizio di ogni anno**, cioè all'inizio dell'inverno, **a partire dall’anno 2**: nel primo anno le truppe non mangiano. Siccome l'inverno non produce Cibo (§5.2), il Cibo per mangiare va messo da parte nell'anno prima (v0.25).
 - Mangiano prima le truppe **più lente**, poi le più veloci; a parità di ricarica, prima quelle più a destra.
 - Una truppa mangia tutta la sua razione o niente; il cibo avanzato passa alla truppa successiva.
-- Una truppa che resta senza cibo ha la **ricarica ×1,5** fino al consumo dell’anno successivo. Eccezione: con l'ascensione *Esercito frugale* non rallenta (§10.4.2, v0.26).
+- Una truppa che resta senza cibo ha la **ricarica ×1,5** fino al consumo dell’anno successivo. Eccezione: con l'ascensione *Esercito frugale* non rallenta (§10.4.2, v0.27).
 - Le truppe reclutate durante l’anno sono sazie fino al consumo successivo.
 - I fantasmi non soffrono la fame.
 
@@ -457,7 +467,7 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
 
 ### 6.5 Potenziamenti — Confermato
 
-- Ogni edificio e ogni truppa ha dei **livelli** (3 livelli). Eccezione: con l'ascensione *Maestria* si arriva al livello 4 (§10.4.2, v0.26).
+- Ogni edificio e ogni truppa ha dei **livelli** (3 livelli). Eccezione: con l'ascensione *Maestria* si arriva al livello 4 (§10.4.2, v0.27).
 - **Potenzia — Confermato (modifica del nucleo, v0.22).** Si potenzia **solo con il Consiglio**, oltre che con eventi e ricompense; non più in qualunque momento.
   - Ogni consigliere ordinario offre, oltre alle 3 proposte, una quarta opzione: **Potenzia**.
   - Potenzia porta di livello un edificio o una truppa della plancia che abbia **almeno un tipo** della categoria del consigliere (§4.2.4).
@@ -512,7 +522,7 @@ La stessa simulazione regola gli scontri contro i fantasmi e, nella proposta att
 
 ### 7.1 Obiettivo — Confermato
 
-Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro (eccezione: l'ascensione *Ultima trincea*, §10.4.2, v0.26). Si perde anche quando la **Corruzione** accumulata raggiunge la Resistenza (§7.6.3).
+Ogni nazione possiede una **Resistenza**. Gli attacchi riducono la Resistenza avversaria; arrivare a zero significa perdere lo scontro (eccezione: l'ascensione *Ultima trincea*, §10.4.2, v0.27). Si perde anche quando la **Corruzione** accumulata raggiunge la Resistenza (§7.6.3).
 
 Truppe ed edifici non hanno punti vita individuali e non vengono eliminati durante la battaglia nella base.
 
@@ -550,7 +560,7 @@ Le truppe pronte vengono valutate **da destra verso sinistra** sulla plancia del
 - la truppa più a destra viene considerata per prima;
 - se può pagare, si attiva e riduce il mana disponibile per le successive;
 - se non può pagare, viene saltata;
-- il mana non viene prenotato per la truppa saltata (eccezione: l'ascensione *Disciplina ferrea*, §10.4.2, v0.26);
+- il mana non viene prenotato per la truppa saltata (eccezione: l'ascensione *Disciplina ferrea*, §10.4.2, v0.27);
 - le truppe più a sinistra possono usare il mana residuo se sufficiente.
 
 Una truppa economica può quindi ritardare una truppa costosa. Produzione, costi, cooldown e ordine della plancia formano insieme la strategia. Con plance fino a 12 truppe questo ordine diventa una fonte importante di profondità, e per la stessa ragione la sua leggibilità (P4) è un requisito.
@@ -573,7 +583,7 @@ Oltre al mana, un edificio può produrre scudo, cura e Corruzione (§7.6.5): all
 
 | Regola | Stato |
 |---|---|
-| Truppe ed edifici iniziano la battaglia con cooldown e intervallo di produzione **pieni** | Confermato; eccezione: con l'ascensione *Prima scintilla* gli edifici partono a metà (§10.4.2, v0.26) |
+| Truppe ed edifici iniziano la battaglia con cooldown e intervallo di produzione **pieni** | Confermato; eccezione: con l'ascensione *Prima scintilla* gli edifici partono a metà (§10.4.2, v0.27) |
 | Nello stesso istante si risolve **prima la produzione di mana**, poi l’attivazione delle truppe; l’ordine completo è in §7.6.6 | Confermato |
 | Le due nazioni agiscono **in contemporanea**; se entrambe cadono nello stesso istante (Resistenza a zero o Corruzione, §7.6.3), lo scontro è un pareggio (§3.4) | Confermato |
 | **Logoramento** contro gli stalli: dopo **45 secondi** di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo (ispirato alla tempesta di sabbia di The Bazaar) | Confermato; forma del danno placeholder (§16.3) |
@@ -812,7 +822,7 @@ Ogni dimensione agisce su una parte diversa del gioco. Dettagli, catalogo e moti
 | Regola | Stato |
 |---|---|
 | Razze fantasy originali con esclusivi in ogni era; quelli di un'era passata escono dalle offerte | Confermato |
-| Ogni razza ha anche **tecnologie esclusive** in ogni era (§10.5.2) | Confermato (v0.25) |
+| Ogni razza ha anche **tecnologie esclusive** in ogni era (§10.5.2) | Confermato (v0.26) |
 | Prototipo: 3 razze, Pietrosangue (difesa), Maremani (economia), Cinerali (attacco rapido); sostituiscono Montanari, Popolo del delta e Popolo delle foreste, ed ereditano i loro esclusivi, eventi, fortune e visitatori | Confermato |
 | Aspetto delle razze sui pezzi | Da definire (rimandato) |
 
@@ -840,7 +850,7 @@ Ogni dimensione agisce su una parte diversa del gioco. Dettagli, catalogo e moti
 
 ## 10. Ricerca, tecnologie ed ere
 
-Dalla v0.25 la Ricerca serve a un **albero delle tecnologie**, e le ere si raggiungono completando tecnologie. Le regole di dettaglio sono state discusse in `docs/Bozza_v0.25_ricerca_tecnologie.md`, approvata da Davide il 5 novembre 2026. Valori placeholder (§16.3).
+Dalla v0.26 la Ricerca serve a un **albero delle tecnologie**, e le ere si raggiungono completando tecnologie. Le regole di dettaglio sono state discusse in `docs/Bozza_v0.26_ricerca_tecnologie.md`, approvata da Davide il 5 novembre 2026. Valori placeholder (§16.3).
 
 Le tecnologie si esprimono con il linguaggio del nucleo (P5): i loro effetti sono modificatori permanenti (§8.2) o perk (§9.3). L’unico concetto nuovo è la **linea** di elementi (§10.5.5), un modo di scrivere il catalogo.
 
@@ -848,9 +858,9 @@ Le tecnologie si esprimono con il linguaggio del nucleo (P5): i loro effetti son
 
 Le ere dipendono dall’investimento in Ricerca, non da un calendario uguale per tutti: una civiltà può entrare in una nuova era prima di un’altra.
 
-Fino alla v0.24 la Ricerca si conservava nel Magazzino e si spendeva per pagare l’era. Dalla v0.25 riempie le tecnologie un po’ alla volta, e l’era si raggiunge con un numero di tecnologie (§10.3).
+Fino alla v0.24 la Ricerca si conservava nel Magazzino e si spendeva per pagare l’era. Dalla v0.26 riempie le tecnologie un po’ alla volta, e l’era si raggiunge con un numero di tecnologie (§10.3).
 
-### 10.2 Che cosa fa un’era — Confermato (v0.15; aggiornato in v0.25)
+### 10.2 Che cosa fa un’era — Confermato (v0.15; aggiornato in v0.26)
 
 | Effetto dell’ingresso in un’era | Riferimento |
 |---|---|
@@ -868,13 +878,13 @@ La scelta e la specializzazione passano sia per le tecnologie (§10.5) sia per l
 
 **Numero di ere — Da definire:** il prototipo ne usa 3 (“Fondazione”, “Sviluppo”, “Ascesa”, nomi placeholder); il numero della run completa si decide dopo i playtest. Ogni era in più richiede un catalogo base, nuove vie con i loro esclusivi e una nuova fascia dell’albero.
 
-### 10.3 Regole del passaggio — Confermato (rivisto in v0.25)
+### 10.3 Regole del passaggio — Confermato (rivisto in v0.26)
 
 | Regola | Stato |
 |---|---|
-| Per entrare nell’era successiva servono **N tecnologie dell’era corrente**; non si paga più l’era con la Ricerca | Confermato (v0.25) |
+| Per entrare nell’era successiva servono **N tecnologie dell’era corrente**; non si paga più l’era con la Ricerca | Confermato (v0.26) |
 | Valori di prova: 4 tecnologie dell’era 1 per l’era 2; 5 dell’era 2 per l’era 3 | Placeholder |
-| Raggiunto il numero, il passaggio **non è automatico**: il giocatore entra quando vuole, in entrambe le metà, senza consumare il round | Confermato (v0.25) |
+| Raggiunto il numero, il passaggio **non è automatico**: il giocatore entra quando vuole, in qualunque round dell'anno, senza consumare il round | Confermato (v0.26) |
 | Ogni era successiva richiede più tecnologie della precedente, senza meccanismi di recupero per chi è rimasto indietro | Confermato nella forma; valori placeholder |
 
 Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili, salvo l’eccezione delle linee (§10.5.5).
@@ -889,19 +899,19 @@ Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una 
 | Si sceglie **fra 3 vie** | Confermato |
 | Ogni era ha un **pool di vie**. Le 3 proposte sono pescate dal pool, con più probabilità per le vie coerenti con l’identità e con le vie già scelte; alcune vie possono essere esclusive di certe identità o di certe vie precedenti | Confermato |
 | Una via usa la **stessa scheda degli elementi dell’identità** (§9.2) | Confermato |
-| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi e **tecnologie esclusive** (§10.5.2, v0.25); dare un tratto permanente (§8), anche una risorsa in più prodotta dalla Capitale (§6.2, v0.22); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
+| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi e **tecnologie esclusive** (§10.5.2, v0.26); dare un tratto permanente (§8), anche una risorsa in più prodotta dalla Capitale (§6.2, v0.22); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
 | Gli effetti sono **liberi**: possono riferirsi a tipi o a elementi specifici, caso per caso nel catalogo | Confermato |
 | Gli **elementi esclusivi** di una via sono **diversi per ogni era**: una via scelta nell’era 2 ha esclusivi propri per l’era 2, per l’era 3 e per le successive. Gli esclusivi di un’era passata spariscono come le altre offerte | Confermato |
 | Le vie si accumulano: nessuna sostituisce le precedenti o gli elementi scelti alla creazione | Confermato |
-| Ogni via è un **albero di tradizioni**: adozione, 4 passi sbloccati dalle imprese, completamento con un'ascensione (§10.4.1, §10.4.2) | Confermato (v0.26) |
+| Ogni via è un **albero di tradizioni**: adozione, 4 passi sbloccati dalle imprese, completamento con un'ascensione (§10.4.1, §10.4.2) | Confermato (v0.27) |
 
 Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un tipo continua a contare.
 
 Le vie sono nel prototipo dalla v0.18, con il catalogo di `docs/Catalogo.md`.
 
-#### 10.4.1 Tradizioni e imprese — Confermato (v0.26)
+#### 10.4.1 Tradizioni e imprese — Confermato (v0.27)
 
-Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come sistema a parte. Le regole sono state discusse in `docs/Bozza_v0.26_tradizioni.md`, approvata da Davide il 5 novembre 2026. Il catalogo dei passi è in `docs/Catalogo.md` (§4.4). Valori placeholder (§16.3).
+Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come sistema a parte. Le regole sono state discusse in `docs/Bozza_v0.27_tradizioni.md`, approvata da Davide il 5 novembre 2026. Il catalogo dei passi è in `docs/Catalogo.md` (§4.4). Valori placeholder (§16.3).
 
 | Regola | Stato |
 |---|---|
@@ -916,7 +926,7 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | Le imprese sono scritte nei dati della via; accanto a ognuna si vede quanto manca (P4) | Confermato |
 | Imprese che guardano dentro la battaglia | Spunto (servono statistiche della battaglia che oggi non si registrano) |
 
-#### 10.4.2 Ascensioni — Confermato (v0.26; il livello 2 è una modifica del nucleo)
+#### 10.4.2 Ascensioni — Confermato (v0.27; il livello 2 è una modifica del nucleo)
 
 | Regola | Stato |
 |---|---|
@@ -925,7 +935,7 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | **Livello 1**: effetti forti con il linguaggio di oggi. **Livello 2**: cambiano una regola e compaiono solo a chi ha già un'ascensione. Nel prototipo la prima ascensione è di livello 1, la seconda di livello 2 | Confermato |
 | Un'ascensione che cambia una regola si vede in battaglia o sulla plancia (P4) | Confermato |
 
-**Ascensioni del livello 2 — Confermato (modifica del nucleo, v0.26), valori placeholder.** Ognuna è un'eccezione scritta anche nella sezione della regola che cambia.
+**Ascensioni del livello 2 — Confermato (modifica del nucleo, v0.27), valori placeholder.** Ognuna è un'eccezione scritta anche nella sezione della regola che cambia.
 
 | Ascensione | Effetto | Regola che cambia |
 |---|---|---|
@@ -935,12 +945,12 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | **Disciplina ferrea** | La truppa più a destra prenota il mana: finché aspetta, le altre truppe non spendono mana | §7.3 |
 | **Mana unito** | Dopo il proprio colore e l'energetico, una truppa può pagare con gli altri colori | §5.3 |
 | **Maestria** | Le carte arrivano al livello 4 | §6.5 |
-| **Doppio ascolto** | Una volta per metà anno si prendono due proposte dallo stesso consigliere | §4.2 |
+| **Doppio ascolto** | Una volta per stagione si prendono due proposte dallo stesso consigliere (Proposta con le stagioni; nel prototipo, finché ci sono le due metà, una volta per metà) | §4.2 |
 | **Esercito frugale** | Le truppe senza Cibo non rallentano | §5.4 |
 
 Le ascensioni del livello 1 (es. +1 spazio truppa e +1 spazio edificio; +20 Resistenza; +25% delle risorse prodotte) sono nel Catalogo (§4.5).
 
-### 10.5 Tecnologie — Confermato (modifica del nucleo, v0.25)
+### 10.5 Tecnologie — Confermato (modifica del nucleo, v0.26)
 
 #### 10.5.1 La Ricerca
 
@@ -949,13 +959,13 @@ Le ascensioni del livello 1 (es. +1 spazio truppa e +1 spazio edificio; +20 Resi
 | La ricerca **non è istantanea**: il giocatore sceglie una tecnologia e la Ricerca che la nazione guadagna la riempie un po’ alla volta | Confermato |
 | Tutta la Ricerca guadagnata (produzione, bottino, azioni, eventi, fortune) va nella **tecnologia in corso** e **non entra nel Magazzino**: non si vende al mercato e non paga azioni | Confermato |
 | Se non c’è una tecnologia in corso (all’inizio della run, o dopo averne completata una senza sceglierne un’altra), la Ricerca resta **in attesa** e passa alla prima tecnologia scelta | Confermato |
-| Una tecnologia si completa **appena** raggiunge il suo costo, anche a metà di una fase | Confermato |
+| Una tecnologia si completa **appena** raggiunge il suo costo, anche a metà di una stagione | Confermato |
 | La Ricerca in più a una tecnologia completata **non va persa**: passa alla tecnologia successiva | Confermato |
 | Si può **cambiare tecnologia a metà**: i progressi su quella lasciata restano salvati | Confermato |
 | La tecnologia da studiare si sceglie **in qualunque momento** fuori dalla battaglia e **non consuma il round** | Confermato |
 | Le tecnologie completate valgono **per sempre** | Confermato |
 | Le tecnologie costano **solo Ricerca**. Costi di prova: 3 Ricerca per la prima altezza di un’era, 4 per la seconda, poi a salire con le ere | Confermato; valori placeholder |
-| La produzione arriva solo all’inizio delle due metà (§5.2): le tecnologie si completano a blocchi, circa due volte all’anno, più bottino, azioni ed eventi | Confermato (conseguenza) |
+| La produzione arriva all’inizio di ogni stagione (§5.2, v0.25): le tecnologie si completano a blocchi, circa quattro volte all’anno, più bottino, azioni ed eventi. I costi di prova erano pensati per due produzioni all'anno e vanno rivisti con le prove | Confermato (conseguenza); costi da ritarare |
 
 #### 10.5.2 L’albero
 
@@ -1053,7 +1063,7 @@ Per il prototipo si usano avversari locali (§16.3); non costituiscono multiplay
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
-Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi (comprese le tecnologie che agiscono in battaglia, v0.25), passi e ascensioni (v0.26) e versione delle regole. Le ascensioni che cambiano le regole della battaglia valgono anche per il fantasma. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
+Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi (comprese le tecnologie che agiscono in battaglia, v0.26), passi e ascensioni (v0.27) e versione delle regole. Le ascensioni che cambiano le regole della battaglia valgono anche per il fantasma. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
 
 È proposto di salvare le **statistiche complete** degli elementi e non solo il loro identificativo: se in seguito un elemento viene ribilanciato, la copia continua a combattere com’era stata registrata.
 
@@ -1069,7 +1079,7 @@ Ottenere informazioni sull’avversario prima dello scontro e poter intervenire 
 | Ogni proposta fa partire lo scontro con un elemento nemico **sabotato** o **rallentato** per alcuni secondi | Confermato |
 | Il bersaglio dipende dalla proposta: **a caso**, a un’**estremità** della fila, il **più lento** o il **più veloce** (§7.7.1) | Confermato |
 | Il Maestro delle spie propone anche edifici e truppe che rallentano o sabotano | Confermato |
-| Vale per lo scontro con il fantasma dell’anno, anche se comprato nella prima metà | Confermato (v0.21) |
+| Vale per lo scontro con il fantasma dell’anno, in qualunque stagione sia comprato: il fantasma si fissa a gennaio e si affronta a dicembre | Confermato (v0.21; v0.25) |
 | Durate: 5 s di Sabotaggio, 10 s di Inefficienza; si paga in **Documenti** (v0.22; nella v0.21 in Influenza) | Confermato (v0.22); valori placeholder |
 | Una proposta indica se colpisce truppe, edifici o qualsiasi elemento | Confermato (v0.21) |
 | Il fantasma non spia il giocatore: è una registrazione (§11.1) | Confermato (v0.21) |
@@ -1131,8 +1141,8 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Economia | Risorse nel Magazzino; produzione prevista per fase. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
-| Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.25). |
-| Tradizioni | Per ogni via adottata: i 4 passi, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.26). |
+| Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.26). |
+| Tradizioni | Per ogni via adottata: i 4 passi, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.27). |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
 | Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa, elementi rallentati o sabotati con durata residua e origine. |
 | Esito | Risultato, perdita di Prestigio, vittorie, conseguenze. |
@@ -1187,10 +1197,10 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Due macrofasi con raccolta automatica all’ingresso e 5 round del Consiglio ciascuna (§4.2): nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
+- Quattro stagioni con raccolta automatica all’ingresso e 3 round del Consiglio ciascuna (§3.2, v0.25; finché non è implementato, il prototipo usa ancora le due metà da 5 round della v0.21). Consiglio nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
-- Albero delle tecnologie con la mano di 3 carte; ere raggiunte con le tecnologie (v0.25).
-- Tradizioni delle vie con imprese e ascensioni (v0.26).
+- Albero delle tecnologie con la mano di 3 carte; ere raggiunte con le tecnologie (v0.26).
+- Tradizioni delle vie con imprese e ascensioni (v0.27).
 - Riordino delle truppe fuori dal combattimento.
 - Fantasma locale fissato per l’anno.
 - Produzione di mana e attivazioni automatiche.
@@ -1246,7 +1256,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Pescata delle 3 vie: peso base 1, +1 per ogni elemento dell’identità o via già scelta che la favorisce; se il pool ha meno di 3 vie valide, si mostrano tutte | Provvisoria, come per le opportunità. |
 | Entrando in una nuova era, le proposte del round in corso vengono ripescate gratis dalla nuova era (prima del Consiglio: le alternative dell’opportunità) | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
-| Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
+| Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno e per quella stagione (primavera o estate), non pescati a caso | Accettata dal creatore (stagione dalla v0.25). |
 | Senza regole di generazione nei dati, se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
 | Pool di offerte basato solo sull’era (l’identità non esiste ancora) | Semplificazione del prototipo. |
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
@@ -1320,20 +1330,22 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Il Malcontento può superare la soglia fra un round e l'altro (es. a fine anno): la Rivoluzione arriva al primo round successivo | Provvisoria (v0.24). |
 | Rivoluzione: la causa principale è quella che ha prodotto più Malcontento dall'ultima rivoluzione (a parità vale l'ordine sconfitte, carestie, malus, eventi). Governi possibili per causa: sconfitte → Dittatura, Monarchia assoluta, Totalitarismo; carestie → Repubblica, Repubblica parlamentare, Monarchia costituzionale; malus → Teocrazia, Ierocrazia, Monarchia; scelte degli eventi → Oligarchia, Plutocrazia, Repubblica. Il governo attuale è escluso; se non resta nessuno, si sceglie fra i governi del tier 1 | Provvisoria (v0.24). |
 | Il Malcontento che sale per un'azione o un evento conta come causa "scelte degli eventi" | Provvisoria (v0.24). |
-| Tecnologie: 3 Ricerca alla prima altezza di un’era e 4 alla seconda, poi a salire con le ere; 4 tecnologie dell’era 1 per l’era 2, 5 dell’era 2 per l’era 3 | Placeholder (v0.25). |
-| Albero del prototipo: per era e per ramo 2 tecnologie alla prima altezza e 1 alla seconda (12 per era); 1 tecnologia esclusiva per via e per razza in ogni era; la seconda altezza si apre con 1 tecnologia della prima nello stesso ramo | Placeholder (v0.25). |
-| Sconto sulla carta scartata: peso dimezzato a ogni scarto, fino a un minimo di 1/8 | Placeholder (v0.25). |
-| Carta dorata: metà del costo già pagata | Placeholder (v0.25). |
-| Tradizioni: passi, imprese ed effetti del Catalogo §4.4; ascensioni del Catalogo §4.5 | Placeholder (v0.26). |
-| Imprese di stato: si controllano dopo ogni azione, a ogni produzione e a fine anno; un traguardo conta dal momento in cui la via è adottata | Provvisoria (v0.26). |
-| Pescata delle 3 ascensioni: peso base 1, +1 per ogni elemento dell'identità o via che la favorisce, con il seme della run; se ce ne sono meno di 3 si mostrano tutte | Provvisoria (v0.26). |
-| Disciplina ferrea: prenota il mana solo la truppa più a destra, e solo se è pronta e non sabotata; le truppe senza mana si attivano comunque | Provvisoria (v0.26). |
-| Mana unito: gli altri colori si usano nell'ordine rosso, verde, blu, viola | Provvisoria (v0.26). |
-| Maestria: il livello 4 costa 4 × era della carta nella risorsa del consigliere, come gli altri livelli | Placeholder (v0.26). |
-| Doppio ascolto: dopo la prima proposta il round non si chiude e la proposta presa sparisce; vale una volta per metà anno, con i consiglieri ordinari | Provvisoria (v0.26). |
-| Fantasmi generati: tutti i passi delle vie delle ere passate e metà di quelli della via dell'era corrente, a caso con il seme della run; un'ascensione per ogni albero completo | Provvisoria (v0.26). |
-| Revisione dei piani (Studioso): 2 Documenti, ripesca la mano delle tecnologie | Placeholder (v0.25). |
-| I fantasmi generati ricevono a caso, con il seme della run, il numero di tecnologie richiesto per ogni era raggiunta; in battaglia valgono solo quelle che agiscono in battaglia | Provvisoria (v0.25). |
+| Tecnologie: 3 Ricerca alla prima altezza di un’era e 4 alla seconda, poi a salire con le ere; 4 tecnologie dell’era 1 per l’era 2, 5 dell’era 2 per l’era 3 | Placeholder (v0.26). |
+| Albero del prototipo: per era e per ramo 2 tecnologie alla prima altezza e 1 alla seconda (12 per era); 1 tecnologia esclusiva per via e per razza in ogni era; la seconda altezza si apre con 1 tecnologia della prima nello stesso ramo | Placeholder (v0.26). |
+| Sconto sulla carta scartata: peso dimezzato a ogni scarto, fino a un minimo di 1/8 | Placeholder (v0.26). |
+| Carta dorata: metà del costo già pagata | Placeholder (v0.26). |
+| Tradizioni: passi, imprese ed effetti del Catalogo §4.4; ascensioni del Catalogo §4.5 | Placeholder (v0.27). |
+| Imprese di stato: si controllano dopo ogni azione, a ogni produzione e a fine anno; un traguardo conta dal momento in cui la via è adottata | Provvisoria (v0.27). |
+| Pescata delle 3 ascensioni: peso base 1, +1 per ogni elemento dell'identità o via che la favorisce, con il seme della run; se ce ne sono meno di 3 si mostrano tutte | Provvisoria (v0.27). |
+| Disciplina ferrea: prenota il mana solo la truppa più a destra, e solo se è pronta e non sabotata; le truppe senza mana si attivano comunque | Provvisoria (v0.27). |
+| Mana unito: gli altri colori si usano nell'ordine rosso, verde, blu, viola | Provvisoria (v0.27). |
+| Maestria: il livello 4 costa 4 × era della carta nella risorsa del consigliere, come gli altri livelli | Placeholder (v0.27). |
+| Doppio ascolto: dopo la prima proposta il round non si chiude e la proposta presa sparisce; vale una volta per stagione (nel prototipo, finché ci sono le due metà, una volta per metà), con i consiglieri ordinari | Provvisoria (v0.27). |
+| Fantasmi generati: tutti i passi delle vie delle ere passate e metà di quelli della via dell'era corrente, a caso con il seme della run; un'ascensione per ogni albero completo | Provvisoria (v0.27). |
+| Revisione dei piani (Studioso): 2 Documenti, ripesca la mano delle tecnologie | Placeholder (v0.26). |
+| I fantasmi generati ricevono a caso, con il seme della run, il numero di tecnologie richiesto per ogni era raggiunta; in battaglia valgono solo quelle che agiscono in battaglia | Provvisoria (v0.26). |
+| Incontro d'estate: forza a metà strada fra quella dell'anno e quella dell'anno successivo | Placeholder (v0.25). |
+| Finché le stagioni non sono implementate, il prototipo usa le due metà da 5 round della v0.21 | Provvisoria (v0.25). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -1343,9 +1355,9 @@ Criteri di accettazione proposti per il prototipo:
 
 | Caso | Risultato atteso |
 |---|---|
-| Ingresso in una fase | Una sola raccolta dagli edifici già presenti. |
-| Costruzione durante Produzione | Nessuna raccolta retroattiva; prima produzione in Preparazione. |
-| Risorse non spese | Conservate al cambio fase e al cambio anno. |
+| Ingresso in una stagione | Una sola raccolta dagli edifici già presenti; d'inverno senza Cibo. |
+| Costruzione durante una stagione | Nessuna raccolta retroattiva; prima produzione all'inizio della stagione successiva. |
+| Risorse non spese | Conservate al cambio di stagione e al cambio anno. |
 | Ricerca guadagnata | Va tutta nella tecnologia in corso, oppure resta in attesa se non ce n’è una; non entra nel Magazzino. |
 | Tecnologia completata | Si completa appena raggiunge il costo; la Ricerca in più passa alla successiva; si pesca una nuova mano. |
 | Cambio di tecnologia | I progressi su quella lasciata restano salvati; la tecnologia iniziata ricompare sempre nella mano. |
@@ -1367,7 +1379,7 @@ Criteri di accettazione proposti per il prototipo:
 | Disciplina ferrea | Con la truppa più a destra in attesa di mana, le altre non spendono mana. |
 | Mana unito | Una truppa paga con un altro colore quando mancano il suo e l'energetico. |
 | Maestria | Potenzia porta una carta al livello 4. |
-| Doppio ascolto | Dopo una proposta il round resta aperto una volta per metà anno. |
+| Doppio ascolto | Dopo una proposta il round resta aperto una volta per stagione (nel prototipo per metà anno). |
 | Esercito frugale | Una truppa senza Cibo mantiene la sua ricarica. |
 | Abbinamento dei fantasmi | Stesso anno, era qualsiasi. |
 | Truppa pronta senza mana | In attesa, senza consumi né cooldown aggiuntivo; il motivo è visibile. |
@@ -1409,7 +1421,7 @@ Criteri di accettazione proposti per il prototipo:
 | Sconfitta contro un incontro del mondo | Oro del Magazzino dimezzato (per difetto); Prestigio e vittorie invariati; durante l’ultima possibilità la run termina. |
 | Vittoria contro un incontro del mondo | Bottino fisso di Oro e Ricerca; poi il giocatore può scegliere una ricompensa dal pool dell’incontro, oppure nessuna. |
 | Vittoria o pareggio contro il fantasma | Bottino fisso di Oro e Ricerca; nessun bottino in caso di sconfitta. |
-| Anno | 5 round, incontro del mondo, 5 round, fantasma; produzione solo all’inizio delle due metà. |
+| Anno | Inverno (3 round), primavera (3 round, incontro), estate (3 round, incontro), autunno (3 round, fantasma); produzione all'inizio di ogni stagione. |
 | Round | 3 consiglieri diversi; scelto uno, 3 proposte (5 dal Clown), se ne prende una sola o si passa. |
 | Pool del consigliere | Propone solo carte con almeno un tipo della sua categoria. |
 | Potenzia | Sale di livello una carta con almeno un tipo della categoria del consigliere; non consuma la scelta; una sola volta per round; non compare senza carte valide o con tutte al massimo. |
@@ -1438,7 +1450,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di ampliare la ricerca | Numero definitivo delle ere; costi delle tecnologie e numero richiesto per ogni era; catalogo delle vie, dei loro esclusivi e dell’albero; progetti speciali; catalogo dei passi e delle ascensioni (§10.4, §10.5). |
 | Per la componente GDR | Valori del Malcontento; tratti delle razze; costo della Riforma; governi dei fantasmi; tipi d'identità delle vie. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
-| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4). |
+| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello; costo del Potenzia dell’Anziano (§4.2.4). |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
 | Più avanti | Progressione fra run, audio, monetizzazione, stile visivo. |
 
@@ -1451,9 +1463,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Nucleo | Insieme delle regole su cui si appoggiano tutti i contenuti; cambia solo con una nuova versione del documento. |
 | Spunto | Idea per il futuro, annotata ma non introdotta nella base. |
 | Run | Partita indipendente che racconta la storia di una civiltà. |
-| Anno | Unità di progressione con due macrofasi, incontri del mondo e uno scontro finale contro un fantasma. |
-| Produzione | Macrofase dedicata principalmente allo sviluppo della nazione. |
-| Preparazione | Macrofase dedicata principalmente all’organizzazione per lo scontro. |
+| Anno | Unità di progressione di 12 round in quattro stagioni, con due incontri del mondo e uno scontro finale contro un fantasma (§3.2). |
+| Stagione | Una delle quattro parti dell'anno (inverno, primavera, estate, autunno), di 3 round; all'inizio di ognuna gli edifici producono (v0.25). |
+| Mese | Un round dell'anno: gennaio è il primo, dicembre l'ultimo (v0.25). |
+| Produzione, Preparazione | Le due metà dell'anno fino alla v0.24; dalla v0.25 sostituite dalle stagioni. |
 | Opportunità | Momento di scelta interno a una macrofase; dalla v0.21 sostituita dai round del Consiglio. |
 | Tipo | Caratteristica di un edificio o di una truppa che decide quali consiglieri lo propongono e lo potenziano e a quali perk risponde (§6.6). Sostituisce le etichette. |
 | Categoria | Insieme di tipi che forma il campo di un consigliere (§4.2.4). |
@@ -1476,7 +1489,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Attacco d’assedio | Danno che colpisce solo lo scudo; proprio delle truppe Assedio. |
 | Prestigio | Risorsa che determina la sopravvivenza della run dopo le sconfitte. |
 | Fantasma | Copia di una nazione avversaria usata per uno scontro asincrono. |
-| Era | Livello di sviluppo raggiunto completando un certo numero di tecnologie (v0.25). |
+| Era | Livello di sviluppo raggiunto completando un certo numero di tecnologie (v0.26). |
 | Tecnologia | Carta dell’albero che si completa con la Ricerca e dà un effetto permanente (§10.5). |
 | Altezza | Livello di una tecnologia nell’albero; ogni era ne occupa due. |
 | Mano | Le 3 tecnologie proposte, fra cui si sceglie quella da studiare. |
@@ -1493,14 +1506,14 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 ## Registro delle versioni
 
-**v0.26 — 5 novembre 2026** (modifica del nucleo)
-- Approvata la bozza `docs/Bozza_v0.26_tradizioni.md`: ogni **via** diventa un albero di **tradizioni**, come in Stellaris ma senza una risorsa nuova (§10.4.1).
+**v0.27 — 5 novembre 2026** (modifica del nucleo)
+- Approvata la bozza `docs/Bozza_v0.27_tradizioni.md`: ogni **via** diventa un albero di **tradizioni**, come in Stellaris ma senza una risorsa nuova (§10.4.1).
 - 4 passi per via, sbloccati dalle **imprese** (traguardi o stati della nazione), in qualsiasi ordine; le imprese si vedono sulla carta della via.
 - Completando l'albero si sceglie un'**ascensione** fra 3 (§10.4.2). Il livello 2 cambia una regola del nucleo: Seconda natura (§4.3), Ultima trincea (§7.1), Prima scintilla (§7.5), Disciplina ferrea (§7.3), Mana unito (§5.3), Maestria (§6.5), Doppio ascolto (§4.2), Esercito frugale (§5.4).
 - Aggiornati fantasmi, informazioni da mostrare, prototipo, convenzioni, verifica, decisioni e glossario (§11.4, §14.3, §15.2, §16.3, §17, §18, §19).
 
-**v0.25 — 5 novembre 2026** (modifica del nucleo)
-- Approvata la bozza `docs/Bozza_v0.25_ricerca_tecnologie.md`: la Ricerca serve a un **albero delle tecnologie** (§10.5).
+**v0.26 — 5 novembre 2026** (modifica del nucleo)
+- Approvata la bozza `docs/Bozza_v0.26_ricerca_tecnologie.md`: la Ricerca serve a un **albero delle tecnologie** (§10.5).
 - La Ricerca non sta più nel Magazzino: riempie la tecnologia in corso un po’ alla volta; non si vende e non paga azioni. Tolto il Mercante; il Tesoriere paga in Influenza (§4.2.3, §5.3).
 - Albero unico a **4 rami** per colore, ognuno con due categorie; due altezze per era; mano di **3 carte** come in Stellaris, con sconto sulla carta scartata; tecnologie iniziate e carte dorate sempre nella mano (§10.5.2, §10.5.3).
 - Si ricercano linee di elementi, perk, miglioramenti del Consiglio e della nazione, dottrine sui tipi; tutte valgono per sempre (§10.5.4). Le **linee** propongono la versione dell’era corrente, o l’ultima precedente (§10.5.5).
@@ -1508,6 +1521,13 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - **Carte dorate** da eventi, fortune e incontri del mondo (§3.3, §10.5.6); tecnologie esclusive di vie e razze (§10.4, §9.4.1); azione Revisione dei piani dello Studioso (§4.2.3).
 - Progetti speciali con risorsa di categoria: Direzione, dopo il primo prototipo (§10.5.7).
 - Aggiornati informazioni da mostrare, prototipo, convenzioni, verifica, decisioni e glossario (§14.3, §15.2, §16.3, §17, §18, §19).
+
+**v0.25 — 5 novembre 2026** (modifica del nucleo)
+- L'anno ha **12 round, uno per mese**, in **quattro stagioni** da 3 round: inverno senza scontri, primavera ed estate con un incontro del mondo ciascuna, autunno con il fantasma che chiude l'anno (§3.2, §3.3, §4.1). Le stagioni sostituiscono Produzione e Preparazione.
+- Gli edifici producono all'inizio di ogni stagione, d'inverno senza Cibo; i valori di produzione non cambiano (§5.2). Il consumo di Cibo resta all'inizio dell'anno, che ora è l'inizio dell'inverno (§5.4).
+- Temi dei round per stagione (§4.2); nome del mese visibile in ogni round (§3.2).
+- La stagione diventa una radice di eventi, visitatori e fortune (§4.2.5). Proposte: pesi dei consiglieri d'inverno, eventi stagionali e invernali, incontro d'estate più forte.
+- Bozza della discussione: `docs/Bozza_v0.25_stagioni.md`.
 
 **v0.24 — 5 novembre 2026** (modifica del nucleo)
 - Approvata la proposta sull'identità (`docs/Proposta_identita.md`, bozza 2): razze fantasy, governi a tier con evoluzione e rivoluzione, credi con incanti esclusivi, culture che cambiano l'uso delle risorse (§9.4).

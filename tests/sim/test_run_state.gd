@@ -451,7 +451,7 @@ func test_passaggio_di_era() -> void:
 	run.research = 7
 	assert_true(run.advance_era())
 	assert_eq(run.era, 2)
-	assert_eq(run.research, 7, "L'era non costa Ricerca (GDD v0.25).")
+	assert_eq(run.research, 7, "L'era non costa Ricerca (GDD v0.26).")
 	assert_eq(run.round_number, 1, "Non consuma il round.")
 	assert_eq(run.board.building_capacity(), 5, "L'era concede uno spazio edificio.")
 	assert_eq(run.board.troop_capacity(), 4, "L'era concede uno spazio truppa.")

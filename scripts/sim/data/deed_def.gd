@@ -1,6 +1,6 @@
 class_name DeedDef
 extends Resource
-## Un'impresa (GDD §10.4.1, v0.26): l'obiettivo che completa un passo dell'albero di una via.
+## Un'impresa (GDD §10.4.1, v0.27): l'obiettivo che completa un passo dell'albero di una via.
 ## Un traguardo conta ciò che si fa dopo l'adozione della via; un'impresa di stato guarda
 ## com'è la nazione e basta raggiungerla una volta. Contiene solo dati: le regole stanno in RunState.
 

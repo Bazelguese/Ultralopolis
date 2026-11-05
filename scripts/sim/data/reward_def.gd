@@ -9,7 +9,7 @@ enum Kind {
 	TRUPPA,
 	PERK,
 	RISORSA,  ## Una risorsa del Magazzino diversa da Oro e Ricerca (vedi "resource").
-	TECNOLOGIA,  ## Una tecnologia già iniziata, una carta dorata (GDD §10.5.6, v0.25).
+	TECNOLOGIA,  ## Una tecnologia già iniziata, una carta dorata (GDD §10.5.6, v0.26).
 }
 
 @export var kind: Kind = Kind.ORO

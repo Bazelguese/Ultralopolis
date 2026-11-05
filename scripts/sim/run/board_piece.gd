@@ -18,7 +18,7 @@ var enchant: OpportunityDef
 var enchant_amount: int = 0
 ## Quantità del secondo effetto, per gli incanti esclusivi che ne hanno due (GDD §9.4, v0.24).
 var enchant_amount_2: int = 0
-## Secondo incanto, possibile solo con l'ascensione Seconda natura (GDD §10.4.2, v0.26).
+## Secondo incanto, possibile solo con l'ascensione Seconda natura (GDD §10.4.2, v0.27).
 var second_enchant: OpportunityDef
 var second_enchant_amount: int = 0
 var second_enchant_amount_2: int = 0

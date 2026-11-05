@@ -1,6 +1,6 @@
 class_name TechDef
 extends Resource
-## Una tecnologia dell'albero (GDD §10.5, v0.25). Si completa con la Ricerca e dà un effetto
+## Una tecnologia dell'albero (GDD §10.5, v0.26). Si completa con la Ricerca e dà un effetto
 ## permanente, espresso con il linguaggio del nucleo (P5): modificatori, perk, spazi o una linea.
 ## Contiene solo dati: le regole stanno in RunState.
 

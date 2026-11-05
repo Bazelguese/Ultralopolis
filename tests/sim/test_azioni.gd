@@ -125,7 +125,7 @@ func test_studiosi_oro_in_ricerca() -> void:
 	assert_eq(run.research, research_before + 3)
 
 
-## Il Mercante (Ricerca in Oro) non esiste più dalla v0.25: la Ricerca non paga azioni.
+## Il Mercante (Ricerca in Oro) non esiste più dalla v0.26: la Ricerca non paga azioni.
 ## Qui uno scambio che costa Documenti, come Decreto fiscale costa Stabilità.
 func test_scambio_e_risorse_insufficienti() -> void:
 	var exchange: OpportunityDef = _opportunity(&"scambio", OpportunityDef.Phase.PRODUZIONE, OpportunityDef.Kind.SCAMBIO_RISORSE)

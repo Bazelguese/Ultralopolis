@@ -14,9 +14,9 @@ extends Resource
 @export var events: Array[EventDef] = []
 ## Visitatori di passaggio (GDD §4.2.5, v0.23).
 @export var visitors: Array[AdvisorDef] = []
-## Albero delle tecnologie (GDD §10.5, v0.25), esclusive di vie e popoli comprese.
+## Albero delle tecnologie (GDD §10.5, v0.26), esclusive di vie e popoli comprese.
 @export var technologies: Array[TechDef] = []
-## Ascensioni, scelte completando l'albero di una via (GDD §10.4.2, v0.26).
+## Ascensioni, scelte completando l'albero di una via (GDD §10.4.2, v0.27).
 @export var ascensions: Array[IdentityDef] = []
 ## Popoli, governi, credi, culture e perk fra cui scegliere (GDD §9).
 @export var identities: Array[IdentityDef] = []

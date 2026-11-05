@@ -312,7 +312,7 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	scheda.riga = "Scegli questa via"
 	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: offerte, elementi esclusivi, un tratto permanente e un bonus immediato."
 	if not via.traditions.is_empty():
-		# Le imprese si vedono prima di scegliere la via (GDD §10.4.1, v0.26).
+		# Le imprese si vedono prima di scegliere la via (GDD §10.4.1, v0.27).
 		scheda.dettagli += "\nTradizioni (completale tutte per un'ascensione):"
 		for passo: TraditionDef in via.traditions:
 			scheda.dettagli += "\n• %s: %s → %s" % [passo.display_name, passo.deed.describe() if passo.deed != null else "", passo.description]
@@ -320,7 +320,7 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	return scheda
 
 
-## Un'ascensione da scegliere completando l'albero di una via (GDD §10.4.2, v0.26).
+## Un'ascensione da scegliere completando l'albero di una via (GDD §10.4.2, v0.27).
 static func da_ascensione(ascensione: IdentityDef) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.VIA
