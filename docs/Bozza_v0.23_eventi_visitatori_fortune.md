@@ -2,7 +2,7 @@
 ## Eventi, Visitatori e Fortune nei round del Consiglio
 
 **Data:** 5 novembre 2026
-**Stato:** **bozza da approvare.** Niente di questo documento è ancora nel GDD né nel gioco. Raccoglie le decisioni prese con Davide e propone le regole e un primo catalogo, tutto placeholder.
+**Stato:** **approvata e riportata nel GDD v0.23** (§4.2.5) e nel gioco (5 novembre 2026). Il catalogo è in `docs/Catalogo.md` (§6 ter). Questo file resta come memoria della discussione.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.22
 
 Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Spunto** = idea per il futuro, da non implementare.

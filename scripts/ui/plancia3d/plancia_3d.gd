@@ -7,7 +7,7 @@ extends Node3D
 
 enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
-enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE }
+enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE }
 
 const PASSO_TRUPPE: float = 1.75
 const PASSO_EDIFICI: float = 2.1
@@ -566,11 +566,19 @@ func _costruisci_scelte() -> void:
 		fase = -1
 	match fase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-			if run.chosen_advisor == null:
+			if run.chosen_event != null:
+				tipo = TipoScelta.OPZIONE
+				for opzione: EventOptionDef in run.event_options():
+					schede.append(SchedaCarta.da_opzione(run, opzione))
+					origini.append(opzione)
+			elif run.chosen_advisor == null:
 				tipo = TipoScelta.CONSIGLIERE
 				for consigliere: AdvisorDef in run.advisor_choices:
 					schede.append(SchedaCarta.da_consigliere(run, consigliere))
 					origini.append(consigliere)
+				if run.event_choice != null:
+					schede.append(SchedaCarta.da_evento(run, run.event_choice))
+					origini.append(run.event_choice)
 			else:
 				tipo = TipoScelta.OFFERTA
 				for offerta: Offer in run.offers:
@@ -596,6 +604,8 @@ func _costruisci_scelte() -> void:
 		firma += "|%d" % origine.get_instance_id()
 	if run.chosen_advisor != null:
 		firma += "|%s" % run.chosen_advisor.id
+	if run.chosen_event != null:
+		firma += "|evento:%s" % run.chosen_event.id
 	if firma == _firma_scelte and _scelte.size() == schede.size():
 		_aggiorna_scelte(schede)
 		return
@@ -722,8 +732,22 @@ func _clic_scelta(tessera: Tessera3D) -> void:
 	var i: int = tessera.indice
 	match _tipo_scelta:
 		TipoScelta.CONSIGLIERE:
+			if i >= run.advisor_choices.size():
+				_esegui(run.choose_event(), run.event_choice.display_name if run.event_choice != null else "")
+				return
 			var nome_consigliere: String = run.advisor_choices[i].display_name
 			_esegui(run.choose_advisor(i), "Ascolti: %s" % nome_consigliere)
+		TipoScelta.OPZIONE:
+			var opzione: EventOptionDef = run.event_options()[i]
+			var motivo: String = run.option_block_reason(opzione)
+			if motivo != "":
+				_hud.mostra_messaggio(motivo, true)
+				return
+			var voci_opzione: Array[String] = run.option_choices(opzione)
+			if not voci_opzione.is_empty():
+				_hud.mostra_scelte(opzione.label, opzione.description, voci_opzione, func(voce: int) -> void: _esegui(run.take_event_option(i, voce)))
+			else:
+				_esegui(run.take_event_option(i), opzione.label)
 		TipoScelta.OFFERTA:
 			var offerta: Offer = run.offers[i]
 			var voci: Array[String] = run.offer_choices(offerta)

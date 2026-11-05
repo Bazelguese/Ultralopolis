@@ -389,6 +389,70 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 
 ---
 
+## 6 ter. Eventi, Visitatori e Fortune (GDD §4.2.5, v0.23)
+
+Compaiono nei round al posto di un consigliere. File dati: `data/catalog/eventi/` (eventi e fortune) e `data/catalog/visitatori/`. Ogni carta ha una sfera (una categoria del Consiglio) e delle radici; le opzioni fra parentesi quadre richiedono qualcosa alla nazione e, se manca, restano visibili ma spente.
+
+### Eventi (18)
+
+Notazione delle opzioni: **[requisito]** = opzione sbloccata solo con quel requisito. "Per un anno" segue §8.2.1. I valori seguono più o meno il budget del Catalogo (1 Oro ≈ 1 Ricerca ≈ 2 unità delle altre risorse).
+
+**Uno per ogni elemento dell'identità**
+
+| Evento | Sfera | Radici | Opzioni |
+|---|---|---|---|
+| **Il passo innevato** | Opera | favorito da Montanari | Spala la neve: 2 Pietra → 3 Ferro · Aspetta il disgelo: per un anno la Capitale produce 1 Pietra in più · **[Guardiano]** Le guardie aprono la strada: +2 Ferro |
+| **La piena del fiume** | Terra | favorito da Popolo del delta | Alza gli argini: 3 Legno → +2 Stabilità · Lascia allagare i campi: per un anno +1 Cibo per fase dagli edifici di Produzione · **[Economico]** I mercanti noleggiano chiatte: +4 Oro |
+| **Il cervo bianco** | Terra | favorito da Popolo delle foreste | Caccialo: +3 Cibo e +1 Legno · Lascialo libero: +2 Fede · **[truppa Fauna]** Addomesticalo: una truppa Fauna sale di livello |
+| **L'erede al trono** | Stato | favorito da Monarchia | Festa di corte: 3 Oro → +3 Stabilità · Matrimonio politico: 2 Stabilità → +4 Influenza · **[Nobile]** Il giuramento dei nobili: per un anno le truppe Nobili ricaricano il 10% più in fretta |
+| **Le elezioni** | Stato | favorito da Repubblica | Campagna generosa: 3 Oro → per un anno ogni consigliere mostra una proposta in più · Lascia decidere il popolo: +2 Stabilità · **[Legge]** Riforma delle leggi: 2 Documenti → +3 Stabilità e +2 Influenza |
+| **Il concilio dei sacerdoti** | Fede | favorito da Teocrazia | Dottrina severa: 2 Fede → +10 Resistenza nel prossimo scontro con il fantasma · Apertura al popolo: +2 Influenza · **[Spirituale]** Grande processione: +3 Fede |
+| **L'eclissi** | Fede | favorito da Culto del Sole | Rito di riparazione: 3 Fede → +5 Oro · Presagio di guerra: fino al prossimo fantasma le truppe ricaricano il 10% più in fretta · **[Accademico]** Gli astronomi la spiegano: +3 Ricerca |
+| **Il bosco che sussurra** | Fede | favorito da Antichi spiriti | Offerta agli spiriti: 2 Cibo → +3 Fede · Abbatti il bosco: +4 Legno · **[Guardiano]** I guardiani del bosco: ricevi gli Esploratori (se c'è spazio) |
+| **La disputa dei dotti** | Conoscenza | favorito da Ordine della Ragione | Finanzia la scuola: 3 Oro → +3 Ricerca · Pubblica gli atti: 2 Documenti → +3 Influenza · **[Accademico]** Il trattato fondamentale: +2 Ricerca e +2 Documenti |
+| **Il torneo** | Militare | favorito da Cultura guerriera | Premi ricchi: 3 Oro → per un anno una truppa a scelta fa il 25% di danno in più · Torneo modesto: 1 Ferro → +2 Stabilità · **[Fante]** Il campione: una truppa Fante a scelta sale di livello |
+| **La grande fiera** | Ricchezza | favorito da Cultura mercantile | Fiera delle meraviglie: 4 Oro → ricevi un edificio Economico dell'era, a caso · Banchi per tutti: 2 Influenza → +5 Oro · **[Infrastruttura Strategica]** Le strade portano mercanti: +2 Oro e +2 Influenza |
+| **Il manoscritto perduto** | Conoscenza | favorito da Cultura erudita | Compralo: 4 Oro → +4 Documenti · Fallo copiare: 2 Documenti → +3 Ricerca · **[Criminale]** Rubalo: 1 Stabilità → +4 Documenti |
+
+**Generici, legati all'era**
+
+| Evento | Sfera | Radici | Opzioni |
+|---|---|---|---|
+| **Banditi sulla strada** | Ombra | era 1 | Scorta armata: 2 Ferro → +3 Oro · Assoldali: 3 Oro → ricevi i Tagliagole (se c'è spazio) · **[Criminale]** Un accordo nell'ombra: +2 Documenti |
+| **Un inverno lungo** | Terra | era 1 | Razionamento: 2 Legno → per un anno le truppe mangiano la metà · Granai del re: 3 Oro → +4 Cibo · **[Produzione]** I campi resistono: +3 Cibo |
+| **Gli esuli** | Stato | era 2 | Accoglili: 2 Cibo → +3 Stabilità · Arruolali: 4 Oro → ricevi una truppa dell'era, a caso · **[Patriota]** Nuovi patrioti: +2 Stabilità e +2 Influenza |
+| **Febbre nei quartieri** | Fede | era 2 | Ospedali da campo: 3 Fede → +3 Stabilità · Chiudi le porte: +4 Stabilità, ma per un anno la Ricerca prodotta si dimezza · **[Spirituale]** I monaci curano: +2 Fede |
+| **La grande opera** | Opera | era 3 | Costruiscila: 5 Pietra → +1 spazio edificio · Rimandala: +2 Pietra · **[Infrastruttura Strategica]** Ingegneri esperti: 3 Pietra → +1 spazio edificio |
+| **Congiura a corte** | Ombra | era 3 | Reprimi: 3 Stabilità → +10 Resistenza nel prossimo scontro con il fantasma · Infiltra i congiurati: 3 Documenti → la truppa più veloce del fantasma parte sabotata per 5 s · **[Legge]** Processo pubblico: +4 Stabilità |
+
+### Visitatori (6)
+
+| Visitatore | Sfera | Radici | Che cosa propone (3 alla volta) | Prezzi |
+|---|---|---|---|---|
+| **Mercanti del delta** | Ricchezza | favoriti da Popolo del delta e Via del Commercio | Edifici Economici dell'era, compresi gli esclusivi di altre nazioni (Porto fluviale, Fondaco…) | Oro +1 |
+| **Compagnia di ventura** | Militare | favorita da Cultura guerriera e Via della Guerra | Truppe Fante dell'era e di quella successiva | Oro +1; +3 per l'era successiva |
+| **Pellegrini** | Fede | favoriti da Teocrazia e dai credi | Incanti del Sacerdote ed elementi Spirituali dell'era | come il Sacerdote |
+| **Ambasciatore straniero** | Stato | dall'era 2; favorito da Monarchia e Repubblica | Ambasciata, Decreto fiscale, Dono diplomatico (+3 Influenza) | come il Cancelliere |
+| **Contrabbandiere** | Ombra | richiede una carta Criminale sulla plancia o la Via dell'Ombra | Carte Criminali ed esclusivi di altre identità (Arcieri dei boschi, Guardie delle vette…) | Oro −1 e 1 Documenti |
+| **Inventore errante** | Conoscenza | favorito da Ordine della Ragione e Cultura erudita; non nell'ultima era | Carte dell'era successiva, in anteprima | Oro +3 |
+
+### Fortune (6)
+
+I valori crescono con l'era: il numero indicato va moltiplicato per l'era corrente.
+
+| Fortuna | Sfera | Favorita da | Dono |
+|---|---|---|---|
+| **Raccolto abbondante** | Terra | Popolo del delta, Antichi spiriti | +3 Cibo |
+| **Una vena d'argento** | Opera | Montanari | +2 Ferro e +2 Oro |
+| **Visione sacra** | Fede | Culto del Sole, Teocrazia | +3 Fede |
+| **La biblioteca ritrovata** | Conoscenza | Cultura erudita, Ordine della Ragione | +2 Documenti e +1 Ricerca |
+| **Festa del popolo** | Stato | Repubblica, Monarchia | +2 Stabilità e +1 Influenza |
+| **Bottino dimenticato** | Militare | Cultura guerriera | +3 Ferro |
+
+Nota: il Contrabbandiere richiede una carta Criminale sulla plancia ed è favorito dalla Via dell'Ombra (§16.3 del GDD).
+
+---
+
 ## 7. Questioni per Davide
 
 Tutte le questioni della bozza 1 sono decise.
@@ -416,4 +480,5 @@ Tutte le questioni della bozza 1 sono decise.
 | Perk | 11 (7 esistenti + 4 nuovi) | | | 11 |
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
-| Azioni del Consiglio | 32 (di cui 2 esclusive dell’identità e 3 dal livello Ministri) | | | 32 |
+| Azioni del Consiglio | 33 (di cui 2 esclusive dell’identità e 3 dal livello Ministri) | | | 33 |
+| Eventi / Fortune / Visitatori | 18 / 6 / 6 | | | 30 |

@@ -300,3 +300,33 @@ func test_ogni_consigliere_ha_edifici_truppe_e_azioni_in_ogni_era() -> void:
 					troops += 1
 			assert_gt(buildings, 0, "%s: edifici nell'era %d" % [advisor.display_name, era])
 			assert_gt(troops, 0, "%s: truppe nell'era %d" % [advisor.display_name, era])
+
+
+func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
+	# Bozza v0.23: 18 eventi, 6 fortune, 6 visitatori; ogni evento ha un'opzione senza requisiti.
+	var catalog: CatalogDef = _catalog()
+	var categories: Array[String] = []
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.category_name != "":
+			categories.append(advisor.category_name)
+	var events: int = 0
+	var fortunes: int = 0
+	for event: EventDef in catalog.events:
+		assert_true(categories.has(event.sphere), "La sfera di %s è una categoria" % event.id)
+		assert_false(event.options.is_empty(), "Opzioni di %s" % event.id)
+		var free: bool = false
+		for option: EventOptionDef in event.options:
+			if option.requires_identity.is_empty() and option.requires_types.is_empty():
+				free = true
+		assert_true(free, "%s ha un'opzione senza requisiti" % event.id)
+		if event.family == EventDef.Family.FORTUNA:
+			fortunes += 1
+			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
+		else:
+			events += 1
+	assert_eq(events, 18)
+	assert_eq(fortunes, 6)
+	assert_eq(catalog.visitors.size(), 6)
+	for visitor: AdvisorDef in catalog.visitors:
+		assert_eq(visitor.special, AdvisorDef.Special.VISITATORE, "%s è un visitatore" % visitor.id)
+		assert_true(categories.has(visitor.category_name), "La sfera di %s è una categoria" % visitor.id)

@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_mercantile.tres" id="e4"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+oro = 4
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Fiera delle meraviglie"
+description = "Paghi 4 Oro, ricevi un edificio Economico dell'era a caso (se c'è spazio)."
+cost = SubResource("RA_2")
+give_random = true
+give_random_kind = 1
+give_random_types = Array[StringName]([&"Economico"])
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+influenza = 2
+
+[sub_resource type="Resource" id="RA_5"]
+script = ExtResource("e3")
+oro = 5
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Banchi per tutti"
+description = "Paghi 2 Influenza, ricevi 5 Oro."
+cost = SubResource("RA_4")
+gain = SubResource("RA_5")
+
+[sub_resource type="Resource" id="RA_7"]
+script = ExtResource("e3")
+oro = 2
+influenza = 2
+
+[sub_resource type="Resource" id="OPT_6"]
+script = ExtResource("e2")
+label = "Le strade portano mercanti"
+description = "Ricevi 2 Oro e 2 Influenza."
+requires_types = Array[StringName]([&"Infrastruttura Strategica"])
+gain = SubResource("RA_7")
+
+[resource]
+script = ExtResource("e1")
+id = &"grande_fiera"
+display_name = "La grande fiera"
+description = "Mercanti da ogni regione arrivano per la fiera."
+sphere = "Ricchezza"
+color = &"verde"
+favored_by = Array[Resource]([ExtResource("e4")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6")])

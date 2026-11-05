@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+pietra = 5
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Costruiscila"
+description = "Paghi 5 Pietra: +1 spazio edificio."
+cost = SubResource("RA_2")
+extra_building_slots = 1
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+pietra = 2
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Rimandala"
+description = "Ricevi 2 Pietra."
+gain = SubResource("RA_4")
+
+[sub_resource type="Resource" id="RA_6"]
+script = ExtResource("e3")
+pietra = 3
+
+[sub_resource type="Resource" id="OPT_5"]
+script = ExtResource("e2")
+label = "Ingegneri esperti"
+description = "Paghi 3 Pietra: +1 spazio edificio."
+requires_types = Array[StringName]([&"Infrastruttura Strategica"])
+cost = SubResource("RA_6")
+extra_building_slots = 1
+
+[resource]
+script = ExtResource("e1")
+id = &"grande_opera"
+display_name = "La grande opera"
+description = "Gli architetti propongono un'opera che resterà nei secoli."
+sphere = "Opera"
+color = &"rosso"
+min_era = 3
+max_era = 3
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_5")])

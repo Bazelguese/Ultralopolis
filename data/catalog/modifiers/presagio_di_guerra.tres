@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_mod"]
+
+[resource]
+script = ExtResource("1_mod")
+id = &"presagio_di_guerra"
+display_name = "Presagio di guerra"
+description = "Fino al prossimo scontro con il fantasma le truppe ricaricano il 10% più in fretta."
+is_malus = false
+effect = 3
+amount = -10
+duration_kind = 1

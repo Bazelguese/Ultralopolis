@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="1_opp"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ra"]
+
+[sub_resource type="Resource" id="Resource_gain"]
+script = ExtResource("2_ra")
+influenza = 3
+
+[resource]
+script = ExtResource("1_opp")
+id = &"dono_diplomatico"
+display_name = "Dono diplomatico"
+description = "L'ambasciatore porta doni: ricevi subito 3 Influenza."
+kind = 4
+gain_resources = SubResource("Resource_gain")

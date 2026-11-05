@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/disgelo.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="e6"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+pietra = 2
+
+[sub_resource type="Resource" id="RA_3"]
+script = ExtResource("e3")
+ferro = 3
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Spala la neve"
+description = "Paghi 2 Pietra, ricevi 3 Ferro."
+cost = SubResource("RA_2")
+gain = SubResource("RA_3")
+
+[sub_resource type="Resource" id="OPT_4"]
+script = ExtResource("e2")
+label = "Aspetta il disgelo"
+description = "Per un anno la Capitale produce 1 Pietra in più."
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_6"]
+script = ExtResource("e3")
+ferro = 2
+
+[sub_resource type="Resource" id="OPT_5"]
+script = ExtResource("e2")
+label = "Le guardie aprono la strada"
+description = "Ricevi 2 Ferro."
+requires_types = Array[StringName]([&"Guardiano"])
+gain = SubResource("RA_6")
+
+[resource]
+script = ExtResource("e1")
+id = &"passo_innevato"
+display_name = "Il passo innevato"
+description = "La neve ha chiuso il passo che porta alle miniere."
+sphere = "Opera"
+color = &"rosso"
+favored_by = Array[Resource]([ExtResource("e6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_5")])

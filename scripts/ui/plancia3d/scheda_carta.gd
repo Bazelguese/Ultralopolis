@@ -208,12 +208,53 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 		AdvisorDef.Special.ANZIANO:
 			scheda.riga = "Perk · neutri"
 			righe.append("Ignora il tema del round. Potenzia: solo edifici neutri, una volta all'anno, in Oro.")
+		AdvisorDef.Special.VISITATORE:
+			scheda.sopratitolo = "Visitatore · %s" % consigliere.category_name
+			scheda.riga = "Di passaggio"
+			righe.append("Ignora il tema del round. Non potenzia; si rinnova solo in Oro.")
 		_:
 			scheda.riga = "Potenzia: %s" % run.advisor_resource_text(consigliere)
 			righe.append("Tipi: %s." % ", ".join(consigliere.types))
 			righe.append("Potenzia e rinnovo con: %s." % run.advisor_resource_text(consigliere))
 	scheda.costo = "Ascolta"
 	scheda.dettagli = "\n".join(righe)
+	return scheda
+
+
+## Un Evento o una Fortuna fra le carte del round (GDD §4.2.5).
+static func da_evento(run: RunState, evento: EventDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.CONSIGLIERE
+	scheda.id = evento.id
+	scheda.titolo = evento.display_name
+	scheda.colore_consigliere = evento.color
+	var fortuna: bool = evento.family == EventDef.Family.FORTUNA
+	scheda.sopratitolo = "%s · %s" % ["Fortuna" if fortuna else "Evento", evento.sphere]
+	scheda.illustrazione = _carica("eventi/%s.png" % evento.id)
+	scheda.riga = "Un dono" if fortuna else "%d scelte" % evento.options.size()
+	var righe: PackedStringArray = PackedStringArray()
+	righe.append(evento.description)
+	for opzione: EventOptionDef in evento.options:
+		var requisito: String = run.option_requirement(opzione)
+		righe.append("• %s%s" % ["[%s] " % requisito if requisito != "" else "", opzione.label])
+	righe.append("Ignora il tema del round. Sceglierlo è la scelta del round.")
+	scheda.costo = "Scegli"
+	scheda.dettagli = "\n".join(righe)
+	return scheda
+
+
+## Un'opzione dell'evento scelto: se è bloccata la carta è spenta e dice perché (principio P4).
+static func da_opzione(run: RunState, opzione: EventOptionDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.AZIONE
+	scheda.titolo = opzione.label
+	var requisito: String = run.option_requirement(opzione)
+	scheda.sopratitolo = requisito if requisito != "" else "Opzione"
+	scheda.riga = opzione.description
+	scheda.costo = opzione.cost.describe() if opzione.cost != null and not opzione.cost.is_empty() else "gratis"
+	var motivo: String = run.option_block_reason(opzione)
+	scheda.disponibile = motivo == ""
+	scheda.dettagli = opzione.description if motivo == "" else "%s\nNon disponibile: %s" % [opzione.description, motivo]
 	return scheda
 
 

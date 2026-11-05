@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.22
+## Game Design Document — v0.23
 
 **Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -183,7 +183,7 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 
 | Regola | Stato |
 |---|---|
-| In ogni round compaiono **3 consiglieri** pescati a caso, diversi fra loro | Confermato |
+| In ogni round compaiono **3 consiglieri** pescati a caso, diversi fra loro; al massimo uno può essere sostituito da un Evento, un Visitatore o una Fortuna (§4.2.5) | Confermato (v0.23) |
 | Il giocatore ne sceglie **uno**; la scelta è definitiva per il round | Confermato |
 | Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato |
 | Il pool di un consigliere è dato dalla sua **categoria** (§4.2.4): propone gli edifici e le truppe che hanno almeno un tipo della categoria | Confermato (v0.22) |
@@ -266,6 +266,25 @@ Una **categoria** è un insieme di tipi (§6.6) ed è il campo di un consigliere
 Categorie e tipi: Confermato nella struttura, nomi placeholder. Fante sta anche in Ricchezza perché i soldati si possono comprare (mercenari). Ombra rappresenta i servizi segreti, che fanno il lavoro sporco: per questo propone anche infrastrutture belliche e strategiche.
 
 Nota per il catalogo: un tipo presente in molte categorie rende le sue carte “comuni” (le propongono e le potenziano molti consiglieri); un tipo presente in una sola categoria le rende “mirate”. Dare un tipo a una carta significa decidere quali consiglieri la propongono.
+
+#### 4.2.5 Eventi, Visitatori e Fortune — Confermato (modifica del nucleo, v0.23)
+
+Nei round, oltre ai consiglieri, possono comparire carte di altre famiglie, legate alla vita della nazione come in un GDR. Gli effetti usano solo il linguaggio del nucleo (risorse, carte, livelli, spazi, modificatori, spionaggio; P5).
+
+| Regola | Stato |
+|---|---|
+| Famiglie: **Evento** (un testo e 2-3 opzioni), **Visitatore** (un consigliere di passaggio con le sue proposte e i suoi prezzi), **Fortuna** (un dono semplice). Altre famiglie legate al GDR restano possibili | Confermato |
+| Compaiono **al posto di un consigliere**: al massimo una per round | Confermato |
+| Compaiono con una probabilità scritta nei dati (in media 1 round su 3); fra le famiglie si pesca con pesi scritti nei dati (Eventi 5, Visitatori 3, Fortune 2) | Confermato; valori placeholder |
+| Ignorano il tema del round, come Clown e Anziano. Sceglierle è la scelta del round, definitiva; si può sempre passare | Confermato |
+| Non offrono Potenzia (un'opzione può però potenziare una carta); un Visitatore si rinnova solo in Oro | Confermato |
+| Un Evento compare una sola volta per run, salvo quelli ripetibili; Visitatori e Fortune possono tornare, ma non nello stesso anno | Confermato |
+| Ogni carta ha una **sfera**: una delle 8 categorie (§4.2.4), che ne dà il tema e la cornice | Confermato |
+| Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo) | Confermato |
+| Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una carta con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione senza requisiti | Confermato |
+| Nessun evento arriva da solo senza essere scelto | Confermato per ora (gli eventi forzati sono uno spunto, Parte III) |
+
+Il catalogo del prototipo (18 eventi, 6 fortune, 6 visitatori) è in `docs/Catalogo.md`.
 
 ### 4.3 Incanto — Confermato (v0.21), valori placeholder
 
@@ -865,6 +884,8 @@ Origini possibili: sviluppo economico, ingresso in una nuova era, decisioni poli
 
 Gli incontri del mondo (§3.3) sono la prima forma concreta di evento: inizialmente scontri automatici, in futuro anche eventi a scelta.
 
+Dalla v0.23 gli **eventi a scelta** esistono nei round del Consiglio (§4.2.5): compaiono al posto di un consigliere, dipendono dall'identità e dalla plancia, e le loro opzioni possono lasciare modificatori (§13.2).
+
 ### 13.2 Conseguenze persistenti
 
 Un effetto avversario o un evento può lasciare un modificatore per uno o più anni. Le conseguenze seguono P1: cambiano il modo di giocare per un periodo, senza debilitare pesantemente.
@@ -935,6 +956,10 @@ Idee annotate per il futuro. Non vanno implementate nella base; la base non deve
 | Spunto | Origine | Nota per l’introduzione |
 |---|---|---|
 | Truppa che elimina una truppa avversaria (Uccidi) | Creatore | Troppo forte all’inizio. Richiede regole su elementi eliminati, oggi assenti: è una modifica del nucleo. Candidata per ere avanzate (P2). |
+| Eventi forzati: arrivano da soli e chiedono solo come reagire | Creatore (v0.23) | Per ora no; dovranno rispettare P1 e P4 (§4.2.5). |
+| Catene di eventi: una scelta sblocca un evento negli anni successivi | Proposta di Claude (v0.23) | Richiede che la nazione ricordi le scelte fatte. |
+| Personaggi ricorrenti: un visitatore che torna e ricorda i rapporti avuti | Proposta di Claude (v0.23) | Come le catene, con un nome proprio. |
+| Tratti acquisiti: un evento lascia un tratto permanente che diventa parte dell'identità | Proposta di Claude (v0.23) | Primo passo verso riforme e conversioni (§9.1). |
 | Malus che porta il nome della nazione che lo ha inflitto | Creatore | Non sempre presente: effetto speciale di certi perk o abilità legati a razza e identità. Usa il campo Origine (§8.2). |
 | Eventi a scelta con testo e opzioni | Creatore | Seconda forma degli incontri del mondo, dopo gli scontri automatici. |
 | Diplomazia come accordi o diserzioni | Creatore | Vedi §13.3. |
@@ -959,7 +984,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Due macrofasi con raccolta automatica all’ingresso e 5 round del Consiglio ciascuna (§4.2): nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio.
+- Due macrofasi con raccolta automatica all’ingresso e 5 round del Consiglio ciascuna (§4.2): nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
 - Riordino delle truppe fuori dal combattimento.
@@ -1049,6 +1074,12 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se si arriva alla creazione da Gioca (nessuna nazione salvata), dopo il salvataggio si torna alla lista delle nazioni | Provvisoria. |
 | Tasso del mercato: 2 unità di una risorsa → 1 Oro, uguale per tutte | Placeholder. |
 | Ogni uso di Potenzia sale di un livello | Provvisoria (v0.22). |
+| Carte speciali del round: probabilità 33% per round; pesi Eventi 5, Visitatori 3, Fortune 2; la carta speciale prende il posto dell'ultimo consigliere pescato | Placeholder (v0.23). |
+| Un evento conta come “comparso” appena viene pescato, anche se non lo si sceglie | Provvisoria (v0.23). |
+| Fortune: il dono si moltiplica per l'era corrente | Placeholder (v0.23). |
+| Edifici e truppe regalati da un evento entrano solo se c'è spazio e valgono il prezzo di catalogo per la vendita | Provvisoria (v0.23). |
+| Contrabbandiere: richiede una carta Criminale sulla plancia ed è favorito dalla Via dell'Ombra (le radici non permettono ancora “una cosa oppure l'altra”) | Provvisoria (v0.23). |
+| Valori di eventi, fortune e visitatori (costi, doni, prezzi): vedi `docs/Catalogo.md` | Placeholder (v0.23). |
 | Costo di Potenzia: livello 2 = 2 × era della carta, livello 3 = 3 × era, in unità della risorsa della categoria; il Maestro delle spie chiede la stessa quantità di Oro e della risorsa casuale; l’Anziano chiede Oro | Placeholder (v0.22). |
 | La Capitale non si potenzia: il suo tipo (Capitale) non sta in nessuna categoria | Accettata dal creatore per ora (v0.22). |
 | In un round Misto almeno una proposta è un’azione, se il consigliere ne ha | Provvisoria (v0.22). |
@@ -1131,6 +1162,12 @@ Criteri di accettazione proposti per il prototipo:
 | Potenzia | Sale di livello una carta con almeno un tipo della categoria del consigliere; non consuma la scelta; una sola volta per round; non compare senza carte valide o con tutte al massimo. |
 | Potenzia dell’Anziano | Solo edifici neutri, una volta all’anno; il Clown non lo offre. |
 | Fuori dal Consiglio | Non si può potenziare (salvo eventi e ricompense). |
+| Carta speciale nel round | Al massimo una fra le carte del round, al posto di un consigliere; con probabilità 0 compaiono solo consiglieri. |
+| Evento | Compare una sola volta per run; scegliendo un'opzione se ne paga il costo, se ne ricevono gli effetti e il round si chiude. |
+| Opzione bloccata | Si vede, spenta, con il requisito; non si può prendere finché il requisito manca. |
+| Radici | Una carta con “richiede” compare solo a chi ha il requisito; una carta favorita esce più spesso. |
+| Fortuna | Non torna nello stesso anno; il dono cresce con l'era. |
+| Visitatore | Propone anche esclusivi di altre nazioni e carte dell'era successiva ai suoi prezzi; non potenzia; si rinnova solo in Oro. |
 | Costo di Potenzia | Si paga con la risorsa della categoria del consigliere. |
 | Potenzia di Ombra | Costa Oro più la risorsa casuale, visibile prima di scegliere il consigliere; con lo stesso seme è sempre la stessa. |
 | Tema del round | Un round Edifici propone solo edifici, Truppe solo truppe, Azioni solo azioni; Clown e Anziano fanno eccezione. |
@@ -1168,6 +1205,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Tipo | Caratteristica di un edificio o di una truppa che decide quali consiglieri lo propongono e lo potenziano e a quali perk risponde (§6.6). Sostituisce le etichette. |
 | Categoria | Insieme di tipi che forma il campo di un consigliere (§4.2.4). |
 | Potenzia | Opzione dei consiglieri che porta di livello una carta senza consumare la scelta del round (§6.5). |
+| Evento | Carta del round con un testo e 2-3 opzioni, alcune sbloccate dalla nazione (§4.2.5). |
+| Visitatore | Consigliere di passaggio con proposte e prezzi propri (§4.2.5). |
+| Fortuna | Carta del round con un dono semplice (§4.2.5). |
+| Radici | Ciò che fa comparire una carta speciale o la rende più frequente (§4.2.5). |
 | Incontro del mondo | Minaccia o evento dell’anno (es. barbari, pirati); inizialmente uno scontro contro una plancia generata. |
 | Plancia generata | Plancia avversaria creata dal gioco per un incontro del mondo. |
 | Magazzino | Riserva persistente di tutte le risorse (§5.3). |
@@ -1190,6 +1231,12 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.23 — 5 novembre 2026** (modifica del nucleo)
+- Nei round possono comparire **Eventi**, **Visitatori** e **Fortune** al posto di un consigliere: al massimo una carta per round, in media 1 round su 3 (§4.2.5).
+- Ogni carta ha una **sfera** (una delle 8 categorie) e delle **radici** (identità, vie, era, tipi sulla plancia, stato della nazione); le opzioni degli eventi possono essere sbloccate dalla nazione e quelle bloccate restano visibili (§4.2.5).
+- Primo catalogo: 18 eventi, 6 fortune, 6 visitatori, tutti placeholder (Catalogo).
+- Nuovi spunti: eventi forzati, catene di eventi, personaggi ricorrenti, tratti acquisiti (Parte III).
 
 **v0.22 — 5 novembre 2026** (modifica del nucleo)
 - Le etichette diventano **tipi**: un’unica lista per edifici e truppe; Tiratori e Cavalleria non esistono più (§6.6).

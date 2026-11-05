@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/presagio_di_guerra.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="e6"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+fede = 3
+
+[sub_resource type="Resource" id="RA_3"]
+script = ExtResource("e3")
+oro = 5
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Rito di riparazione"
+description = "Paghi 3 Fede, ricevi 5 Oro."
+cost = SubResource("RA_2")
+gain = SubResource("RA_3")
+
+[sub_resource type="Resource" id="OPT_4"]
+script = ExtResource("e2")
+label = "Presagio di guerra"
+description = "Fino al prossimo fantasma le truppe ricaricano il 10% più in fretta."
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_6"]
+script = ExtResource("e3")
+ricerca = 3
+
+[sub_resource type="Resource" id="OPT_5"]
+script = ExtResource("e2")
+label = "Gli astronomi la spiegano"
+description = "Ricevi 3 Ricerca."
+requires_types = Array[StringName]([&"Accademico"])
+gain = SubResource("RA_6")
+
+[resource]
+script = ExtResource("e1")
+id = &"eclissi"
+display_name = "L'eclissi"
+description = "Il sole si oscura a mezzogiorno e il popolo ha paura."
+sphere = "Fede"
+color = &"blu"
+favored_by = Array[Resource]([ExtResource("e6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_5")])

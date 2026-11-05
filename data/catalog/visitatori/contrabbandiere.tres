@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="v1"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_ombra.tres" id="v2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="v3"]
+
+[sub_resource type="Resource" id="Resource_extra"]
+script = ExtResource("v3")
+documenti = 1
+
+[resource]
+script = ExtResource("v1")
+id = &"contrabbandiere"
+display_name = "Contrabbandiere"
+special = 3
+color = &"viola"
+category_name = "Ombra"
+description = "Merce che non dovrebbe esistere: carte Criminali ed esclusive di altre nazioni, a 1 Oro in meno ma con 1 Documenti in più. Arriva solo da chi ha già carte Criminali."
+types = Array[StringName]([&"Criminale"])
+favored_by = Array[Resource]([ExtResource("v2")])
+requires_types = Array[StringName]([&"Criminale"])
+foreign_exclusives = 2
+price_extra = -1
+extra_cost = SubResource("Resource_extra")

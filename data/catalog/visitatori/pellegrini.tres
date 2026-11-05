@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="v1"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="v2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_danno.tres" id="v3"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_scudo.tres" id="v4"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_cura.tres" id="v5"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_corruzione.tres" id="v6"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_inefficienza.tres" id="v7"]
+[ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="v8"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="v9"]
+[ext_resource type="Resource" path="res://data/catalog/identita/antichi_spiriti.tres" id="v10"]
+[ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="v11"]
+
+[resource]
+script = ExtResource("v1")
+id = &"pellegrini"
+display_name = "Pellegrini"
+special = 3
+color = &"blu"
+category_name = "Fede"
+description = "In cammino verso i santuari: offrono incanti ed elementi Spirituali dell'era."
+types = Array[StringName]([&"Spirituale"])
+actions = Array[ExtResource("v2")]([ExtResource("v3"), ExtResource("v4"), ExtResource("v5"), ExtResource("v6"), ExtResource("v7")])
+favored_by = Array[Resource]([ExtResource("v8"), ExtResource("v9"), ExtResource("v10"), ExtResource("v11")])

@@ -124,6 +124,37 @@
 [ext_resource type="Resource" path="res://data/catalog/troops/contrabbandieri.tres" id="nt2_0"]
 [ext_resource type="Resource" path="res://data/catalog/troops/avvelenatori.tres" id="nt2_1"]
 [ext_resource type="Resource" path="res://data/catalog/troops/lame_nere.tres" id="nt2_2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="ev_script"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/banditi_sulla_strada.tres" id="ev_0"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/biblioteca_ritrovata.tres" id="ev_1"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/bosco_che_sussurra.tres" id="ev_2"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/bottino_dimenticato.tres" id="ev_3"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/cervo_bianco.tres" id="ev_4"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/concilio_dei_sacerdoti.tres" id="ev_5"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/congiura_a_corte.tres" id="ev_6"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/disputa_dei_dotti.tres" id="ev_7"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/eclissi.tres" id="ev_8"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/elezioni.tres" id="ev_9"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/erede_al_trono.tres" id="ev_10"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/esuli.tres" id="ev_11"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/febbre_nei_quartieri.tres" id="ev_12"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/festa_del_popolo.tres" id="ev_13"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/grande_fiera.tres" id="ev_14"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/grande_opera.tres" id="ev_15"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/inverno_lungo.tres" id="ev_16"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/manoscritto_perduto.tres" id="ev_17"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/passo_innevato.tres" id="ev_18"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/piena_del_fiume.tres" id="ev_19"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/raccolto_abbondante.tres" id="ev_20"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/torneo.tres" id="ev_21"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/vena_d_argento.tres" id="ev_22"]
+[ext_resource type="Resource" path="res://data/catalog/eventi/visione_sacra.tres" id="ev_23"]
+[ext_resource type="Resource" path="res://data/catalog/visitatori/ambasciatore_straniero.tres" id="vi_0"]
+[ext_resource type="Resource" path="res://data/catalog/visitatori/compagnia_di_ventura.tres" id="vi_1"]
+[ext_resource type="Resource" path="res://data/catalog/visitatori/contrabbandiere.tres" id="vi_2"]
+[ext_resource type="Resource" path="res://data/catalog/visitatori/inventore_errante.tres" id="vi_3"]
+[ext_resource type="Resource" path="res://data/catalog/visitatori/mercanti_del_delta.tres" id="vi_4"]
+[ext_resource type="Resource" path="res://data/catalog/visitatori/pellegrini.tres" id="vi_5"]
 
 [resource]
 script = ExtResource("34_2n8s1")
@@ -135,3 +166,5 @@ encounters = Array[ExtResource("16_eg6f4")]([ExtResource("17_p5yub"), ExtResourc
 identities = Array[ExtResource("34_uymuy")]([ExtResource("35_tye5o"), ExtResource("36_2n8s1"), ExtResource("37_fp2ii"), ExtResource("38_03c6b"), ExtResource("39_rvnac"), ExtResource("40_cd6s8"), ExtResource("41_hkuyl"), ExtResource("42_7tkbw"), ExtResource("43_rht80"), ExtResource("44_ynrp2"), ExtResource("45_v1cj4"), ExtResource("46_dt2h5"), ExtResource("47_nc1ak"), ExtResource("48_hcct1"), ExtResource("49_6hmn4"), ExtResource("50_f4eue"), ExtResource("51_ifash"), ExtResource("52_wu0fy"), ExtResource("58_cd6s8"), ExtResource("68_1w4xj"), ExtResource("69_wrjoy"), ExtResource("70_jdf2v"), ExtResource("71_h1k3v")])
 generator = ExtResource("35_hkuyl")
 advisors = Array[ExtResource("adv_script")]([ExtResource("adv_0"), ExtResource("adv_1"), ExtResource("adv_2"), ExtResource("adv_3"), ExtResource("adv_4"), ExtResource("adv_5"), ExtResource("adv_6"), ExtResource("adv_7"), ExtResource("adv_8"), ExtResource("adv_9")])
+events = Array[ExtResource("ev_script")]([ExtResource("ev_0"), ExtResource("ev_1"), ExtResource("ev_2"), ExtResource("ev_3"), ExtResource("ev_4"), ExtResource("ev_5"), ExtResource("ev_6"), ExtResource("ev_7"), ExtResource("ev_8"), ExtResource("ev_9"), ExtResource("ev_10"), ExtResource("ev_11"), ExtResource("ev_12"), ExtResource("ev_13"), ExtResource("ev_14"), ExtResource("ev_15"), ExtResource("ev_16"), ExtResource("ev_17"), ExtResource("ev_18"), ExtResource("ev_19"), ExtResource("ev_20"), ExtResource("ev_21"), ExtResource("ev_22"), ExtResource("ev_23")])
+visitors = Array[ExtResource("adv_script")]([ExtResource("vi_0"), ExtResource("vi_1"), ExtResource("vi_2"), ExtResource("vi_3"), ExtResource("vi_4"), ExtResource("vi_5")])

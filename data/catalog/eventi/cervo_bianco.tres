@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Resource" path="res://data/catalog/identita/popolo_delle_foreste.tres" id="e4"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+cibo = 3
+legno = 1
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Caccialo"
+description = "Ricevi 3 Cibo e 1 Legno."
+gain = SubResource("RA_2")
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+fede = 2
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Lascialo libero"
+description = "Ricevi 2 Fede."
+gain = SubResource("RA_4")
+
+[sub_resource type="Resource" id="OPT_5"]
+script = ExtResource("e2")
+label = "Addomesticalo"
+description = "Una tua truppa Fauna sale di un livello."
+requires_types = Array[StringName]([&"Fauna"])
+requires_kind = 2
+requirement_label = "truppa Fauna"
+upgrade = true
+upgrade_types = Array[StringName]([&"Fauna"])
+upgrade_kind = 2
+
+[resource]
+script = ExtResource("e1")
+id = &"cervo_bianco"
+display_name = "Il cervo bianco"
+description = "I cacciatori hanno avvistato un cervo bianco nel bosco."
+sphere = "Terra"
+color = &"verde"
+favored_by = Array[Resource]([ExtResource("e4")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_5")])

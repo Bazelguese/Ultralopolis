@@ -119,6 +119,14 @@ var elder_upgrades_used: int = 0
 var offers: Array[Offer] = []
 ## Aumento accumulato del costo di rinnovo (GDD §4.2).
 var reroll_extra: int = 0
+## Evento o Fortuna fra le carte del round, al posto di un consigliere (GDD §4.2.5); null se non c'è.
+var event_choice: EventDef
+## Evento o Fortuna scelti in questo round.
+var chosen_event: EventDef
+## Eventi già comparsi nella run: un evento compare una sola volta, salvo i ripetibili.
+var seen_events: Array[StringName] = []
+## Visitatori e Fortune già comparsi quest'anno: non tornano nello stesso anno.
+var seen_this_year: Array[StringName] = []
 ## Effetti dello spionaggio per il prossimo scontro con il fantasma (GDD §12):
 ## [effetto, indice dell'elemento del fantasma, millisecondi], come BattleSideSetup.start_timer_effects.
 var spy_effects: Array[Array] = []
@@ -256,6 +264,8 @@ func advisor_resource_text(advisor: AdvisorDef) -> String:
 			return "nessuna: il Clown non potenzia"
 		AdvisorDef.Special.ANZIANO:
 			return "Oro"
+		AdvisorDef.Special.VISITATORE:
+			return "nessuna: i visitatori non potenziano"
 	if advisor.random_resource:
 		return "%s + %s" % [Res.NAMES[advisor.upgrade_resource], Res.NAMES[shadow_resource]]
 	return Res.NAMES[advisor.upgrade_resource]
@@ -385,7 +395,7 @@ static func is_neutral_building(def: BuildingDef) -> bool:
 ## Costo di Potenzia con il consigliere scelto: la quantità dipende dal livello e dall'era della
 ## carta, la risorsa dal consigliere (GDD §4.2.4). null se il consigliere non potenzia.
 func upgrade_cost_of(piece: BoardPiece) -> ResourceAmounts:
-	if chosen_advisor == null or chosen_advisor.special == AdvisorDef.Special.CLOWN:
+	if chosen_advisor == null or chosen_advisor.special in [AdvisorDef.Special.CLOWN, AdvisorDef.Special.VISITATORE]:
 		return null
 	if piece.level >= run_rules.max_level:
 		return null
@@ -412,12 +422,16 @@ func upgrade_block_reason(piece: BoardPiece) -> String:
 	if not way_choices.is_empty():
 		return "Prima scegli la via della nazione."
 	if chosen_advisor == null:
+		if chosen_event != null:
+			return "In questo round hai scelto un evento: Potenzia è un'opzione dei consiglieri."
 		return "Scegli prima un consigliere: Potenzia è una delle sue opzioni."
 	if piece.level >= run_rules.max_level:
 		return "Già al livello massimo."
 	match chosen_advisor.special:
 		AdvisorDef.Special.CLOWN:
 			return "Il Clown non potenzia."
+		AdvisorDef.Special.VISITATORE:
+			return "I visitatori non potenziano."
 		AdvisorDef.Special.ANZIANO:
 			if not is_neutral_building(piece.building):
 				return "L'Anziano potenzia solo gli edifici neutri."
@@ -645,8 +659,8 @@ func make_battle_replay() -> BattleSim:
 func choose_advisor(index: int) -> bool:
 	if not _require_shopping():
 		return false
-	if chosen_advisor != null:
-		return _fail("Hai già scelto il consigliere di questo round.")
+	if chosen_advisor != null or chosen_event != null:
+		return _fail("Hai già fatto la scelta di questo round.")
 	if index < 0 or index >= advisor_choices.size():
 		return _fail("Consigliere non valido.")
 	chosen_advisor = advisor_choices[index]
@@ -668,6 +682,10 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 		return _fail("Proposta non valida.")
 	var offer: Offer = offers[offer_index]
 	var source: String = offer.opportunity.display_name if offer.opportunity != null else chosen_advisor.display_name
+	# Un visitatore può chiedere, oltre all'Oro, un'altra risorsa per le sue carte (GDD §4.2.5).
+	var element_extra: ResourceAmounts = offer.other_cost if offer.is_element() else null
+	if element_extra != null and not can_pay(element_extra):
+		return _fail("Risorse insufficienti (servono %s)." % offer.cost_text())
 
 	match offer.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
@@ -757,6 +775,9 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			if not _pay(offer):
 				return false
 			_adopt_identity(offer.perk)
+	if element_extra != null:
+		for type: Res.Type in Res.NAMES:
+			stock[type] -= element_extra.internal(type)
 	_next_round()
 	return true
 
@@ -768,6 +789,208 @@ func pass_round() -> bool:
 	_log("Round %d lasciato passare." % round_number)
 	_next_round()
 	return true
+
+
+# --- Eventi e Fortune (GDD §4.2.5, v0.23) ------------------------------------------
+
+## Sceglie l'Evento o la Fortuna del round: come un consigliere, la scelta è definitiva.
+func choose_event() -> bool:
+	if not _require_shopping():
+		return false
+	if chosen_advisor != null or chosen_event != null:
+		return _fail("Hai già fatto la scelta di questo round.")
+	if event_choice == null:
+		return _fail("In questo round non c'è nessun evento.")
+	chosen_event = event_choice
+	_log("Round %d: %s." % [round_number, chosen_event.display_name])
+	return true
+
+
+## Opzioni dell'evento scelto (una sola per le Fortune).
+func event_options() -> Array[EventOptionDef]:
+	return chosen_event.options if chosen_event != null else []
+
+
+## Requisito di un'opzione, es. "Spirituale" o "Repubblica"; vuoto se non ne ha.
+func option_requirement(option: EventOptionDef) -> String:
+	if option.requirement_label != "":
+		return option.requirement_label
+	var parts: PackedStringArray = PackedStringArray()
+	for element: Resource in option.requires_identity:
+		parts.append((element as IdentityDef).display_name)
+	for card_type: StringName in option.requires_types:
+		parts.append(String(card_type))
+	return " o ".join(parts)
+
+
+## Perché l'opzione non si può scegliere adesso; stringa vuota se si può (principio P4).
+func option_block_reason(option: EventOptionDef) -> String:
+	if not option.requires_identity.is_empty():
+		var found: bool = false
+		for element: Resource in option.requires_identity:
+			if identity.has(element):
+				found = true
+		if not found:
+			return "Richiede: %s." % option_requirement(option)
+	if not option.requires_types.is_empty() and _pieces_with(option.requires_types, option.requires_kind).is_empty():
+		return "Serve una carta %s sulla plancia." % option_requirement(option)
+	if option.cost != null and not can_pay(option.cost):
+		return "Risorse insufficienti (servono %s)." % option.cost.describe()
+	if option.upgrade and _option_upgrade_candidates(option).is_empty():
+		return "Nessuna carta da potenziare."
+	if _option_troop_modifier(option) and board.troops.is_empty():
+		return "Nessuna truppa a cui applicarlo."
+	if option.spy != null and _spy_candidates(option.spy).is_empty():
+		return "Il fantasma non ha un bersaglio adatto."
+	return ""
+
+
+## Voci fra cui scegliere per un'opzione (la carta da potenziare o la truppa del modificatore).
+func option_choices(option: EventOptionDef) -> Array[String]:
+	var labels: Array[String] = []
+	var pieces: Array[BoardPiece] = _option_choice_pieces(option)
+	if pieces.size() > 1:
+		for piece: BoardPiece in pieces:
+			labels.append(piece.display_name())
+	return labels
+
+
+## Prende un'opzione dell'evento scelto, ne paga il costo, applica gli effetti e chiude il round.
+func take_event_option(index: int, choice: int = -1) -> bool:
+	if not _require_shopping():
+		return false
+	if chosen_event == null:
+		return _fail("Scegli prima l'evento.")
+	var options: Array[EventOptionDef] = event_options()
+	if index < 0 or index >= options.size():
+		return _fail("Opzione non valida.")
+	var option: EventOptionDef = options[index]
+	var reason: String = option_block_reason(option)
+	if reason != "":
+		return _fail(reason)
+	var pieces: Array[BoardPiece] = _option_choice_pieces(option)
+	if pieces.size() == 1:
+		choice = 0
+	if not pieces.is_empty() and (choice < 0 or choice >= pieces.size()):
+		return _fail("Scegli su quale carta applicarla.")
+	var chosen_piece: BoardPiece = pieces[choice] if not pieces.is_empty() else null
+	var source: String = chosen_event.display_name
+	if option.cost != null:
+		for type: Res.Type in Res.NAMES:
+			stock[type] -= option.cost.internal(type)
+	if option.gain != null:
+		var scale: int = era if chosen_event.scale_with_era else 1
+		for type: Res.Type in Res.NAMES:
+			stock[type] += option.gain.internal(type) * scale
+	for def: ModifierDef in option.modifiers:
+		var target: BoardPiece = chosen_piece if def.target in [ModifierDef.Target.TRUPPA_SCELTA, ModifierDef.Target.EDIFICIO_SCELTO] else null
+		_log(modifiers.apply(def, ActiveModifier.OriginKind.EVENTO, source, year, board, _rng, target))
+	if option.give_building != null:
+		_gift_building(option.give_building)
+	if option.give_troop != null:
+		_gift_troop(option.give_troop)
+	if option.give_random:
+		_gift_random(option)
+	if option.upgrade and chosen_piece != null:
+		chosen_piece.level += 1
+		_log("%s: %s sale al livello %d." % [source, chosen_piece.display_name(), chosen_piece.level])
+	if option.extra_building_slots > 0:
+		board.base_building_slots += mini(option.extra_building_slots, maxi(0, board.max_building_slots - board.building_capacity()))
+	if option.extra_troop_slots > 0:
+		board.base_troop_slots += mini(option.extra_troop_slots, maxi(0, board.max_troop_slots - board.troop_capacity()))
+	if option.spy != null:
+		var effect: int = BattleSim.EFFECT_SABOTAGE if option.spy.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else BattleSim.EFFECT_SLOW
+		var spy_target: int = _spy_pick(option.spy)
+		spy_effects.append([effect, spy_target, option.spy.spy_ms])
+		_log("%s: %s partirà %s nello scontro con il fantasma." % [source, _ghost_element_name(spy_target), "sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato"])
+	_log("%s: %s." % [source, option.label])
+	_next_round()
+	return true
+
+
+## Elementi della plancia con almeno uno di questi tipi, del genere indicato.
+func _pieces_with(card_types: Array[StringName], kind: EventOptionDef.PieceKind) -> Array[BoardPiece]:
+	var found: Array[BoardPiece] = []
+	var pool: Array[BoardPiece] = []
+	if kind != EventOptionDef.PieceKind.TRUPPA:
+		pool.append_array(board.buildings)
+	if kind != EventOptionDef.PieceKind.EDIFICIO:
+		pool.append_array(board.troops)
+	for piece: BoardPiece in pool:
+		if card_types.is_empty():
+			found.append(piece)
+			continue
+		for card_type: StringName in piece_types(piece):
+			if card_types.has(card_type):
+				found.append(piece)
+				break
+	return found
+
+
+func _option_upgrade_candidates(option: EventOptionDef) -> Array[BoardPiece]:
+	var found: Array[BoardPiece] = []
+	for piece: BoardPiece in _pieces_with(option.upgrade_types, option.upgrade_kind):
+		if piece.level < run_rules.max_level:
+			found.append(piece)
+	return found
+
+
+func _option_troop_modifier(option: EventOptionDef) -> bool:
+	for def: ModifierDef in option.modifiers:
+		if def.target == ModifierDef.Target.TRUPPA_SCELTA:
+			return true
+	return false
+
+
+## Carte fra cui il giocatore sceglie per l'opzione: da potenziare, oppure la truppa del modificatore.
+func _option_choice_pieces(option: EventOptionDef) -> Array[BoardPiece]:
+	if option.upgrade:
+		return _option_upgrade_candidates(option)
+	if _option_troop_modifier(option):
+		return board.troops.duplicate()
+	return []
+
+
+## Edificio regalato da un evento: entra solo se c'è spazio e vale il suo prezzo di catalogo (§6.4).
+func _gift_building(def: BuildingDef) -> void:
+	if board.can_add_building(def):
+		board.buildings.append(BoardPiece.of_building(def, def.cost_gold))
+		_log("Ricevuto: %s." % def.display_name)
+	else:
+		_log("Nessuno spazio per %s." % def.display_name)
+
+
+func _gift_troop(def: TroopDef) -> void:
+	if board.has_free_troop_slot():
+		board.troops.append(BoardPiece.of_troop(def, def.cost_gold))
+		_log("Ricevuto: %s." % def.display_name)
+	else:
+		_log("Nessuno spazio per %s." % def.display_name)
+
+
+## Una carta a caso dell'era corrente con uno dei tipi dell'opzione.
+func _gift_random(option: EventOptionDef) -> void:
+	if option.give_random_kind == EventOptionDef.PieceKind.TRUPPA:
+		var troops: Array[TroopDef] = []
+		for def: TroopDef in _troops_of_era():
+			if option.give_random_types.is_empty() or _has_any_type(def.types, option.give_random_types):
+				troops.append(def)
+		if not troops.is_empty():
+			_gift_troop(troops[_rng.randi_range(0, troops.size() - 1)])
+	else:
+		var buildings: Array[BuildingDef] = []
+		for def: BuildingDef in _buildings_of_era():
+			if option.give_random_types.is_empty() or _has_any_type(def.types, option.give_random_types):
+				buildings.append(def)
+		if not buildings.is_empty():
+			_gift_building(buildings[_rng.randi_range(0, buildings.size() - 1)])
+
+
+static func _has_any_type(card_types: Array[StringName], wanted: Array[StringName]) -> bool:
+	for card_type: StringName in card_types:
+		if wanted.has(card_type):
+			return true
+	return false
 
 
 ## Ripesca le proposte del consigliere scelto. Si paga in Oro oppure, con with_resource,
@@ -825,6 +1048,8 @@ func advance_era() -> bool:
 ## Dopo un cambio d'era o di via: si ripescano le proposte del consigliere scelto, oppure,
 ## se non lo si è ancora scelto, i consiglieri del round (i loro pool sono cambiati).
 func _redraw_round() -> void:
+	if chosen_event != null:
+		return
 	if chosen_advisor != null:
 		_draw_offers()
 	else:
@@ -1026,6 +1251,7 @@ func _start_year(new_year: int) -> void:
 		_log(message)
 	elder_upgrades_used = 0
 	spy_effects = []
+	seen_this_year = []
 	# Il consumo di Cibo avviene a inizio anno, dall'anno 2 (GDD §5.4).
 	if year >= 2:
 		_feed_troops()
@@ -1074,6 +1300,8 @@ func _next_round() -> void:
 	offers = []
 	chosen_advisor = null
 	advisor_choices = []
+	event_choice = null
+	chosen_event = null
 	upgrade_used = false
 	if round_number > run_rules.rounds_per_half:
 		_end_shopping_phase()
@@ -1091,6 +1319,8 @@ func _end_shopping_phase() -> void:
 	offers = []
 	advisor_choices = []
 	chosen_advisor = null
+	event_choice = null
+	chosen_event = null
 	if phase == Phase.PRODUZIONE:
 		phase = Phase.SCELTA_INCONTRO
 		if encounter_choices.is_empty():
@@ -1118,10 +1348,115 @@ func _draw_advisors() -> void:
 		advisor_choices.append(pool[pick])
 		pool.remove_at(pick)
 		weights.remove_at(pick)
+	_draw_special_card()
 	for advisor: AdvisorDef in advisor_choices:
 		if advisor.random_resource:
 			shadow_resource = _draw_shadow_resource()
 			break
+
+
+## Con la probabilità delle regole, una delle carte del round è un Evento, un Visitatore o una
+## Fortuna al posto di un consigliere: al massimo una per round (GDD §4.2.5).
+func _draw_special_card() -> void:
+	event_choice = null
+	if catalog.events.is_empty() and catalog.visitors.is_empty():
+		return
+	if _rng.randi_range(1, 100) > run_rules.special_card_chance_percent:
+		return
+	var events: Array[EventDef] = _available_events(EventDef.Family.EVENTO)
+	var fortunes: Array[EventDef] = _available_events(EventDef.Family.FORTUNA)
+	var visitors: Array[AdvisorDef] = _available_visitors()
+	var families: Array[int] = []
+	var weights: Array[int] = []
+	if not events.is_empty() and run_rules.event_weight > 0:
+		families.append(0)
+		weights.append(run_rules.event_weight)
+	if not visitors.is_empty() and run_rules.visitor_weight > 0:
+		families.append(1)
+		weights.append(run_rules.visitor_weight)
+	if not fortunes.is_empty() and run_rules.fortune_weight > 0:
+		families.append(2)
+		weights.append(run_rules.fortune_weight)
+	if families.is_empty():
+		return
+	var family: int = families[_weighted_pick(weights)]
+	if advisor_choices.size() >= run_rules.advisors_per_round:
+		advisor_choices.pop_back()
+	if family == 1:
+		var visitor_weights: Array[int] = []
+		for visitor: AdvisorDef in visitors:
+			visitor_weights.append(_roots_weight(visitor.favored_by))
+		var visitor_pick: AdvisorDef = visitors[_weighted_pick(visitor_weights)]
+		advisor_choices.append(visitor_pick)
+		seen_this_year.append(visitor_pick.id)
+		return
+	var pool: Array[EventDef] = events if family == 0 else fortunes
+	var event_weights: Array[int] = []
+	for event: EventDef in pool:
+		event_weights.append(_roots_weight(event.favored_by))
+	event_choice = pool[_weighted_pick(event_weights)]
+	seen_events.append(event_choice.id)
+	seen_this_year.append(event_choice.id)
+
+
+## Eventi o Fortune che possono comparire adesso: radici soddisfatte, non già visti.
+func _available_events(family: EventDef.Family) -> Array[EventDef]:
+	var found: Array[EventDef] = []
+	for event: EventDef in catalog.events:
+		if event.family != family or seen_this_year.has(event.id):
+			continue
+		if family == EventDef.Family.EVENTO and not event.repeatable and seen_events.has(event.id):
+			continue
+		if not _roots_ok(event.requires_any, event.min_era, event.max_era, event.requires_types):
+			continue
+		if event.requires_stock != null and not can_pay(event.requires_stock):
+			continue
+		if event.requires_malus and modifiers.year_malus().is_empty():
+			continue
+		if event.options.is_empty():
+			continue
+		found.append(event)
+	return found
+
+
+func _available_visitors() -> Array[AdvisorDef]:
+	var found: Array[AdvisorDef] = []
+	for visitor: AdvisorDef in catalog.visitors:
+		if seen_this_year.has(visitor.id) or advisor_choices.has(visitor):
+			continue
+		if not _roots_ok(visitor.requires_any, visitor.min_era, visitor.max_era, visitor.requires_types):
+			continue
+		if _advisor_candidates(visitor).is_empty():
+			continue
+		found.append(visitor)
+	return found
+
+
+## Radici di una carta speciale (GDD §4.2.5): richiede almeno un elemento, ere, tipi sulla plancia.
+func _roots_ok(requires_any: Array[Resource], min_era: int, max_era: int, requires_types: Array[StringName]) -> bool:
+	if not requires_any.is_empty():
+		var found: bool = false
+		for element: Resource in requires_any:
+			if identity.has(element):
+				found = true
+		if not found:
+			return false
+	if min_era > 0 and era < min_era:
+		return false
+	if max_era > 0 and era > max_era:
+		return false
+	if not requires_types.is_empty() and _pieces_with(requires_types, EventOptionDef.PieceKind.QUALSIASI).is_empty():
+		return false
+	return true
+
+
+## Peso: 1, più 1 per ogni elemento dell'identità o via che favorisce la carta.
+func _roots_weight(favored_by: Array[Resource]) -> int:
+	var weight: int = 1
+	for element: Resource in favored_by:
+		if identity.has(element):
+			weight += 1
+	return weight
 
 
 ## Peso di un consigliere: 1, più 1 per ogni elemento dell'identità che lo favorisce
@@ -1166,6 +1501,8 @@ func _advisor_has_proposals(advisor: AdvisorDef) -> bool:
 ## Clown e Anziano ignorano il tema (GDD §4.2.2, Proposta).
 func _advisor_candidates(advisor: AdvisorDef) -> Array[Offer]:
 	var candidates: Array[Offer] = []
+	if advisor.special == AdvisorDef.Special.VISITATORE:
+		return _visitor_candidates(advisor)
 	if advisor.special == AdvisorDef.Special.ANZIANO:
 		candidates.append_array(_action_candidates(advisor))
 		for def: BuildingDef in _neutral_buildings_of_era():
@@ -1185,6 +1522,78 @@ func _advisor_candidates(advisor: AdvisorDef) -> Array[Offer]:
 			if advisor.covers(def.types):
 				candidates.append(_element_offer(advisor, null, def))
 	return candidates
+
+
+## Proposte di un visitatore: le sue azioni e le carte della sua lista, anche di altre nazioni
+## o di un'altra era, con i suoi prezzi. Ignora il tema del round (GDD §4.2.5).
+func _visitor_candidates(visitor: AdvisorDef) -> Array[Offer]:
+	var candidates: Array[Offer] = _action_candidates(visitor)
+	for shift: int in range(visitor.era_shift_min, visitor.era_shift_max + 1):
+		var target_era: int = era + shift
+		if target_era < 1 or target_era > catalog.eras.size():
+			continue
+		var extra: int = visitor.price_extra if shift == 0 else visitor.next_era_extra
+		if visitor.offers_buildings:
+			for def: BuildingDef in _visitor_buildings(visitor, target_era):
+				var offer: Offer = _element_offer(visitor, def, null)
+				offer.price = maxi(0, def.cost_gold + extra)
+				offer.other_cost = visitor.extra_cost
+				candidates.append(offer)
+		if visitor.offers_troops:
+			for def: TroopDef in _visitor_troops(visitor, target_era):
+				var offer: Offer = _element_offer(visitor, null, def)
+				offer.price = maxi(0, def.cost_gold + extra)
+				offer.other_cost = visitor.extra_cost
+				candidates.append(offer)
+	return candidates
+
+
+func _visitor_buildings(visitor: AdvisorDef, target_era: int) -> Array[BuildingDef]:
+	var own: Array[BuildingDef] = catalog.buildings.duplicate()
+	for identity_def: IdentityDef in identity:
+		own.append_array(identity_def.exclusive_buildings)
+	var found: Array[BuildingDef] = []
+	for def: BuildingDef in own:
+		if def.era == target_era and (visitor.any_type or visitor.covers(def.types)) and not found.has(def):
+			found.append(def)
+	if visitor.foreign_exclusives != AdvisorDef.Foreign.NESSUNO:
+		for element: IdentityDef in _foreign_identity_elements():
+			for def: BuildingDef in element.exclusive_buildings:
+				if def.era != target_era or found.has(def):
+					continue
+				if visitor.foreign_exclusives == AdvisorDef.Foreign.TUTTI or visitor.covers(def.types):
+					found.append(def)
+	return found
+
+
+func _visitor_troops(visitor: AdvisorDef, target_era: int) -> Array[TroopDef]:
+	var own: Array[TroopDef] = catalog.troops.duplicate()
+	for identity_def: IdentityDef in identity:
+		own.append_array(identity_def.exclusive_troops)
+	var found: Array[TroopDef] = []
+	for def: TroopDef in own:
+		if def.era == target_era and (visitor.any_type or visitor.covers(def.types)) and not found.has(def):
+			found.append(def)
+	if visitor.foreign_exclusives != AdvisorDef.Foreign.NESSUNO:
+		for element: IdentityDef in _foreign_identity_elements():
+			for def: TroopDef in element.exclusive_troops:
+				if def.era != target_era or found.has(def):
+					continue
+				if visitor.foreign_exclusives == AdvisorDef.Foreign.TUTTI or visitor.covers(def.types):
+					found.append(def)
+	return found
+
+
+## Elementi dell'identità e vie che la nazione non ha: i loro esclusivi sono "stranieri".
+func _foreign_identity_elements() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	var all: Array[IdentityDef] = catalog.identities.duplicate()
+	for era_def: EraDef in catalog.eras:
+		all.append_array(era_def.ways)
+	for element: IdentityDef in all:
+		if not identity.has(element) and not found.has(element):
+			found.append(element)
+	return found
 
 
 ## Pesca le proposte del consigliere scelto (GDD §4.2). In un round Misto almeno una proposta

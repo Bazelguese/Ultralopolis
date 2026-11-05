@@ -61,6 +61,13 @@ extends Resource
 @export var upgrade_cost_per_era: PackedInt32Array = PackedInt32Array([2, 3])
 ## Potenzia dell'Anziano (solo edifici neutri) per anno (GDD §4.2.2: 1).
 @export var elder_upgrades_per_year: int = 1
+## Probabilità, in percentuale, che in un round una delle carte sia un Evento, un Visitatore
+## o una Fortuna al posto di un consigliere (GDD §4.2.5: in media 1 round su 3).
+@export var special_card_chance_percent: int = 33
+## Pesi delle tre famiglie (GDD §4.2.5: 5, 3, 2).
+@export var event_weight: int = 5
+@export var visitor_weight: int = 3
+@export var fortune_weight: int = 2
 ## Costo del primo rinnovo delle proposte.
 @export var reroll_base_cost: int = 1
 ## Il rinnovo non costa mai meno di così, nemmeno con i bonus che lo riducono.

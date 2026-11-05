@@ -8,6 +8,14 @@ enum Special {
 	NESSUNO,  ## Consigliere ordinario, con una categoria.
 	CLOWN,    ## Propone un elemento per ogni colore di mana e un edificio neutro (GDD §4.2.2).
 	ANZIANO,  ## Propone perk ed edifici neutri; potenzia i neutri una volta all'anno.
+	VISITATORE,  ## Di passaggio, al posto di un consigliere (GDD §4.2.5, v0.23): non potenzia.
+}
+
+## Esclusivi di altre nazioni che un visitatore può proporre.
+enum Foreign {
+	NESSUNO,
+	PER_TIPO,  ## Solo quelli con un tipo del visitatore.
+	TUTTI,
 }
 
 @export var id: StringName = &""
@@ -35,6 +43,28 @@ enum Special {
 ## Azioni che il consigliere può proporre (GDD §4.2.3). Quelle esclusive di un elemento
 ## dell'identità compaiono solo a chi lo ha.
 @export var actions: Array[OpportunityDef] = []
+
+
+@export_group("Visitatore (GDD §4.2.5)")
+## Radici, come per EventDef: richiede, favorito da, ere, tipi sulla plancia.
+@export var requires_any: Array[Resource] = []
+@export var favored_by: Array[Resource] = []
+@export var min_era: int = 0
+@export var max_era: int = 0
+@export var requires_types: Array[StringName] = []
+## Propone carte di qualsiasi tipo (altrimenti solo quelle con un suo tipo).
+@export var any_type: bool = false
+@export var offers_buildings: bool = true
+@export var offers_troops: bool = true
+@export var foreign_exclusives: Foreign = Foreign.NESSUNO
+## Ere proposte rispetto a quella corrente: da era + era_shift_min a era + era_shift_max.
+@export var era_shift_min: int = 0
+@export var era_shift_max: int = 0
+## Oro in più (o in meno) sul prezzo delle carte dell'era corrente e di quelle successive.
+@export var price_extra: int = 0
+@export var next_era_extra: int = 0
+## Altro costo aggiunto a ogni carta proposta (es. 1 Documenti del Contrabbandiere).
+@export var extra_cost: ResourceAmounts
 
 
 ## true se la carta con questi tipi rientra nella categoria del consigliere.

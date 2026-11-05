@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="v1"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="v2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/ambasciata.tres" id="v3"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/decreto_fiscale.tres" id="v4"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/dono_diplomatico.tres" id="v5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/monarchia.tres" id="v6"]
+[ext_resource type="Resource" path="res://data/catalog/identita/repubblica.tres" id="v7"]
+
+[resource]
+script = ExtResource("v1")
+id = &"ambasciatore_straniero"
+display_name = "Ambasciatore straniero"
+special = 3
+color = &"blu"
+category_name = "Stato"
+description = "Un inviato di un'altra nazione: porta doni e propone accordi."
+actions = Array[ExtResource("v2")]([ExtResource("v3"), ExtResource("v4"), ExtResource("v5")])
+favored_by = Array[Resource]([ExtResource("v6"), ExtResource("v7")])
+min_era = 2
+offers_buildings = false
+offers_troops = false

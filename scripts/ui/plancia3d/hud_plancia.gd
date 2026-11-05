@@ -574,9 +574,19 @@ func aggiorna_partita(run: RunState) -> void:
 ## Suggerimento durante i round del Consiglio (GDD §4.2).
 func _testo_consiglio(run: RunState) -> String:
 	var consigliere: AdvisorDef = run.chosen_advisor
+	if run.chosen_event != null:
+		if run.chosen_event.family == EventDef.Family.FORTUNA:
+			return "%s: prendi il dono, oppure passa." % run.chosen_event.display_name
+		return "%s: scegli un'opzione, oppure passa. Le opzioni spente dicono che cosa serve." % run.chosen_event.display_name
 	if consigliere == null:
-		if run.advisor_choices.is_empty():
+		if run.advisor_choices.is_empty() and run.event_choice == null:
 			return "Nessun consigliere ha proposte per questo tema: passa il round."
+		var speciale: bool = run.event_choice != null
+		for scelta: AdvisorDef in run.advisor_choices:
+			if scelta.special == AdvisorDef.Special.VISITATORE:
+				speciale = true
+		if speciale:
+			return "Scegli una carta (tema: %s): un consigliere, oppure chi è arrivato in questo round." % run.theme_name()
 		return "Scegli quale consigliere ascoltare (tema: %s). Passa il mouse sulle carte per i dettagli." % run.theme_name()
 	var testo: String = "%s: prendi una proposta, oppure passa." % consigliere.display_name
 	if run.upgrade_used:

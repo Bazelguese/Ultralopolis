@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="1_mod"]
+
+[resource]
+script = ExtResource("1_mod")
+id = &"campi_allagati"
+display_name = "Campi allagati"
+description = "Per un anno gli edifici di Produzione producono 1 Cibo in più a ogni fase."
+is_malus = false
+effect = 8
+target_type = &"Produzione"
+resource = 2
+amount = 1
