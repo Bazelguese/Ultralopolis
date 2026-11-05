@@ -291,7 +291,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 
 ---
 
-## 4.4 Tradizioni delle vie (GDD §10.4.1, v0.26)
+### 4.4 Tradizioni delle vie (GDD §10.4.1, v0.26)
 
 **Stato: placeholder.** Ogni via ha 4 passi; ognuno si completa con la sua impresa e dà un effetto permanente. File dati: i passi sono dentro i file delle vie (`data/catalog/vie/`).
 
@@ -341,7 +341,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | | Antenati | Scegli 2 Eventi di Terra o di Fede | +8 Resistenza in ogni scontro |
 | | Grande madre | Raccogli almeno 10 Cibo in una sola produzione | +1 Cibo per fase da ogni edificio Fauna o di Produzione |
 
-## 4.5 Ascensioni (GDD §10.4.2, v0.26)
+### 4.5 Ascensioni (GDD §10.4.2, v0.26)
 
 **Stato: placeholder.** File dati: `data/catalog/ascensioni/`.
 

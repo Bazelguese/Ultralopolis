@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="1_id"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_mod"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_ombra.tres" id="fav_0"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_del_commercio.tres" id="fav_1"]
+
+[resource]
+script = ExtResource("1_id")
+id = &"doppio_ascolto"
+display_name = "Doppio ascolto"
+description = "Una volta per metà anno si prendono due proposte dallo stesso consigliere."
+dimension = 6
+ascension_level = 2
+rule = 7
+favored_by = Array[Resource]([ExtResource("fav_0"), ExtResource("fav_1")])

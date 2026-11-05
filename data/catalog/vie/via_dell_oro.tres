@@ -11,6 +11,118 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="10_ikxyj"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_oro_rinnovo.tres" id="11_fgmxq"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="12_qm22b"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
+
+[sub_resource type="Resource" id="tr_deed_zecche"]
+script = ExtResource("tr_deed")
+kind = 2
+amount = 3
+advisor_id = &"tesoriere"
+advisor_name = "Tesoriere"
+
+[sub_resource type="Resource" id="tr_mod_zecche"]
+script = ExtResource("tr_mod")
+id = &"trad_zecche"
+display_name = "Zecche"
+description = "+2 Oro per fase dalla Capitale."
+is_malus = false
+effect = 8
+target_type = &"Capitale"
+resource = 0
+amount = 2
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_zecche"]
+script = ExtResource("tr_trad")
+id = &"zecche"
+display_name = "Zecche"
+description = "+2 Oro per fase dalla Capitale."
+deed = SubResource("tr_deed_zecche")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_zecche")])
+
+[sub_resource type="Resource" id="tr_deed_banchieri"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 3
+types = Array[StringName]([&"Economico"])
+pieces = 1
+
+[sub_resource type="Resource" id="tr_mod_banchieri"]
+script = ExtResource("tr_mod")
+id = &"trad_banchieri"
+display_name = "Banchieri"
+description = "+1 Influenza per fase da ogni edificio Economico."
+is_malus = false
+effect = 8
+target_type = &"Economico"
+resource = 7
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_banchieri"]
+script = ExtResource("tr_trad")
+id = &"banchieri"
+display_name = "Banchieri"
+description = "+1 Influenza per fase da ogni edificio Economico."
+deed = SubResource("tr_deed_banchieri")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_banchieri")])
+
+[sub_resource type="Resource" id="tr_deed_credito"]
+script = ExtResource("tr_deed")
+kind = 6
+amount = 20
+resource = 0
+
+[sub_resource type="Resource" id="tr_mod_credito"]
+script = ExtResource("tr_mod")
+id = &"trad_credito"
+display_name = "Credito"
+description = "Rinnovare le proposte costa 1 Oro in meno."
+is_malus = false
+effect = 4
+amount = -1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_credito"]
+script = ExtResource("tr_trad")
+id = &"credito"
+display_name = "Credito"
+description = "Rinnovare le proposte costa 1 Oro in meno."
+deed = SubResource("tr_deed_credito")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_credito")])
+
+[sub_resource type="Resource" id="tr_deed_monopolio"]
+script = ExtResource("tr_deed")
+kind = 5
+amount = 2
+types = Array[StringName]([&"Economico"])
+pieces = 1
+min_level = 3
+
+[sub_resource type="Resource" id="tr_mod_monopolio"]
+script = ExtResource("tr_mod")
+id = &"trad_monopolio"
+display_name = "Monopolio"
+description = "+15% Oro prodotto."
+is_malus = false
+effect = 7
+resource = 0
+amount = 15
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_monopolio"]
+script = ExtResource("tr_trad")
+id = &"monopolio"
+display_name = "Monopolio"
+description = "+15% Oro prodotto."
+deed = SubResource("tr_deed_monopolio")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_monopolio")])
 
 [resource]
 script = ExtResource("12_qm22b")
@@ -23,3 +135,4 @@ favored_opportunities = Array[ExtResource("3_plebw")]([ExtResource("8_bqfo6")])
 exclusive_buildings = Array[ExtResource("1_nsx7d")]([ExtResource("2_mbxum")])
 favored_by = Array[Resource]([ExtResource("5_4oon7"), ExtResource("6_vyvbh"), ExtResource("7_s6tqb")])
 permanent_modifiers = Array[ExtResource("10_ikxyj")]([ExtResource("11_fgmxq")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_zecche"), SubResource("tr_step_banchieri"), SubResource("tr_step_credito"), SubResource("tr_step_monopolio")])

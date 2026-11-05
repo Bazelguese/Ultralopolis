@@ -14,6 +14,118 @@
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="13_c7dkq"]
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="adv_s"]
 [ext_resource type="Resource" path="res://data/catalog/consiglieri/tesoriere.tres" id="adv_tes"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
+
+[sub_resource type="Resource" id="tr_deed_botteghe"]
+script = ExtResource("tr_deed")
+kind = 2
+amount = 3
+advisor_id = &"tesoriere"
+advisor_name = "Tesoriere"
+
+[sub_resource type="Resource" id="tr_mod_botteghe"]
+script = ExtResource("tr_mod")
+id = &"trad_botteghe"
+display_name = "Botteghe"
+description = "+1 Oro per fase dalla Capitale."
+is_malus = false
+effect = 8
+target_type = &"Capitale"
+resource = 0
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_botteghe"]
+script = ExtResource("tr_trad")
+id = &"botteghe"
+display_name = "Botteghe"
+description = "+1 Oro per fase dalla Capitale."
+deed = SubResource("tr_deed_botteghe")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_botteghe")])
+
+[sub_resource type="Resource" id="tr_deed_carovane"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 2
+types = Array[StringName]([&"Infrastruttura Strategica"])
+pieces = 1
+
+[sub_resource type="Resource" id="tr_mod_carovane"]
+script = ExtResource("tr_mod")
+id = &"trad_carovane"
+display_name = "Carovane"
+description = "+1 Influenza per fase da ogni edificio Infrastruttura Strategica."
+is_malus = false
+effect = 8
+target_type = &"Infrastruttura Strategica"
+resource = 7
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_carovane"]
+script = ExtResource("tr_trad")
+id = &"carovane"
+display_name = "Carovane"
+description = "+1 Influenza per fase da ogni edificio Infrastruttura Strategica."
+deed = SubResource("tr_deed_carovane")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_carovane")])
+
+[sub_resource type="Resource" id="tr_deed_fiere_annuali"]
+script = ExtResource("tr_deed")
+kind = 6
+amount = 12
+resource = 0
+
+[sub_resource type="Resource" id="tr_mod_fiere_annuali"]
+script = ExtResource("tr_mod")
+id = &"trad_fiere_annuali"
+display_name = "Fiere annuali"
+description = "Rinnovare le proposte costa 1 Oro in meno."
+is_malus = false
+effect = 4
+amount = -1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_fiere_annuali"]
+script = ExtResource("tr_trad")
+id = &"fiere_annuali"
+display_name = "Fiere annuali"
+description = "Rinnovare le proposte costa 1 Oro in meno."
+deed = SubResource("tr_deed_fiere_annuali")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_fiere_annuali")])
+
+[sub_resource type="Resource" id="tr_deed_gilde"]
+script = ExtResource("tr_deed")
+kind = 5
+amount = 3
+types = Array[StringName]([&"Economico"])
+pieces = 1
+min_level = 2
+
+[sub_resource type="Resource" id="tr_mod_gilde"]
+script = ExtResource("tr_mod")
+id = &"trad_gilde"
+display_name = "Gilde"
+description = "+10% Oro prodotto."
+is_malus = false
+effect = 7
+resource = 0
+amount = 10
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_gilde"]
+script = ExtResource("tr_trad")
+id = &"gilde"
+display_name = "Gilde"
+description = "+10% Oro prodotto."
+deed = SubResource("tr_deed_gilde")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_gilde")])
 
 [resource]
 script = ExtResource("13_c7dkq")
@@ -27,3 +139,4 @@ exclusive_buildings = Array[ExtResource("1_xm7k1")]([ExtResource("2_gq2ts"), Ext
 favored_by = Array[Resource]([ExtResource("6_kp1h6"), ExtResource("7_k2cpf"), ExtResource("8_iu28t")])
 permanent_modifiers = Array[ExtResource("11_0jwc7")]([ExtResource("12_3ir5u")])
 favored_advisors = Array[ExtResource("adv_s")]([ExtResource("adv_tes")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_botteghe"), SubResource("tr_step_carovane"), SubResource("tr_step_fiere_annuali"), SubResource("tr_step_gilde")])

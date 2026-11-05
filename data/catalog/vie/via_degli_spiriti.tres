@@ -11,10 +11,119 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_spiriti_cibo.tres" id="9_pvh4n"]
 [ext_resource type="Resource" path="res://data/catalog/identita/spiriti_dei_luoghi.tres" id="10_kvkrr"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="10_kx25f"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
 
 [sub_resource type="Resource" id="Resource_asojx"]
 script = ExtResource("5_jyrfm")
 legno = 4
+
+[sub_resource type="Resource" id="tr_deed_boschi_sacri"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 2
+types = Array[StringName]([&"Produzione", &"Fauna"])
+pieces = 1
+
+[sub_resource type="Resource" id="tr_mod_boschi_sacri"]
+script = ExtResource("tr_mod")
+id = &"trad_boschi_sacri"
+display_name = "Boschi sacri"
+description = "+1 Legno per fase dalla Capitale."
+is_malus = false
+effect = 8
+target_type = &"Capitale"
+resource = 3
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_boschi_sacri"]
+script = ExtResource("tr_trad")
+id = &"boschi_sacri"
+display_name = "Boschi sacri"
+description = "+1 Legno per fase dalla Capitale."
+deed = SubResource("tr_deed_boschi_sacri")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_boschi_sacri")])
+
+[sub_resource type="Resource" id="tr_deed_branchi"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 3
+types = Array[StringName]([&"Fauna"])
+
+[sub_resource type="Resource" id="tr_mod_branchi"]
+script = ExtResource("tr_mod")
+id = &"trad_branchi"
+display_name = "Branchi"
+description = "Le truppe Fauna ricaricano il 10% più in fretta."
+is_malus = false
+effect = 3
+target_type = &"Fauna"
+amount = -10
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_branchi"]
+script = ExtResource("tr_trad")
+id = &"branchi"
+display_name = "Branchi"
+description = "Le truppe Fauna ricaricano il 10% più in fretta."
+deed = SubResource("tr_deed_branchi")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_branchi")])
+
+[sub_resource type="Resource" id="tr_deed_antenati"]
+script = ExtResource("tr_deed")
+kind = 3
+amount = 2
+spheres = PackedStringArray("Terra", "Fede")
+
+[sub_resource type="Resource" id="tr_mod_antenati"]
+script = ExtResource("tr_mod")
+id = &"trad_antenati"
+display_name = "Antenati"
+description = "+8 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 8
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_antenati"]
+script = ExtResource("tr_trad")
+id = &"antenati"
+display_name = "Antenati"
+description = "+8 Resistenza in ogni scontro."
+deed = SubResource("tr_deed_antenati")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_antenati")])
+
+[sub_resource type="Resource" id="tr_deed_grande_madre"]
+script = ExtResource("tr_deed")
+kind = 6
+amount = 10
+resource = 2
+
+[sub_resource type="Resource" id="tr_mod_grande_madre"]
+script = ExtResource("tr_mod")
+id = &"trad_grande_madre"
+display_name = "Grande madre"
+description = "+1 Cibo per fase da ogni edificio Fauna o di Produzione."
+is_malus = false
+effect = 8
+target_types_any = Array[StringName]([&"Fauna", &"Produzione"])
+resource = 2
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_grande_madre"]
+script = ExtResource("tr_trad")
+id = &"grande_madre"
+display_name = "Grande madre"
+description = "+1 Cibo per fase da ogni edificio Fauna o di Produzione."
+deed = SubResource("tr_deed_grande_madre")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_grande_madre")])
 
 [resource]
 script = ExtResource("10_kx25f")
@@ -28,3 +137,4 @@ exclusive_buildings = Array[ExtResource("1_7xdl0")]([ExtResource("2_kvkrr")])
 requires_any = Array[Resource]([ExtResource("10_kvkrr")])
 favored_by = Array[Resource]([ExtResource("6_570nj")])
 permanent_modifiers = Array[ExtResource("8_kyp4d")]([ExtResource("9_pvh4n")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_boschi_sacri"), SubResource("tr_step_branchi"), SubResource("tr_step_antenati"), SubResource("tr_step_grande_madre")])
