@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.24
+## Game Design Document — v0.25
 
 **Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -94,25 +94,31 @@ Ogni partita è una nuova storia di una civiltà. “Campagna” descrive eventu
 
 Gli elementi posseduti e le conseguenze persistono all’interno della run. Progressione permanente fra run, sblocchi di account o ricompense collezionabili non sono definiti.
 
-### 3.2 Anni e scontri — Confermato (struttura dei round v0.21)
+### 3.2 Anni e stagioni — Confermato (modifica del nucleo, v0.25)
 
-La run è divisa in anni. Ogni anno ha due metà separate dall’incontro del mondo e si chiude con uno scontro contro un fantasma:
+La run è divisa in anni. Ogni anno ha **12 round, uno per mese**, divisi in **quattro stagioni da 3 round**. L'anno comincia con l'**inverno** e si chiude con lo **scontro contro un fantasma** alla fine dell'autunno:
 
-1. **Prima metà (Produzione)**: 5 round di scelte.
-2. **Scontro di mezzo**: l’incontro del mondo (§3.3).
-3. **Seconda metà (Preparazione)**: 5 round di scelte.
-4. **Scontro automatico contro un fantasma**, seguito dall’esito e dalle eventuali conseguenze.
+| Stagione | Mesi | Si chiude con |
+|---|---|---|
+| **Inverno** | gennaio, febbraio, marzo | nessuno scontro |
+| **Primavera** | aprile, maggio, giugno | un **incontro del mondo** (§3.3) |
+| **Estate** | luglio, agosto, settembre | un secondo **incontro del mondo** |
+| **Autunno** | ottobre, novembre, dicembre | lo **scontro con il fantasma**, che chiude l'anno |
 
-In ogni round il giocatore ascolta uno dei consiglieri della nazione (§4.2). Edifici e truppe si ottengono in **entrambe le metà**: la divisione fra una fase di sola costruzione e una di sola disposizione non vale più.
+In ogni round il giocatore ascolta uno dei consiglieri della nazione (§4.2). Edifici e truppe si ottengono in **tutte le stagioni**.
 
 | Regola | Stato |
 |---|---|
-| 5 round, scontro di mezzo, 5 round, scontro con il fantasma | Confermato (v0.21) |
-| Edifici e truppe disponibili in entrambe le metà | Confermato (v0.21) |
-| La produzione resta all’inizio delle due metà (§5.2); l’economia non cambia | Confermato (v0.21) |
-| Le due metà mantengono i nomi Produzione e Preparazione | Confermato (v0.21) per ora; i nomi si possono rivedere |
+| 12 round all'anno, uno per mese, in 4 stagioni da 3 | Confermato (v0.25) |
+| L'anno va dall'inverno all'autunno: l'ultimo scontro dell'anno è il fantasma | Confermato (v0.25) |
+| Primavera ed estate finiscono con un incontro del mondo, l'autunno con il fantasma; d'inverno non si combatte | Confermato (v0.25) |
+| La produzione avviene all'inizio di ogni stagione; d'inverno gli edifici non producono Cibo (§5.2) | Confermato (v0.25) |
+| L'inverno è la stagione della politica interna: eventi suoi, più azioni "interne", meno carte militari (§4.2, §4.2.5) | Confermato (v0.25) |
+| Ogni round mostra il **nome del mese** (es. "Anno 2 · Estate · Agosto") | Confermato (v0.25) |
+| Edifici e truppe disponibili in tutte le stagioni | Confermato (v0.21) |
+| Le stagioni sostituiscono le due metà Produzione e Preparazione (5 round, incontro, 5 round, fantasma) della v0.21 | Confermato (v0.25) |
 
-La durata in minuti della run non è ancora fissata.
+La durata in minuti della run non è ancora fissata. Con 12 round e 3 scontri un anno dura circa un quarto in più della v0.24.
 
 ### 3.3 Incontri del mondo — Confermato nella funzione, Da definire nei dettagli
 
@@ -125,7 +131,8 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | In futuro, misto di scontri automatici ed eventi a scelta (testo e opzioni) | Direzione |
 | Lo scontro usa la stessa simulazione del combattimento contro i fantasmi; la plancia generata ha la stessa struttura di una plancia giocatore | Proposta |
 | Le 10 vittorie della run restano legate agli scontri contro i fantasmi; gli incontri del mondo non le modificano | Proposta |
-| Un incontro per anno, in un **momento fisso** fra Produzione e Preparazione (struttura ispirata allo scontro con i mostri a metà giornata di The Bazaar) | Confermato come base provvisoria |
+| **Due incontri per anno**, in momenti fissi: alla fine della primavera e alla fine dell'estate (§3.2; struttura ispirata agli scontri con i mostri di The Bazaar) | Confermato (v0.25) |
+| L'incontro d'estate è più forte di quello di primavera: a metà strada fra un anno e il successivo | Proposta (v0.25) |
 | Il giocatore sceglie **fra 3 incontri** diversi (es. tre minacce di difficoltà e ricompensa diverse) | Confermato |
 | Presenza nel primo prototipo | Confermato |
 | La sconfitta ha **conseguenze leggere** | Confermato |
@@ -134,7 +141,7 @@ Lo scontro contro il fantasma resta il momento centrale dell’anno, ma da solo 
 | Ricompense per la vittoria: edifici, truppe, perk o risorse. Ogni incontro propone un **pool ristretto**; il giocatore sceglie **se e che cosa** prendere | Confermato (i perk entrano quando esisteranno, §9) |
 | Una vittoria (anche un pareggio) dà inoltre un **bottino fisso** di Oro e Ricerca, più alto per gli incontri più difficili | Confermato (v0.21); valori placeholder (§16.3) |
 | Le plance generate diventano più forti con il passare degli anni; la loro Resistenza è fissata nei dati, senza il calcolo di §7.1 | Confermato; valori placeholder |
-| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17); regole di crescita placeholder (§16.3) |
+| Negli anni senza incontri scritti a mano, il gioco **genera** 3 incontri (facile, media, difficile) per ogni incontro dell'anno, dal catalogo, più forti con gli anni e con ricompense proporzionate | Confermato (v0.17; due volte all'anno dalla v0.25); regole di crescita placeholder (§16.3) |
 
 ### 3.4 Vittoria e fine della run — Base adottata
 
@@ -163,15 +170,14 @@ Non sono previste per ora regole per recuperare Prestigio o ricompense speciali 
 
 | Passaggio | Comportamento |
 |---|---|
-| Nuovo anno | Conservazione della nazione, del Magazzino e dei modificatori attivi; aggiornamento delle durate. |
-| Selezione del fantasma | L’avversario dell’anno viene fissato. |
-| Inizio Produzione | Tutti gli edifici già costruiti producono le rispettive risorse. |
-| Round 1–5 | In ogni round si sceglie un consigliere e una sua proposta (§4.2). |
-| Incontro del mondo | Scelta fra 3 incontri e scontro automatico contro una plancia generata (§3.3). |
-| Inizio Preparazione | Tutti gli edifici già costruiti producono di nuovo. |
-| Round 6–10 | Come nella prima metà; lo spionaggio (§12) agisce sul fantasma già fissato. |
+| Nuovo anno (gennaio) | Conservazione della nazione, del Magazzino e dei modificatori attivi; aggiornamento delle durate; consumo di Cibo (§5.4). |
+| Selezione degli avversari | Il fantasma dell'anno e i due incontri vengono fissati. |
+| Inverno | Gli edifici producono, senza Cibo (§5.2); round 1–3 (gennaio, febbraio, marzo). Nessuno scontro. |
+| Primavera | Gli edifici producono; round 4–6 (aprile, maggio, giugno); **incontro del mondo** (§3.3). |
+| Estate | Gli edifici producono; round 7–9 (luglio, agosto, settembre); secondo **incontro del mondo**. |
+| Autunno | Gli edifici producono; round 10–12 (ottobre, novembre, dicembre). Lo spionaggio (§12) agisce sul fantasma già fissato. |
 | Combattimento contro il fantasma | Produzione di mana e attivazione automatica delle truppe. |
-| Esito | Vittoria o sconfitta, bottino, aggiornamento della run ed eventuali conseguenze. |
+| Esito | Vittoria o sconfitta, bottino, aggiornamento della run ed eventuali conseguenze. L'anno finisce. |
 
 Il fantasma va fissato **prima dei round** (e quindi delle proposte di spionaggio) e non cambia dopo che il giocatore ha investito per ottenere informazioni su di esso — Confermato.
 
@@ -179,7 +185,7 @@ Il fantasma va fissato **prima dei round** (e quindi delle proposte di spionaggi
 
 Al posto dei mercanti di The Bazaar la nazione ha un **Consiglio**: consiglieri di tipo diverso (economico, agricolo, costruttore, comandante, spionaggio…). Ogni consigliere ha un proprio pool di proposte: **azioni** (tutto ciò che non è l’acquisto di un elemento) ed **edifici e truppe a lui affini**. Il Consiglio dà una direzione al giocatore: prima sceglie a chi dare ascolto, poi che cosa fare.
 
-La produzione di risorse avviene all’inizio delle **due metà**, non a ogni round (§5.2).
+La produzione di risorse avviene all’inizio di ogni **stagione**, non a ogni round (§5.2).
 
 | Regola | Stato |
 |---|---|
@@ -189,7 +195,8 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 | Il pool di un consigliere è dato dalla sua **categoria** (§4.2.4): propone gli edifici e le truppe che hanno almeno un tipo della categoria | Confermato (v0.22) |
 | Oltre alle proposte, ogni consigliere ordinario offre l’opzione **Potenzia** (§6.5): non consuma la scelta del round e si usa una volta per round | Confermato (v0.22) |
 | Ogni round ha un **tema**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
-| In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tema è visibile prima di scegliere il consigliere | Confermato (v0.21) |
+| Ogni stagione ha i suoi tre temi, in ordine pescato a caso con il seme della run: **inverno** Azioni, Edifici, Misto (nessun round Truppe); **primavera** Edifici, Misto, Misto; **estate** Truppe, Edifici, Misto; **autunno** Truppe, Azioni, Misto. Il tema è visibile prima di scegliere il consigliere | Confermato (v0.25; nella v0.21 ogni metà aveva Azioni, Edifici, Truppe e due Misti) |
+| D'inverno Cancelliere, Sacerdote e Fattore compaiono più spesso (+1 di peso), il Generale meno (peso dimezzato, almeno 1) | Proposta (v0.25) |
 | Un consigliere che non ha niente da proporre per il tema del round non viene pescato in quel round | Confermato (v0.21) |
 | Si può **passare**: senza scegliere un consigliere, oppure dopo averlo scelto senza prendere nulla. Passare non dà nulla | Confermato (v0.21) |
 | Il **rinnovo** a pagamento ripesca le proposte del consigliere scelto | Confermato (v0.21) |
@@ -280,7 +287,8 @@ Nei round, oltre ai consiglieri, possono comparire carte di altre famiglie, lega
 | Non offrono Potenzia (un'opzione può però potenziare una carta); un Visitatore si rinnova solo in Oro | Confermato |
 | Un Evento compare una sola volta per run, salvo quelli ripetibili; Visitatori e Fortune possono tornare, ma non nello stesso anno | Confermato |
 | Ogni carta ha una **sfera**: una delle 8 categorie (§4.2.4), che ne dà il tema e la cornice | Confermato |
-| Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo) | Confermato |
+| Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo); dalla v0.25 anche le **stagioni** in cui la carta può comparire | Confermato |
+| Eventi legati alle stagioni: *Un inverno lungo* e *Il passo innevato* d'inverno, *La piena del fiume* e *Le terre di confine* in primavera, *Il torneo* d'estate, *Raccolto abbondante* d'estate o d'autunno, *La grande fiera* d'autunno; nuovi eventi invernali; d'inverno la Riforma e i Tumulti in piazza sono più frequenti (+1 di peso) | Proposta (v0.25) |
 | Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una carta con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione **gratuita e senza requisiti**, così si può sempre scegliere qualcosa (v0.24) | Confermato |
 | Nessun evento arriva da solo senza essere scelto, con una sola eccezione: la **Rivoluzione** (§9.4.2) | Confermato (eccezione dalla v0.24) |
 | Le opzioni possono anche **cambiare il governo** (Riforma, Rivoluzione) e far salire o scendere il **Malcontento** (§5.5) | Confermato (v0.24) |
@@ -314,13 +322,15 @@ Nel linguaggio degli effetti (§8) un incanto è un modificatore permanente sull
 
 La scelta di un edificio incide quindi su entrambi i momenti di gioco. Gli edifici persistono durante la run: non si ricostruisce l’economia da zero ogni anno. Il criterio con cui differenziare gli edifici è proposto in P3.
 
-### 5.2 Produzione per fase — Confermato
+### 5.2 Produzione per stagione — Confermato (v0.25)
 
-All’inizio di Produzione e Preparazione, gli edifici presenti depositano automaticamente le rispettive risorse nel Magazzino, una volta per ingresso nella fase.
+All’inizio di ogni stagione gli edifici presenti depositano automaticamente le rispettive risorse nel Magazzino, una volta per stagione. **D'inverno nessun edificio produce Cibo**, nemmeno la Capitale; tutte le altre risorse sì.
 
-Un edificio costruito durante una fase non produce retroattivamente: inizia a produrre dalla fase successiva.
+Un edificio costruito durante una stagione non produce retroattivamente: inizia a produrre dalla stagione successiva.
 
-**Esempio senza valori:** una biblioteca costruita durante Produzione fornisce la prima Ricerca all’inizio della Preparazione dello stesso anno, e produce di nuovo all’inizio della Produzione dell’anno seguente.
+I valori di produzione restano quelli della v0.24: con quattro produzioni all'anno invece di due le entrate raddoppiano. Sono placeholder e il bilanciamento si rifà con le prove (Confermato, v0.25).
+
+**Esempio senza valori:** una biblioteca costruita in primavera fornisce la prima Ricerca all’inizio dell’estate, e produce di nuovo all’inizio dell’autunno e dell’inverno successivo. Una fattoria costruita in autunno produce Cibo dalla primavera dell'anno dopo: d'inverno non ne dà.
 
 ### 5.3 Risorse — Confermato (modifica del nucleo, v0.12; riviste in v0.22)
 
@@ -351,7 +361,7 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 - Un edificio può produrre più risorse a ogni fase.
 - I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
 
-**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Il mercato funziona **solo in vendita**: con l’Oro non si comprano risorse, così l’Oro raccoglie le eccedenze ma non sostituisce la specializzazione (confermato in v0.22). Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
+**Mercato delle risorse — Confermato.** In ogni round il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Il mercato funziona **solo in vendita**: con l’Oro non si comprano risorse, così l’Oro raccoglie le eccedenze ma non sostituisce la specializzazione (confermato in v0.22). Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
 
 **Mana — Confermato.** Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia. Mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
 
@@ -376,7 +386,7 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 ### 5.4 Cibo e mantenimento — Confermato
 
 - Ogni truppa consuma di base **0,5 Cibo**; alcune truppe possono chiederne di più.
-- Il consumo avviene **all’inizio di ogni anno, a partire dall’anno 2**: nel primo anno le truppe non mangiano.
+- Il consumo avviene **all’inizio di ogni anno**, cioè all'inizio dell'inverno, **a partire dall’anno 2**: nel primo anno le truppe non mangiano. Siccome l'inverno non produce Cibo (§5.2), il Cibo per mangiare va messo da parte nell'anno prima (v0.25).
 - Mangiano prima le truppe **più lente**, poi le più veloci; a parità di ricarica, prima quelle più a destra.
 - Una truppa mangia tutta la sua razione o niente; il cibo avanzato passa alla truppa successiva.
 - Una truppa che resta senza cibo ha la **ricarica ×1,5** fino al consumo dell’anno successivo.
@@ -865,7 +875,7 @@ La struttura è **lineare**: ere in sequenza, senza albero tecnologico. La scelt
 
 ### 10.3 Regole del passaggio — Confermato
 
-L’avanzamento si può pagare in entrambe le metà dell’anno e non consuma il round. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
+L’avanzamento si può pagare in qualunque round dell’anno e non consuma il round. Entrando in una nuova era, le offerte delle ere precedenti **non** restano disponibili.
 
 ### 10.4 Le vie — Confermato (v0.15)
 
@@ -933,7 +943,7 @@ Ottenere informazioni sull’avversario prima dello scontro e poter intervenire 
 | Ogni proposta fa partire lo scontro con un elemento nemico **sabotato** o **rallentato** per alcuni secondi | Confermato |
 | Il bersaglio dipende dalla proposta: **a caso**, a un’**estremità** della fila, il **più lento** o il **più veloce** (§7.7.1) | Confermato |
 | Il Maestro delle spie propone anche edifici e truppe che rallentano o sabotano | Confermato |
-| Vale per lo scontro con il fantasma dell’anno, anche se comprato nella prima metà | Confermato (v0.21) |
+| Vale per lo scontro con il fantasma dell’anno, in qualunque stagione sia comprato: il fantasma si fissa a gennaio e si affronta a dicembre | Confermato (v0.21; v0.25) |
 | Durate: 5 s di Sabotaggio, 10 s di Inefficienza; si paga in **Documenti** (v0.22; nella v0.21 in Influenza) | Confermato (v0.22); valori placeholder |
 | Una proposta indica se colpisce truppe, edifici o qualsiasi elemento | Confermato (v0.21) |
 | Il fantasma non spia il giocatore: è una registrazione (§11.1) | Confermato (v0.21) |
@@ -1050,7 +1060,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Due macrofasi con raccolta automatica all’ingresso e 5 round del Consiglio ciascuna (§4.2): nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
+- Quattro stagioni con raccolta automatica all’ingresso e 3 round del Consiglio ciascuna (§3.2, v0.25; finché non è implementato, il prototipo usa ancora le due metà da 5 round della v0.21). Consiglio nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Ricerca spendibile per avanzare di era.
 - Riordino delle truppe fuori dal combattimento.
@@ -1108,7 +1118,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Pescata delle 3 vie: peso base 1, +1 per ogni elemento dell’identità o via già scelta che la favorisce; se il pool ha meno di 3 vie valide, si mostrano tutte | Provvisoria, come per le opportunità. |
 | Entrando in una nuova era, le proposte del round in corso vengono ripescate gratis dalla nuova era (prima del Consiglio: le alternative dell’opportunità) | Accettata dal creatore. |
 | Un pareggio contro un incontro del mondo vale come vittoria (dà la ricompensa) | Accettata dal creatore. |
-| Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno, non pescati a caso | Accettata dal creatore. |
+| Gli incontri di ogni anno sono i 3 indicati nei dati per quell’anno e per quella stagione (primavera o estate), non pescati a caso | Accettata dal creatore (stagione dalla v0.25). |
 | Senza regole di generazione nei dati, se manca il fantasma di un anno si usa il più recente disponibile; uno scontro interrotto per il limite di sicurezza conta come pareggio | Protezioni tecniche contro dati sbagliati, accettate dal creatore. |
 | Pool di offerte basato solo sull’era (l’identità non esiste ancora) | Semplificazione del prototipo. |
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
@@ -1182,6 +1192,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Il Malcontento può superare la soglia fra un round e l'altro (es. a fine anno): la Rivoluzione arriva al primo round successivo | Provvisoria (v0.24). |
 | Rivoluzione: la causa principale è quella che ha prodotto più Malcontento dall'ultima rivoluzione (a parità vale l'ordine sconfitte, carestie, malus, eventi). Governi possibili per causa: sconfitte → Dittatura, Monarchia assoluta, Totalitarismo; carestie → Repubblica, Repubblica parlamentare, Monarchia costituzionale; malus → Teocrazia, Ierocrazia, Monarchia; scelte degli eventi → Oligarchia, Plutocrazia, Repubblica. Il governo attuale è escluso; se non resta nessuno, si sceglie fra i governi del tier 1 | Provvisoria (v0.24). |
 | Il Malcontento che sale per un'azione o un evento conta come causa "scelte degli eventi" | Provvisoria (v0.24). |
+| Incontro d'estate: forza a metà strada fra quella dell'anno e quella dell'anno successivo | Placeholder (v0.25). |
+| Finché le stagioni non sono implementate, il prototipo usa le due metà da 5 round della v0.21 | Provvisoria (v0.25). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -1191,9 +1203,9 @@ Criteri di accettazione proposti per il prototipo:
 
 | Caso | Risultato atteso |
 |---|---|
-| Ingresso in una fase | Una sola raccolta dagli edifici già presenti. |
-| Costruzione durante Produzione | Nessuna raccolta retroattiva; prima produzione in Preparazione. |
-| Risorse non spese | Conservate al cambio fase e al cambio anno. |
+| Ingresso in una stagione | Una sola raccolta dagli edifici già presenti; d'inverno senza Cibo. |
+| Costruzione durante una stagione | Nessuna raccolta retroattiva; prima produzione all'inizio della stagione successiva. |
+| Risorse non spese | Conservate al cambio di stagione e al cambio anno. |
 | Passaggio di era | Ricerca pagata una volta; resto conservato; offerte coerenti con l’era. |
 | Ingresso in un’era | Spazi e quota di Resistenza dell’era concessi; dalla seconda era, scelta obbligatoria fra 3 vie. |
 | Vie | Le 3 proposte vengono dal pool dell’era, pesate da identità e vie precedenti; la via scelta applica bonus immediato e tratto permanente. |
@@ -1238,7 +1250,7 @@ Criteri di accettazione proposti per il prototipo:
 | Sconfitta contro un incontro del mondo | Oro del Magazzino dimezzato (per difetto); Prestigio e vittorie invariati; durante l’ultima possibilità la run termina. |
 | Vittoria contro un incontro del mondo | Bottino fisso di Oro e Ricerca; poi il giocatore può scegliere una ricompensa dal pool dell’incontro, oppure nessuna. |
 | Vittoria o pareggio contro il fantasma | Bottino fisso di Oro e Ricerca; nessun bottino in caso di sconfitta. |
-| Anno | 5 round, incontro del mondo, 5 round, fantasma; produzione solo all’inizio delle due metà. |
+| Anno | Inverno (3 round), primavera (3 round, incontro), estate (3 round, incontro), autunno (3 round, fantasma); produzione all'inizio di ogni stagione. |
 | Round | 3 consiglieri diversi; scelto uno, 3 proposte (5 dal Clown), se ne prende una sola o si passa. |
 | Pool del consigliere | Propone solo carte con almeno un tipo della sua categoria. |
 | Potenzia | Sale di livello una carta con almeno un tipo della categoria del consigliere; non consuma la scelta; una sola volta per round; non compare senza carte valide o con tutte al massimo. |
@@ -1267,7 +1279,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
 | Per la componente GDR | Valori del Malcontento; tratti delle razze; costo della Riforma; governi dei fantasmi; tipi d'identità delle vie. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
-| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4). |
+| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello; costo del Potenzia dell’Anziano (§4.2.4). |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
 | Più avanti | Progressione fra run, audio, monetizzazione, stile visivo. |
 
@@ -1280,9 +1292,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Nucleo | Insieme delle regole su cui si appoggiano tutti i contenuti; cambia solo con una nuova versione del documento. |
 | Spunto | Idea per il futuro, annotata ma non introdotta nella base. |
 | Run | Partita indipendente che racconta la storia di una civiltà. |
-| Anno | Unità di progressione con due macrofasi, incontri del mondo e uno scontro finale contro un fantasma. |
-| Produzione | Macrofase dedicata principalmente allo sviluppo della nazione. |
-| Preparazione | Macrofase dedicata principalmente all’organizzazione per lo scontro. |
+| Anno | Unità di progressione di 12 round in quattro stagioni, con due incontri del mondo e uno scontro finale contro un fantasma (§3.2). |
+| Stagione | Una delle quattro parti dell'anno (inverno, primavera, estate, autunno), di 3 round; all'inizio di ognuna gli edifici producono (v0.25). |
+| Mese | Un round dell'anno: gennaio è il primo, dicembre l'ultimo (v0.25). |
+| Produzione, Preparazione | Le due metà dell'anno fino alla v0.24; dalla v0.25 sostituite dalle stagioni. |
 | Opportunità | Momento di scelta interno a una macrofase; dalla v0.21 sostituita dai round del Consiglio. |
 | Tipo | Caratteristica di un edificio o di una truppa che decide quali consiglieri lo propongono e lo potenziano e a quali perk risponde (§6.6). Sostituisce le etichette. |
 | Categoria | Insieme di tipi che forma il campo di un consigliere (§4.2.4). |
@@ -1313,6 +1326,13 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.25 — 5 novembre 2026** (modifica del nucleo)
+- L'anno ha **12 round, uno per mese**, in **quattro stagioni** da 3 round: inverno senza scontri, primavera ed estate con un incontro del mondo ciascuna, autunno con il fantasma che chiude l'anno (§3.2, §3.3, §4.1). Le stagioni sostituiscono Produzione e Preparazione.
+- Gli edifici producono all'inizio di ogni stagione, d'inverno senza Cibo; i valori di produzione non cambiano (§5.2). Il consumo di Cibo resta all'inizio dell'anno, che ora è l'inizio dell'inverno (§5.4).
+- Temi dei round per stagione (§4.2); nome del mese visibile in ogni round (§3.2).
+- La stagione diventa una radice di eventi, visitatori e fortune (§4.2.5). Proposte: pesi dei consiglieri d'inverno, eventi stagionali e invernali, incontro d'estate più forte.
+- Bozza della discussione: `docs/Bozza_v0.25_stagioni.md`.
 
 **v0.24 — 5 novembre 2026** (modifica del nucleo)
 - Approvata la proposta sull'identità (`docs/Proposta_identita.md`, bozza 2): razze fantasy, governi a tier con evoluzione e rivoluzione, credi con incanti esclusivi, culture che cambiano l'uso delle risorse (§9.4).
