@@ -126,6 +126,7 @@ func _collega_hud() -> void:
 	_hud.passa.connect(func() -> void: _esegui(run.pass_round(), "Round passato"))
 	_hud.nessuna_ricompensa.connect(func() -> void: _esegui(run.skip_reward()))
 	_hud.avanza_era.connect(_on_avanza_era)
+	_hud.scegli_tecnologia.connect(_on_scegli_tecnologia)
 	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.run_rules.market_units_per_gold)))
 	_hud.ricomincia.connect(_nuova_run)
 	_hud.menu.connect(func() -> void: GameSession.go(GameSession.MENU_SCENE))
@@ -688,6 +689,20 @@ func _annulla() -> void:
 	for tessera: Tessera3D in _truppe[Lato.GIOCATORE] + _edifici[Lato.GIOCATORE]:
 		if is_instance_valid(tessera):
 			tessera.imposta_alone(Color(0.0, 0.0, 0.0, 0.0))
+
+
+## Sceglie la tecnologia da studiare fra le carte della mano (GDD §10.5.3).
+func _on_scegli_tecnologia(indice: int) -> void:
+	var carte: Array[TechDef] = run.tech_hand_cards()
+	if indice < 0 or indice >= carte.size():
+		return
+	var scelta: TechDef = carte[indice]
+	var gia_fatte: int = run.techs_done.size()
+	var riuscita: bool = run.choose_tech(scelta)
+	var messaggio: String = "Si studia: %s" % scelta.display_name
+	if riuscita and run.techs_done.size() > gia_fatte:
+		messaggio = "Tecnologia completata: %s" % scelta.display_name
+	_esegui(riuscita, messaggio)
 
 
 func _on_avanza_era() -> void:

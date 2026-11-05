@@ -286,6 +286,8 @@ static func da_ricompensa(ricompensa: RewardDef) -> SchedaCarta:
 			scheda.titolo = ricompensa.describe()
 			scheda.riga = ricompensa.describe()
 			scheda.dettagli = ricompensa.perk.description if ricompensa.kind == RewardDef.Kind.PERK and ricompensa.perk != null else ricompensa.describe()
+			if ricompensa.kind == RewardDef.Kind.TECNOLOGIA:
+				scheda.dettagli = "Carta dorata: una tecnologia %s arriva già iniziata a metà e resta fra le carte della Ricerca finché non la completi." % ("(%s)" % ricompensa.tech.display_name if ricompensa.tech != null else "a caso della tua era")
 	scheda.sopratitolo = "Ricompensa"
 	return scheda
 
