@@ -4,12 +4,14 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x2"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/mercato_libero.tres" id="x3"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_repubblica_parlamentare_influenza.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/parlamento.tres" id="p2"]
 
 [resource]
 script = ExtResource("x1")
 id = &"repubblica_parlamentare"
 display_name = "Repubblica parlamentare"
-description = "Il parlamento decide. Compaiono 4 consiglieri e le proposte non costano Oro in più; rinnovare le offerte costa 1 Oro in meno. Capitale: +1 Influenza."
+description = "Il parlamento decide. Compaiono 4 consiglieri e le proposte non costano Oro in più; rinnovare le offerte costa 1 Oro in meno. Carta esclusiva: Parlamento (era 3). Capitale: +1 Influenza."
 dimension = 1
 identity_type = &"Parlamentare"
 resistance_bonus = 4
@@ -18,3 +20,4 @@ reform_requires_types = Array[StringName]([&"Legge"])
 advisors_change = 1
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
 revolution_causes = Array[int]([1])
+exclusive_buildings = Array[ExtResource("p1")]([ExtResource("p2")])

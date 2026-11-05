@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"mercenari_dei_magnati"
+display_name = "Mercenari dei magnati"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Fante", &"Nobile", &"Plutocratico"])
+mana_type = &"verde"
+mana_cost = 3
+cooldown_ms = 2000
+damage = 12

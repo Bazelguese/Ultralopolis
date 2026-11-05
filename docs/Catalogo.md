@@ -485,7 +485,7 @@ Teocrazia      ──►  Ierocrazia
 | **Repubblica parlamentare** | 3 | Parlamentare | 4 | 4 consiglieri senza sovrapprezzo; rinnovo −1 Oro | Legge | Influenza |
 | **Plutocrazia** | 3 | Plutocratico | 3 | Proposte −1 Oro; Visitatori molto più frequenti (+4 peso); Tesoriere più frequente | Nobile | Oro |
 
-Esclusivi dei governi del tier 1: Castello del re (Monarchia, era 2), Foro (Repubblica, era 1), Guardie del tempio (Teocrazia, era 2).
+Carte esclusive dei governi: Castello del re (Monarchia, era 2), Foro (Repubblica, era 1), Guardie del tempio (Teocrazia, era 2), Guardia del sovrano (Monarchia assoluta, era 2), Camera dei pari (Monarchia costituzionale, era 2), Banco delle famiglie (Oligarchia, era 2), Milizia del regime (Dittatura, era 2), Collegio dei sacerdoti (Ierocrazia, era 2), Polizia segreta (Totalitarismo, era 3), Parlamento (Repubblica parlamentare, era 3), Mercenari dei magnati (Plutocrazia, era 3). Quando il governo cambia, le carte del vecchio governo restano sulla plancia con il loro tipo, ma non vengono più offerte.
 
 ### 6 quater.3 Credi e incanti esclusivi
 
@@ -530,6 +530,14 @@ Gli sconti lasciano sempre almeno 1 unità.
 | Campioni del clan (truppa) | Cultura guerriera | 2 | Fante, Patriota, Guerriero | rosso 3, 2 s | Danno 9 | 7 |
 | Collegio dei saggi (edificio) | Cultura erudita | 2 | Accademico, Erudito | viola | Ricerca 3, Documenti 1; 1 mana ogni 2 s | 7 |
 | Gilda dei mastri (edificio) | Cultura artigiana | 2 | Produzione, Infrastruttura Strategica, Artigiano | rosso | Legno 1, Pietra 1; 1 mana ogni 1,5 s | 7 |
+| Guardia del sovrano (truppa) | Monarchia assoluta | 2 | Nobile, Patriota, Assolutista | blu 3, 2,5 s | Danno 6, Scudo 4 | 7 |
+| Camera dei pari (edificio) | Monarchia costituzionale | 2 | Legge, Nobile, Costituzionale | blu | Stabilità 2, Influenza 1; 1 mana ogni 2 s | 7 |
+| Banco delle famiglie (edificio) | Oligarchia | 2 | Economico, Nobile, Oligarchico | verde | Oro 4; 1 mana ogni 1,5 s | 7 |
+| Milizia del regime (truppa) | Dittatura | 2 | Fante, Patriota, Dittatoriale | rosso 2, 1,5 s | Danno 6 | 7 |
+| Collegio dei sacerdoti (edificio) | Ierocrazia | 2 | Spirituale, Legge, Ierocratico | blu | Fede 2; Cura 2; 1 mana ogni 2 s | 7 |
+| Polizia segreta (truppa) | Totalitarismo | 3 | Criminale, Legge, Totalitario | viola 4, 3 s | Danno 6, Inefficienza 3 s | 10 |
+| Parlamento (edificio) | Repubblica parlamentare | 3 | Legge, Infrastruttura Strategica, Parlamentare | blu | Influenza 3, Stabilità 2; 2 mana ogni 2 s | 10 |
+| Mercenari dei magnati (truppa) | Plutocrazia | 3 | Fante, Nobile, Plutocratico | verde 3, 2 s | Danno 12 | 10 |
 
 Gli esclusivi dell'era 1 che esistevano già sono stati rinominati: Porto lagunare (era Porto fluviale), Arcieri delle ceneri (erano Arcieri dei boschi, ora Fante invece di Guardiano).
 
@@ -575,7 +583,7 @@ Tutte le questioni della bozza 1 sono decise.
 | Truppe base | 10 | 10 | 10 | 30 |
 | Vie | — | 4 | 4 + 1 esclusiva | 9 |
 | Esclusivi delle vie | — | 4 | 9 | 13 |
-| Esclusivi dell’identità | 6 | 10 | 4 | 20 |
+| Esclusivi dell’identità | 6 | 16 | 6 | 28 |
 | Perk | 11 (7 esistenti + 4 nuovi) | | | 11 |
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |

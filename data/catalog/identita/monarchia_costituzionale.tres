@@ -8,12 +8,14 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/ambasciata.tres" id="x6"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x7"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_monarchia_costituzionale_influenza.tres" id="x8"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/camera_dei_pari.tres" id="p2"]
 
 [resource]
 script = ExtResource("x1")
 id = &"monarchia_costituzionale"
 display_name = "Monarchia costituzionale"
-description = "Il sovrano giura sulla carta. Cancelliere più frequente; l'Ambasciata costa 1 Stabilità in meno (almeno 1). Capitale: +1 Influenza."
+description = "Il sovrano giura sulla carta. Cancelliere più frequente; l'Ambasciata costa 1 Stabilità in meno (almeno 1). Carta esclusiva: Camera dei pari (era 2). Capitale: +1 Influenza."
 dimension = 1
 identity_type = &"Costituzionale"
 resistance_bonus = 5
@@ -25,3 +27,4 @@ favored_advisors = Array[ExtResource("x3")]([ExtResource("x4")])
 cheaper_actions = Array[ExtResource("x5")]([ExtResource("x6")])
 permanent_modifiers = Array[ExtResource("x7")]([ExtResource("x8")])
 revolution_causes = Array[int]([1])
+exclusive_buildings = Array[ExtResource("p1")]([ExtResource("p2")])
