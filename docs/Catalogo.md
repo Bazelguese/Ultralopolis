@@ -100,7 +100,7 @@ Un edificio **senza mana è neutro**: non ha colore (§5.3 del GDD). Come ogni a
 
 Legenda della colonna “In battaglia”: ciò che l’edificio produce allo scadere del suo unico intervallo (§7.4 del GDD).
 
-### 2.1 Era 1 — budget 4, costo base 4 Oro (13 edifici)
+### 2.1 Era 1 — budget 4, costo base 4 Oro (14 edifici)
 
 | Edificio | Tipi | Colore | Per fase | In battaglia | Extra | Punti |
 |---|---|---|---|---|---|---:|
@@ -117,6 +117,7 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Stalle | Fauna, Produzione | verde | Cibo 2, Legno 1 | 1 mana ogni 1,5 s | — | 4,2 |
 | Tribunale *(nuovo, bozza 4)* | Legge | blu | Oro 1, Stabilità 2 | 1 mana ogni 2 s | — | 4 |
 | Covo *(nuovo, bozza 4)* | Criminale, Infrastruttura Segreta | viola | Influenza 1, Documenti 1 | 1 mana + 1 Corruzione ogni 3 s | — | 3,8 |
+| Armeria *(nuova, bozza 4)* | Infrastruttura Bellica | rosso | Ferro 2 | 1 mana ogni 1,5 s | — | 3,7 |
 
 ### 2.2 Era 2 — budget 6, costo base 7 Oro
 
@@ -132,6 +133,8 @@ Legenda della colonna “In battaglia”: ciò che l’edificio produce allo sca
 | Loggia segreta | Infrastruttura Segreta, Criminale | viola | Influenza 1, Documenti 2 | 1 mana + 2 Corruzione ogni 3 s | — | 5,8 |
 | Prefettura *(nuova, bozza 4)* | Legge, Patriota | blu | Oro 2, Stabilità 2 | 1 mana + 1 scudo ogni 2 s | — | 6,5 |
 | Mercato nero *(nuovo, bozza 4)* | Criminale, Infrastruttura Strategica | viola | Oro 2, Influenza 2 | 1 mana ogni 1,5 s | — | 5,7 |
+| Campo d’addestramento *(nuovo, bozza 4)* | Infrastruttura Bellica | rosso | Oro 1, Ferro 2 | 1 mana ogni 1 s | — | 6 |
+| Torre di guardia *(nuova, bozza 4)* | Guardiano | **neutro** | Pietra 2 | 5 scudo ogni 3 s (nessun mana) | — | 6 |
 
 ### 2.3 Era 3 — budget 8, costo base 10 Oro
 
@@ -186,6 +189,8 @@ Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “E
 | Arcieri a cavallo | Fauna, Fante | verde 2 | 1,5 s | Danno 4, Inefficienza 2 s (truppe) | 1 | 6 |
 | Confraternita | Spirituale, Guardiano | blu 3 | 2,5 s | Cura 6, Scudo 4 | 0,5 | 10 |
 | Predicatori | Spirituale | blu 3 | 3 s | Corruzione 6, Danno 2 | 0,5 | 11 |
+| Contrabbandieri *(nuovi, bozza 4)* | Criminale | verde 2 | 1,5 s | Danno 4, Inefficienza 2 s (edifici) | 0,5 | 6 |
+| Avvelenatori *(nuovi, bozza 4)* | Criminale | viola 3 | 3 s | Danno 2, Corruzione 6 | 0,5 | 11 |
 
 ### 3.3 Era 3 — moltiplicatore ×2, costo base 10 Oro
 
@@ -200,6 +205,7 @@ Legenda: “Mana” indica colore e quantità richiesti a ogni attivazione; “E
 | Paladini | Spirituale, Guardiano | blu 4 | 2 s | Danno 10, Cura 6 | 0,5 | 16 |
 | Inquisitori | Spirituale, Legge | blu 4 | 3 s | Corruzione 12 | 0,5 | 18 |
 | Guardia reale *(nuova, bozza 4)* | Nobile, Patriota | blu 4 | 2,5 s | Danno 10, Scudo 7 | 0,5 | 17 |
+| Lame nere *(nuove, bozza 4)* | Criminale | viola 4 | 2,5 s | Danno 9, Sabotaggio 4 s (truppe) | 0,5 | 17 |
 
 ### 3.4 Quando compaiono gli effetti — deciso con Davide
 
@@ -374,7 +380,7 @@ Le categorie, i loro tipi e le risorse di Potenzia sono nel GDD (§4.2.4). File 
 | Rifornimenti avvelenati | Inefficienza 10 s | l’edificio più veloce |
 | Infiltrati | Inefficienza 10 s | un elemento a caso |
 
-**Copertura (bozza 4).** Ogni consigliere ordinario ha almeno due azioni comuni e, in ogni era, almeno un edificio e una truppa con un suo tipo (lo verifica un test automatico). Per riempire i buchi sono state aggiunte: Tribunale, Prefettura e Palazzo del governo (Stato); Covo, Mercato nero e Arsenale clandestino (Ombra); Acciaieria (Opera, era 3); Zappatori (Assedio dell’era 1, per l’Architetto); Tagliagole (Ombra, era 1); Guardia reale (Stato, era 3); le azioni Archivisti, Manuali tecnici, Decreto fiscale e Censimento. Restano sottili: le truppe del Maestro delle spie (1–2 per era) e gli edifici del Generale nell’era 2 (solo la Fortezza).
+**Copertura (bozza 4).** Ogni consigliere ordinario ha almeno due azioni comuni e, in ogni era, almeno un edificio e una truppa con un suo tipo (lo verifica un test automatico). Per riempire i buchi sono state aggiunte: Tribunale, Prefettura e Palazzo del governo (Stato); Covo, Mercato nero e Arsenale clandestino (Ombra); Acciaieria (Opera, era 3); Zappatori (Assedio dell’era 1, per l’Architetto); Tagliagole (Ombra, era 1); Guardia reale (Stato, era 3); le azioni Archivisti, Manuali tecnici, Decreto fiscale e Censimento. In seguito sono arrivati Armeria, Campo d’addestramento e Torre di guardia per il Generale, Contrabbandieri, Avvelenatori e Lame nere per il Maestro delle spie: ora entrambi hanno almeno 2 truppe e 3 edifici in ogni era.
 
 ---
 
@@ -397,8 +403,8 @@ Tutte le questioni della bozza 1 sono decise.
 
 | | Era 1 | Era 2 | Era 3 | Totale |
 |---|---:|---:|---:|---:|
-| Edifici base | 13 | 10 | 11 | 34 |
-| Truppe base | 10 | 8 | 9 | 27 |
+| Edifici base | 14 | 12 | 11 | 37 |
+| Truppe base | 10 | 10 | 10 | 30 |
 | Vie | — | 4 | 4 + 1 esclusiva | 9 |
 | Esclusivi delle vie | — | 4 | 9 | 13 |
 | Esclusivi dell’identità | 3 | — | — | 3 |

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_trp"]
+
+[resource]
+script = ExtResource("1_trp")
+id = &"lame_nere"
+display_name = "Lame nere"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Criminale"])
+mana_type = &"viola"
+mana_cost = 4
+cooldown_ms = 2500
+damage = 9
+sabotage_ms = 4000

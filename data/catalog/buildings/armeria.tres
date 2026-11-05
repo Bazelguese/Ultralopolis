@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_bld"]
+
+[resource]
+script = ExtResource("1_bld")
+id = &"armeria"
+display_name = "Armeria"
+cost_gold = 4
+types = Array[StringName]([&"Infrastruttura Bellica"])
+iron_per_phase = 2
+mana_type = &"rosso"
+mana_amount = 1
+mana_interval_ms = 1500

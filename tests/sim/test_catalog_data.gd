@@ -92,8 +92,8 @@ func test_ogni_elemento_dell_identita_indica_una_risorsa_della_capitale() -> voi
 
 func test_catalogo_bozza_3() -> void:
 	var catalog: CatalogDef = _catalog()
-	assert_eq(catalog.buildings.size(), 34, "34 edifici (Catalogo §8, bozza 4).")
-	assert_eq(catalog.troops.size(), 27, "27 truppe (bozza 4).")
+	assert_eq(catalog.buildings.size(), 37, "37 edifici (Catalogo §8, bozza 4).")
+	assert_eq(catalog.troops.size(), 30, "30 truppe (bozza 4).")
 	assert_eq(catalog.eras[1].ways.size(), 4, "4 vie nell'era 2.")
 	assert_eq(catalog.eras[2].ways.size(), 5, "4 vie più l'esclusiva nell'era 3.")
 	for def: TroopDef in catalog.troops:
