@@ -188,9 +188,9 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 | Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato |
 | Il pool di un consigliere è dato dalla sua **categoria** (§4.2.4): propone gli edifici e le truppe che hanno almeno un tipo della categoria | Confermato (v0.22) |
 | Oltre alle proposte, ogni consigliere ordinario offre l’opzione **Potenzia** (§6.5): non consuma la scelta del round e si usa una volta per round | Confermato (v0.22) |
-| Ogni round ha un **tipo**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
-| In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tipo è visibile prima di scegliere il consigliere | Proposta |
-| Un consigliere che non ha niente da proporre per il tipo del round non viene pescato in quel round | Proposta |
+| Ogni round ha un **tema**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
+| In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tema è visibile prima di scegliere il consigliere | Proposta |
+| Un consigliere che non ha niente da proporre per il tema del round non viene pescato in quel round | Proposta |
 | Si può **passare**: senza scegliere un consigliere, oppure dopo averlo scelto senza prendere nulla. Passare non dà nulla | Passare: Confermato; dopo la scelta del consigliere: Proposta |
 | Il **rinnovo** a pagamento ripesca le proposte del consigliere scelto | Proposta |
 | Il rinnovo costa Oro, almeno 1; il costo aumenta a ogni rinnovo e a ogni nuovo round si dimezza l’aumento accumulato (arrotondato per difetto), senza scendere sotto il costo iniziale | Confermato |
@@ -210,7 +210,7 @@ I consiglieri hanno **3 livelli**, legati all’**era**: Funzionari, Ministri e 
 
 - **Clown:** propone **5 elementi**, edifici e truppe mescolati: uno per ciascun colore di mana (rosso, verde, blu, viola) e un edificio neutro — Confermato (v0.22). Non offre Potenzia.
 - **Anziano:** propone **perk** ed **elementi neutrali**. Proposta: gli elementi neutrali sono gli edifici neutri, perché non esistono truppe neutre. Offre Potenzia **solo per gli edifici neutri**, qualunque tipo abbiano, e **una volta all’anno** — Confermato (v0.22).
-- **Proposta:** Clown e Anziano ignorano il tipo del round.
+- **Proposta:** Clown e Anziano ignorano il tema del round.
 
 #### 4.2.3 Consiglio del prototipo — Proposta
 
@@ -231,7 +231,7 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 
 Le risorse con cui si pagano le azioni sono quelle del prototipo precedente: vanno riviste insieme alle risorse delle categorie (§4.2.4, Da definire).
 
-Un tipo di proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
+Una proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
 
 **Da definire:** Studioso e Cancelliere hanno una sola azione: in un round Azioni mostrerebbero una sola proposta.
 
@@ -415,7 +415,7 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
   - Ogni consigliere ordinario offre, oltre alle 3 proposte, una quarta opzione: **Potenzia**.
   - Potenzia porta di livello un edificio o una truppa della plancia che abbia **almeno un tipo** della categoria del consigliere (§4.2.4).
   - Usare Potenzia **non consuma la scelta** del round: si può prendere anche una delle proposte. Una volta usata, l’opzione sparisce per quel round.
-  - Potenzia è disponibile in **ogni tipo di round**, per edifici e truppe.
+  - Potenzia è disponibile con **ogni tema del round**, per edifici e truppe.
   - Il **costo** lo decide il consigliere: la stessa carta può costare risorse diverse a seconda di chi la potenzia. Risorse di ogni categoria: Da definire.
   - Potenzia non compare se nessuna carta ha un tipo del consigliere o se sono tutte al livello massimo.
   - Il Clown non offre Potenzia; l’Anziano solo per gli edifici neutri, una volta all’anno (§4.2.2).
@@ -759,7 +759,7 @@ La **Ricerca si conserva e viene spesa** per avanzare quando il giocatore può p
 
 Gli elementi posseduti restano utilizzabili e non migliorano automaticamente: il vantaggio tecnologico richiede anche la capacità economica di acquistare ciò che viene sbloccato.
 
-La struttura è **lineare**: ere in sequenza, senza albero tecnologico. La scelta e la specializzazione passano per le vie (§10.4). La Ricerca serve, per ora, solo a passare d’era.
+La struttura è **lineare**: ere in sequenza, senza albero tecnologico. La scelta e la specializzazione passano per le vie (§10.4). La Ricerca serve, per ora, solo a passare d’era; in futuro servirà anche alle tecnologie (Direzione, §10.5).
 
 **Costo — Confermato nella forma:** ogni era costa più Ricerca della precedente, senza meccanismi di recupero per chi è rimasto indietro. Valori placeholder.
 
@@ -795,7 +795,7 @@ Le vie sono nel prototipo dalla v0.18, con il catalogo di `docs/Catalogo.md`.
 - Costi definitivi delle ere e andamento fra un’era e la successiva.
 - Numero definitivo di ere (§10.2).
 - Catalogo delle vie e dei loro esclusivi.
-- Altri usi della Ricerca oltre al passaggio d’era (ad esempio tecnologie come offerte), se serviranno.
+- **Tecnologie — Direzione (v0.22):** la Ricerca servirà anche per le tecnologie, un sistema ancora da introdurre. Per questo la Ricerca non è la risorsa di nessuna categoria del Consiglio (§4.2.4).
 
 ## 11. Fantasmi e asincronia
 
@@ -1105,7 +1105,7 @@ Criteri di accettazione proposti per il prototipo:
 | Potenzia | Sale di livello una carta con almeno un tipo della categoria del consigliere; non consuma la scelta; una sola volta per round; non compare senza carte valide o con tutte al massimo. |
 | Potenzia dell’Anziano | Solo edifici neutri, una volta all’anno; il Clown non lo offre. |
 | Fuori dal Consiglio | Non si può potenziare (salvo eventi e ricompense). |
-| Tipo del round | Un round Edifici propone solo edifici, Truppe solo truppe, Azioni solo azioni; Clown e Anziano fanno eccezione. |
+| Tema del round | Un round Edifici propone solo edifici, Truppe solo truppe, Azioni solo azioni; Clown e Anziano fanno eccezione. |
 | Incanto | Una sola volta per truppa; aggiunge l’effetto e il costo di mana, anche a una truppa che non usava mana. |
 | Spionaggio | Lo scontro con il fantasma parte con l’elemento scelto dal criterio della proposta già sabotato o rallentato; con lo stesso seme è sempre lo stesso. |
 
@@ -1167,6 +1167,8 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - **Potenzia**: si potenzia solo con il Consiglio (quarta opzione che non consuma la scelta), oltre che con eventi e ricompense; il costo lo decide il consigliere (§6.5). Tolte le azioni di potenziamento di Architetto e Generale (§4.2.3).
 - **Quattro colori** di mana: rosso, verde, blu, viola, più l’energetico; i tipi non hanno colore, le categorie danno solo una tendenza (§5.3).
 - Clown con 5 elementi; Anziano con Potenzia sugli edifici neutri una volta all’anno (§4.2.2). Diplomatico rinominato Cancelliere (placeholder).
+- Il “tipo del round” si chiama ora **tema del round**, per non confonderlo con i tipi delle carte (§4.2).
+- Direzione: la Ricerca servirà anche per le tecnologie (§10.5).
 - Da definire: risorse di ogni categoria; revisione degli impieghi delle risorse (§5.3).
 
 **v0.21 — 4 novembre 2026** (dopo le partite di Davide)
