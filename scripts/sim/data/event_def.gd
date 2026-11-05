@@ -13,6 +13,7 @@ enum Family {
 enum Special {
 	NESSUNO,
 	RIFORMA,  ## Un'opzione per ogni governo a cui il governo attuale può evolvere, pagata in Influenza.
+	RIVOLUZIONE,  ## Arriva da sola quando il Malcontento tocca la soglia; un'opzione gratuita per governo possibile.
 }
 
 @export var id: StringName = &""
@@ -35,6 +36,8 @@ enum Special {
 ## Era minima e massima in cui può comparire (0 = nessun limite).
 @export var min_era: int = 0
 @export var max_era: int = 0
+## Compare solo se il Malcontento è almeno questo (0 = nessun limite; GDD §5.5, v0.24).
+@export var min_malcontent: int = 0
 ## Compare solo se sulla plancia c'è almeno una carta con uno di questi tipi.
 @export var requires_types: Array[StringName] = []
 ## Compare solo se nel Magazzino c'è almeno questa quantità (unità intere) di queste risorse.

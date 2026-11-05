@@ -19,3 +19,4 @@ evolves_to = Array[Resource]([ExtResource("x2")])
 reform_requires_types = Array[StringName]([&"Patriota"])
 advisors_change = -1
 permanent_modifiers = Array[ExtResource("x3")]([ExtResource("x4"), ExtResource("x5")])
+revolution_causes = Array[int]([0])

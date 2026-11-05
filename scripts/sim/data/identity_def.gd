@@ -4,6 +4,22 @@ extends Resource
 ## Tutti usano la stessa scheda; ogni campo è facoltativo. Gli effetti si esprimono
 ## con il linguaggio del nucleo (P5): Resistenza, dotazione, opportunità, elementi, modificatori.
 
+## Cause del Malcontento (GDD §5.5, v0.24): quella che ne ha prodotto di più decide quali governi
+## può portare la Rivoluzione.
+enum Grievance {
+	SCONFITTE,  ## Scontri persi.
+	CARESTIE,   ## Truppe rimaste senza Cibo.
+	MALUS,      ## Malus subiti.
+	EVENTI,     ## Scelte degli eventi.
+}
+
+const GRIEVANCE_NAMES: Dictionary[Grievance, String] = {
+	Grievance.SCONFITTE: "le sconfitte",
+	Grievance.CARESTIE: "le carestie",
+	Grievance.MALUS: "i malus subiti",
+	Grievance.EVENTI: "le scelte di governo",
+}
+
 enum Dimension {
 	POPOLO,
 	GOVERNO,
@@ -74,6 +90,8 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export var evolves_to: Array[Resource] = []
 ## Tipi richiesti sulla plancia per raggiungere questo governo con una Riforma.
 @export var reform_requires_types: Array[StringName] = []
+## Cause del Malcontento per cui una Rivoluzione può portare a questo governo, di qualunque tier.
+@export var revolution_causes: Array[Grievance] = []
 
 @export_group("Consiglio")
 ## Effetti sul Consiglio e sulle risorse (GDD §9.2, v0.24): valgono fuori dalla battaglia e si

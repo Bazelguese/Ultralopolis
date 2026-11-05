@@ -24,3 +24,4 @@ action_discount = 1
 favored_advisors = Array[ExtResource("x3")]([ExtResource("x4")])
 cheaper_actions = Array[ExtResource("x5")]([ExtResource("x6")])
 permanent_modifiers = Array[ExtResource("x7")]([ExtResource("x8")])
+revolution_causes = Array[int]([1])

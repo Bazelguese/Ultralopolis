@@ -187,6 +187,11 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 	while not run.is_over() and guard < 1000:
 		guard += 1
 		match run.phase:
+			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE when run.is_revolution_round():
+				# La Rivoluzione arriva da sola: si sceglie il primo governo possibile (GDD §9.4.2).
+				if run.chosen_event == null:
+					run.choose_event()
+				assert_true(run.take_event_option(0), run.last_error)
 			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
 				# Ascolta il primo consigliere, potenzia se può, compra la prima proposta che si può
 				# pagare senza sostituzioni e senza scelte, altrimenti passa.
@@ -318,8 +323,13 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 			categories.append(advisor.category_name)
 	var events: int = 0
 	var fortunes: int = 0
+	var revolutions: int = 0
 	for event: EventDef in catalog.events:
 		assert_true(categories.has(event.sphere), "La sfera di %s è una categoria" % event.id)
+		# La Rivoluzione arriva da sola e costruisce le sue opzioni dai governi (GDD §9.4.2).
+		if event.special == EventDef.Special.RIVOLUZIONE:
+			revolutions += 1
+			continue
 		assert_false(event.options.is_empty(), "Opzioni di %s" % event.id)
 		var free: bool = false
 		for option: EventOptionDef in event.options:
@@ -331,7 +341,8 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
 		else:
 			events += 1
-	assert_eq(events, 19, "18 eventi più la Riforma (v0.24).")
+	assert_eq(events, 20, "18 eventi più la Riforma e i Tumulti in piazza (v0.24).")
+	assert_eq(revolutions, 1, "Una Rivoluzione.")
 	assert_eq(fortunes, 6)
 	assert_eq(catalog.visitors.size(), 6)
 	for visitor: AdvisorDef in catalog.visitors:
@@ -409,3 +420,17 @@ func test_esclusivi_dell_identita() -> void:
 			IdentityDef.Dimension.GOVERNO:
 				if def.tier == 1:
 					assert_false(eras.is_empty(), "%s ha una carta esclusiva" % def.id)
+
+
+func test_ogni_governo_ha_una_causa_di_rivoluzione_e_ogni_causa_dei_governi() -> void:
+	# GDD §9.4.2 (v0.24): la causa del Malcontento decide quali governi sono possibili.
+	var catalog: CatalogDef = _catalog()
+	var per_cause: Dictionary[int, int] = {}
+	for def: IdentityDef in catalog.identities:
+		if def.dimension != IdentityDef.Dimension.GOVERNO:
+			continue
+		assert_false(def.revolution_causes.is_empty(), "%s ha una causa" % def.id)
+		for cause: int in def.revolution_causes:
+			per_cause[cause] = per_cause.get(cause, 0) + 1
+	for cause: IdentityDef.Grievance in IdentityDef.GRIEVANCE_NAMES:
+		assert_gte(per_cause.get(cause, 0), 2, "Almeno due governi per %s" % IdentityDef.GRIEVANCE_NAMES[cause])

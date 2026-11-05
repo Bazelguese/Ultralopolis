@@ -6,6 +6,7 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/tributi_feudali.tres" id="act_1"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/decreto_fiscale.tres" id="new_0"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/censimento.tres" id="new_1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/ordine_pubblico.tres" id="p1"]
 
 [resource]
 script = ExtResource("1_advdf")
@@ -16,4 +17,4 @@ category_name = "Stato"
 description = "Regge lo Stato: propone legge, patrioti, nobili e sapere di Stato."
 types = Array[StringName]([&"Legge", &"Patriota", &"Accademico", &"Nobile"])
 upgrade_resource = 8
-actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("new_0"), ExtResource("new_1")])
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("new_0"), ExtResource("new_1"), ExtResource("p1")])

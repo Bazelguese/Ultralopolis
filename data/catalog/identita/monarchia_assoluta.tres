@@ -18,3 +18,4 @@ evolves_to = Array[Resource]([ExtResource("x2")])
 reform_requires_types = Array[StringName]([&"Nobile"])
 court_advisor_always = true
 permanent_modifiers = Array[ExtResource("x3")]([ExtResource("x4")])
+revolution_causes = Array[int]([0])

@@ -22,3 +22,4 @@ reform_requires_types = Array[StringName]([&"Economico"])
 visitor_weight_change = 2
 favored_advisors = Array[ExtResource("x3")]([ExtResource("x4"), ExtResource("x5")])
 permanent_modifiers = Array[ExtResource("x6")]([ExtResource("x7")])
+revolution_causes = Array[int]([3])

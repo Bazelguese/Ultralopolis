@@ -234,6 +234,15 @@ static func da_evento(run: RunState, evento: EventDef) -> SchedaCarta:
 	scheda.riga = "Un dono" if fortuna else "%d scelte" % evento.options.size()
 	var righe: PackedStringArray = PackedStringArray()
 	righe.append(evento.description)
+	if evento.special == EventDef.Special.RIVOLUZIONE:
+		scheda.riga = "Arriva da sola"
+		for governo: IdentityDef in run.revolution_targets():
+			righe.append("• Verso: %s" % governo.display_name)
+		righe.append("Causa principale del Malcontento: %s." % IdentityDef.GRIEVANCE_NAMES[run.main_grievance()])
+	elif evento.special == EventDef.Special.RIFORMA:
+		scheda.riga = "%d scelte" % (run.evolution_targets().size() + evento.options.size())
+		for governo: IdentityDef in run.evolution_targets():
+			righe.append("• Verso: %s" % governo.display_name)
 	for opzione: EventOptionDef in evento.options:
 		var requisito: String = run.option_requirement(opzione)
 		righe.append("• %s%s" % ["[%s] " % requisito if requisito != "" else "", opzione.label])
@@ -408,6 +417,8 @@ static func _riassunto_azione(opportunita: OpportunityDef) -> String:
 				dai.append(opportunita.cost_resources.describe())
 			if opportunita.gain_resources != null and not opportunita.gain_resources.is_empty():
 				ricevi.append(opportunita.gain_resources.describe())
+			if opportunita.malcontent_change != 0:
+				ricevi.append("%+d Malcontento" % opportunita.malcontent_change)
 			if dai.is_empty():
 				return "+" + " +".join(ricevi)
 			return "%s → %s" % [" + ".join(dai), " + ".join(ricevi)]

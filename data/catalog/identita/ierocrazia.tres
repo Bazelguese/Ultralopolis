@@ -20,3 +20,4 @@ action_discount = 1
 cheaper_advisors = Array[ExtResource("x2")]([ExtResource("x3")])
 always_present_advisor = ExtResource("x3")
 permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5")])
+revolution_causes = Array[int]([2])

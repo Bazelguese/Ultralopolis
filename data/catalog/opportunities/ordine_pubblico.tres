@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+stabilita = 2
+
+[resource]
+script = ExtResource("x1")
+id = &"ordine_pubblico"
+display_name = "Ordine pubblico"
+description = "Paghi 2 Stabilità: il Malcontento scende di 3. Compare solo se c'è Malcontento."
+kind = 4
+cost_resources = SubResource("S1")
+malcontent_change = -3

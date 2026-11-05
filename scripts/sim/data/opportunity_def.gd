@@ -74,6 +74,11 @@ enum SpyEffect {
 @export var spy_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
 @export var spy_criterion: SpyCriterion = SpyCriterion.A_CASO
 
+@export_group("Malcontento")
+## Malcontento in più (o, se negativo, in meno) quando si prende l'azione (GDD §5.5, v0.24).
+## Un'azione che lo fa scendere compare solo se c'è Malcontento.
+@export var malcontent_change: int = 0
+
 @export_group("Incanto")
 ## Valore di battaglia aggiunto alla truppa: danno, scudo, cura, Corruzione o Inefficienza (GDD §4.3).
 @export var enchant_value: ModifierDef.BattleValue = ModifierDef.BattleValue.DANNO

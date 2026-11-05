@@ -17,3 +17,4 @@ tier = 3
 reform_requires_types = Array[StringName]([&"Legge"])
 advisors_change = 1
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
+revolution_causes = Array[int]([1])

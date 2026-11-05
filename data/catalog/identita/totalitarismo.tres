@@ -23,3 +23,4 @@ spy_ms_change = 1000
 favored_advisors = Array[ExtResource("x2")]([ExtResource("x3")])
 excluded_advisors = Array[ExtResource("x2")]([ExtResource("x4")])
 permanent_modifiers = Array[ExtResource("x5")]([ExtResource("x6"), ExtResource("x7")])
+revolution_causes = Array[int]([0])

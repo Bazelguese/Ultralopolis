@@ -20,3 +20,4 @@ proposal_gold_change = -1
 visitor_weight_change = 4
 favored_advisors = Array[ExtResource("x2")]([ExtResource("x3")])
 permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5")])
+revolution_causes = Array[int]([3])

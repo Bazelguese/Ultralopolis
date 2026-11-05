@@ -177,6 +177,10 @@ var nation_name: String = "La tua nazione"
 var identity: Array[IdentityDef] = []
 ## Vie proposte entrando nell'era: finché non se ne sceglie una, le altre azioni aspettano.
 var way_choices: Array[IdentityDef] = []
+## Malcontento della nazione (GDD §5.5, v0.24): una pressione fuori dal Magazzino e dalla battaglia.
+var malcontent: int = 0
+## Malcontento prodotto da ogni causa dall'ultima rivoluzione (IdentityDef.Grievance → quantità).
+var malcontent_sources: Dictionary[int, int] = {}
 ## Governi a cui la nazione può evolvere entrando nella nuova era (GDD §9.4, v0.24): si sceglie
 ## uno o si rifiuta. Vuoto se non c'è nulla da decidere.
 var government_choices: Array[IdentityDef] = []
@@ -549,6 +553,7 @@ func _feed_troops() -> void:
 	_log("Le truppe consumano %s Cibo." % Res.format(Res.Type.CIBO, eaten))
 	if not hungry_names.is_empty():
 		_log("Senza cibo (ricarica più lenta per un anno): %s." % ", ".join(hungry_names))
+		_change_malcontent(hungry_names.size() * run_rules.malcontent_per_hungry_troop, IdentityDef.Grievance.CARESTIE, "Carestia")
 
 
 ## Ordine del pasto: ricarica più lunga prima; a parità, la truppa più a destra.
@@ -808,6 +813,8 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 	if element_extra != null:
 		for type: Res.Type in Res.NAMES:
 			stock[type] -= element_extra.internal(type)
+	if offer.opportunity != null and offer.opportunity.malcontent_change != 0:
+		_change_malcontent(offer.opportunity.malcontent_change, IdentityDef.Grievance.EVENTI, source)
 	_next_round()
 	return true
 
@@ -816,6 +823,8 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 func pass_round() -> bool:
 	if not _require_shopping():
 		return false
+	if is_revolution_round():
+		return _fail("La Rivoluzione non si può evitare: scegli il nuovo governo.")
 	_log("Round %d lasciato passare." % round_number)
 	_next_round()
 	return true
@@ -852,6 +861,14 @@ func event_options() -> Array[EventOptionDef]:
 ## Opzioni della Riforma (GDD §9.4, v0.24): una per ramo, pagata in Influenza secondo il tier.
 func _special_options(event: EventDef) -> Array[EventOptionDef]:
 	var built: Array[EventOptionDef] = []
+	if event.special == EventDef.Special.RIVOLUZIONE:
+		for target: IdentityDef in revolution_targets():
+			var choice: EventOptionDef = EventOptionDef.new()
+			choice.label = "Verso: %s" % target.display_name
+			choice.description = "Il popolo porta al governo %s (tier %d). %s" % [target.display_name, target.tier, target.description]
+			choice.change_government = target
+			built.append(choice)
+		return built
 	if event.special != EventDef.Special.RIFORMA:
 		return built
 	for target: IdentityDef in evolution_targets():
@@ -960,6 +977,12 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 		_log("%s: %s partirà %s nello scontro con il fantasma." % [source, _ghost_element_name(spy_target), "sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato"])
 	if option.change_government != null:
 		_change_government(option.change_government as IdentityDef, source)
+	if option.malcontent_change != 0:
+		_change_malcontent(option.malcontent_change, IdentityDef.Grievance.EVENTI, source)
+	if chosen_event.special == EventDef.Special.RIVOLUZIONE:
+		malcontent = 0
+		malcontent_sources = {}
+		_log("Dopo la Rivoluzione il Malcontento si azzera.")
 	_log("%s: %s." % [source, option.label])
 	_next_round()
 	return true
@@ -1181,6 +1204,7 @@ func choose_encounter(index: int) -> bool:
 	var lost_gold: int = gold - half_down(gold)
 	gold = half_down(gold)
 	_log("Sconfitta contro %s: perso metà dell'Oro (%d)." % [encounter.display_name, lost_gold])
+	_change_malcontent(run_rules.malcontent_per_encounter_defeat, IdentityDef.Grievance.SCONFITTE, "Sconfitta")
 	if last_chance:
 		_end_run(RunEnd.SCONFITTA)
 		return true
@@ -1268,6 +1292,7 @@ func fight_ghost() -> bool:
 			return true
 		prestige -= year
 		_log("Sconfitta contro %s: perso %d Prestigio." % [ghost_name, year])
+		_change_malcontent(run_rules.malcontent_per_ghost_defeat, IdentityDef.Grievance.SCONFITTE, "Sconfitta")
 		_apply_ghost_malus(ghost_name)
 		if prestige <= 0:
 			prestige = 0
@@ -1396,6 +1421,14 @@ func _end_shopping_phase() -> void:
 ## Pesca i consiglieri del round: diversi fra loro, solo quelli che hanno qualcosa da proporre
 ## per il tema, più probabili se l'identità li favorisce (§16.3: peso 1, +1 per elemento).
 func _draw_advisors() -> void:
+	# Raggiunta la soglia del Malcontento il round mostra solo la Rivoluzione (GDD §5.5, §9.4).
+	var revolution: EventDef = _revolution_event()
+	if revolution != null and malcontent >= run_rules.malcontent_threshold and not revolution_targets().is_empty():
+		advisor_choices = []
+		_mandatory_count = 0
+		event_choice = revolution
+		_log("Il Malcontento ha raggiunto la soglia: scoppia la Rivoluzione.")
+		return
 	var pool: Array[AdvisorDef] = []
 	var weights: Array[int] = []
 	var excluded: Array[AdvisorDef] = _excluded_advisors()
@@ -1489,6 +1522,11 @@ func _available_events(family: EventDef.Family) -> Array[EventDef]:
 		if event.requires_malus and modifiers.year_malus().is_empty():
 			continue
 		if event.special == EventDef.Special.RIFORMA and evolution_targets().is_empty():
+			continue
+		# La Rivoluzione non si pesca: arriva da sola (GDD §4.2.5).
+		if event.special == EventDef.Special.RIVOLUZIONE:
+			continue
+		if event.min_malcontent > 0 and malcontent < event.min_malcontent:
 			continue
 		if event.options.is_empty():
 			continue
@@ -1818,6 +1856,8 @@ func _action_available(opportunity: OpportunityDef) -> bool:
 		return false
 	if opportunity.min_level > council_level():
 		return false
+	if opportunity.malcontent_change < 0 and malcontent <= 0:
+		return false
 	match opportunity.kind:
 		OpportunityDef.Kind.SPAZIO_EDIFICIO:
 			return board.building_capacity() < board.max_building_slots
@@ -1991,6 +2031,8 @@ static func _gain_text(opportunity: OpportunityDef) -> String:
 		parts.append("%d Ricerca" % opportunity.gain_research)
 	if opportunity.gain_resources != null and not opportunity.gain_resources.is_empty():
 		parts.append(opportunity.gain_resources.describe())
+	if opportunity.malcontent_change != 0:
+		parts.append("%+d Malcontento" % opportunity.malcontent_change)
 	return " e ".join(parts) if not parts.is_empty() else "nulla"
 
 
@@ -2089,6 +2131,7 @@ func _apply_ghost_malus(ghost_name: String) -> void:
 		return
 	for def: ModifierDef in current_ghost.malus:
 		_log(modifiers.apply(def, ActiveModifier.OriginKind.FANTASMA, ghost_name, year, board, _rng))
+		_change_malcontent(run_rules.malcontent_per_malus, IdentityDef.Grievance.MALUS, def.display_name)
 
 
 ## Toglie i modificatori di elementi che non sono più sulla plancia.
@@ -2200,6 +2243,61 @@ func choose_way(index: int) -> bool:
 	# Le proposte in corso tengono conto della via appena scelta.
 	_redraw_round()
 	return true
+
+
+# --- Malcontento e Rivoluzione (GDD §5.5, §9.4.2; v0.24) ----------------------------
+
+## Il Malcontento sale (amount > 0) per una causa, o scende (amount < 0); mai sotto zero.
+func _change_malcontent(amount: int, cause: IdentityDef.Grievance, reason: String) -> void:
+	if amount == 0:
+		return
+	var before: int = malcontent
+	malcontent = maxi(0, malcontent + amount)
+	if amount > 0:
+		malcontent_sources[cause] = malcontent_sources.get(cause, 0) + amount
+	_log("%s: Malcontento %s %d (ora %d su %d)." % [reason, "+" if amount > 0 else "−", absi(malcontent - before), malcontent, run_rules.malcontent_threshold])
+	if amount > 0 and malcontent >= run_rules.malcontent_warning and before < run_rules.malcontent_warning:
+		_log("Attenzione: la rivoluzione si avvicina.")
+
+
+## Causa che ha prodotto più Malcontento dall'ultima rivoluzione (a parità, la prima dell'elenco).
+func main_grievance() -> IdentityDef.Grievance:
+	var best: IdentityDef.Grievance = IdentityDef.Grievance.SCONFITTE
+	var best_amount: int = -1
+	for cause: IdentityDef.Grievance in IdentityDef.GRIEVANCE_NAMES:
+		var amount: int = malcontent_sources.get(cause, 0)
+		if amount > best_amount:
+			best = cause
+			best_amount = amount
+	return best
+
+
+## Vero se questo round mostra solo la Rivoluzione.
+func is_revolution_round() -> bool:
+	return event_choice != null and event_choice.special == EventDef.Special.RIVOLUZIONE
+
+
+## Governi a cui può portare la Rivoluzione (GDD §9.4.2): quelli legati alla causa principale,
+## di qualunque tier, tranne quello attuale. Se nessuno è legato alla causa, i governi del tier 1.
+func revolution_targets() -> Array[IdentityDef]:
+	var cause: IdentityDef.Grievance = main_grievance()
+	var current: IdentityDef = government()
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == IdentityDef.Dimension.GOVERNO and def != current and def.revolution_causes.has(cause):
+			found.append(def)
+	if found.is_empty():
+		for def: IdentityDef in catalog.identities:
+			if def.dimension == IdentityDef.Dimension.GOVERNO and def != current and def.tier == 1:
+				found.append(def)
+	return found
+
+
+func _revolution_event() -> EventDef:
+	for event: EventDef in catalog.events:
+		if event.special == EventDef.Special.RIVOLUZIONE:
+			return event
+	return null
 
 
 # --- Governi a tier (GDD §9.4, v0.24) ------------------------------------------------

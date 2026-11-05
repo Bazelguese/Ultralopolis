@@ -54,3 +54,5 @@ enum PieceKind {
 @export var spy: OpportunityDef
 ## Nuovo governo della nazione (IdentityDef), per la Riforma e la Rivoluzione (GDD §9.4, v0.24).
 @export var change_government: Resource
+## Malcontento in più (o, se negativo, in meno) (GDD §5.5, v0.24).
+@export var malcontent_change: int = 0

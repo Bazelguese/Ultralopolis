@@ -259,3 +259,24 @@ func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 ## Carte attese prima di scegliere: i consiglieri del round più l'evento, se c'è (GDD §4.2.5).
 func _carte_del_round(run: RunState) -> int:
 	return run.advisor_choices.size() + (1 if run.event_choice != null else 0)
+
+
+func test_la_rivoluzione_occupa_il_tavolo_e_non_si_puo_passare() -> void:
+	# GDD §5.5, §9.4.2 (v0.24): raggiunta la soglia il round mostra solo la Rivoluzione.
+	var run: RunState = _run()
+	run.malcontent = run.run_rules.malcontent_threshold
+	run.pass_round()
+	_scena.call("_aggiorna_tutto")
+	assert_true(run.is_revolution_round(), "Arriva la Rivoluzione.")
+	var scelte: Array = _scena.get("_scelte")
+	assert_eq(scelte.size(), 1, "Sul tavolo solo la Rivoluzione.")
+	var hud: HudPlancia = _scena.get("_hud")
+	assert_false((hud.get("_pulsante_passa") as Button).visible, "Non si può passare.")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_not_null(run.chosen_event, "Cliccando si apre la Rivoluzione.")
+	scelte = _scena.get("_scelte")
+	assert_eq(scelte.size(), run.revolution_targets().size(), "Una carta per ogni governo possibile.")
+	var nuovo: IdentityDef = run.revolution_targets()[0]
+	_scena.call("_clic_scelta", scelte[0])
+	assert_eq(run.government(), nuovo)
+	assert_eq(run.malcontent, 0)
