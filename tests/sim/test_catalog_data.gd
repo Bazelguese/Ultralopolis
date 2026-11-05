@@ -330,3 +330,22 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 	for visitor: AdvisorDef in catalog.visitors:
 		assert_eq(visitor.special, AdvisorDef.Special.VISITATORE, "%s è un visitatore" % visitor.id)
 		assert_true(categories.has(visitor.category_name), "La sfera di %s è una categoria" % visitor.id)
+
+
+func test_identita_del_prototipo_v024() -> void:
+	# GDD §9.3 (v0.24): 3 razze, 3 governi alla creazione, 4 credi, 4 culture.
+	# L'Ordine della Ragione non è più un credo: il sapere passa alla Cultura erudita.
+	var catalog: CatalogDef = _catalog()
+	var expected: Dictionary[IdentityDef.Dimension, Array] = {
+		IdentityDef.Dimension.POPOLO: [&"pietrosangue", &"maremani", &"cinerali"],
+		IdentityDef.Dimension.GOVERNO: [&"monarchia", &"repubblica", &"teocrazia"],
+		IdentityDef.Dimension.CREDO: [&"culto_solare", &"spiriti_dei_luoghi", &"culto_degli_antenati", &"culto_del_vuoto"],
+		IdentityDef.Dimension.CULTURA: [&"cultura_mercantile", &"cultura_guerriera", &"cultura_erudita", &"cultura_artigiana"],
+	}
+	for dimension: IdentityDef.Dimension in expected:
+		var ids: Array[StringName] = []
+		for def: IdentityDef in IdentityRules.options(catalog, dimension):
+			ids.append(def.id)
+		for wanted: StringName in expected[dimension]:
+			assert_true(ids.has(wanted), "%s fra le opzioni" % wanted)
+		assert_eq(ids.size(), expected[dimension].size(), "Numero di opzioni per %s" % IdentityDef.DIMENSION_NAMES[dimension])
