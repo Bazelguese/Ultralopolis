@@ -219,7 +219,7 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 | Consigliere | Categoria | Azioni | Paga le azioni con |
 |---|---|---|---|
 | Tesoriere | Ricchezza | Esattori: Oro subito · Mercante: Ricerca in Oro · Assemblea: +50% Oro o Ricerca per un anno | Ricerca, Influenza |
-| Fattore | Terra | Scorte: Cibo e Fauna in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno, Fauna |
+| Fattore | Terra | Scorte: Cibo in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno |
 | Architetto | Opera | Architetti: spazio edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | Pietra, Legno (lo spazio in Oro) |
 | Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
 | Studioso | Conoscenza | Studiosi: Legno in Ricerca | Legno |
@@ -229,7 +229,7 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 | Clown | — | 5 elementi di mana diverso (§4.2.2) | — |
 | Anziano | — | Un perk (§9.3) | Fede e Influenza |
 
-Le risorse con cui si pagano le azioni sono quelle del prototipo precedente: vanno riviste insieme alle risorse delle categorie (§4.2.4, Da definire).
+Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
 
 Una proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
 
@@ -246,19 +246,22 @@ Una **categoria** è un insieme di tipi (§6.6) ed è il campo di un consigliere
 | Ogni consigliere ordinario ha una categoria; Clown e Anziano non ne hanno | Confermato |
 | Un consigliere propone gli edifici e le truppe che hanno **almeno un tipo** della sua categoria | Confermato |
 | Lo stesso tipo può stare in più categorie: le sue carte possono allora essere proposte da più consiglieri | Confermato |
-| Un consigliere può potenziare (§6.5) le carte che hanno almeno un tipo della sua categoria; il costo lo decide la categoria | Confermato |
-| Quale risorsa chiede ogni categoria, per i potenziamenti e per le azioni | Da definire |
+| Un consigliere può potenziare (§6.5) le carte che hanno almeno un tipo della sua categoria, pagando con la **risorsa della categoria** (tabella sotto) | Confermato |
+| La risorsa della categoria vale solo per Potenzia; le azioni si pagano come in §4.2.3 | Confermato |
+| **Ombra** chiede Oro più una **risorsa casuale**, pescata fra Ferro, Pietra, Legno, Influenza, Fede, Stabilità e Documenti (escluse Ricerca e Cibo) | Confermato |
+| La risorsa casuale di Ombra si pesca con il seme della run quando il Maestro delle spie compare fra i consiglieri del round, è **visibile prima di sceglierlo** e resta la stessa per tutto il round | Confermato |
+| Costo del Potenzia dell’Anziano (che non ha categoria) | Da definire |
 
-| Categoria | Tipi | Consigliere | Colore tendenziale (§5.3) |
-|---|---|---|---|
-| Militare | Assedio, Infrastruttura Bellica, Fante, Guardiano | Generale | rosso |
-| Opera | Infrastruttura Strategica, Produzione, Assedio | Architetto | rosso |
-| Terra | Fauna, Produzione, Guardiano, Economico | Fattore | verde |
-| Ricchezza | Economico, Fante, Infrastruttura Strategica, Nobile | Tesoriere | verde |
-| Conoscenza | Accademico, Criminale, Legge, Infrastruttura Segreta | Studioso | viola |
-| Fede | Spirituale, Patriota, Fauna, Guardiano | Sacerdote | blu |
-| Stato | Legge, Patriota, Accademico, Nobile | Cancelliere | blu |
-| Ombra | Criminale, Infrastruttura Strategica, Infrastruttura Bellica, Infrastruttura Segreta | Maestro delle spie | viola |
+| Categoria | Tipi | Consigliere | Risorsa di Potenzia | Colore tendenziale (§5.3) |
+|---|---|---|---|---|
+| Militare | Assedio, Infrastruttura Bellica, Fante, Guardiano | Generale | Ferro | rosso |
+| Opera | Infrastruttura Strategica, Produzione, Assedio | Architetto | Pietra | rosso |
+| Terra | Fauna, Produzione, Guardiano, Economico | Fattore | Legno | verde |
+| Ricchezza | Economico, Fante, Infrastruttura Strategica, Nobile | Tesoriere | Influenza | verde |
+| Conoscenza | Accademico, Criminale, Legge, Infrastruttura Segreta | Studioso | Documenti | viola |
+| Fede | Spirituale, Patriota, Fauna, Guardiano | Sacerdote | Fede | blu |
+| Stato | Legge, Patriota, Accademico, Nobile | Cancelliere | Stabilità | blu |
+| Ombra | Criminale, Infrastruttura Strategica, Infrastruttura Bellica, Infrastruttura Segreta | Maestro delle spie | Oro + una risorsa casuale | viola |
 
 Categorie e tipi: Confermato nella struttura, nomi placeholder. Fante sta anche in Ricchezza perché i soldati si possono comprare (mercenari). Ombra rappresenta i servizi segreti, che fanno il lavoro sporco: per questo propone anche infrastrutture belliche e strategiche.
 
@@ -299,26 +302,32 @@ Un edificio costruito durante una fase non produce retroattivamente: inizia a pr
 
 **Esempio senza valori:** una biblioteca costruita durante Produzione fornisce la prima Ricerca all’inizio della Preparazione dello stesso anno, e produce di nuovo all’inizio della Produzione dell’anno seguente.
 
-### 5.3 Risorse — Confermato (modifica del nucleo, v0.12)
+### 5.3 Risorse — Confermato (modifica del nucleo, v0.12; riviste in v0.22)
 
-Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; le altre servono a **specializzarsi**: potenziamenti, possibilità peculiari, mantenimento.
+Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; le altre servono a **specializzarsi**: potenziamenti, azioni del Consiglio, mantenimento.
 
-| Risorsa | Impiego |
-|---|---|
-| Oro | Moneta comune: edifici, truppe, spazi, rinnovi delle offerte. |
-| Ricerca | Passaggio di era. |
-| Cibo | Mantenimento delle truppe (§5.4). |
-| Legno | Potenziamento degli edifici. |
-| Pietra | Potenziamento degli edifici, soprattutto difensivi. |
-| Ferro | Potenziamento delle truppe. |
-| Fauna | Elementi con etichetta Fauna (allevamenti, cavalleria). |
-| Fede | Elementi Sacri e possibilità legate al credo. |
-| Influenza | Diplomazia e possibilità peculiari (es. Ambasciata). |
+Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è quella con cui il consigliere fa pagare Potenzia (§6.5). Tre risorse restano fuori dalle categorie: l’Oro (moneta), la Ricerca (ere e tecnologie) e il Cibo (mantenimento).
+
+| Risorsa | Impiego | Prodotta soprattutto da |
+|---|---|---|
+| Oro | Moneta comune: edifici, truppe, spazi, rinnovi delle offerte; Potenzia del Maestro delle spie, insieme a una risorsa casuale (§4.2.4). | edifici Economici |
+| Ricerca | Passaggio di era; in futuro le tecnologie (§10.5). Non è la risorsa di nessuna categoria. | edifici Accademici |
+| Cibo | Mantenimento delle truppe (§5.4). | edifici di Produzione agricola |
+| Ferro | Potenzia del Generale (Militare). | edifici di Produzione e Infrastrutture Belliche |
+| Pietra | Potenzia dell’Architetto (Opera). | edifici di Produzione |
+| Legno | Potenzia del Fattore (Terra). | edifici di Produzione |
+| Influenza | Potenzia del Tesoriere (Ricchezza). | edifici Economici e Nobili |
+| Fede | Potenzia del Sacerdote (Fede). | edifici Spirituali |
+| **Stabilità** | Potenzia del Cancelliere (Stato). Nuova (v0.22). | edifici di Legge, Patrioti e di Stato (es. Consolato, Università) |
+| **Documenti** | Potenzia dello Studioso (Conoscenza). Nuova (v0.22). | edifici Accademici e Infrastrutture Segrete (es. Biblioteca, Accademia, Osservatorio, Loggia segreta, Rete di informatori) |
+
+- La **Fauna** non è più una risorsa (v0.22): resta solo come tipo (§6.6).
+- Le **azioni** dei consiglieri non seguono la risorsa della categoria: si pagano come indicato in §4.2.3 — Confermato (v0.22).
+- La colonna “Prodotta soprattutto da” è una tendenza per il catalogo, non una regola.
 
 - Tutte le risorse stanno nel **Magazzino**, senza limite di capacità.
 - Un edificio può produrre più risorse a ogni fase.
 - I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
-- **Da definire (v0.22):** dalla v0.22 la risorsa dei potenziamenti la decide il consigliere che li esegue (§6.5, §4.2.4); gli impieghi indicati in questa tabella vanno rivisti insieme alle risorse delle categorie.
 
 **Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
 
@@ -416,7 +425,7 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
   - Potenzia porta di livello un edificio o una truppa della plancia che abbia **almeno un tipo** della categoria del consigliere (§4.2.4).
   - Usare Potenzia **non consuma la scelta** del round: si può prendere anche una delle proposte. Una volta usata, l’opzione sparisce per quel round.
   - Potenzia è disponibile con **ogni tema del round**, per edifici e truppe.
-  - Il **costo** lo decide il consigliere: la stessa carta può costare risorse diverse a seconda di chi la potenzia. Risorse di ogni categoria: Da definire.
+  - Il **costo** lo decide il consigliere, con la risorsa della sua categoria (§4.2.4): la stessa carta può costare risorse diverse a seconda di chi la potenzia. Quantità placeholder.
   - Potenzia non compare se nessuna carta ha un tipo del consigliere o se sono tutte al livello massimo.
   - Il Clown non offre Potenzia; l’Anziano solo per gli edifici neutri, una volta all’anno (§4.2.2).
 - Effetti: ogni livello aumenta **tutti i valori d’effetto** dell’elemento (danno, scudo, cura, Corruzione, danno agli scudi, durate di Inefficienza e Sabotaggio); gli edifici producono anche più risorse per fase (valori placeholder, §16.3) — Confermato (v0.16).
@@ -1105,6 +1114,8 @@ Criteri di accettazione proposti per il prototipo:
 | Potenzia | Sale di livello una carta con almeno un tipo della categoria del consigliere; non consuma la scelta; una sola volta per round; non compare senza carte valide o con tutte al massimo. |
 | Potenzia dell’Anziano | Solo edifici neutri, una volta all’anno; il Clown non lo offre. |
 | Fuori dal Consiglio | Non si può potenziare (salvo eventi e ricompense). |
+| Costo di Potenzia | Si paga con la risorsa della categoria del consigliere. |
+| Potenzia di Ombra | Costa Oro più la risorsa casuale, visibile prima di scegliere il consigliere; con lo stesso seme è sempre la stessa. |
 | Tema del round | Un round Edifici propone solo edifici, Truppe solo truppe, Azioni solo azioni; Clown e Anziano fanno eccezione. |
 | Incanto | Una sola volta per truppa; aggiunge l’effetto e il costo di mana, anche a una truppa che non usava mana. |
 | Spionaggio | Lo scontro con il fantasma parte con l’elemento scelto dal criterio della proposta già sabotato o rallentato; con lo stesso seme è sempre lo stesso. |
@@ -1120,7 +1131,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
-| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; risorse di ogni categoria (§4.2.4); nuove azioni per Studioso e Cancelliere. |
+| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; costo del Potenzia dell’Anziano (§4.2.4); nuove azioni per Studioso e Cancelliere. |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
 | Più avanti | Progressione fra run, audio, monetizzazione, stile visivo. |
 
@@ -1143,6 +1154,8 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Incontro del mondo | Minaccia o evento dell’anno (es. barbari, pirati); inizialmente uno scontro contro una plancia generata. |
 | Plancia generata | Plancia avversaria creata dal gioco per un incontro del mondo. |
 | Magazzino | Riserva persistente di tutte le risorse (§5.3). |
+| Stabilità | Risorsa dello Stato: paga il Potenzia del Cancelliere (§5.3). |
+| Documenti | Risorsa della Conoscenza: paga il Potenzia dello Studioso (§5.3). |
 | Mana | Risorsa prodotta in battaglia e spesa per attivare le truppe. |
 | Cooldown | Tempo di attesa fra due attivazioni. |
 | Resistenza | Capacità della nazione di sopravvivere al singolo scontro. |
@@ -1169,7 +1182,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - Clown con 5 elementi; Anziano con Potenzia sugli edifici neutri una volta all’anno (§4.2.2). Diplomatico rinominato Cancelliere (placeholder).
 - Il “tipo del round” si chiama ora **tema del round**, per non confonderlo con i tipi delle carte (§4.2).
 - Direzione: la Ricerca servirà anche per le tecnologie (§10.5).
-- Da definire: risorse di ogni categoria; revisione degli impieghi delle risorse (§5.3).
+- **Risorse riviste** (§5.3, §4.2.4): ogni categoria ha la sua risorsa per Potenzia (Ferro, Pietra, Legno, Influenza, Documenti, Fede, Stabilità; Ombra Oro più una risorsa casuale). Nuove risorse **Stabilità** e **Documenti**; la **Fauna** non è più una risorsa (resta come tipo). Le azioni si pagano come prima.
 
 **v0.21 — 4 novembre 2026** (dopo le partite di Davide)
 - L’anno ha 5 round, l’incontro del mondo, altri 5 round e il fantasma; edifici e truppe si ottengono in entrambe le metà (§3.2, §4.1). L’economia non cambia.
