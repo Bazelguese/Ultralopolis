@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="v1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/maremani.tres" id="v2"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_del_commercio.tres" id="v3"]
+
+[resource]
+script = ExtResource("v1")
+id = &"mercanti_delle_lagune"
+display_name = "Mercanti delle lagune"
+special = 3
+color = &"verde"
+category_name = "Ricchezza"
+description = "Barche cariche arrivano dalle lagune: vendono edifici Economici, anche quelli che si costruiscono solo in altre nazioni, a 1 Oro in più."
+types = Array[StringName]([&"Economico"])
+favored_by = Array[Resource]([ExtResource("v2"), ExtResource("v3")])
+offers_troops = false
+foreign_exclusives = 1
+price_extra = 1

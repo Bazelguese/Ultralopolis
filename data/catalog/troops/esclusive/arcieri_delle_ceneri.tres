@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_ajcti"]
+
+[resource]
+script = ExtResource("1_ajcti")
+id = &"arcieri_delle_ceneri"
+display_name = "Arcieri delle ceneri"
+cost_gold = 4
+types = Array[StringName]([&"Fante", &"Cinerale"])
+mana_type = &"verde"
+mana_cost = 2
+cooldown_ms = 1200
+damage = 5

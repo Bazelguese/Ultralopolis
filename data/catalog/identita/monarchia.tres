@@ -8,14 +8,22 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="6_w7vpt"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_swsbc"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_monarchia_stabilita.tres" id="7_urday"]
+[ext_resource type="Resource" path="res://data/catalog/identita/monarchia_assoluta.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/monarchia_costituzionale.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/castello_del_re.tres" id="p3"]
 
 [resource]
 script = ExtResource("7_swsbc")
 id = &"monarchia"
 display_name = "Monarchia"
-description = "Un sovrano e i suoi feudatari. Fortificazioni più frequenti e Tributi feudali esclusivi. Capitale: +1 Stabilità."
+description = "Un sovrano e i suoi feudatari. Il primo consigliere che ascolti diventa il consigliere di corte e compare più spesso; Fortificazioni più frequenti e Tributi feudali esclusivi. Carta esclusiva: Castello del re (era 2). Capitale: +1 Stabilità."
 dimension = 1
+identity_type = &"Monarchico"
 resistance_bonus = 6
 exclusive_opportunities = Array[ExtResource("2_urday")]([ExtResource("3_yjl7w")])
 favored_opportunities = Array[ExtResource("2_urday")]([ExtResource("5_7k12g")])
 permanent_modifiers = Array[ExtResource("6_w7vpt")]([ExtResource("7_urday")])
+court_advisor_weight = 2
+evolves_to = Array[Resource]([ExtResource("p1"), ExtResource("p2")])
+exclusive_buildings = Array[ExtResource("1_uilto")]([ExtResource("p3")])
+revolution_causes = Array[int]([2])

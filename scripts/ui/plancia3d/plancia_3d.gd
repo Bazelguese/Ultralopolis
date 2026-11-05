@@ -7,7 +7,7 @@ extends Node3D
 
 enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
-enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE }
+enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE, GOVERNO }
 
 const PASSO_TRUPPE: float = 1.75
 const PASSO_EDIFICI: float = 2.1
@@ -126,7 +126,7 @@ func _collega_hud() -> void:
 	_hud.passa.connect(func() -> void: _esegui(run.pass_round(), "Round passato"))
 	_hud.nessuna_ricompensa.connect(func() -> void: _esegui(run.skip_reward()))
 	_hud.avanza_era.connect(_on_avanza_era)
-	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.run_rules.market_units_per_gold)))
+	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.market_rate())))
 	_hud.ricomincia.connect(_nuova_run)
 	_hud.menu.connect(func() -> void: GameSession.go(GameSession.MENU_SCENE))
 	_hud.pausa.connect(_on_pausa)
@@ -564,6 +564,15 @@ func _costruisci_scelte() -> void:
 			schede.append(SchedaCarta.da_via(via))
 			origini.append(via)
 		fase = -1
+	elif not run.government_choices.is_empty():
+		# Evoluzione del governo entrando nell'era (GDD §9.4): l'ultima carta la rifiuta.
+		tipo = TipoScelta.GOVERNO
+		for governo: IdentityDef in run.government_choices:
+			schede.append(SchedaCarta.da_governo(governo))
+			origini.append(governo)
+		schede.append(SchedaCarta.da_resta(run.government()))
+		origini.append(run.government())
+		fase = -1
 	match fase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
 			if run.chosen_event != null:
@@ -779,6 +788,12 @@ func _clic_scelta(tessera: Tessera3D) -> void:
 		TipoScelta.VIA:
 			var nome_via: String = run.way_choices[i].display_name
 			_esegui(run.choose_way(i), "Via scelta: %s" % nome_via)
+		TipoScelta.GOVERNO:
+			if i < run.government_choices.size():
+				var nome_governo: String = run.government_choices[i].display_name
+				_esegui(run.choose_government(i), "Nuovo governo: %s" % nome_governo)
+			else:
+				_esegui(run.refuse_evolution(), "Il governo resta com'è")
 
 
 ## Edificio o truppa presi: la carta vola nello spazio libero, poi si esegue l'azione.

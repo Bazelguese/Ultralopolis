@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModifierDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"pugno_di_ferro"
+display_name = "Pugno di ferro"
+description = "Il consigliere scelto mostra una proposta in più."
+is_malus = false
+effect = 5
+amount = 1
+duration_kind = 2
+stacking = 1

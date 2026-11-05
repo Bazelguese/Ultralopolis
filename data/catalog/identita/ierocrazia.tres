@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/sacerdote.tres" id="x3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_ierocrazia_fede.tres" id="x5"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/collegio_dei_sacerdoti.tres" id="p2"]
+
+[resource]
+script = ExtResource("x1")
+id = &"ierocrazia"
+display_name = "Ierocrazia"
+description = "I sacerdoti sono lo Stato. Il Sacerdote è sempre fra i consiglieri e le sue azioni costano 1 Fede in meno (almeno 1). Carta esclusiva: Collegio dei sacerdoti (era 2). Capitale: +1 Fede."
+dimension = 1
+identity_type = &"Ierocratico"
+resistance_bonus = 6
+tier = 2
+reform_requires_types = Array[StringName]([&"Spirituale"])
+action_discount = 1
+cheaper_advisors = Array[ExtResource("x2")]([ExtResource("x3")])
+always_present_advisor = ExtResource("x3")
+permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5")])
+revolution_causes = Array[int]([2])
+exclusive_buildings = Array[ExtResource("p1")]([ExtResource("p2")])

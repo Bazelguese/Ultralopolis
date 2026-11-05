@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/architetto.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x5"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_cultura_artigiana_pietra.tres" id="x6"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/gilda_dei_mastri.tres" id="p1"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p2"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+legno = 2
+pietra = 2
+
+[resource]
+script = ExtResource("x1")
+id = &"cultura_artigiana"
+display_name = "Cultura artigiana"
+description = "Botteghe e corporazioni: Potenzia costa 1 unità in meno (almeno 1), +2 Legno e +2 Pietra iniziali, Architetto più frequente. Carta esclusiva: Gilda dei mastri (era 2). Capitale: +1 Pietra."
+dimension = 3
+identity_type = &"Artigiano"
+resistance_bonus = 1
+extra_resources = SubResource("S1")
+favored_advisors = Array[ExtResource("x3")]([ExtResource("x4")])
+permanent_modifiers = Array[ExtResource("x5")]([ExtResource("x6")])
+upgrade_discount = 1
+exclusive_buildings = Array[ExtResource("p2")]([ExtResource("p1")])

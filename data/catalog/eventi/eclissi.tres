@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/presagio_di_guerra.tres" id="e5"]
-[ext_resource type="Resource" path="res://data/catalog/identita/culto_del_sole.tres" id="e6"]
+[ext_resource type="Resource" path="res://data/catalog/identita/culto_solare.tres" id="e6"]
 
 [sub_resource type="Resource" id="RA_2"]
 script = ExtResource("e3")

@@ -109,6 +109,11 @@ var _half_themes: Array[int] = []
 var advisor_choices: Array[AdvisorDef] = []
 ## Il consigliere ascoltato in questo round; null finché non lo si sceglie.
 var chosen_advisor: AdvisorDef
+## Consigliere di corte (GDD §9.4, v0.24): il primo consigliere ordinario ascoltato nella run
+## (convenzione provvisoria, §16.3). Conta solo se un elemento dell'identità lo favorisce.
+var court_advisor: AdvisorDef
+## Quanti dei consiglieri del round sono sempre presenti (la carta speciale non li sostituisce).
+var _mandatory_count: int = 0
 ## Risorsa casuale chiesta da Ombra in questo round, pescata quando il consigliere compare (GDD §4.2.4).
 var shadow_resource: Res.Type = Res.Type.FERRO
 ## true se Potenzia è già stato usato in questo round (GDD §6.5).
@@ -172,6 +177,15 @@ var nation_name: String = "La tua nazione"
 var identity: Array[IdentityDef] = []
 ## Vie proposte entrando nell'era: finché non se ne sceglie una, le altre azioni aspettano.
 var way_choices: Array[IdentityDef] = []
+## Malcontento della nazione (GDD §5.5, v0.24): una pressione fuori dal Magazzino e dalla battaglia.
+var malcontent: int = 0
+## Malcontento prodotto da ogni causa dall'ultima rivoluzione (IdentityDef.Grievance → quantità).
+var malcontent_sources: Dictionary[int, int] = {}
+## Governi a cui la nazione può evolvere entrando nella nuova era (GDD §9.4, v0.24): si sceglie
+## uno o si rifiuta. Vuoto se non c'è nulla da decidere.
+var government_choices: Array[IdentityDef] = []
+## Opzioni costruite dalle regole per l'evento scelto (Riforma), seguite da quelle dei dati.
+var _built_options: Array[EventOptionDef] = []
 
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
@@ -404,6 +418,7 @@ func upgrade_cost_of(piece: BoardPiece) -> ResourceAmounts:
 		return null
 	var card_era: int = piece.building.era if piece.building != null else piece.troop.era
 	var quantity: int = run_rules.upgrade_cost_per_era[index] * maxi(1, card_era)
+	quantity = maxi(1, quantity - _identity_int(&"upgrade_discount"))
 	var amounts: ResourceAmounts = ResourceAmounts.new()
 	if chosen_advisor.special == AdvisorDef.Special.ANZIANO:
 		amounts.add(Res.Type.ORO, quantity)
@@ -490,12 +505,17 @@ func _upgrade(piece: BoardPiece) -> bool:
 
 ## Vende risorse in cambio di Oro, a tasso fisso. units: unità intere da vendere
 ## (multiplo del tasso). Si può fare in Produzione e Preparazione, senza consumare l'opportunità.
+## Unità da vendere al mercato per 1 Oro: la cultura può migliorare il tasso (GDD §9.2, v0.24).
+func market_rate() -> int:
+	return maxi(1, run_rules.market_units_per_gold - _identity_int(&"market_rate_change"))
+
+
 func sell_resource(type: Res.Type, units: int) -> bool:
 	if not _require_shopping():
 		return false
 	if type == Res.Type.ORO:
 		return _fail("L'Oro non si vende.")
-	var rate: int = run_rules.market_units_per_gold
+	var rate: int = market_rate()
 	if units <= 0 or units % rate != 0:
 		return _fail("Si vende a gruppi di %d." % rate)
 	var internal_amount: int = units * Res.scale(type)
@@ -533,6 +553,7 @@ func _feed_troops() -> void:
 	_log("Le truppe consumano %s Cibo." % Res.format(Res.Type.CIBO, eaten))
 	if not hungry_names.is_empty():
 		_log("Senza cibo (ricarica più lenta per un anno): %s." % ", ".join(hungry_names))
+		_change_malcontent(hungry_names.size() * run_rules.malcontent_per_hungry_troop, IdentityDef.Grievance.CARESTIE, "Carestia")
 
 
 ## Ordine del pasto: ricarica più lunga prima; a parità, la truppa più a destra.
@@ -601,6 +622,15 @@ func offer_choices(offer: Offer) -> Array[String]:
 
 
 ## Truppe che si possono ancora incantare: ognuna una sola volta (GDD §4.3).
+## Quantità di un effetto dell'incanto per l'era della truppa, con l'eventuale percentuale in più.
+static func _enchant_amount(amounts: PackedInt32Array, troop_era: int, bonus_percent: int) -> int:
+	if amounts.is_empty():
+		return 0
+	var amount: int = amounts[clampi(troop_era, 1, amounts.size()) - 1]
+	@warning_ignore("integer_division")
+	return amount + amount * bonus_percent / 100
+
+
 func _enchantable_troops() -> Array[BoardPiece]:
 	var found: Array[BoardPiece] = []
 	for piece: BoardPiece in board.troops:
@@ -665,6 +695,10 @@ func choose_advisor(index: int) -> bool:
 		return _fail("Consigliere non valido.")
 	chosen_advisor = advisor_choices[index]
 	_log("Round %d (%s): ascolti %s." % [round_number, theme_name(), chosen_advisor.display_name])
+	if court_advisor == null and chosen_advisor.special == AdvisorDef.Special.NESSUNO:
+		court_advisor = chosen_advisor
+		if _has_court():
+			_log("%s diventa il consigliere di corte." % court_advisor.display_name)
 	_draw_offers()
 	return true
 
@@ -750,9 +784,9 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			var target: int = _spy_pick(offer.opportunity)
 			var spy: OpportunityDef = offer.opportunity
 			var effect: int = BattleSim.EFFECT_SABOTAGE if spy.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else BattleSim.EFFECT_SLOW
-			spy_effects.append([effect, target, spy.spy_ms])
+			spy_effects.append([effect, target, spy_duration(spy)])
 			_log("%s: %s parte %s per %d s nello scontro con il fantasma." % [source, _ghost_element_name(target),
-					"sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato", _whole_seconds(spy.spy_ms)])
+					"sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato", _whole_seconds(spy_duration(spy))])
 		OpportunityDef.Kind.INCANTO:
 			var troops: Array[BoardPiece] = _enchantable_troops()
 			if troops.is_empty():
@@ -766,8 +800,9 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			var enchanted: BoardPiece = troops[choice]
 			var spell: OpportunityDef = offer.opportunity
 			enchanted.enchant = spell
-			var amounts: PackedInt32Array = spell.enchant_amounts
-			enchanted.enchant_amount = amounts[clampi(enchanted.troop.era, 1, amounts.size()) - 1] if not amounts.is_empty() else 0
+			var bonus: int = spell.enchant_no_mana_bonus_percent if enchanted.troop.mana_cost <= 0 else 0
+			enchanted.enchant_amount = _enchant_amount(spell.enchant_amounts, enchanted.troop.era, bonus)
+			enchanted.enchant_amount_2 = _enchant_amount(spell.enchant_amounts_2, enchanted.troop.era, bonus)
 			_log("%s: %s è incantata (%s)." % [source, enchanted.display_name(), spell.description])
 		OpportunityDef.Kind.PERK:
 			if identity.has(offer.perk):
@@ -778,6 +813,8 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 	if element_extra != null:
 		for type: Res.Type in Res.NAMES:
 			stock[type] -= element_extra.internal(type)
+	if offer.opportunity != null and offer.opportunity.malcontent_change != 0:
+		_change_malcontent(offer.opportunity.malcontent_change, IdentityDef.Grievance.EVENTI, source)
 	_next_round()
 	return true
 
@@ -786,6 +823,8 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 func pass_round() -> bool:
 	if not _require_shopping():
 		return false
+	if is_revolution_round():
+		return _fail("La Rivoluzione non si può evitare: scegli il nuovo governo.")
 	_log("Round %d lasciato passare." % round_number)
 	_next_round()
 	return true
@@ -802,13 +841,46 @@ func choose_event() -> bool:
 	if event_choice == null:
 		return _fail("In questo round non c'è nessun evento.")
 	chosen_event = event_choice
+	_built_options = _special_options(chosen_event)
 	_log("Round %d: %s." % [round_number, chosen_event.display_name])
 	return true
 
 
-## Opzioni dell'evento scelto (una sola per le Fortune).
+## Opzioni dell'evento scelto (una sola per le Fortune). Per la Riforma le prime sono costruite
+## dalle regole, una per ogni governo raggiungibile.
 func event_options() -> Array[EventOptionDef]:
-	return chosen_event.options if chosen_event != null else []
+	if chosen_event == null:
+		return []
+	if _built_options.is_empty():
+		return chosen_event.options
+	var all: Array[EventOptionDef] = _built_options.duplicate()
+	all.append_array(chosen_event.options)
+	return all
+
+
+## Opzioni della Riforma (GDD §9.4, v0.24): una per ramo, pagata in Influenza secondo il tier.
+func _special_options(event: EventDef) -> Array[EventOptionDef]:
+	var built: Array[EventOptionDef] = []
+	if event.special == EventDef.Special.RIVOLUZIONE:
+		for target: IdentityDef in revolution_targets():
+			var choice: EventOptionDef = EventOptionDef.new()
+			choice.label = "Verso: %s" % target.display_name
+			choice.description = "Il popolo porta al governo %s (tier %d). %s" % [target.display_name, target.tier, target.description]
+			choice.change_government = target
+			built.append(choice)
+		return built
+	if event.special != EventDef.Special.RIFORMA:
+		return built
+	for target: IdentityDef in evolution_targets():
+		var option: EventOptionDef = EventOptionDef.new()
+		option.label = "Verso: %s" % target.display_name
+		option.description = "Il governo diventa %s (tier %d). %s" % [target.display_name, target.tier, target.description]
+		option.cost = ResourceAmounts.new()
+		option.cost.add(Res.Type.INFLUENZA, run_rules.reform_influence_per_tier * target.tier)
+		option.requires_types = target.reform_requires_types
+		option.change_government = target
+		built.append(option)
+	return built
 
 
 ## Requisito di un'opzione, es. "Spirituale" o "Repubblica"; vuoto se non ne ha.
@@ -901,8 +973,16 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 	if option.spy != null:
 		var effect: int = BattleSim.EFFECT_SABOTAGE if option.spy.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else BattleSim.EFFECT_SLOW
 		var spy_target: int = _spy_pick(option.spy)
-		spy_effects.append([effect, spy_target, option.spy.spy_ms])
+		spy_effects.append([effect, spy_target, spy_duration(option.spy)])
 		_log("%s: %s partirà %s nello scontro con il fantasma." % [source, _ghost_element_name(spy_target), "sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato"])
+	if option.change_government != null:
+		_change_government(option.change_government as IdentityDef, source)
+	if option.malcontent_change != 0:
+		_change_malcontent(option.malcontent_change, IdentityDef.Grievance.EVENTI, source)
+	if chosen_event.special == EventDef.Special.RIVOLUZIONE:
+		malcontent = 0
+		malcontent_sources = {}
+		_log("Dopo la Rivoluzione il Malcontento si azzera.")
 	_log("%s: %s." % [source, option.label])
 	_next_round()
 	return true
@@ -1039,6 +1119,10 @@ func advance_era() -> bool:
 	way_choices = _draw_ways(next)
 	if not way_choices.is_empty():
 		_log("Scegli la via della nazione per l'era %s." % next.display_name)
+	# Entrando in un'era il governo può evolvere: dopo la via, e si può rifiutare (§16.3).
+	government_choices = evolution_targets()
+	if not government_choices.is_empty():
+		_log("Il governo può evolvere: scegli la nuova forma o resta com'è.")
 	# Le offerte delle ere precedenti non restano disponibili (GDD §10.3):
 	# le proposte in corso vengono ripescate gratis dalla nuova era (§16.3).
 	_redraw_round()
@@ -1120,6 +1204,7 @@ func choose_encounter(index: int) -> bool:
 	var lost_gold: int = gold - half_down(gold)
 	gold = half_down(gold)
 	_log("Sconfitta contro %s: perso metà dell'Oro (%d)." % [encounter.display_name, lost_gold])
+	_change_malcontent(run_rules.malcontent_per_encounter_defeat, IdentityDef.Grievance.SCONFITTE, "Sconfitta")
 	if last_chance:
 		_end_run(RunEnd.SCONFITTA)
 		return true
@@ -1207,6 +1292,7 @@ func fight_ghost() -> bool:
 			return true
 		prestige -= year
 		_log("Sconfitta contro %s: perso %d Prestigio." % [ghost_name, year])
+		_change_malcontent(run_rules.malcontent_per_ghost_defeat, IdentityDef.Grievance.SCONFITTE, "Sconfitta")
 		_apply_ghost_malus(ghost_name)
 		if prestige <= 0:
 			prestige = 0
@@ -1335,15 +1421,33 @@ func _end_shopping_phase() -> void:
 ## Pesca i consiglieri del round: diversi fra loro, solo quelli che hanno qualcosa da proporre
 ## per il tema, più probabili se l'identità li favorisce (§16.3: peso 1, +1 per elemento).
 func _draw_advisors() -> void:
+	# Raggiunta la soglia del Malcontento il round mostra solo la Rivoluzione (GDD §5.5, §9.4).
+	var revolution: EventDef = _revolution_event()
+	if revolution != null and malcontent >= run_rules.malcontent_threshold and not revolution_targets().is_empty():
+		advisor_choices = []
+		_mandatory_count = 0
+		event_choice = revolution
+		_log("Il Malcontento ha raggiunto la soglia: scoppia la Rivoluzione.")
+		return
 	var pool: Array[AdvisorDef] = []
 	var weights: Array[int] = []
+	var excluded: Array[AdvisorDef] = _excluded_advisors()
 	for advisor: AdvisorDef in catalog.advisors:
-		if not _advisor_has_proposals(advisor):
+		if excluded.has(advisor) or not _advisor_has_proposals(advisor):
 			continue
 		pool.append(advisor)
 		weights.append(_advisor_weight(advisor))
 	advisor_choices = []
-	for i: int in range(mini(run_rules.advisors_per_round, pool.size())):
+	var wanted: int = advisors_per_round()
+	# Prima i consiglieri che il governo vuole sempre presenti (GDD §9.4, v0.24).
+	for advisor: AdvisorDef in _mandatory_advisors():
+		var at: int = pool.find(advisor)
+		if at != -1 and advisor_choices.size() < wanted:
+			advisor_choices.append(advisor)
+			pool.remove_at(at)
+			weights.remove_at(at)
+	_mandatory_count = advisor_choices.size()
+	while advisor_choices.size() < wanted and not pool.is_empty():
 		var pick: int = _weighted_pick(weights)
 		advisor_choices.append(pool[pick])
 		pool.remove_at(pick)
@@ -1371,16 +1475,20 @@ func _draw_special_card() -> void:
 	if not events.is_empty() and run_rules.event_weight > 0:
 		families.append(0)
 		weights.append(run_rules.event_weight)
-	if not visitors.is_empty() and run_rules.visitor_weight > 0:
+	var visitor_weight: int = run_rules.visitor_weight + _identity_int(&"visitor_weight_change")
+	if not visitors.is_empty() and visitor_weight > 0:
 		families.append(1)
-		weights.append(run_rules.visitor_weight)
+		weights.append(visitor_weight)
 	if not fortunes.is_empty() and run_rules.fortune_weight > 0:
 		families.append(2)
 		weights.append(run_rules.fortune_weight)
 	if families.is_empty():
 		return
+	# La carta speciale non prende il posto di un consigliere sempre presente.
+	if advisor_choices.size() >= advisors_per_round() and advisor_choices.size() <= _mandatory_count:
+		return
 	var family: int = families[_weighted_pick(weights)]
-	if advisor_choices.size() >= run_rules.advisors_per_round:
+	if advisor_choices.size() >= advisors_per_round():
 		advisor_choices.pop_back()
 	if family == 1:
 		var visitor_weights: Array[int] = []
@@ -1412,6 +1520,13 @@ func _available_events(family: EventDef.Family) -> Array[EventDef]:
 		if event.requires_stock != null and not can_pay(event.requires_stock):
 			continue
 		if event.requires_malus and modifiers.year_malus().is_empty():
+			continue
+		if event.special == EventDef.Special.RIFORMA and evolution_targets().is_empty():
+			continue
+		# La Rivoluzione non si pesca: arriva da sola (GDD §4.2.5).
+		if event.special == EventDef.Special.RIVOLUZIONE:
+			continue
+		if event.min_malcontent > 0 and malcontent < event.min_malcontent:
 			continue
 		if event.options.is_empty():
 			continue
@@ -1463,6 +1578,8 @@ func _roots_weight(favored_by: Array[Resource]) -> int:
 ## direttamente o che favorisce una delle sue azioni.
 func _advisor_weight(advisor: AdvisorDef) -> int:
 	var weight: int = 1
+	if advisor == court_advisor:
+		weight += _identity_int(&"court_advisor_weight")
 	for def: IdentityDef in identity:
 		if def.favored_advisors.has(advisor):
 			weight += 1
@@ -1677,6 +1794,7 @@ func _element_offer(advisor: AdvisorDef, building: BuildingDef, troop: TroopDef)
 		offer.kind = OpportunityDef.Kind.RECLUTA_TRUPPA
 		offer.troop = troop
 		offer.price = troop.cost_gold
+	offer.price = maxi(0, offer.price + _identity_int(&"proposal_gold_change"))
 	return offer
 
 
@@ -1703,9 +1821,32 @@ func _action_offer(advisor: AdvisorDef, opportunity: OpportunityDef) -> Offer:
 	offer.opportunity = opportunity
 	offer.kind = opportunity.kind
 	offer.price = opportunity.cost_gold
+	if offer.price > 0:
+		offer.price = maxi(0, offer.price + _identity_int(&"proposal_gold_change"))
 	offer.research_price = opportunity.cost_research
-	offer.other_cost = opportunity.cost_resources
+	offer.other_cost = _discounted_action_cost(advisor, opportunity)
 	return offer
+
+
+## Costo in risorse di un'azione, con lo sconto della cultura o del governo (GDD §9.2, v0.24):
+## ogni risorsa diversa dall'Oro costa le unità dello sconto in meno, ma almeno 1.
+func _discounted_action_cost(advisor: AdvisorDef, opportunity: OpportunityDef) -> ResourceAmounts:
+	var original: ResourceAmounts = opportunity.cost_resources
+	if original == null:
+		return null
+	var discount: int = 0
+	for def: IdentityDef in identity:
+		if def.cheaper_advisors.has(advisor) or def.cheaper_actions.has(opportunity):
+			discount += def.action_discount
+	if discount <= 0:
+		return original
+	var cheaper: ResourceAmounts = ResourceAmounts.new()
+	for type: Res.Type in Res.NAMES:
+		var amount: int = original.whole(type)
+		if amount > 0 and type != Res.Type.ORO:
+			amount = maxi(1, amount - discount)
+		cheaper.add(type, amount)
+	return cheaper
 
 
 ## Un'azione esclusiva di un elemento dell'identità compare solo a chi lo ha; una proposta che
@@ -1714,6 +1855,8 @@ func _action_available(opportunity: OpportunityDef) -> bool:
 	if _is_exclusive_action(opportunity) and not _has_exclusive_action(opportunity):
 		return false
 	if opportunity.min_level > council_level():
+		return false
+	if opportunity.malcontent_change < 0 and malcontent <= 0:
 		return false
 	match opportunity.kind:
 		OpportunityDef.Kind.SPAZIO_EDIFICIO:
@@ -1888,6 +2031,8 @@ static func _gain_text(opportunity: OpportunityDef) -> String:
 		parts.append("%d Ricerca" % opportunity.gain_research)
 	if opportunity.gain_resources != null and not opportunity.gain_resources.is_empty():
 		parts.append(opportunity.gain_resources.describe())
+	if opportunity.malcontent_change != 0:
+		parts.append("%+d Malcontento" % opportunity.malcontent_change)
 	return " e ".join(parts) if not parts.is_empty() else "nulla"
 
 
@@ -1986,6 +2131,7 @@ func _apply_ghost_malus(ghost_name: String) -> void:
 		return
 	for def: ModifierDef in current_ghost.malus:
 		_log(modifiers.apply(def, ActiveModifier.OriginKind.FANTASMA, ghost_name, year, board, _rng))
+		_change_malcontent(run_rules.malcontent_per_malus, IdentityDef.Grievance.MALUS, def.display_name)
 
 
 ## Toglie i modificatori di elementi che non sono più sulla plancia.
@@ -2080,6 +2226,8 @@ func _require_shopping() -> bool:
 		return _fail("Questa azione è possibile solo in Produzione o Preparazione.")
 	if not way_choices.is_empty():
 		return _fail("Prima scegli la via della nazione.")
+	if not government_choices.is_empty():
+		return _fail("Prima decidi se far evolvere il governo.")
 	return true
 
 
@@ -2095,6 +2243,124 @@ func choose_way(index: int) -> bool:
 	# Le proposte in corso tengono conto della via appena scelta.
 	_redraw_round()
 	return true
+
+
+# --- Malcontento e Rivoluzione (GDD §5.5, §9.4.2; v0.24) ----------------------------
+
+## Il Malcontento sale (amount > 0) per una causa, o scende (amount < 0); mai sotto zero.
+func _change_malcontent(amount: int, cause: IdentityDef.Grievance, reason: String) -> void:
+	if amount == 0:
+		return
+	var before: int = malcontent
+	malcontent = maxi(0, malcontent + amount)
+	if amount > 0:
+		malcontent_sources[cause] = malcontent_sources.get(cause, 0) + amount
+	_log("%s: Malcontento %s %d (ora %d su %d)." % [reason, "+" if amount > 0 else "−", absi(malcontent - before), malcontent, run_rules.malcontent_threshold])
+	if amount > 0 and malcontent >= run_rules.malcontent_warning and before < run_rules.malcontent_warning:
+		_log("Attenzione: la rivoluzione si avvicina.")
+
+
+## Causa che ha prodotto più Malcontento dall'ultima rivoluzione (a parità, la prima dell'elenco).
+func main_grievance() -> IdentityDef.Grievance:
+	var best: IdentityDef.Grievance = IdentityDef.Grievance.SCONFITTE
+	var best_amount: int = -1
+	for cause: IdentityDef.Grievance in IdentityDef.GRIEVANCE_NAMES:
+		var amount: int = malcontent_sources.get(cause, 0)
+		if amount > best_amount:
+			best = cause
+			best_amount = amount
+	return best
+
+
+## Vero se questo round mostra solo la Rivoluzione.
+func is_revolution_round() -> bool:
+	return event_choice != null and event_choice.special == EventDef.Special.RIVOLUZIONE
+
+
+## Governi a cui può portare la Rivoluzione (GDD §9.4.2): quelli legati alla causa principale,
+## di qualunque tier, tranne quello attuale. Se nessuno è legato alla causa, i governi del tier 1.
+func revolution_targets() -> Array[IdentityDef]:
+	var cause: IdentityDef.Grievance = main_grievance()
+	var current: IdentityDef = government()
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == IdentityDef.Dimension.GOVERNO and def != current and def.revolution_causes.has(cause):
+			found.append(def)
+	if found.is_empty():
+		for def: IdentityDef in catalog.identities:
+			if def.dimension == IdentityDef.Dimension.GOVERNO and def != current and def.tier == 1:
+				found.append(def)
+	return found
+
+
+func _revolution_event() -> EventDef:
+	for event: EventDef in catalog.events:
+		if event.special == EventDef.Special.RIVOLUZIONE:
+			return event
+	return null
+
+
+# --- Governi a tier (GDD §9.4, v0.24) ------------------------------------------------
+
+## Il governo attuale della nazione (null prima della creazione).
+func government() -> IdentityDef:
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.GOVERNO:
+			return def
+	return null
+
+
+## Governi del tier successivo a cui il governo attuale può evolvere.
+func evolution_targets() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	var current: IdentityDef = government()
+	if current == null:
+		return found
+	for target: Resource in current.evolves_to:
+		if target is IdentityDef:
+			found.append(target as IdentityDef)
+	return found
+
+
+## Evolve al governo proposto entrando nell'era (si può scegliere anche durante la scelta della via).
+func choose_government(index: int) -> bool:
+	if index < 0 or index >= government_choices.size():
+		return _fail("Governo non valido.")
+	var target: IdentityDef = government_choices[index]
+	government_choices = []
+	_change_government(target, "Evoluzione")
+	_redraw_round()
+	return true
+
+
+## Rifiuta l'evoluzione proposta: il governo resta com'è.
+func refuse_evolution() -> bool:
+	if government_choices.is_empty():
+		return _fail("Non c'è nessuna evoluzione da rifiutare.")
+	government_choices = []
+	_log("Il governo resta %s." % government().display_name)
+	return true
+
+
+## Cambia il governo: finisce il tratto del vecchio e vale quello nuovo, con i suoi effetti sul
+## Consiglio e la sua risorsa della Capitale. Gli elementi sulla plancia restano (GDD §9.4).
+func _change_government(target: IdentityDef, source: String) -> void:
+	var old: IdentityDef = government()
+	if old == target:
+		return
+	if old != null:
+		identity.erase(old)
+		for active_modifier: ActiveModifier in modifiers.active.duplicate():
+			if active_modifier.origin_kind == ActiveModifier.OriginKind.IDENTITA and active_modifier.origin_name == old.display_name \
+					and old.permanent_modifiers.has(active_modifier.def):
+				modifiers.active.erase(active_modifier)
+	_log("%s: il governo passa da %s a %s." % [source, old.display_name if old != null else "nessuno", target.display_name])
+	_adopt_identity(target)
+
+
+## Durata di uno spionaggio, con quella in più data dal governo (GDD §9.4, v0.24).
+func spy_duration(spy: OpportunityDef) -> int:
+	return maxi(0, spy.spy_ms + _identity_int(&"spy_ms_change"))
 
 
 ## Tre vie pescate dal pool dell'era, pesate da identità e vie già scelte (§16.3).
@@ -2165,6 +2431,47 @@ func _adopt_identity(def: IdentityDef) -> void:
 			_log("Nessuno spazio per %s." % troop.display_name)
 	for modifier: ModifierDef in def.permanent_modifiers:
 		_log(modifiers.apply(modifier, ActiveModifier.OriginKind.IDENTITA, def.display_name, year, board, _rng))
+
+
+## Somma di un effetto numerico della scheda fra tutti gli elementi dell'identità (GDD §9.2).
+func _identity_int(property: StringName) -> int:
+	var total: int = 0
+	for def: IdentityDef in identity:
+		total += int(def.get(property))
+	return total
+
+
+## Consiglieri per round: quelli delle regole, più o meno quelli del governo (almeno 1).
+func advisors_per_round() -> int:
+	return maxi(1, run_rules.advisors_per_round + _identity_int(&"advisors_change"))
+
+
+func _has_court() -> bool:
+	if _identity_int(&"court_advisor_weight") > 0:
+		return true
+	for def: IdentityDef in identity:
+		if def.court_advisor_always:
+			return true
+	return false
+
+
+## Consiglieri che compaiono sempre: quelli indicati dall'identità e il consigliere di corte,
+## se il governo lo vuole sempre presente.
+func _mandatory_advisors() -> Array[AdvisorDef]:
+	var found: Array[AdvisorDef] = []
+	for def: IdentityDef in identity:
+		if def.always_present_advisor != null and not found.has(def.always_present_advisor):
+			found.append(def.always_present_advisor)
+		if def.court_advisor_always and court_advisor != null and not found.has(court_advisor):
+			found.append(court_advisor)
+	return found
+
+
+func _excluded_advisors() -> Array[AdvisorDef]:
+	var found: Array[AdvisorDef] = []
+	for def: IdentityDef in identity:
+		found.append_array(def.excluded_advisors)
+	return found
 
 
 static func _identity_resistance(elements: Array[IdentityDef]) -> int:

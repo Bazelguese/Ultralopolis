@@ -4,7 +4,6 @@
 [ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
 [ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
 [ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="e4"]
-[ext_resource type="Resource" path="res://data/catalog/identita/ordine_della_ragione.tres" id="e5"]
 
 [sub_resource type="Resource" id="RA_2"]
 script = ExtResource("e3")
@@ -25,6 +24,6 @@ description = "Sotto le rovine c'è una biblioteca intatta."
 family = 1
 sphere = "Conoscenza"
 color = &"viola"
-favored_by = Array[Resource]([ExtResource("e4"), ExtResource("e5")])
+favored_by = Array[Resource]([ExtResource("e4")])
 options = Array[ExtResource("e2")]([SubResource("OPT_1")])
 scale_with_era = true

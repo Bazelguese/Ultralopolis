@@ -8,6 +8,11 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_corruzione.tres" id="act_3"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_inefficienza.tres" id="act_4"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/processione.tres" id="act_5"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_mezzogiorno.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_linfa.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_scudo_degli_avi.tres" id="p3"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_morso_del_nulla.tres" id="p4"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/predica_di_pace.tres" id="p5"]
 
 [resource]
 script = ExtResource("1_advdf")
@@ -18,4 +23,4 @@ category_name = "Fede"
 description = "Guida il culto: propone elementi spirituali, patrioti, guardiani e animali sacri."
 types = Array[StringName]([&"Spirituale", &"Patriota", &"Fauna", &"Guardiano"])
 upgrade_resource = 6
-actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("act_2"), ExtResource("act_3"), ExtResource("act_4"), ExtResource("act_5")])
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("act_2"), ExtResource("act_3"), ExtResource("act_4"), ExtResource("act_5"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5")])

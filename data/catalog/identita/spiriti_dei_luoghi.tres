@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/favore_degli_spiriti.tres" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_spiriti_dei_luoghi_legno.tres" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="p1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/incanto_linfa.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/bosco_sacro.tres" id="p3"]
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="p4"]
+
+[resource]
+script = ExtResource("x1")
+id = &"spiriti_dei_luoghi"
+display_name = "Spiriti dei luoghi"
+description = "Ogni bosco e fiume ha uno spirito che aiuta gli edifici: mana prodotto il 10% più in fretta. Carta esclusiva: Bosco sacro (era 2); incanto esclusivo: Linfa degli spiriti. Capitale: +1 Legno."
+dimension = 2
+identity_type = &"Animista"
+resistance_bonus = 2
+permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
+exclusive_opportunities = Array[ExtResource("p1")]([ExtResource("p2")])
+exclusive_buildings = Array[ExtResource("p4")]([ExtResource("p3")])

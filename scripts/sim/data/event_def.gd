@@ -9,11 +9,20 @@ enum Family {
 	FORTUNA,  ## Un dono semplice: una sola opzione.
 }
 
+## Eventi con opzioni costruite dalle regole invece che scritte nei dati (GDD §9.4, v0.24).
+enum Special {
+	NESSUNO,
+	RIFORMA,  ## Un'opzione per ogni governo a cui il governo attuale può evolvere, pagata in Influenza.
+	RIVOLUZIONE,  ## Arriva da sola quando il Malcontento tocca la soglia; un'opzione gratuita per governo possibile.
+}
+
 @export var id: StringName = &""
 @export var display_name: String = ""
 ## Testo dell'evento, come lo legge il giocatore.
 @export_multiline var description: String = ""
 @export var family: Family = Family.EVENTO
+## Le opzioni scritte nei dati si aggiungono, in coda, a quelle costruite dalle regole.
+@export var special: Special = Special.NESSUNO
 ## Sfera: il nome di una categoria del Consiglio (es. "Fede"), per tema e cornice.
 @export var sphere: String = ""
 ## Colore della sfera (solo grafica), come AdvisorDef.color.
@@ -27,6 +36,8 @@ enum Family {
 ## Era minima e massima in cui può comparire (0 = nessun limite).
 @export var min_era: int = 0
 @export var max_era: int = 0
+## Compare solo se il Malcontento è almeno questo (0 = nessun limite; GDD §5.5, v0.24).
+@export var min_malcontent: int = 0
 ## Compare solo se sulla plancia c'è almeno una carta con uno di questi tipi.
 @export var requires_types: Array[StringName] = []
 ## Compare solo se nel Magazzino c'è almeno questa quantità (unità intere) di queste risorse.

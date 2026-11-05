@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+fede = 3
+
+[resource]
+script = ExtResource("x1")
+id = &"incanto_morso_del_nulla"
+display_name = "Incanto: morso del nulla"
+description = "Esclusivo del Culto del vuoto. Paghi 3 Fede: una truppa a tua scelta, una sola volta, infligge Corruzione in più (1/2/3) e Sabotaggio (1/2/3 s secondo l'era); chiede 2 mana in più, viola se prima non ne chiedeva."
+kind = 8
+cost_resources = SubResource("S1")
+enchant_value = 3
+enchant_amounts = PackedInt32Array(1, 2, 3)
+enchant_color = &"viola"
+enchant_value_2 = 6
+enchant_amounts_2 = PackedInt32Array(1000, 2000, 3000)

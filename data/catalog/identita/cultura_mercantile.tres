@@ -7,13 +7,17 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_cultura_mercantile_oro.tres" id="6_7crgb"]
 [ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="adv_s"]
 [ext_resource type="Resource" path="res://data/catalog/consiglieri/tesoriere.tres" id="adv_tes"]
+[ext_resource type="Resource" path="res://data/catalog/buildings/esclusivi/emporio.tres" id="p1"]
 
 [resource]
 script = ExtResource("6_0qo2s")
 id = &"cultura_mercantile"
 display_name = "Cultura mercantile"
-description = "Si costruisce per commerciare: +4 Oro iniziale, Tesoriere più frequente. Capitale: +1 Oro."
+description = "Si costruisce per commerciare: +4 Oro iniziale, al mercato basta 1 unità per 1 Oro, Tesoriere più frequente. Carta esclusiva: Emporio. Capitale: +1 Oro."
 dimension = 3
+identity_type = &"Mercantile"
 extra_gold = 4
 permanent_modifiers = Array[ExtResource("5_osjtt")]([ExtResource("6_7crgb")])
 favored_advisors = Array[ExtResource("adv_s")]([ExtResource("adv_tes")])
+market_rate_change = 1
+exclusive_buildings = Array[ExtResource("1_any5m")]([ExtResource("p1")])

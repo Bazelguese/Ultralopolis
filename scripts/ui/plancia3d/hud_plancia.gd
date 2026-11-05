@@ -39,6 +39,8 @@ var _sotto_fase: Label
 var _prestigio: Label
 var _vittorie: Label
 var _era: Label
+var _malcontento: Label
+var _malcontento_cella: Control
 var _ultima_possibilita: Label
 var _valori_risorse: Dictionary[int, Label] = {}
 var _produzioni_risorse: Dictionary[int, Label] = {}
@@ -211,6 +213,12 @@ func _crea_run() -> void:
 	var era: Array = _valore("Era", Color("c7b8ff"))
 	riga.add_child(era[0])
 	_era = era[1]
+	# Malcontento (GDD §5.5, v0.24): sempre visibile, con la soglia della Rivoluzione.
+	var malcontento: Array = _valore("Malcontento")
+	riga.add_child(malcontento[0])
+	_malcontento = malcontento[1]
+	_malcontento_cella = malcontento[0]
+	_malcontento_cella.mouse_filter = Control.MOUSE_FILTER_PASS
 	riga.add_child(_pulsante("Menu", func() -> void: menu.emit()))
 	_ancora(riquadro, Control.PRESET_TOP_RIGHT, Vector2(-24, 20))
 	_ultima_possibilita = StileVisivo.etichetta("ULTIMA POSSIBILITÀ", StileVisivo.FONT_TITOLI, 22, StileVisivo.PERICOLO)
@@ -505,6 +513,11 @@ func aggiorna_partita(run: RunState) -> void:
 	_vittorie.text = "%d/%d" % [run.wins, run.run_rules.wins_needed]
 	_era.text = run.era_name()
 	_ultima_possibilita.visible = run.last_chance
+	_malcontento.text = "%d/%d" % [run.malcontent, run.run_rules.malcontent_threshold]
+	var vicina: bool = run.malcontent >= run.run_rules.malcontent_warning
+	_malcontento.add_theme_color_override("font_color", StileVisivo.PERICOLO if vicina else StileVisivo.TESTO)
+	_malcontento_cella.tooltip_text = "Malcontento: sale con sconfitte, carestie, malus ed eventi; scende spendendo Stabilità (Cancelliere), Fede o Cibo. A %d scoppia la Rivoluzione.%s" % [
+			run.run_rules.malcontent_threshold, "\nLa rivoluzione si avvicina!" if vicina else ""]
 
 	var produzione: Array[int] = run.production_per_phase()
 	for tipo: int in _valori_risorse:
@@ -518,7 +531,7 @@ func aggiorna_partita(run: RunState) -> void:
 		_pulsante_era.disabled = not comprando or run.research < costo_era
 	else:
 		_pulsante_era.visible = false
-	var lotto: int = run.run_rules.market_units_per_gold
+	var lotto: int = run.market_rate()
 	for tipo: int in _righe_magazzino:
 		_righe_magazzino[tipo].text = "%s  %s" % [Res.NAMES[tipo], run.stock_text(tipo)]
 		if _vendite.has(tipo):
@@ -539,10 +552,10 @@ func aggiorna_partita(run: RunState) -> void:
 	ultime.reverse()
 	_testo_cronaca.text = "\n".join(ultime)
 
-	var scelta_via: bool = not run.way_choices.is_empty()
+	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty()
 	var consigliere: AdvisorDef = run.chosen_advisor
 	_pulsante_rinnova.visible = comprando and not scelta_via and consigliere != null
-	_pulsante_passa.visible = comprando and not scelta_via
+	_pulsante_passa.visible = comprando and not scelta_via and not run.is_revolution_round()
 	_pulsante_rinnova.text = "Rinnova · %d Oro" % run.reroll_cost()
 	_pulsante_rinnova.disabled = run.gold < run.reroll_cost()
 	var costo_risorsa: ResourceAmounts = run.reroll_resource_cost()
@@ -567,13 +580,19 @@ func aggiorna_partita(run: RunState) -> void:
 			_principale.text = "Nuova partita"
 		_:
 			_suggerimento_fase.text = ""
-	if scelta_via:
+	if not run.way_choices.is_empty():
 		_suggerimento_fase.text = "Nuova era: scegli la via della nazione. Diventa parte della tua identità."
+	elif not run.government_choices.is_empty():
+		_suggerimento_fase.text = "Nuova era: il governo può evolvere. Scegli la nuova forma, oppure resta com'è."
 
 
 ## Suggerimento durante i round del Consiglio (GDD §4.2).
 func _testo_consiglio(run: RunState) -> String:
 	var consigliere: AdvisorDef = run.chosen_advisor
+	if run.is_revolution_round():
+		if run.chosen_event == null:
+			return "Il Malcontento è esploso: scoppia la Rivoluzione. Non si può evitare."
+		return "Rivoluzione: scegli il nuovo governo. Il Malcontento poi si azzera."
 	if run.chosen_event != null:
 		if run.chosen_event.family == EventDef.Family.FORTUNA:
 			return "%s: prendi il dono, oppure passa." % run.chosen_event.display_name

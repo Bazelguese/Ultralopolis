@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Rimanda"
+description = "Il governo resta com'è: la Riforma potrà tornare."
+
+[resource]
+script = ExtResource("x1")
+id = &"riforma"
+display_name = "La Riforma"
+description = "A corte e in piazza si discute di cambiare il modo di governare. Ogni via costa Influenza: di più per i governi di tier più alto."
+special = 1
+sphere = "Stato"
+color = &"blu"
+repeatable = true
+options = Array[ExtResource("x2")]([SubResource("S1")])

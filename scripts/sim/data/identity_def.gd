@@ -4,6 +4,22 @@ extends Resource
 ## Tutti usano la stessa scheda; ogni campo è facoltativo. Gli effetti si esprimono
 ## con il linguaggio del nucleo (P5): Resistenza, dotazione, opportunità, elementi, modificatori.
 
+## Cause del Malcontento (GDD §5.5, v0.24): quella che ne ha prodotto di più decide quali governi
+## può portare la Rivoluzione.
+enum Grievance {
+	SCONFITTE,  ## Scontri persi.
+	CARESTIE,   ## Truppe rimaste senza Cibo.
+	MALUS,      ## Malus subiti.
+	EVENTI,     ## Scelte degli eventi.
+}
+
+const GRIEVANCE_NAMES: Dictionary[Grievance, String] = {
+	Grievance.SCONFITTE: "le sconfitte",
+	Grievance.CARESTIE: "le carestie",
+	Grievance.MALUS: "i malus subiti",
+	Grievance.EVENTI: "le scelte di governo",
+}
+
 enum Dimension {
 	POPOLO,
 	GOVERNO,
@@ -32,6 +48,12 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export_multiline var description: String = ""
 @export var dimension: Dimension = Dimension.POPOLO
 
+@export_group("Tipo d'identità")
+## Tipo d'identità dell'elemento, es. "Pietrosangue" o "Monarchico" (GDD §6.6, v0.24).
+## Sta fuori da tutte le categorie: lo portano le carte esclusive dell'elemento, insieme ad
+## almeno un tipo di categoria, e lo leggono perk, tratti ed eventi.
+@export var identity_type: StringName = &""
+
 @export_group("Resistenza")
 ## Quota di Resistenza in ogni scontro (GDD §7.1.1).
 @export var resistance_bonus: int = 0
@@ -59,6 +81,47 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export var favored_opportunities: Array[OpportunityDef] = []
 ## Consiglieri che compaiono più spesso nei round (peso +1 ciascuno, GDD §4.2).
 @export var favored_advisors: Array[AdvisorDef] = []
+
+@export_group("Governo a tier")
+## Tier del governo (GDD §9.4, v0.24): alla creazione si sceglie solo il tier 1.
+@export var tier: int = 1
+## Governi del tier successivo a cui può evolvere (IdentityDef). Dichiarato come Resource
+## per lo stesso motivo di requires_any (vedi sotto).
+@export var evolves_to: Array[Resource] = []
+## Tipi richiesti sulla plancia per raggiungere questo governo con una Riforma.
+@export var reform_requires_types: Array[StringName] = []
+## Cause del Malcontento per cui una Rivoluzione può portare a questo governo, di qualunque tier.
+@export var revolution_causes: Array[Grievance] = []
+
+@export_group("Consiglio")
+## Effetti sul Consiglio e sulle risorse (GDD §9.2, v0.24): valgono fuori dalla battaglia e si
+## sommano fra tutti gli elementi dell'identità.
+## Consiglieri in più (o in meno) in ogni round.
+@export var advisors_change: int = 0
+## Consigliere che compare sempre fra quelli del round.
+@export var always_present_advisor: AdvisorDef
+## Consiglieri che non compaiono mai.
+@export var excluded_advisors: Array[AdvisorDef] = []
+## Peso in più del consigliere di corte (Monarchia). Convenzione provvisoria (GDD §16.3):
+## il consigliere di corte è il primo consigliere ordinario ascoltato nella run.
+@export var court_advisor_weight: int = 0
+## Se vero, il consigliere di corte compare sempre fra quelli del round (Monarchia assoluta).
+@export var court_advisor_always: bool = false
+## Oro in più (o in meno) su ogni proposta che costa Oro.
+@export var proposal_gold_change: int = 0
+## Peso in più dei Visitatori fra le carte speciali (GDD §4.2.5).
+@export var visitor_weight_change: int = 0
+## Le azioni di questi consiglieri, e queste azioni, costano action_discount unità in meno di
+## ogni risorsa del costo (Oro escluso), ma almeno 1.
+@export var cheaper_advisors: Array[AdvisorDef] = []
+@export var cheaper_actions: Array[OpportunityDef] = []
+@export var action_discount: int = 0
+## Unità in meno da vendere al mercato per 1 Oro (minimo 1).
+@export var market_rate_change: int = 0
+## Unità in meno a ogni Potenzia (minimo 1 per risorsa).
+@export var upgrade_discount: int = 0
+## Millisecondi in più (o in meno) per gli effetti dello spionaggio (GDD §4.2.3).
+@export var spy_ms_change: int = 0
 
 @export_group("Elementi esclusivi")
 ## Edifici offerti dai Costruttori solo a questa nazione (nella loro era).
