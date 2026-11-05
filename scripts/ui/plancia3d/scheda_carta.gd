@@ -6,8 +6,6 @@ extends RefCounted
 
 enum Genere { EDIFICIO, TRUPPA, AZIONE, INCONTRO, FANTASMA, VIA, CONSIGLIERE }
 
-const CORNICE_CONSIGLIERE: Color = Color("5fd0b8")
-
 ## Le illustrazioni si cercano qui, con il nome dell'identificativo:
 ## edifici/<id>.png, truppe/<id>.png, azioni/<id>.png. Se mancano si usa il segnaposto.
 const CARTELLA_ILLUSTRAZIONI: String = "res://assets/illustrazioni/"
@@ -42,6 +40,8 @@ var dettagli: String = ""
 var illustrazione: Texture2D
 ## false se l'offerta non si può pagare: la carta appare spenta.
 var disponibile: bool = true
+## Colore della categoria di un consigliere (solo grafica).
+var colore_consigliere: StringName = &""
 
 
 func colore_cornice() -> Color:
@@ -53,7 +53,7 @@ func colore_cornice() -> Color:
 		Genere.INCONTRO, Genere.FANTASMA:
 			return StileVisivo.CORNICE_MINACCIA
 		Genere.CONSIGLIERE:
-			return CORNICE_CONSIGLIERE
+			return StileVisivo.colore_mana_nome(colore_consigliere) if colore_consigliere != &"" else StileVisivo.ORO_LUCE
 	return StileVisivo.colore_cornice(era)
 
 
@@ -93,7 +93,7 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 		righe.append("+%d spazio truppa." % def.extra_troop_slots)
 	if def.is_capital:
 		righe.append("Non si può vendere né sostituire.")
-	righe.append(_riga_etichette(def.tags, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello))
 	if p_malus != "":
 		righe.append("Colpito da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
@@ -131,7 +131,7 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 	righe.append("Mangia %s Cibo a inizio anno." % Res.format(Res.Type.CIBO, def.food_tenths))
 	if p_affamata:
 		righe.append("Affamata: ricarica più lenta fino al prossimo pasto.")
-	righe.append(_riga_etichette(def.tags, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello))
 	if p_malus != "":
 		righe.append("Colpita da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
@@ -148,34 +148,8 @@ static func da_pezzo(run: RunState, pezzo: BoardPiece) -> SchedaCarta:
 	if pezzo.building != null:
 		return da_edificio(run.effective_building(pezzo), pezzo.level, malus_testo)
 	var scheda: SchedaCarta = da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
-	if pezzo.enchantment != null:
-		scheda.dettagli += "\nIncantata: %s (già compreso nei valori)." % pezzo.enchantment.display_name
-	return scheda
-
-
-## Un consigliere da scegliere nel round (GDD §4.2).
-static func da_consigliere(run: RunState, def: CouncillorDef) -> SchedaCarta:
-	var scheda: SchedaCarta = SchedaCarta.new()
-	scheda.genere = Genere.CONSIGLIERE
-	scheda.id = def.id
-	scheda.titolo = def.display_name
-	scheda.era = run.era
-	var livello: int = run.councillor_tier()
-	scheda.sopratitolo = run.run_rules.tier_names[livello - 1] if livello - 1 < run.run_rules.tier_names.size() else "Consigliere"
-	match def.special:
-		CouncillorDef.Special.CLOWN:
-			scheda.riga = "4 elementi a sorpresa"
-		CouncillorDef.Special.ANZIANO:
-			scheda.riga = "Perk ed edifici neutri"
-		_:
-			scheda.riga = {
-				RunState.RoundType.AZIONI: "Azioni",
-				RunState.RoundType.EDIFICI: "Edifici",
-				RunState.RoundType.TRUPPE: "Truppe",
-				RunState.RoundType.MISTO: "Azioni ed elementi",
-			}[run.round_type]
-	scheda.dettagli = "%s\nIn questo round propone: %s.\nScelto il consigliere non si torna indietro; poi si prende una sola proposta, oppure si passa." % [def.description, scheda.riga.to_lower()]
-	scheda.illustrazione = _carica("consiglieri/%s.png" % def.id)
+	if pezzo.enchant != null:
+		scheda.dettagli += "\n%s (già compreso nei valori)." % pezzo.enchant.display_name
 	return scheda
 
 
@@ -184,25 +158,103 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	match offerta.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
 			scheda = da_edificio(offerta.building)
+			scheda.sopratitolo = "Edificio"
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
 			scheda = da_truppa(offerta.troop)
+			scheda.sopratitolo = "Truppa"
+		OpportunityDef.Kind.PERK:
+			scheda = SchedaCarta.new()
+			scheda.genere = Genere.AZIONE
+			scheda.id = offerta.perk.id
+			scheda.titolo = offerta.perk.display_name
+			scheda.riga = "Perk"
+			scheda.dettagli = "%s\n%s" % [offerta.perk.description, offerta.opportunity.description]
+			scheda.illustrazione = _carica("perk/%s.png" % offerta.perk.id)
+			scheda.sopratitolo = "Perk"
 		_:
 			scheda = SchedaCarta.new()
 			scheda.genere = Genere.AZIONE
-			scheda.id = offerta.opportunity.id if offerta.opportunity != null else &""
-			scheda.titolo = offerta.title()
-			scheda.riga = "Nuovo perk" if offerta.perk != null else _riassunto_azione(offerta.opportunity)
-			scheda.dettagli = offerta.description()
-			if offerta.perk != null:
-				scheda.dettagli = "Perk: %s\n%s" % [offerta.perk.display_name, offerta.perk.description]
-			scheda.illustrazione = _carica("azioni/%s.png" % scheda.id)
-	scheda.sopratitolo = offerta.councillor.display_name if offerta.councillor != null else ""
+			scheda.id = offerta.opportunity.id
+			scheda.titolo = offerta.opportunity.display_name
+			scheda.riga = _riassunto_azione(offerta.opportunity)
+			scheda.dettagli = offerta.opportunity.description
+			scheda.illustrazione = _carica("azioni/%s.png" % offerta.opportunity.id)
+			scheda.sopratitolo = "Azione"
 	scheda.costo = offerta.cost_text()
 	scheda.disponibile = run.can_afford(offerta)
 	if run.offer_needs_replacement(offerta):
 		scheda.dettagli += "\nPlancia piena: sceglierai quale elemento sostituire (ti torna metà del prezzo)."
 	elif not run.offer_choices(offerta).is_empty():
 		scheda.dettagli += "\nDopo averla presa scegli una voce."
+	return scheda
+
+
+## Un consigliere del round (GDD §4.2): categoria, tipi, risorsa di Potenzia e che cosa propone.
+static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.CONSIGLIERE
+	scheda.id = consigliere.id
+	scheda.titolo = consigliere.display_name
+	scheda.colore_consigliere = consigliere.color
+	scheda.sopratitolo = consigliere.category_name if consigliere.category_name != "" else "Consigliere speciale"
+	scheda.sopratitolo += " · %s" % run.council_level_name()
+	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
+	var righe: PackedStringArray = PackedStringArray()
+	righe.append(consigliere.description)
+	match consigliere.special:
+		AdvisorDef.Special.CLOWN:
+			scheda.riga = "5 colori"
+			righe.append("Ignora il tema del round. Non offre Potenzia; si rinnova solo in Oro.")
+		AdvisorDef.Special.ANZIANO:
+			scheda.riga = "Perk · neutri"
+			righe.append("Ignora il tema del round. Potenzia: solo edifici neutri, una volta all'anno, in Oro.")
+		AdvisorDef.Special.VISITATORE:
+			scheda.sopratitolo = "Visitatore · %s" % consigliere.category_name
+			scheda.riga = "Di passaggio"
+			righe.append("Ignora il tema del round. Non potenzia; si rinnova solo in Oro.")
+		_:
+			scheda.riga = "Potenzia: %s" % run.advisor_resource_text(consigliere)
+			righe.append("Tipi: %s." % ", ".join(consigliere.types))
+			righe.append("Potenzia e rinnovo con: %s." % run.advisor_resource_text(consigliere))
+	scheda.costo = "Ascolta"
+	scheda.dettagli = "\n".join(righe)
+	return scheda
+
+
+## Un Evento o una Fortuna fra le carte del round (GDD §4.2.5).
+static func da_evento(run: RunState, evento: EventDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.CONSIGLIERE
+	scheda.id = evento.id
+	scheda.titolo = evento.display_name
+	scheda.colore_consigliere = evento.color
+	var fortuna: bool = evento.family == EventDef.Family.FORTUNA
+	scheda.sopratitolo = "%s · %s" % ["Fortuna" if fortuna else "Evento", evento.sphere]
+	scheda.illustrazione = _carica("eventi/%s.png" % evento.id)
+	scheda.riga = "Un dono" if fortuna else "%d scelte" % evento.options.size()
+	var righe: PackedStringArray = PackedStringArray()
+	righe.append(evento.description)
+	for opzione: EventOptionDef in evento.options:
+		var requisito: String = run.option_requirement(opzione)
+		righe.append("• %s%s" % ["[%s] " % requisito if requisito != "" else "", opzione.label])
+	righe.append("Ignora il tema del round. Sceglierlo è la scelta del round.")
+	scheda.costo = "Scegli"
+	scheda.dettagli = "\n".join(righe)
+	return scheda
+
+
+## Un'opzione dell'evento scelto: se è bloccata la carta è spenta e dice perché (principio P4).
+static func da_opzione(run: RunState, opzione: EventOptionDef) -> SchedaCarta:
+	var scheda: SchedaCarta = SchedaCarta.new()
+	scheda.genere = Genere.AZIONE
+	scheda.titolo = opzione.label
+	var requisito: String = run.option_requirement(opzione)
+	scheda.sopratitolo = requisito if requisito != "" else "Opzione"
+	scheda.riga = opzione.description
+	scheda.costo = opzione.cost.describe() if opzione.cost != null and not opzione.cost.is_empty() else "gratis"
+	var motivo: String = run.option_block_reason(opzione)
+	scheda.disponibile = motivo == ""
+	scheda.dettagli = opzione.description if motivo == "" else "%s\nNon disponibile: %s" % [opzione.description, motivo]
 	return scheda
 
 
@@ -302,11 +354,11 @@ static func _righe_effetti(scudo_v: int, cura_v: int, corruzione_v: int, assedio
 	return righe
 
 
-static func _riga_etichette(etichette: Array[StringName], p_livello: int) -> String:
+static func _riga_tipi(tipi: Array[StringName], p_livello: int) -> String:
 	var nomi: PackedStringArray = PackedStringArray()
-	for etichetta: StringName in etichette:
-		nomi.append(String(etichetta))
-	return "Livello %d di 3 · %s" % [p_livello, ", ".join(nomi) if not nomi.is_empty() else "nessuna etichetta"]
+	for tipo: StringName in tipi:
+		nomi.append(String(tipo))
+	return "Livello %d di 3 · Tipi: %s" % [p_livello, ", ".join(nomi) if not nomi.is_empty() else "nessuno"]
 
 
 static func _riassunto_azione(opportunita: OpportunityDef) -> String:
@@ -326,10 +378,10 @@ static func _riassunto_azione(opportunita: OpportunityDef) -> String:
 				ricevi.append("%d Oro" % opportunita.gain_gold)
 			if opportunita.gain_research > 0:
 				ricevi.append("%d Ricerca" % opportunita.gain_research)
-			if opportunita.gain_resources != null and not opportunita.gain_resources.is_empty():
-				ricevi.append(opportunita.gain_resources.describe())
 			if opportunita.cost_resources != null and not opportunita.cost_resources.is_empty():
 				dai.append(opportunita.cost_resources.describe())
+			if opportunita.gain_resources != null and not opportunita.gain_resources.is_empty():
+				ricevi.append(opportunita.gain_resources.describe())
 			if dai.is_empty():
 				return "+" + " +".join(ricevi)
 			return "%s → %s" % [" + ".join(dai), " + ".join(ricevi)]
@@ -340,25 +392,10 @@ static func _riassunto_azione(opportunita: OpportunityDef) -> String:
 			return " o ".join(nomi)
 		OpportunityDef.Kind.ACCORCIA_MALUS:
 			return "−%d anno a un malus" % opportunita.shorten_years
-		OpportunityDef.Kind.POTENZIA_EDIFICIO:
-			return "+1 livello a un edificio"
-		OpportunityDef.Kind.POTENZIA_TRUPPA:
-			return "+1 livello a una truppa"
-		OpportunityDef.Kind.INCANTA:
-			var effetto: String = {
-				OpportunityDef.Enchant.DANNO: "+%d Danno",
-				OpportunityDef.Enchant.SCUDO: "+%d Scudo",
-				OpportunityDef.Enchant.CURA: "+%d Cura",
-				OpportunityDef.Enchant.CORRUZIONE: "+%d Corruzione",
-				OpportunityDef.Enchant.RALLENTAMENTO: "Rallenta",
-			}[opportunita.enchant_effect]
-			if effetto.contains("%d"):
-				effetto = effetto % opportunita.enchant_value
-			return "%s · +%d mana" % [effetto, opportunita.enchant_mana_cost]
 		OpportunityDef.Kind.SPIONAGGIO:
-			return "%s %s · %s" % ["Sabota" if opportunita.spy_sabotage else "Rallenta", secondi(opportunita.spy_duration_ms), TimerTarget.CRITERION_NAMES[opportunita.spy_criterion]]
-		OpportunityDef.Kind.PERK:
-			return "Nuovo perk"
+			return "Sabota il fantasma" if opportunita.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else "Rallenta il fantasma"
+		OpportunityDef.Kind.INCANTO:
+			return "Incanta una truppa"
 	return ""
 
 

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TroopDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_trp"]
+
+[resource]
+script = ExtResource("1_trp")
+id = &"contrabbandieri"
+display_name = "Contrabbandieri"
+era = 2
+cost_gold = 7
+types = Array[StringName]([&"Criminale"])
+mana_type = &"verde"
+mana_cost = 2
+cooldown_ms = 1500
+damage = 4
+inefficiency_ms = 2000
+inefficiency_target = 1

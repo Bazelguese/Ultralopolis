@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_h4uxc"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_b258k"]
-
-[sub_resource type="Resource" id="Resource_h4uxc"]
-script = ExtResource("2_b258k")
-pietra = 6
-
-[sub_resource type="Resource" id="Resource_b258k"]
-script = ExtResource("2_b258k")
-pietra = 9
 
 [resource]
 script = ExtResource("1_h4uxc")
@@ -17,9 +8,8 @@ id = &"bastioni"
 display_name = "Bastioni"
 era = 3
 cost_gold = 10
-tags = Array[StringName]([&"Difensivo"])
+types = Array[StringName]([&"Guardiano"])
 stone_per_phase = 2
 mana_type = &"neutro"
 mana_interval_ms = 3000
 shield = 7
-upgrade_costs = Array[ExtResource("2_b258k")]([SubResource("Resource_h4uxc"), SubResource("Resource_b258k")])

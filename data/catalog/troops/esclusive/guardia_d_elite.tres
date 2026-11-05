@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_3hrhh"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_2r04k"]
-
-[sub_resource type="Resource" id="Resource_3hrhh"]
-script = ExtResource("2_2r04k")
-ferro = 6
-
-[sub_resource type="Resource" id="Resource_2r04k"]
-script = ExtResource("2_2r04k")
-ferro = 9
 
 [resource]
 script = ExtResource("1_3hrhh")
@@ -17,9 +8,8 @@ id = &"guardia_d_elite"
 display_name = "Guardia d'élite"
 era = 3
 cost_gold = 10
-tags = Array[StringName]([&"Fanteria"])
+types = Array[StringName]([&"Fante"])
 mana_cost = 4
 cooldown_ms = 2000
 damage = 12
 shield = 5
-upgrade_costs = Array[ExtResource("2_2r04k")]([SubResource("Resource_3hrhh"), SubResource("Resource_2r04k")])

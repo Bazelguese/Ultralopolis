@@ -11,8 +11,9 @@ extends Resource
 @export_range(1, 10) var era: int = 1
 ## Prezzo in Oro.
 @export var cost_gold: int = 0
-## Etichette (GDD §6.6), es. &"Agricolo", &"Sacro".
-@export var tags: Array[StringName] = []
+## Tipi (GDD §6.6, v0.22), es. &"Produzione", &"Spirituale". Decidono quali consiglieri
+## propongono e potenziano l'edificio e a quali perk e modificatori risponde.
+@export var types: Array[StringName] = []
 ## La Capitale non si può vendere né sostituire (GDD §6.2).
 @export var is_capital: bool = false
 
@@ -24,13 +25,14 @@ extends Resource
 @export var wood_per_phase: int = 0
 @export var stone_per_phase: int = 0
 @export var iron_per_phase: int = 0
-@export var fauna_per_phase: int = 0
 @export var faith_per_phase: int = 0
 @export var influence_per_phase: int = 0
+@export var stability_per_phase: int = 0
+@export var documents_per_phase: int = 0
 
 @export_group("In battaglia")
-## Colore del mana prodotto: rosso, verde, blu o energetico (GDD §5.3).
-## Indica anche la famiglia dell'edificio.
+## Colore del mana prodotto: rosso, verde, blu, viola o energetico (GDD §5.3).
+## Il colore non dipende dai tipi (GDD v0.22).
 @export var mana_type: StringName = &"energetico"
 ## Mana prodotto a ogni intervallo. Zero = edificio neutro, senza colore (GDD §5.3).
 @export var mana_amount: int = 0
@@ -52,9 +54,6 @@ extends Resource
 ## Spazi truppa aggiunti alla plancia finché l'edificio è costruito (GDD §6.3).
 @export var extra_troop_slots: int = 0
 
-@export_group("Potenziamenti")
-## Costo per salire di livello: posizione 0 = dal livello 1 al 2, posizione 1 = dal 2 al 3 (GDD §6.5).
-@export var upgrade_costs: Array[ResourceAmounts] = []
 
 
 ## Produzione per fase di una risorsa, in unità intere.
@@ -66,7 +65,8 @@ func production(type: Res.Type) -> int:
 		Res.Type.LEGNO: return wood_per_phase
 		Res.Type.PIETRA: return stone_per_phase
 		Res.Type.FERRO: return iron_per_phase
-		Res.Type.FAUNA: return fauna_per_phase
 		Res.Type.FEDE: return faith_per_phase
 		Res.Type.INFLUENZA: return influence_per_phase
+		Res.Type.STABILITA: return stability_per_phase
+		Res.Type.DOCUMENTI: return documents_per_phase
 	return 0

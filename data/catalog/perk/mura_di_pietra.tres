@@ -11,6 +11,6 @@
 script = ExtResource("6_wici2")
 id = &"mura_di_pietra"
 display_name = "Mura di pietra"
-description = "Gli edifici Difensivi producono 1 scudo in più."
+description = "Gli elementi Guardiani che producono scudo ne producono 1 in più."
 dimension = 4
 permanent_modifiers = Array[ExtResource("4_2pgm6")]([ExtResource("5_2qsuf")])

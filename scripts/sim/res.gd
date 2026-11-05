@@ -11,9 +11,10 @@ enum Type {
 	LEGNO,
 	PIETRA,
 	FERRO,
-	FAUNA,
 	FEDE,
 	INFLUENZA,
+	STABILITA,  ## Risorsa dello Stato (GDD §5.3, v0.22).
+	DOCUMENTI,  ## Risorsa della Conoscenza (GDD §5.3, v0.22).
 }
 
 const NAMES: Dictionary[Type, String] = {
@@ -23,12 +24,13 @@ const NAMES: Dictionary[Type, String] = {
 	Type.LEGNO: "Legno",
 	Type.PIETRA: "Pietra",
 	Type.FERRO: "Ferro",
-	Type.FAUNA: "Fauna",
 	Type.FEDE: "Fede",
 	Type.INFLUENZA: "Influenza",
+	Type.STABILITA: "Stabilità",
+	Type.DOCUMENTI: "Documenti",
 }
 
-const COUNT: int = 9
+const COUNT: int = 10
 
 
 ## Quante unità interne vale 1 unità mostrata al giocatore.

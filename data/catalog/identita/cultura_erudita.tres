@@ -5,14 +5,14 @@
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="3_d3in2"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/studiosi.tres" id="4_o1abb"]
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="5_vkbdh"]
-[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_cultura_erudita_ricerca.tres" id="6_17hm8"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_cultura_erudita_documenti.tres" id="6_17hm8"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="6_45qko"]
 
 [resource]
 script = ExtResource("6_45qko")
 id = &"cultura_erudita"
 display_name = "Cultura erudita"
-description = "Scuole e archivi: +3 Ricerca iniziale, Studiosi più frequenti. Capitale: +1 Ricerca."
+description = "Scuole e archivi: +3 Ricerca iniziale, Studiosi più frequenti. Capitale: +1 Documenti."
 dimension = 3
 extra_research = 3
 favored_opportunities = Array[ExtResource("2_17hm8")]([ExtResource("4_o1abb")])

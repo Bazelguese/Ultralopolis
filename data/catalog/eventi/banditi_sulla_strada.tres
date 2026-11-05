@@ -1,0 +1,54 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Resource" path="res://data/catalog/troops/tagliagole.tres" id="e4"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+ferro = 2
+
+[sub_resource type="Resource" id="RA_3"]
+script = ExtResource("e3")
+oro = 3
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Scorta armata"
+description = "Paghi 2 Ferro, ricevi 3 Oro."
+cost = SubResource("RA_2")
+gain = SubResource("RA_3")
+
+[sub_resource type="Resource" id="RA_5"]
+script = ExtResource("e3")
+oro = 3
+
+[sub_resource type="Resource" id="OPT_4"]
+script = ExtResource("e2")
+label = "Assoldali"
+description = "Paghi 3 Oro, ricevi i Tagliagole (se c'è spazio)."
+cost = SubResource("RA_5")
+give_troop = ExtResource("e4")
+
+[sub_resource type="Resource" id="RA_7"]
+script = ExtResource("e3")
+documenti = 2
+
+[sub_resource type="Resource" id="OPT_6"]
+script = ExtResource("e2")
+label = "Un accordo nell'ombra"
+description = "Ricevi 2 Documenti."
+requires_types = Array[StringName]([&"Criminale"])
+gain = SubResource("RA_7")
+
+[resource]
+script = ExtResource("e1")
+id = &"banditi_sulla_strada"
+display_name = "Banditi sulla strada"
+description = "Una banda assalta le carovane sulla strada maestra."
+sphere = "Ombra"
+color = &"viola"
+min_era = 1
+max_era = 1
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_6")])

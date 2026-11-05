@@ -1,48 +1,57 @@
 class_name OpportunityDef
 extends Resource
-## Un'azione del Consiglio (GDD §4.2): una delle proposte che un consigliere può fare.
-## Ogni proposta è un singolo acquisto o una singola scelta.
-## (Il nome della classe viene dalle "opportunità" delle versioni precedenti del GDD.)
+## Un'azione del Consiglio (GDD §4.2.3): una delle proposte che un consigliere può fare,
+## diversa dall'acquisto di un edificio o di una truppa. Ogni proposta è un singolo acquisto
+## o una singola scelta. Prima del Consiglio (v0.21) si chiamava "opportunità".
 
-enum Kind {
-	COSTRUISCI_EDIFICIO,    ## Offre un edificio dell'era corrente, pescato a caso (es. Costruttori).
-	RECLUTA_TRUPPA,         ## Offre una truppa dell'era corrente, pescata a caso (es. Reclutatori).
-	SPAZIO_EDIFICIO,        ## Un nuovo spazio edificio (es. Architetti).
-	SPAZIO_TRUPPA,          ## Un nuovo spazio truppa (es. Quartiermastro).
-	SCAMBIO_RISORSE,        ## Paghi Oro e/o Ricerca, ricevi Oro e/o Ricerca (es. Studiosi, Esattori, Mercante).
-	MODIFICATORE_A_SCELTA,  ## Ricevi uno dei modificatori elencati (es. Assemblea, Addestramento, Fortificazioni).
-	ACCORCIA_MALUS,         ## Accorcia di qualche anno un malus attivo a scelta (es. Ambasciata).
-	POTENZIA_EDIFICIO,      ## Un edificio a scelta sale di un livello (GDD §6.5).
-	POTENZIA_TRUPPA,        ## Una truppa a scelta sale di un livello.
-	INCANTA,                ## Incanta una truppa a scelta (GDD §4.3).
-	SPIONAGGIO,             ## Lo scontro con il fantasma parte con un suo elemento sabotato o rallentato (§12).
-	PERK,                   ## Un perk non ancora posseduto, pescato a caso (Anziano, §4.2.2).
+## Non più usata dal Consiglio (le azioni valgono in entrambe le metà): resta per i vecchi dati.
+enum Phase {
+	PRODUZIONE,
+	PREPARAZIONE,
 }
 
-## Effetto aggiunto da un incanto (GDD §4.3).
-enum Enchant {
-	DANNO,
-	SCUDO,
-	CURA,
-	CORRUZIONE,
-	RALLENTAMENTO,
+enum Kind {
+	COSTRUISCI_EDIFICIO,    ## Proposta di un edificio (i consiglieri la creano dai loro tipi).
+	RECLUTA_TRUPPA,         ## Proposta di una truppa (i consiglieri la creano dai loro tipi).
+	SPAZIO_EDIFICIO,        ## Un nuovo spazio edificio (es. Architetti).
+	SPAZIO_TRUPPA,          ## Un nuovo spazio truppa (es. Quartiermastro).
+	SCAMBIO_RISORSE,        ## Paghi risorse, ne ricevi altre (es. Studiosi, Esattori, Mercante, Scorte).
+	MODIFICATORE_A_SCELTA,  ## Ricevi uno dei modificatori elencati (es. Assemblea, Addestramento, Fortificazioni).
+	ACCORCIA_MALUS,         ## Accorcia di qualche anno un malus attivo a scelta (es. Ambasciata).
+	SPIONAGGIO,             ## Un elemento del fantasma parte sabotato o rallentato (GDD §12).
+	INCANTO,                ## Aggiunge un effetto e un costo di mana a una truppa (GDD §4.3).
+	PERK,                   ## Un perk proposto dall'Anziano (GDD §4.2.2, §9.3).
+}
+
+## Criterio con cui lo spionaggio sceglie l'elemento nemico (GDD §12).
+enum SpyCriterion {
+	A_CASO,      ## Un elemento a caso fra quelli validi.
+	ESTREMITA,   ## L'elemento all'estremità destra della fila (il primo ad agire).
+	PIU_LENTO,   ## Ricarica o intervallo più lunghi.
+	PIU_VELOCE,  ## Ricarica o intervallo più corti.
+}
+
+## Effetto dello spionaggio all'inizio dello scontro con il fantasma (GDD §7.7, §12).
+enum SpyEffect {
+	SABOTAGGIO,
+	INEFFICIENZA,
 }
 
 @export var id: StringName = &""
 @export var display_name: String = ""
 @export_multiline var description: String = ""
-@export var kind: Kind = Kind.SCAMBIO_RISORSE
-## Il consigliere che propone questa azione (id di un CouncillorDef).
-@export var councillor: StringName = &""
-## Livello minimo del consigliere (cioè l'era, §4.2.1) perché l'azione compaia.
-@export var min_tier: int = 1
+## Non più usata (vedi Phase).
+@export var phase: Phase = Phase.PRODUZIONE
+@export var kind: Kind = Kind.COSTRUISCI_EDIFICIO
+## Livello minimo del Consiglio perché l'azione compaia (GDD §4.2.1): il livello è l'era corrente.
+@export_range(1, 10) var min_level: int = 1
 
 @export_group("Costo")
-## Oro da pagare (per gli edifici e le truppe conta invece il loro prezzo).
+## Oro da pagare (le azioni non costano Oro, salvo gli spazi: GDD §4.2).
 @export var cost_gold: int = 0
 ## Ricerca da pagare.
 @export var cost_research: int = 0
-## Altre risorse da pagare (es. Ferro per l'Addestramento, Influenza per l'Ambasciata).
+## Altre risorse da pagare (es. Ferro per l'Addestramento, Stabilità per l'Ambasciata).
 @export var cost_resources: ResourceAmounts
 
 @export_group("Guadagno")
@@ -50,27 +59,27 @@ enum Enchant {
 @export var gain_gold: int = 0
 ## Ricerca ricevuta (SCAMBIO_RISORSE).
 @export var gain_research: int = 0
-## Altre risorse ricevute (SCAMBIO_RISORSE), es. Cibo e Fauna per le Scorte.
+## Altre risorse ricevute (SCAMBIO_RISORSE), es. il Cibo delle Scorte.
 @export var gain_resources: ResourceAmounts
 ## Modificatori fra cui scegliere (MODIFICATORE_A_SCELTA). Con uno solo non c'è scelta.
 @export var modifiers: Array[ModifierDef] = []
 ## Anni tolti al malus scelto (ACCORCIA_MALUS).
 @export var shorten_years: int = 1
 
-@export_group("Incanto")
-@export var enchant_effect: Enchant = Enchant.DANNO
-## Valore dell'effetto; per il rallentamento sono millisecondi.
-@export var enchant_value: int = 2
-## Mana in più richiesto dalla truppa incantata.
-@export var enchant_mana_cost: int = 2
-## Colore del mana per una truppa che non usava mana.
-@export var enchant_mana_type: StringName = &"rosso"
-## Bersagli del rallentamento aggiunto.
-@export var enchant_slow_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
-
 @export_group("Spionaggio")
-## true: Sabotaggio; false: Inefficienza (rallentamento).
-@export var spy_sabotage: bool = true
-@export var spy_duration_ms: int = 5000
+@export var spy_effect: SpyEffect = SpyEffect.SABOTAGGIO
+## Durata dell'effetto all'inizio dello scontro con il fantasma, in millisecondi.
+@export var spy_ms: int = 5000
+## Truppe, edifici o qualsiasi elemento.
 @export var spy_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
-@export var spy_criterion: TimerTarget.Criterion = TimerTarget.Criterion.A_CASO
+@export var spy_criterion: SpyCriterion = SpyCriterion.A_CASO
+
+@export_group("Incanto")
+## Valore di battaglia aggiunto alla truppa: danno, scudo, cura, Corruzione o Inefficienza (GDD §4.3).
+@export var enchant_value: ModifierDef.BattleValue = ModifierDef.BattleValue.DANNO
+## Quantità per era della truppa: posizione 0 = era 1 (in millisecondi per l'Inefficienza).
+@export var enchant_amounts: PackedInt32Array = PackedInt32Array([2, 4, 6])
+## Mana in più chiesto dalla truppa incantata (GDD §4.3: 2).
+@export var enchant_mana: int = 2
+## Colore del mana se la truppa prima non ne chiedeva (GDD §4.3).
+@export var enchant_color: StringName = &"blu"

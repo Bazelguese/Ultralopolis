@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="v1"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_guerriera.tres" id="v2"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_della_guerra.tres" id="v3"]
+
+[resource]
+script = ExtResource("v1")
+id = &"compagnia_di_ventura"
+display_name = "Compagnia di ventura"
+special = 3
+color = &"rosso"
+category_name = "Militare"
+description = "Soldati di professione: truppe Fante dell'era (1 Oro in più) e dell'era successiva (3 Oro in più)."
+types = Array[StringName]([&"Fante"])
+favored_by = Array[Resource]([ExtResource("v2"), ExtResource("v3")])
+offers_buildings = false
+era_shift_min = 0
+era_shift_max = 1
+price_extra = 1
+next_era_extra = 3

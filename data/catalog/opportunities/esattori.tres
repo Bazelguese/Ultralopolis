@@ -8,5 +8,5 @@ script = ExtResource("2_m3kdu")
 id = &"esattori"
 display_name = "Esattori"
 description = "Ottieni subito 3 Oro."
-councillor = &"tesoriere"
+kind = 4
 gain_gold = 3

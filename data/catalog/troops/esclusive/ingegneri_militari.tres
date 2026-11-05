@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_aeyvf"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_o1g28"]
-
-[sub_resource type="Resource" id="Resource_aeyvf"]
-script = ExtResource("2_o1g28")
-ferro = 6
-
-[sub_resource type="Resource" id="Resource_o1g28"]
-script = ExtResource("2_o1g28")
-ferro = 9
 
 [resource]
 script = ExtResource("1_aeyvf")
@@ -17,12 +8,12 @@ id = &"ingegneri_militari"
 display_name = "Ingegneri militari"
 era = 3
 cost_gold = 10
-tags = Array[StringName]([&"Assedio"])
+types = Array[StringName]([&"Assedio", &"Accademico"])
 food_tenths = 10
+mana_type = &"viola"
 mana_cost = 5
 cooldown_ms = 3000
 damage = 10
 siege_damage = 14
 inefficiency_ms = 5000
 inefficiency_target = 1
-upgrade_costs = Array[ExtResource("2_o1g28")]([SubResource("Resource_aeyvf"), SubResource("Resource_o1g28")])

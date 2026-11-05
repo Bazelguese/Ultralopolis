@@ -6,10 +6,10 @@
 script = ExtResource("1_cpdfy")
 id = &"via_rivelazione_sacri"
 display_name = "Via della Rivelazione"
-description = "Gli edifici Sacri producono il 10% più in fretta."
+description = "Gli edifici Spirituali producono il 10% più in fretta."
 is_malus = false
 effect = 2
-target_tag = &"Sacro"
+target_type = &"Spirituale"
 amount = -10
 duration_kind = 2
 stacking = 1

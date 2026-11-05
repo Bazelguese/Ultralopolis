@@ -1,22 +1,21 @@
 [gd_resource type="Resource" script_class="OpportunityDef" format=3]
 
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_ww2b2"]
-[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_hpluu"]
-[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_q15c3"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="1_opp"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ra"]
 
-[sub_resource type="Resource" id="Resource_ww2b2"]
-script = ExtResource("1_ww2b2")
-influenza = 3
+[sub_resource type="Resource" id="Resource_cost"]
+script = ExtResource("2_ra")
+documenti = 3
 
 [resource]
-script = ExtResource("3_q15c3")
+script = ExtResource("1_opp")
 id = &"rete_di_sabotatori"
 display_name = "Rete di sabotatori"
-description = "Paghi 3 Influenza: all'inizio dello scontro con il fantasma, sabota per 8 s il suo elemento più veloce."
-kind = 10
-councillor = &"maestro_spie"
-min_tier = 2
-cost_resources = SubResource("Resource_ww2b2")
-spy_duration_ms = 8000
+description = "Dal livello Ministri: paghi 3 Documenti; nello scontro con il fantasma di quest'anno il suo elemento più veloce parte sabotato per 8 s."
+kind = 7
+cost_resources = SubResource("Resource_cost")
+min_level = 2
+spy_effect = 0
+spy_ms = 8000
 spy_target = 2
-spy_criterion = 4
+spy_criterion = 3

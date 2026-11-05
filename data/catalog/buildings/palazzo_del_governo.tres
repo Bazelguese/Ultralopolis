@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="BuildingDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_bld"]
+
+[resource]
+script = ExtResource("1_bld")
+id = &"palazzo_del_governo"
+display_name = "Palazzo del governo"
+era = 3
+cost_gold = 10
+types = Array[StringName]([&"Nobile", &"Legge"])
+gold_per_phase = 2
+influence_per_phase = 1
+stability_per_phase = 3
+mana_type = &"blu"
+mana_amount = 2
+mana_interval_ms = 2000

@@ -1,25 +1,15 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_ljd5l"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ixasc"]
-
-[sub_resource type="Resource" id="Resource_ljd5l"]
-script = ExtResource("2_ixasc")
-legno = 2
-
-[sub_resource type="Resource" id="Resource_ixasc"]
-script = ExtResource("2_ixasc")
-legno = 3
 
 [resource]
 script = ExtResource("1_ljd5l")
 id = &"segheria"
 display_name = "Segheria"
 cost_gold = 4
-tags = Array[StringName]([&"Estrattivo"])
+types = Array[StringName]([&"Produzione"])
 gold_per_phase = 1
 wood_per_phase = 2
 mana_type = &"verde"
 mana_amount = 1
 mana_interval_ms = 2000
-upgrade_costs = Array[ExtResource("2_ixasc")]([SubResource("Resource_ljd5l"), SubResource("Resource_ixasc")])

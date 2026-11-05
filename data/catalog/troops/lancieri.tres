@@ -1,23 +1,13 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_mcfmb"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_1ewl5"]
-
-[sub_resource type="Resource" id="Resource_1ewl5"]
-script = ExtResource("2_1ewl5")
-ferro = 2
-
-[sub_resource type="Resource" id="Resource_jvt30"]
-script = ExtResource("2_1ewl5")
-ferro = 3
 
 [resource]
 script = ExtResource("1_mcfmb")
 id = &"lancieri"
 display_name = "Lancieri"
 cost_gold = 3
-tags = Array[StringName]([&"Fanteria"])
+types = Array[StringName]([&"Fante"])
 cooldown_ms = 3000
 damage = 1
 shield = 1
-upgrade_costs = Array[ExtResource("2_1ewl5")]([SubResource("Resource_1ewl5"), SubResource("Resource_jvt30")])

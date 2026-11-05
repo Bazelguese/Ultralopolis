@@ -34,12 +34,13 @@ enum TroopState {
 const SIDE_A: int = 0
 const SIDE_B: int = 1
 
-## Colori del mana (GDD §5.3). L'energetico vale come qualsiasi colore.
+## Colori del mana (GDD §5.3, v0.22: quattro colori). L'energetico vale come qualsiasi colore.
 const MANA_ROSSO: StringName = &"rosso"
 const MANA_VERDE: StringName = &"verde"
 const MANA_BLU: StringName = &"blu"
+const MANA_VIOLA: StringName = &"viola"
 const MANA_ENERGETICO: StringName = &"energetico"
-const MANA_COLORS: Array[StringName] = [&"rosso", &"verde", &"blu", &"energetico"]
+const MANA_COLORS: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola", &"energetico"]
 ## Gli edifici senza mana sono neutri (GDD §5.3).
 const MANA_NEUTRO: StringName = &"neutro"
 
@@ -138,8 +139,7 @@ func _init(p_rules: BattleRules, side_a: BattleSideSetup, side_b: BattleSideSetu
 		if setup.start_building_sabotage_ms > 0:
 			_apply_timer_effect(side_index, EFFECT_SABOTAGE, TimerTarget.Kind.EDIFICI, setup.start_building_sabotage_ms)
 		for effect: Array in setup.start_timer_effects:
-			var timer_effect: int = EFFECT_SABOTAGE if bool(effect[0]) else EFFECT_SLOW
-			_apply_start_effect(side_index, timer_effect, effect[1] as TimerTarget.Kind, effect[2] as TimerTarget.Criterion, int(effect[3]))
+			_apply_timer_effect_to(side_index, effect[0], effect[1], effect[2])
 
 
 ## Fa avanzare lo scontro di un passo. Non fa nulla se lo scontro è finito.
@@ -412,43 +412,21 @@ func _apply_timer_effect(side_index: int, effect: int, category: TimerTarget.Kin
 	_record(side_index, kind, target, duration_ms, 0)
 
 
-## Effetto dello spionaggio a inizio scontro: il bersaglio segue il criterio (GDD §7.7.1, §12).
-## A caso usa la stessa rotazione degli altri effetti; gli altri criteri scelgono fra gli elementi
-## validi l'ultimo o il primo della fila, o quello con il timer più lungo o più corto.
-## A parità vale la posizione più a destra; le truppe stanno a destra degli edifici.
-func _apply_start_effect(side_index: int, effect: int, category: TimerTarget.Kind, criterion: TimerTarget.Criterion, duration_ms: int) -> void:
-	if criterion == TimerTarget.Criterion.A_CASO:
-		_apply_timer_effect(side_index, effect, category, duration_ms)
-		return
+## Applica Inefficienza o Sabotaggio a un elemento preciso (es. lo spionaggio, GDD §12).
+## Un indice che non esiste viene ignorato.
+func _apply_timer_effect_to(side_index: int, effect: int, target: int, duration_ms: int) -> void:
 	var state: SideState = _sides[side_index]
-	var valid: Array[int] = []
-	if category != TimerTarget.Kind.TRUPPE:
-		for i: int in range(state.buildings.size()):
-			valid.append(i)
-	if category != TimerTarget.Kind.EDIFICI:
-		for i: int in range(state.troops.size()):
-			valid.append(TROOP_INDEX_OFFSET + i)
-	if valid.is_empty():
-		return
-	var target: int = valid[valid.size() - 1]
-	match criterion:
-		TimerTarget.Criterion.PIU_A_SINISTRA:
-			target = valid[0]
-		TimerTarget.Criterion.PIU_LENTO, TimerTarget.Criterion.PIU_VELOCE:
-			var best: int = -1
-			for candidate: int in valid:
-				var timer: int = state.troops[candidate - TROOP_INDEX_OFFSET].cooldown_ms if candidate >= TROOP_INDEX_OFFSET else state.buildings[candidate].mana_interval_ms
-				var better: bool = timer >= best if criterion == TimerTarget.Criterion.PIU_LENTO else (best < 0 or timer <= best)
-				if best < 0 or better:
-					best = timer
-					target = candidate
 	if target >= TROOP_INDEX_OFFSET:
 		var troop_index: int = target - TROOP_INDEX_OFFSET
+		if troop_index < 0 or troop_index >= state.troops.size():
+			return
 		if effect == EFFECT_SLOW:
 			state.troop_slow_ms[troop_index] += duration_ms
 		else:
 			state.troop_sabotage_ms[troop_index] += duration_ms
 	else:
+		if target < 0 or target >= state.buildings.size():
+			return
 		if effect == EFFECT_SLOW:
 			state.building_slow_ms[target] += duration_ms
 		else:

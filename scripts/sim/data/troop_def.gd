@@ -11,13 +11,14 @@ extends Resource
 @export_range(1, 10) var era: int = 1
 ## Prezzo in Oro.
 @export var cost_gold: int = 0
-## Etichette (GDD §6.6), es. &"Fanteria", &"Cavalleria".
-@export var tags: Array[StringName] = []
+## Tipi (GDD §6.6, v0.22), es. &"Fante", &"Fauna". Decidono quali consiglieri
+## propongono e potenziano la truppa e a quali perk e modificatori risponde.
+@export var types: Array[StringName] = []
 ## Cibo consumato a inizio anno, in decimi (5 = 0,5 Cibo, GDD §5.4).
 @export var food_tenths: int = 5
 
 @export_group("In battaglia")
-## Colore del mana richiesto: rosso, verde o blu (GDD §5.3). Ignorato se mana_cost è 0.
+## Colore del mana richiesto: rosso, verde, blu o viola (GDD §5.3). Ignorato se mana_cost è 0.
 @export var mana_type: StringName = &"rosso"
 ## Mana consumato a ogni attivazione. Zero = truppa senza richiesta di mana.
 @export var mana_cost: int = 0
@@ -31,7 +32,7 @@ extends Resource
 @export var heal: int = 0
 ## Corruzione inflitta all'avversario a ogni attivazione (GDD §7.6.3).
 @export var corruption: int = 0
-## Danno agli scudi (attacco d'assedio): solo truppe con etichetta Assedio (GDD §7.6.4).
+## Danno agli scudi (attacco d'assedio): solo truppe con tipo Assedio (GDD §7.6.4).
 @export var siege_damage: int = 0
 ## Inefficienza inflitta (millisecondi) e sua categoria di bersaglio (GDD §7.7).
 @export var inefficiency_ms: int = 0
@@ -40,6 +41,3 @@ extends Resource
 @export var sabotage_ms: int = 0
 @export var sabotage_target: TimerTarget.Kind = TimerTarget.Kind.TRUPPE
 
-@export_group("Potenziamenti")
-## Costo per salire di livello: posizione 0 = dal livello 1 al 2, posizione 1 = dal 2 al 3 (GDD §6.5).
-@export var upgrade_costs: Array[ResourceAmounts] = []

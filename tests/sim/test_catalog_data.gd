@@ -28,15 +28,9 @@ func test_regole_confermate_nel_gdd() -> void:
 	assert_eq(rules.max_building_slots, 10, "GDD §6.1")
 	assert_eq(rules.max_troop_slots, 12, "GDD §6.1")
 	assert_eq(rules.rounds_per_half, 5, "GDD §3.2: 5 round per metà")
-	assert_eq(rules.councillors_per_round, 3, "GDD §4.2: 3 consiglieri")
-	assert_eq(rules.proposals_per_councillor, 3, "GDD §4.2: 3 proposte")
-	assert_eq(rules.clown_proposals, 4, "GDD §4.2.2: il Clown ne propone 4")
-	assert_eq(rules.tier_names.size(), 3, "GDD §4.2.1: 3 livelli")
-	var types: Array[int] = []
-	for type: int in rules.round_types:
-		types.append(type)
-	types.sort()
-	assert_eq(types, [0, 1, 2, 3, 3] as Array[int], "GDD §4.2: Azioni, Edifici, Truppe e due Misti")
+	assert_eq(rules.advisors_per_round, 3, "GDD §4.2: 3 consiglieri per round")
+	assert_eq(rules.proposals_per_advisor, 3, "GDD §4.2: 3 proposte")
+	assert_eq(rules.elder_upgrades_per_year, 1, "GDD §4.2.2: l'Anziano potenzia una volta all'anno")
 	assert_eq(rules.starting_research, 0, "GDD §6.2")
 	assert_eq(rules.starting_buildings.size(), 1, "GDD §6.2: un edificio di base")
 	assert_eq(rules.starting_troops.size(), 1, "GDD §6.2: una truppa di base")
@@ -58,7 +52,7 @@ func test_identificativi_unici_e_valori_validi() -> void:
 		assert_between(def.era, 1, catalog.eras.size(), "Era di %s" % def.id)
 
 
-func test_colori_etichette_e_capitale() -> void:
+func test_colori_tipi_e_capitale() -> void:
 	var catalog: CatalogDef = _catalog()
 	var rules: RunRules = load(RUN_RULES_PATH) as RunRules
 	for def: BuildingDef in catalog.buildings:
@@ -66,27 +60,45 @@ func test_colori_etichette_e_capitale() -> void:
 			assert_eq(def.mana_type, BattleSim.MANA_NEUTRO, "Senza mana l'edificio è neutro (%s)" % def.id)
 		else:
 			assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
-		assert_false(def.tags.is_empty(), "Etichette di %s" % def.id)
+		assert_false(def.types.is_empty(), "Tipi di %s" % def.id)
 		assert_false(def.is_capital, "La Capitale non è fra le offerte (%s)" % def.id)
 	for def: TroopDef in catalog.troops:
 		assert_true(BattleSim.MANA_COLORS.has(def.mana_type), "Colore di %s" % def.id)
-		assert_false(def.tags.is_empty(), "Etichette di %s" % def.id)
-		assert_eq(def.upgrade_costs.size(), rules.max_level - 1, "Costi di potenziamento di %s" % def.id)
+		assert_false(def.types.is_empty(), "Tipi di %s" % def.id)
 	assert_eq(rules.starting_buildings.size(), 1)
 	assert_true(rules.starting_buildings[0].is_capital, "Si parte dalla Capitale.")
+	# GDD §6.2 (v0.22): la Capitale produce di base solo Oro, Cibo e Ricerca.
+	var base: Array[Res.Type] = [Res.Type.ORO, Res.Type.CIBO, Res.Type.RICERCA]
 	for type: Res.Type in Res.NAMES:
-		assert_gt(rules.starting_buildings[0].production(type), 0, "La Capitale produce %s" % Res.NAMES[type])
+		if base.has(type):
+			assert_gt(rules.starting_buildings[0].production(type), 0, "La Capitale produce %s" % Res.NAMES[type])
+		else:
+			assert_eq(rules.starting_buildings[0].production(type), 0, "Di base la Capitale non produce %s" % Res.NAMES[type])
+
+
+func test_ogni_elemento_dell_identita_indica_una_risorsa_della_capitale() -> void:
+	# GDD §6.2, §9.2 (v0.22): popolo, governo, credo e cultura indicano una risorsa ciascuno.
+	var catalog: CatalogDef = _catalog()
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == IdentityDef.Dimension.PERK:
+			continue
+		var capital_bonus: int = 0
+		for modifier: ModifierDef in def.permanent_modifiers:
+			if modifier.effect == ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO and modifier.target_type == &"Capitale":
+				capital_bonus += 1
+				assert_eq(modifier.amount, 1, "+1 a fase (%s)" % def.id)
+		assert_eq(capital_bonus, 1, "Una sola risorsa della Capitale per %s" % def.id)
 
 
 func test_catalogo_bozza_3() -> void:
 	var catalog: CatalogDef = _catalog()
-	assert_eq(catalog.buildings.size(), 27, "27 edifici (Catalogo §8).")
-	assert_eq(catalog.troops.size(), 24, "24 truppe.")
+	assert_eq(catalog.buildings.size(), 37, "37 edifici (Catalogo §8, bozza 4).")
+	assert_eq(catalog.troops.size(), 30, "30 truppe (bozza 4).")
 	assert_eq(catalog.eras[1].ways.size(), 4, "4 vie nell'era 2.")
 	assert_eq(catalog.eras[2].ways.size(), 5, "4 vie più l'esclusiva nell'era 3.")
 	for def: TroopDef in catalog.troops:
 		if def.siege_damage > 0:
-			assert_true(def.tags.has(&"Assedio"), "Solo le truppe Assedio hanno l'attacco d'assedio (%s)." % def.id)
+			assert_true(def.types.has(&"Assedio"), "Solo le truppe Assedio hanno l'attacco d'assedio (%s)." % def.id)
 	var perks: int = IdentityRules.options(catalog, IdentityDef.Dimension.PERK).size()
 	assert_eq(perks, 11, "7 perk esistenti + 4 nuovi.")
 	assert_eq(catalog.generator.ghost_malus_pool.size(), 12, "6 malus esistenti + 6 nuovi.")
@@ -105,37 +117,39 @@ func test_identita_complete() -> void:
 		assert_false(ghost.identity.is_empty(), "Identità del fantasma %s" % ghost.display_name)
 
 
-func test_il_consiglio() -> void:
+func test_il_consiglio_del_prototipo() -> void:
+	# GDD §4.2.2, §4.2.3 (v0.22): 8 consiglieri ordinari con azioni, più Clown e Anziano.
 	var catalog: CatalogDef = _catalog()
-	var ids: Array[StringName] = []
-	var specials: Array[CouncillorDef.Special] = []
-	for def: CouncillorDef in catalog.councillors:
-		ids.append(def.id)
-		specials.append(def.special)
-	assert_eq(catalog.councillors.size(), 10, "10 consiglieri (GDD §4.2.3).")
-	assert_true(specials.has(CouncillorDef.Special.CLOWN), "C'è il Clown.")
-	assert_true(specials.has(CouncillorDef.Special.ANZIANO), "C'è l'Anziano.")
-	for action: OpportunityDef in catalog.opportunities:
-		assert_true(ids.has(action.councillor), "%s appartiene a un consigliere esistente." % action.id)
-	for def: CouncillorDef in catalog.councillors:
-		if def.special != CouncillorDef.Special.NESSUNO:
+	var specials: Array[AdvisorDef.Special] = []
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special != AdvisorDef.Special.NESSUNO:
+			specials.append(advisor.special)
 			continue
-		var has_something: bool = false
-		for action: OpportunityDef in catalog.opportunities:
-			if action.councillor == def.id:
-				has_something = true
-		for building: BuildingDef in catalog.buildings:
-			if def.is_affine_building(building):
-				has_something = true
-		for troop: TroopDef in catalog.troops:
-			if def.is_affine_troop(troop):
-				has_something = true
-		assert_true(has_something, "%s ha qualcosa da proporre." % def.display_name)
-	var kinds: Array[OpportunityDef.Kind] = []
-	for action: OpportunityDef in catalog.opportunities:
-		kinds.append(action.kind)
-	for kind: OpportunityDef.Kind in [OpportunityDef.Kind.INCANTA, OpportunityDef.Kind.SPIONAGGIO, OpportunityDef.Kind.PERK, OpportunityDef.Kind.POTENZIA_EDIFICIO, OpportunityDef.Kind.POTENZIA_TRUPPA]:
-		assert_true(kinds.has(kind), "Il catalogo ha azioni di tipo %d." % kind)
+		assert_false(advisor.actions.is_empty(), "Azioni di %s" % advisor.display_name)
+		for action: OpportunityDef in advisor.actions:
+			assert_ne(action.kind, OpportunityDef.Kind.COSTRUISCI_EDIFICIO, "Gli edifici vengono dai tipi (%s)" % action.id)
+			assert_ne(action.kind, OpportunityDef.Kind.RECLUTA_TRUPPA, "Le truppe vengono dai tipi (%s)" % action.id)
+			assert_eq(action.cost_gold if action.kind not in [OpportunityDef.Kind.SPAZIO_EDIFICIO, OpportunityDef.Kind.SPAZIO_TRUPPA] else 0, 0,
+					"Le azioni non costano Oro, salvo gli spazi (GDD §4.2): %s" % action.id)
+		if advisor.random_resource:
+			assert_eq(advisor.upgrade_resource, Res.Type.ORO, "Ombra: Oro più una risorsa casuale")
+	assert_true(specials.has(AdvisorDef.Special.CLOWN), "C'è il Clown")
+	assert_true(specials.has(AdvisorDef.Special.ANZIANO), "C'è l'Anziano")
+
+
+func test_ogni_risorsa_di_categoria_paga_almeno_un_azione() -> void:
+	# GDD §4.2.3, §5.3 (v0.22).
+	var catalog: CatalogDef = _catalog()
+	var paid: Dictionary[Res.Type, bool] = {}
+	for advisor: AdvisorDef in catalog.advisors:
+		for action: OpportunityDef in advisor.actions:
+			if action.cost_resources != null:
+				for type: Res.Type in Res.NAMES:
+					if action.cost_resources.whole(type) > 0:
+						paid[type] = true
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special == AdvisorDef.Special.NESSUNO and not advisor.random_resource:
+			assert_true(paid.has(advisor.upgrade_resource), "%s paga almeno un'azione" % Res.NAMES[advisor.upgrade_resource])
 
 
 func test_ogni_anno_di_prova_ha_fantasma_e_tre_incontri() -> void:
@@ -170,25 +184,27 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 			choices.append(options[i])
 	assert_true(run.found_nation("Prova", choices), "La nazione si crea con i dati veri.")
 	var guard: int = 0
-	while not run.is_over() and guard < 5000:
+	while not run.is_over() and guard < 1000:
 		guard += 1
 		match run.phase:
 			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-				if not run.way_choices.is_empty():
-					run.choose_way(0)
-					continue
-				if run.is_choosing_councillor() and not run.councillor_choices.is_empty():
-					run.choose_councillor(0)
-					continue
-				# Compra la prima proposta che si può pagare senza sostituzioni, altrimenti passa.
+				# Ascolta il primo consigliere, potenzia se può, compra la prima proposta che si può
+				# pagare senza sostituzioni e senza scelte, altrimenti passa.
+				if run.chosen_advisor == null and not run.advisor_choices.is_empty():
+					run.choose_advisor(0)
+				for piece: BoardPiece in run.board.buildings + run.board.troops:
+					var cost: ResourceAmounts = run.upgrade_cost_of(piece)
+					if run.upgrade_block_reason(piece) == "" and cost != null and run.can_pay(cost):
+						run.upgrade_building(run.board.buildings.find(piece)) if piece.building != null else run.upgrade_troop(run.board.troops.find(piece))
+						break
 				var bought: bool = false
 				for i: int in range(run.offers.size()):
 					var offer: Offer = run.offers[i]
-					if run.can_afford(offer) and not run.offer_needs_replacement(offer):
-						bought = run.buy_offer(i, 0 if not run.offer_choices(offer).is_empty() else -1)
+					if run.can_afford(offer) and not run.offer_needs_replacement(offer) and run.offer_choices(offer).is_empty():
+						bought = run.buy_offer(i)
 						break
 				if not bought:
-					run.pass_opportunity()
+					run.pass_round()
 			RunState.Phase.SCELTA_INCONTRO:
 				run.choose_encounter(0)
 			RunState.Phase.RICOMPENSA_INCONTRO:
@@ -196,7 +212,7 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 			RunState.Phase.SCONTRO_FANTASMA:
 				run.fight_ghost()
 	assert_true(run.is_over(), "La run termina.")
-	assert_lt(guard, 5000, "Nessun ciclo infinito.")
+	assert_lt(guard, 1000, "Nessun ciclo infinito.")
 	assert_ne(run.run_end, RunState.RunEnd.FINE_PROVA, "La run è completa: finisce con vittoria o sconfitta.")
 	assert_eq(run.history.size(), run.year, "Un riepilogo per ogni anno.")
 
@@ -212,3 +228,105 @@ func test_bottino_dei_nemici() -> void:
 	var generati: Array[EncounterDef] = OpponentGenerator.generate_encounters(catalog, catalog.generator, rules, 5, 1, 3)
 	assert_eq(generati[0].loot_gold, 2, "Facile: 2 Oro.")
 	assert_eq(generati[2].loot_research, 3, "Difficile: 3 Ricerca.")
+
+
+func test_ogni_tipo_delle_carte_sta_in_una_categoria() -> void:
+	# GDD §4.2.4, §6.6 (v0.22): i tipi delle carte formano le categorie dei consiglieri.
+	var catalog: CatalogDef = _catalog()
+	var in_categories: Dictionary[StringName, bool] = {}
+	var ordinary: int = 0
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special == AdvisorDef.Special.NESSUNO:
+			ordinary += 1
+			assert_false(advisor.types.is_empty(), "Tipi della categoria %s" % advisor.category_name)
+		for card_type: StringName in advisor.types:
+			in_categories[card_type] = true
+	assert_eq(ordinary, 8, "8 categorie (GDD §4.2.4).")
+	var used: Dictionary[StringName, bool] = {}
+	var cards: Array[Array] = []
+	for def: BuildingDef in catalog.buildings:
+		cards.append([def.id, def.types])
+	for def: TroopDef in catalog.troops:
+		cards.append([def.id, def.types])
+	for identity: IdentityDef in catalog.identities:
+		for def: BuildingDef in identity.exclusive_buildings:
+			cards.append([def.id, def.types])
+		for def: TroopDef in identity.exclusive_troops:
+			cards.append([def.id, def.types])
+	for card: Array in cards:
+		var card_types: Array[StringName] = card[1]
+		assert_between(card_types.size(), 1, 3, "1–3 tipi per %s" % card[0])
+		for card_type: StringName in card_types:
+			used[card_type] = true
+			assert_true(in_categories.has(card_type), "Il tipo %s di %s sta in una categoria" % [card_type, card[0]])
+	for card_type: StringName in in_categories:
+		assert_true(used.has(card_type), "Il tipo %s è usato da almeno una carta" % card_type)
+
+
+func test_ogni_era_ha_truppe_di_tutti_e_quattro_i_colori() -> void:
+	# GDD §5.3 (v0.22): quattro colori; il catalogo ne offre in ogni era.
+	var catalog: CatalogDef = _catalog()
+	for era: int in range(1, catalog.eras.size() + 1):
+		var colors: Dictionary[StringName, bool] = {}
+		for def: TroopDef in catalog.troops:
+			if def.era == era and def.mana_cost > 0:
+				colors[def.mana_type] = true
+		for color: StringName in [BattleSim.MANA_ROSSO, BattleSim.MANA_VERDE, BattleSim.MANA_BLU, BattleSim.MANA_VIOLA]:
+			assert_true(colors.has(color), "Era %d: truppe %s" % [era, color])
+
+
+func test_ogni_consigliere_ha_edifici_truppe_e_azioni_in_ogni_era() -> void:
+	# Catalogo bozza 4: niente consiglieri a mani vuote nei round Edifici, Truppe e Azioni.
+	var catalog: CatalogDef = _catalog()
+	var exclusive: Array[OpportunityDef] = []
+	for def: IdentityDef in catalog.identities:
+		exclusive.append_array(def.exclusive_opportunities)
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special != AdvisorDef.Special.NESSUNO:
+			continue
+		var common_actions: int = 0
+		for action: OpportunityDef in advisor.actions:
+			if not exclusive.has(action):
+				common_actions += 1
+		assert_gte(common_actions, 2, "%s ha almeno due azioni comuni" % advisor.display_name)
+		for era: int in range(1, catalog.eras.size() + 1):
+			var buildings: int = 0
+			var troops: int = 0
+			for def: BuildingDef in catalog.buildings:
+				if def.era == era and advisor.covers(def.types):
+					buildings += 1
+			for def: TroopDef in catalog.troops:
+				if def.era == era and advisor.covers(def.types):
+					troops += 1
+			assert_gt(buildings, 0, "%s: edifici nell'era %d" % [advisor.display_name, era])
+			assert_gt(troops, 0, "%s: truppe nell'era %d" % [advisor.display_name, era])
+
+
+func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
+	# Bozza v0.23: 18 eventi, 6 fortune, 6 visitatori; ogni evento ha un'opzione senza requisiti.
+	var catalog: CatalogDef = _catalog()
+	var categories: Array[String] = []
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.category_name != "":
+			categories.append(advisor.category_name)
+	var events: int = 0
+	var fortunes: int = 0
+	for event: EventDef in catalog.events:
+		assert_true(categories.has(event.sphere), "La sfera di %s è una categoria" % event.id)
+		assert_false(event.options.is_empty(), "Opzioni di %s" % event.id)
+		var free: bool = false
+		for option: EventOptionDef in event.options:
+			if option.requires_identity.is_empty() and option.requires_types.is_empty():
+				free = true
+		assert_true(free, "%s ha un'opzione senza requisiti" % event.id)
+		if event.family == EventDef.Family.FORTUNA:
+			fortunes += 1
+			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
+		else:
+			events += 1
+	assert_eq(events, 18)
+	assert_eq(fortunes, 6)
+	assert_eq(catalog.visitors.size(), 6)
+	for visitor: AdvisorDef in catalog.visitors:
+		assert_eq(visitor.special, AdvisorDef.Special.VISITATORE, "%s è un visitatore" % visitor.id)
+		assert_true(categories.has(visitor.category_name), "La sfera di %s è una categoria" % visitor.id)

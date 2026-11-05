@@ -9,5 +9,4 @@ id = &"architetti"
 display_name = "Architetti"
 description = "Aggiunge uno spazio edificio alla plancia."
 kind = 2
-councillor = &"architetto"
 cost_gold = 6

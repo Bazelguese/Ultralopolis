@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_erudita.tres" id="e4"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+oro = 4
+
+[sub_resource type="Resource" id="RA_3"]
+script = ExtResource("e3")
+documenti = 4
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Compralo"
+description = "Paghi 4 Oro, ricevi 4 Documenti."
+cost = SubResource("RA_2")
+gain = SubResource("RA_3")
+
+[sub_resource type="Resource" id="RA_5"]
+script = ExtResource("e3")
+documenti = 2
+
+[sub_resource type="Resource" id="RA_6"]
+script = ExtResource("e3")
+ricerca = 3
+
+[sub_resource type="Resource" id="OPT_4"]
+script = ExtResource("e2")
+label = "Fallo copiare"
+description = "Paghi 2 Documenti, ricevi 3 Ricerca."
+cost = SubResource("RA_5")
+gain = SubResource("RA_6")
+
+[sub_resource type="Resource" id="RA_8"]
+script = ExtResource("e3")
+stabilita = 1
+
+[sub_resource type="Resource" id="RA_9"]
+script = ExtResource("e3")
+documenti = 4
+
+[sub_resource type="Resource" id="OPT_7"]
+script = ExtResource("e2")
+label = "Rubalo"
+description = "Paghi 1 Stabilità, ricevi 4 Documenti."
+requires_types = Array[StringName]([&"Criminale"])
+cost = SubResource("RA_8")
+gain = SubResource("RA_9")
+
+[resource]
+script = ExtResource("e1")
+id = &"manoscritto_perduto"
+display_name = "Il manoscritto perduto"
+description = "Un antico manoscritto è in vendita al mercato."
+sphere = "Conoscenza"
+color = &"viola"
+favored_by = Array[Resource]([ExtResource("e4")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7")])

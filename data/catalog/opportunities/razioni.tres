@@ -1,20 +1,19 @@
 [gd_resource type="Resource" script_class="OpportunityDef" format=3]
 
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_nmuo1"]
-[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_to857"]
-[ext_resource type="Resource" path="res://data/catalog/modifiers/razioni.tres" id="3_2v6i5"]
-[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="4_mda5t"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="1_opp"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ra"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="3_mod"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/razioni.tres" id="4_raz"]
 
-[sub_resource type="Resource" id="Resource_nmuo1"]
-script = ExtResource("1_nmuo1")
-fauna = 2
+[sub_resource type="Resource" id="Resource_cost"]
+script = ExtResource("2_ra")
+legno = 2
 
 [resource]
-script = ExtResource("4_mda5t")
+script = ExtResource("1_opp")
 id = &"razioni"
 display_name = "Razioni"
-description = "Paghi 2 Fauna: per un anno le truppe mangiano la metà del Cibo."
+description = "Paghi 2 Legno: per un anno le truppe mangiano la metà del Cibo."
 kind = 5
-councillor = &"fattore"
-cost_resources = SubResource("Resource_nmuo1")
-modifiers = Array[ExtResource("2_to857")]([ExtResource("3_2v6i5")])
+cost_resources = SubResource("Resource_cost")
+modifiers = Array[ExtResource("3_mod")]([ExtResource("4_raz")])

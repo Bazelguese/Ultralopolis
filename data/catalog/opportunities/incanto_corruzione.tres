@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="OpportunityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="1_opp"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ra"]
+
+[sub_resource type="Resource" id="Resource_cost"]
+script = ExtResource("2_ra")
+fede = 2
+
+[resource]
+script = ExtResource("1_opp")
+id = &"incanto_corruzione"
+display_name = "Incanto: maledizione"
+description = "Paghi 2 Fede: una truppa a tua scelta, una sola volta, infligge Corruzione in più (1/3/4 secondo l'era) e chiede 2 mana in più, viola se prima non ne chiedeva."
+kind = 8
+cost_resources = SubResource("Resource_cost")
+enchant_value = 3
+enchant_amounts = PackedInt32Array(1, 3, 4)
+enchant_color = &"viola"

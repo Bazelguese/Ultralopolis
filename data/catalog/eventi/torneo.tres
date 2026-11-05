@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/manuali_tecnici.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cultura_guerriera.tres" id="e6"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+oro = 3
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Premi ricchi"
+description = "Paghi 3 Oro: per un anno una truppa a scelta fa il 25% di danno in più."
+cost = SubResource("RA_2")
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+ferro = 1
+
+[sub_resource type="Resource" id="RA_5"]
+script = ExtResource("e3")
+stabilita = 2
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Torneo modesto"
+description = "Paghi 1 Ferro, ricevi 2 Stabilità."
+cost = SubResource("RA_4")
+gain = SubResource("RA_5")
+
+[sub_resource type="Resource" id="OPT_6"]
+script = ExtResource("e2")
+label = "Il campione"
+description = "Una tua truppa Fante sale di un livello."
+requires_types = Array[StringName]([&"Fante"])
+requires_kind = 2
+requirement_label = "truppa Fante"
+upgrade = true
+upgrade_types = Array[StringName]([&"Fante"])
+upgrade_kind = 2
+
+[resource]
+script = ExtResource("e1")
+id = &"torneo"
+display_name = "Il torneo"
+description = "I guerrieri della nazione chiedono un torneo."
+sphere = "Militare"
+color = &"rosso"
+favored_by = Array[Resource]([ExtResource("e6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6")])

@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_0qjoa"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_edryq"]
-
-[sub_resource type="Resource" id="Resource_0qjoa"]
-script = ExtResource("2_edryq")
-fede = 4
-
-[sub_resource type="Resource" id="Resource_edryq"]
-script = ExtResource("2_edryq")
-fede = 6
 
 [resource]
 script = ExtResource("1_0qjoa")
@@ -17,10 +8,9 @@ id = &"confraternita"
 display_name = "Confraternita"
 era = 2
 cost_gold = 7
-tags = Array[StringName]([&"Sacro"])
+types = Array[StringName]([&"Spirituale", &"Guardiano"])
 mana_type = &"blu"
 mana_cost = 3
 cooldown_ms = 2500
 shield = 4
 heal = 6
-upgrade_costs = Array[ExtResource("2_edryq")]([SubResource("Resource_0qjoa"), SubResource("Resource_edryq")])

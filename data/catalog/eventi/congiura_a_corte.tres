@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/fortificazioni.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/spia_sabotaggio_veloce.tres" id="e6"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+stabilita = 3
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Reprimi"
+description = "Paghi 3 Stabilità: +10 Resistenza nel prossimo scontro con il fantasma."
+cost = SubResource("RA_2")
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+documenti = 3
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Infiltra i congiurati"
+description = "Paghi 3 Documenti: la truppa più veloce del fantasma parte sabotata per 5 s."
+cost = SubResource("RA_4")
+spy = ExtResource("e6")
+
+[sub_resource type="Resource" id="RA_6"]
+script = ExtResource("e3")
+stabilita = 4
+
+[sub_resource type="Resource" id="OPT_5"]
+script = ExtResource("e2")
+label = "Processo pubblico"
+description = "Ricevi 4 Stabilità."
+requires_types = Array[StringName]([&"Legge"])
+gain = SubResource("RA_6")
+
+[resource]
+script = ExtResource("e1")
+id = &"congiura_a_corte"
+display_name = "Congiura a corte"
+description = "Si sussurra di una congiura contro il governo."
+sphere = "Ombra"
+color = &"viola"
+min_era = 3
+max_era = 3
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_5")])

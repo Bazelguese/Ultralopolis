@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_hcst5"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_l7ap1"]
-
-[sub_resource type="Resource" id="Resource_hcst5"]
-script = ExtResource("2_l7ap1")
-ferro = 6
-
-[sub_resource type="Resource" id="Resource_l7ap1"]
-script = ExtResource("2_l7ap1")
-ferro = 9
 
 [resource]
 script = ExtResource("1_hcst5")
@@ -17,10 +8,9 @@ id = &"granatieri"
 display_name = "Granatieri"
 era = 3
 cost_gold = 10
-tags = Array[StringName]([&"Fanteria", &"Assedio"])
+types = Array[StringName]([&"Fante", &"Assedio"])
 food_tenths = 10
 mana_cost = 5
 cooldown_ms = 3000
 damage = 15
 siege_damage = 12
-upgrade_costs = Array[ExtResource("2_l7ap1")]([SubResource("Resource_hcst5"), SubResource("Resource_l7ap1")])

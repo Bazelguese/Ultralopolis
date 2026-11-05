@@ -7,7 +7,7 @@ extends Node3D
 
 enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
-enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE }
+enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE }
 
 const PASSO_TRUPPE: float = 1.75
 const PASSO_EDIFICI: float = 2.1
@@ -31,7 +31,7 @@ const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
 const SPAZI_TRUPPE: int = 12
 const SPAZI_EDIFICI: int = 10
-const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"energetico"]
+const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola", &"energetico"]
 ## Oltre questo numero di gemme in volo non se ne lanciano altre (solo effetto visivo).
 const MASSIMO_GEMME_IN_VOLO: int = 24
 
@@ -122,7 +122,8 @@ func _ready() -> void:
 func _collega_hud() -> void:
 	_hud.azione_principale.connect(_on_azione_principale)
 	_hud.rinnova.connect(func() -> void: _esegui(run.reroll_offers(), "Proposte rinnovate"))
-	_hud.passa.connect(func() -> void: _esegui(run.pass_opportunity(), "Round passato"))
+	_hud.rinnova_risorsa.connect(func() -> void: _esegui(run.reroll_offers(true), "Proposte rinnovate"))
+	_hud.passa.connect(func() -> void: _esegui(run.pass_round(), "Round passato"))
 	_hud.nessuna_ricompensa.connect(func() -> void: _esegui(run.skip_reward()))
 	_hud.avanza_era.connect(_on_avanza_era)
 	_hud.vendi_risorsa.connect(func(tipo: int) -> void: _esegui(run.sell_resource(tipo, run.run_rules.market_units_per_gold)))
@@ -426,7 +427,7 @@ func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
 	_riserve[lato] = nodo
 	for i: int in range(COLORI_RISERVA.size()):
 		var mana: StringName = COLORI_RISERVA[i]
-		var x: float = (i - 1.5) * 0.55
+		var x: float = (i - (COLORI_RISERVA.size() - 1) * 0.5) * 0.55
 		var gemma: MeshInstance3D = MeshInstance3D.new()
 		var forma: CylinderMesh = CylinderMesh.new()
 		forma.top_radius = 0.19
@@ -565,11 +566,19 @@ func _costruisci_scelte() -> void:
 		fase = -1
 	match fase:
 		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
-			if run.is_choosing_councillor():
+			if run.chosen_event != null:
+				tipo = TipoScelta.OPZIONE
+				for opzione: EventOptionDef in run.event_options():
+					schede.append(SchedaCarta.da_opzione(run, opzione))
+					origini.append(opzione)
+			elif run.chosen_advisor == null:
 				tipo = TipoScelta.CONSIGLIERE
-				for consigliere: CouncillorDef in run.councillor_choices:
+				for consigliere: AdvisorDef in run.advisor_choices:
 					schede.append(SchedaCarta.da_consigliere(run, consigliere))
 					origini.append(consigliere)
+				if run.event_choice != null:
+					schede.append(SchedaCarta.da_evento(run, run.event_choice))
+					origini.append(run.event_choice)
 			else:
 				tipo = TipoScelta.OFFERTA
 				for offerta: Offer in run.offers:
@@ -590,9 +599,13 @@ func _costruisci_scelte() -> void:
 				tipo = TipoScelta.FANTASMA
 				schede.append(SchedaCarta.da_fantasma(run, run.current_ghost))
 				origini.append(run.current_ghost)
-	var firma: String = "%d|%d|%d|%d|%d" % [tipo, run.year, run.phase, run.round_number, run.era]
+	var firma: String = "%d|%d|%d|%d" % [tipo, run.year, run.phase, run.round_number]
 	for origine: Object in origini:
 		firma += "|%d" % origine.get_instance_id()
+	if run.chosen_advisor != null:
+		firma += "|%s" % run.chosen_advisor.id
+	if run.chosen_event != null:
+		firma += "|evento:%s" % run.chosen_event.id
 	if firma == _firma_scelte and _scelte.size() == schede.size():
 		_aggiorna_scelte(schede)
 		return
@@ -718,6 +731,23 @@ func _unhandled_input(evento: InputEvent) -> void:
 func _clic_scelta(tessera: Tessera3D) -> void:
 	var i: int = tessera.indice
 	match _tipo_scelta:
+		TipoScelta.CONSIGLIERE:
+			if i >= run.advisor_choices.size():
+				_esegui(run.choose_event(), run.event_choice.display_name if run.event_choice != null else "")
+				return
+			var nome_consigliere: String = run.advisor_choices[i].display_name
+			_esegui(run.choose_advisor(i), "Ascolti: %s" % nome_consigliere)
+		TipoScelta.OPZIONE:
+			var opzione: EventOptionDef = run.event_options()[i]
+			var motivo: String = run.option_block_reason(opzione)
+			if motivo != "":
+				_hud.mostra_messaggio(motivo, true)
+				return
+			var voci_opzione: Array[String] = run.option_choices(opzione)
+			if not voci_opzione.is_empty():
+				_hud.mostra_scelte(opzione.label, opzione.description, voci_opzione, func(voce: int) -> void: _esegui(run.take_event_option(i, voce)))
+			else:
+				_esegui(run.take_event_option(i), opzione.label)
 		TipoScelta.OFFERTA:
 			var offerta: Offer = run.offers[i]
 			var voci: Array[String] = run.offer_choices(offerta)
@@ -729,9 +759,6 @@ func _clic_scelta(tessera: Tessera3D) -> void:
 				_inizia_sostituzione(truppa, testo, func(sostituita: int) -> bool: return run.buy_offer(i, sostituita))
 			else:
 				_vola_e_esegui(tessera, func() -> bool: return run.buy_offer(i))
-		TipoScelta.CONSIGLIERE:
-			var consigliere: String = run.councillor_choices[i].display_name
-			_esegui(run.choose_councillor(i), "Ascolti: %s" % consigliere)
 		TipoScelta.INCONTRO:
 			var nome: String = run.encounter_choices[i].display_name
 			var prima: Dictionary = _istantanea()
@@ -812,9 +839,14 @@ func _seleziona(truppa: bool, i: int) -> void:
 	if truppa:
 		azioni.append({"testo": "◀ Sposta", "attiva": i > 0, "clic": func() -> void: _sposta(i, i - 1)})
 		azioni.append({"testo": "Sposta ▶", "attiva": i < run.board.troops.size() - 1, "clic": func() -> void: _sposta(i, i + 1)})
-	var costo: ResourceAmounts = run.upgrade_cost_of(pezzo)
-	if costo != null:
-		azioni.append({"testo": "Potenzia · %s" % costo.describe(), "attiva": run.can_pay(costo), "clic": func() -> void: _potenzia(truppa, i)})
+	# Potenzia è un'opzione del consigliere scelto (GDD §6.5): se non si può, si dice perché (P4).
+	if run.is_shopping_phase() and pezzo.level < run.run_rules.max_level:
+		var motivo: String = run.upgrade_block_reason(pezzo)
+		var costo: ResourceAmounts = run.upgrade_cost_of(pezzo)
+		if motivo == "" and costo != null:
+			azioni.append({"testo": "Potenzia · %s" % costo.describe(), "attiva": run.can_pay(costo), "clic": func() -> void: _potenzia(truppa, i)})
+		else:
+			azioni.append({"testo": "Potenzia: %s" % motivo, "attiva": false, "clic": func() -> void: pass})
 	if pezzo.building == null or not pezzo.building.is_capital:
 		var vendibile: bool = truppa or run.board.can_sell_building(i)
 		azioni.append({"testo": "Vendi · +%d Oro" % RunState.half_down(pezzo.paid), "attiva": vendibile, "clic": func() -> void: _vendi(truppa, i)})

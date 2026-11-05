@@ -45,19 +45,29 @@ extends Resource
 @export var building_production_per_level: int = 1
 
 @export_group("Consiglio")
-## Round in ciascuna delle due metà dell'anno (GDD §3.2: 5).
+## Nomi dei livelli del Consiglio, uno per era (GDD §4.2.1, nomi placeholder).
+@export var council_level_names: PackedStringArray = PackedStringArray(["Funzionari", "Ministri", "Gran Consiglieri"])
+## Round in ogni metà dell'anno (GDD §3.2: 5).
 @export var rounds_per_half: int = 5
-## Consiglieri pescati in ogni round (GDD §4.2: 3).
-@export var councillors_per_round: int = 3
-## Proposte di un consigliere (GDD §4.2: 3).
-@export var proposals_per_councillor: int = 3
-## Proposte del Clown (GDD §4.2.2: 4).
-@export var clown_proposals: int = 4
-## Tipi dei round di una metà, mescolati con il seme della run all'inizio di ogni metà:
-## 0 Azioni, 1 Edifici, 2 Truppe, 3 Misto (GDD §4.2).
-@export var round_types: PackedInt32Array = PackedInt32Array([0, 1, 2, 3, 3])
-## Nomi dei livelli dei consiglieri, uno per era (GDD §4.2.1).
-@export var tier_names: PackedStringArray = PackedStringArray(["Funzionario", "Ministro", "Gran Consigliere"])
+## Consiglieri pescati in ogni round, diversi fra loro (GDD §4.2: 3).
+@export var advisors_per_round: int = 3
+## Proposte mostrate dal consigliere scelto (GDD §4.2: 3; il Clown ne mostra una per colore più un neutro).
+@export var proposals_per_advisor: int = 3
+## Temi dei round di una metà, in un ordine pescato a caso con il seme della run (GDD §4.2, Proposta):
+## 0 = Azioni, 1 = Edifici, 2 = Truppe, 3 = Misto. Se sono meno dei round si ripete l'ultimo.
+@export var half_themes: PackedInt32Array = PackedInt32Array([0, 1, 2, 3, 3])
+## Costo di Potenzia: per salire al livello 2 servono upgrade_cost_per_era[0] × era della carta
+## unità della risorsa del consigliere, per il livello 3 upgrade_cost_per_era[1] × era (placeholder).
+@export var upgrade_cost_per_era: PackedInt32Array = PackedInt32Array([2, 3])
+## Potenzia dell'Anziano (solo edifici neutri) per anno (GDD §4.2.2: 1).
+@export var elder_upgrades_per_year: int = 1
+## Probabilità, in percentuale, che in un round una delle carte sia un Evento, un Visitatore
+## o una Fortuna al posto di un consigliere (GDD §4.2.5: in media 1 round su 3).
+@export var special_card_chance_percent: int = 33
+## Pesi delle tre famiglie (GDD §4.2.5: 5, 3, 2).
+@export var event_weight: int = 5
+@export var visitor_weight: int = 3
+@export var fortune_weight: int = 2
 ## Costo del primo rinnovo delle proposte.
 @export var reroll_base_cost: int = 1
 ## Il rinnovo non costa mai meno di così, nemmeno con i bonus che lo riducono.

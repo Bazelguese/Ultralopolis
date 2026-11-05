@@ -1,13 +1,13 @@
 class_name Offer
 extends RefCounted
-## Una proposta di un consigliere (GDD §4.2): un edificio, una truppa, un perk
-## oppure un'azione (OpportunityDef).
+## Una proposta del consigliere scelto nel round (GDD §4.2): un edificio, una truppa,
+## un perk oppure un'azione del Consiglio (OpportunityDef).
 
-var kind: OpportunityDef.Kind = OpportunityDef.Kind.SCAMBIO_RISORSE
-## Il consigliere che la propone (può essere null nei test che creano offerte a mano).
-var councillor: CouncillorDef
-## L'azione proposta; null per un semplice edificio o una semplice truppa.
+var kind: OpportunityDef.Kind = OpportunityDef.Kind.COSTRUISCI_EDIFICIO
+## Azione proposta (null per edifici e truppe).
 var opportunity: OpportunityDef
+## Consigliere che fa la proposta.
+var advisor: AdvisorDef
 ## Edificio offerto (COSTRUISCI_EDIFICIO).
 var building: BuildingDef
 ## Truppa offerta (RECLUTA_TRUPPA).
@@ -22,58 +22,26 @@ var research_price: int = 0
 var other_cost: ResourceAmounts
 
 
-static func of_building(def: BuildingDef, p_councillor: CouncillorDef = null) -> Offer:
-	var offer: Offer = Offer.new()
-	offer.kind = OpportunityDef.Kind.COSTRUISCI_EDIFICIO
-	offer.building = def
-	offer.price = def.cost_gold
-	offer.councillor = p_councillor
-	return offer
+## true se la proposta è un edificio o una truppa.
+func is_element() -> bool:
+	return kind == OpportunityDef.Kind.COSTRUISCI_EDIFICIO or kind == OpportunityDef.Kind.RECLUTA_TRUPPA
 
 
-static func of_troop(def: TroopDef, p_councillor: CouncillorDef = null) -> Offer:
-	var offer: Offer = Offer.new()
-	offer.kind = OpportunityDef.Kind.RECLUTA_TRUPPA
-	offer.troop = def
-	offer.price = def.cost_gold
-	offer.councillor = p_councillor
-	return offer
-
-
-static func of_action(def: OpportunityDef, p_councillor: CouncillorDef = null) -> Offer:
-	var offer: Offer = Offer.new()
-	offer.kind = def.kind
-	offer.opportunity = def
-	offer.price = def.cost_gold
-	offer.research_price = def.cost_research
-	offer.other_cost = def.cost_resources
-	offer.councillor = p_councillor
-	return offer
-
-
-## Nome di ciò che si prende, es. "Fattoria", "Esattori", "Perk: Mercanti abili".
-func title() -> String:
-	if building != null:
-		return building.display_name
-	if troop != null:
-		return troop.display_name
-	if perk != null:
-		return perk.display_name
-	if opportunity != null:
-		return opportunity.display_name
-	return "?"
-
-
-## Titolo con il consigliere, es. "Architetto: Fattoria".
+## Titolo breve, es. "Fattoria", "Esattori", "Perk: Mulini".
 func describe() -> String:
-	if councillor != null:
-		return "%s: %s" % [councillor.display_name, title()]
-	return title()
+	match kind:
+		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
+			return building.display_name
+		OpportunityDef.Kind.RECLUTA_TRUPPA:
+			return troop.display_name
+		OpportunityDef.Kind.PERK:
+			return "Perk: %s" % perk.display_name
+	return opportunity.display_name
 
 
-## Spiegazione per il giocatore.
+## Descrizione completa della proposta (per le azioni e i perk).
 func description() -> String:
-	if perk != null:
+	if kind == OpportunityDef.Kind.PERK and perk != null:
 		return perk.description
 	if opportunity != null:
 		return opportunity.description

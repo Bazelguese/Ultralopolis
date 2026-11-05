@@ -6,10 +6,10 @@
 script = ExtResource("1_yb33b")
 id = &"mura_di_pietra"
 display_name = "Mura di pietra"
-description = "Scudo +1 per gli edifici Difensivi."
+description = "Scudo +1 per gli elementi Guardiani che producono scudo."
 is_malus = false
 effect = 11
-target_tag = &"Difensivo"
+target_type = &"Guardiano"
 battle_value = 1
 amount = 1
 duration_kind = 2

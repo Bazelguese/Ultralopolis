@@ -62,10 +62,10 @@ enum Stacking {
 @export var is_malus: bool = true
 @export var effect: Effect = Effect.PRODUZIONE_RICERCA
 @export var target: Target = Target.NAZIONE
-## Se indicata, l'effetto vale solo per gli edifici o le truppe con questa etichetta (GDD §6.6).
-@export var target_tag: StringName = &""
-## In alternativa: l'effetto vale per gli elementi che hanno almeno una di queste etichette.
-@export var target_tags_any: Array[StringName] = []
+## Se indicata, l'effetto vale solo per gli edifici o le truppe con questo tipo (GDD §6.6).
+@export var target_type: StringName = &""
+## In alternativa: l'effetto vale per gli elementi che hanno almeno uno di questi tipi.
+@export var target_types_any: Array[StringName] = []
 ## Risorsa interessata (per PRODUZIONE_PERCENTUALE e PRODUZIONE_PER_EDIFICIO).
 @export var resource: Res.Type = Res.Type.ORO
 ## Valore di battaglia interessato (per VALORE_PERCENTUALE e VALORE_FISSO).

@@ -1,19 +1,18 @@
 [gd_resource type="Resource" script_class="OpportunityDef" format=3]
 
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_h788n"]
-[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_5v7jo"]
-[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="3_xk8bh"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="1_opp"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_ra"]
 
-[sub_resource type="Resource" id="Resource_h788n"]
-script = ExtResource("1_h788n")
+[sub_resource type="Resource" id="Resource_cost"]
+script = ExtResource("2_ra")
 legno = 4
 
 [resource]
-script = ExtResource("3_xk8bh")
+script = ExtResource("1_opp")
 id = &"trattati"
 display_name = "Trattati"
-description = "Paghi 4 Legno: ottieni subito 5 Ricerca."
-councillor = &"studioso"
-min_tier = 2
-cost_resources = SubResource("Resource_h788n")
+description = "Dal livello Ministri: paghi 4 Legno e ottieni subito 5 Ricerca."
+kind = 4
+cost_resources = SubResource("Resource_cost")
+min_level = 2
 gain_research = 5

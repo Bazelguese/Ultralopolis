@@ -8,6 +8,6 @@ script = ExtResource("2_mfo6e")
 id = &"quartiermastro"
 display_name = "Quartiermastro"
 description = "Aggiunge uno spazio truppa alla plancia."
+phase = 1
 kind = 3
-councillor = &"generale"
 cost_gold = 5

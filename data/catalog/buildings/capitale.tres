@@ -1,33 +1,15 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_xjn80"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_6vccm"]
-
-[sub_resource type="Resource" id="Resource_8p7wq"]
-script = ExtResource("2_6vccm")
-legno = 2
-pietra = 2
-
-[sub_resource type="Resource" id="Resource_hna3f"]
-script = ExtResource("2_6vccm")
-legno = 4
-pietra = 4
 
 [resource]
 script = ExtResource("1_xjn80")
 id = &"capitale"
 display_name = "Capitale"
-tags = Array[StringName]([&"Capitale"])
+types = Array[StringName]([&"Capitale"])
 is_capital = true
 gold_per_phase = 1
 research_per_phase = 1
 food_per_phase = 1
-wood_per_phase = 1
-stone_per_phase = 1
-iron_per_phase = 1
-fauna_per_phase = 1
-faith_per_phase = 1
-influence_per_phase = 1
 mana_amount = 1
 mana_interval_ms = 2000
-upgrade_costs = Array[ExtResource("2_6vccm")]([SubResource("Resource_8p7wq"), SubResource("Resource_hna3f")])

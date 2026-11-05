@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_danno.tres" id="act_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_scudo.tres" id="act_1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_cura.tres" id="act_2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_corruzione.tres" id="act_3"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/incanto_inefficienza.tres" id="act_4"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/esclusive/processione.tres" id="act_5"]
+
+[resource]
+script = ExtResource("1_advdf")
+id = &"sacerdote"
+display_name = "Sacerdote"
+color = &"blu"
+category_name = "Fede"
+description = "Guida il culto: propone elementi spirituali, patrioti, guardiani e animali sacri."
+types = Array[StringName]([&"Spirituale", &"Patriota", &"Fauna", &"Guardiano"])
+upgrade_resource = 6
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1"), ExtResource("act_2"), ExtResource("act_3"), ExtResource("act_4"), ExtResource("act_5")])

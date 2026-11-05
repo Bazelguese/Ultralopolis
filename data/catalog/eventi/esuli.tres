@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+cibo = 2
+
+[sub_resource type="Resource" id="RA_3"]
+script = ExtResource("e3")
+stabilita = 3
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Accoglili"
+description = "Paghi 2 Cibo, ricevi 3 Stabilità."
+cost = SubResource("RA_2")
+gain = SubResource("RA_3")
+
+[sub_resource type="Resource" id="RA_5"]
+script = ExtResource("e3")
+oro = 4
+
+[sub_resource type="Resource" id="OPT_4"]
+script = ExtResource("e2")
+label = "Arruolali"
+description = "Paghi 4 Oro, ricevi una truppa dell'era a caso (se c'è spazio)."
+cost = SubResource("RA_5")
+give_random = true
+give_random_kind = 2
+
+[sub_resource type="Resource" id="RA_7"]
+script = ExtResource("e3")
+stabilita = 2
+influenza = 2
+
+[sub_resource type="Resource" id="OPT_6"]
+script = ExtResource("e2")
+label = "Nuovi patrioti"
+description = "Ricevi 2 Stabilità e 2 Influenza."
+requires_types = Array[StringName]([&"Patriota"])
+gain = SubResource("RA_7")
+
+[resource]
+script = ExtResource("e1")
+id = &"esuli"
+display_name = "Gli esuli"
+description = "Un popolo in fuga chiede di entrare nei confini."
+sphere = "Stato"
+color = &"blu"
+min_era = 2
+max_era = 2
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_6")])

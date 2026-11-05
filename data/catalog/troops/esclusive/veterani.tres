@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_gy5vt"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_q0crt"]
-
-[sub_resource type="Resource" id="Resource_gy5vt"]
-script = ExtResource("2_q0crt")
-ferro = 4
-
-[sub_resource type="Resource" id="Resource_q0crt"]
-script = ExtResource("2_q0crt")
-ferro = 6
 
 [resource]
 script = ExtResource("1_gy5vt")
@@ -17,9 +8,8 @@ id = &"veterani"
 display_name = "Veterani"
 era = 2
 cost_gold = 7
-tags = Array[StringName]([&"Fanteria"])
+types = Array[StringName]([&"Fante"])
 mana_cost = 3
 cooldown_ms = 2000
 damage = 7
 shield = 3
-upgrade_costs = Array[ExtResource("2_q0crt")]([SubResource("Resource_gy5vt"), SubResource("Resource_q0crt")])

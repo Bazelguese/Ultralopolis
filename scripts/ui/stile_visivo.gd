@@ -5,7 +5,7 @@ extends RefCounted
 ## Qui stanno tutti i colori, i caratteri e i materiali: cambiando questo file cambia l'aspetto.
 ## Solo aspetto: nessuna regola di gioco.
 
-enum Mana { NESSUNO, ROSSO, VERDE, BLU, ENERGETICO }
+enum Mana { NESSUNO, ROSSO, VERDE, BLU, ENERGETICO, VIOLA }
 
 # Ambiente e superfici.
 const NOTTE: Color = Color("0b1220")
@@ -40,6 +40,7 @@ const COLORI_MANA: Dictionary[int, Color] = {
 	Mana.VERDE: Color("3ddc6b"),
 	Mana.BLU: Color("3d8bff"),
 	Mana.ENERGETICO: Color("ffcc33"),
+	Mana.VIOLA: Color("b14dff"),
 }
 const NOMI_MANA: Dictionary[int, String] = {
 	Mana.NESSUNO: "nessuno",
@@ -47,6 +48,7 @@ const NOMI_MANA: Dictionary[int, String] = {
 	Mana.VERDE: "verde",
 	Mana.BLU: "blu",
 	Mana.ENERGETICO: "energetico",
+	Mana.VIOLA: "viola",
 }
 
 const FONT_TITOLI: FontFile = preload("res://assets/fonts/BarlowSemiCondensed-ExtraBold.ttf")
@@ -63,7 +65,7 @@ static func colore_cornice(era: int) -> Color:
 	return CORNICI_ERA.get(era, CORNICI_ERA[1])
 
 
-## Colore del mana dal nome usato nei dati del gioco (&"rosso", &"verde", &"blu", &"energetico").
+## Colore del mana dal nome usato nei dati del gioco (&"rosso", &"verde", &"blu", &"viola", &"energetico").
 static func colore_mana_nome(nome: StringName) -> Color:
 	return colore_mana(mana_da_nome(nome))
 
@@ -73,6 +75,7 @@ static func mana_da_nome(nome: StringName) -> int:
 		&"rosso": return Mana.ROSSO
 		&"verde": return Mana.VERDE
 		&"blu": return Mana.BLU
+		&"viola": return Mana.VIOLA
 		&"energetico": return Mana.ENERGETICO
 	return Mana.NESSUNO
 

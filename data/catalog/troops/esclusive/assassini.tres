@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_yju4x"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_aig0s"]
-
-[sub_resource type="Resource" id="Resource_yju4x"]
-script = ExtResource("2_aig0s")
-ferro = 6
-
-[sub_resource type="Resource" id="Resource_aig0s"]
-script = ExtResource("2_aig0s")
-ferro = 9
 
 [resource]
 script = ExtResource("1_yju4x")
@@ -17,11 +8,10 @@ id = &"assassini"
 display_name = "Assassini"
 era = 3
 cost_gold = 10
-tags = Array[StringName]([&"Fanteria"])
-mana_type = &"verde"
+types = Array[StringName]([&"Criminale"])
+mana_type = &"viola"
 mana_cost = 4
 cooldown_ms = 3000
 damage = 2
 corruption = 6
 sabotage_ms = 4000
-upgrade_costs = Array[ExtResource("2_aig0s")]([SubResource("Resource_yju4x"), SubResource("Resource_aig0s")])

@@ -1,6 +1,8 @@
 extends GutTest
 ## Vie delle ere (GDD §10.4, §17).
 
+const Aiuti = preload("res://tests/sim/aiuti_consiglio.gd")
+
 var era1: EraDef
 var era2: EraDef
 var commerce: IdentityDef
@@ -42,6 +44,7 @@ func before_each() -> void:
 	exclusive_building.id = &"fondaco"
 	exclusive_building.era = 2
 	commerce.exclusive_buildings = [exclusive_building]
+	exclusive_building.types = [Aiuti.TIPO_PROVA]
 
 	era1 = EraDef.new()
 	era2 = EraDef.new()
@@ -54,16 +57,12 @@ func before_each() -> void:
 	common.id = &"comune"
 	common.era = 2
 	catalog.buildings = [common]
-	var builder: CouncillorDef = CouncillorDef.new()
-	builder.id = &"costruttore"
-	builder.buildings = [common, exclusive_building]
-	catalog.councillors = [builder]
 	rules = RunRules.new()
+	Aiuti.consiglio_semplice(catalog, rules)
 	rules.starting_gold = 0
 	rules.prototype_years = 0
 	rules.starting_buildings = []
 	rules.starting_troops = []
-	rules.round_types = PackedInt32Array([1, 1, 1, 1, 1])
 
 
 func _run(run_seed: int = 1) -> RunState:
@@ -76,10 +75,10 @@ func test_entrando_nella_seconda_era_si_sceglie_fra_tre_vie() -> void:
 	var run: RunState = _run()
 	assert_true(run.advance_era())
 	assert_eq(run.way_choices.size(), 3)
-	assert_false(run.pass_opportunity(), "Prima la scelta della via.")
+	assert_false(run.pass_round(), "Prima la scelta della via.")
 	assert_true(run.choose_way(0))
 	assert_true(run.way_choices.is_empty())
-	assert_true(run.pass_opportunity())
+	assert_true(run.pass_round())
 
 
 func test_la_via_diventa_identita_e_da_il_bonus_immediato() -> void:
@@ -144,7 +143,7 @@ func test_esclusivi_della_via_solo_nella_loro_era_e_per_chi_ha_la_via() -> void:
 	run.advance_era()
 	run.way_choices[0] = commerce
 	run.choose_way(0)
-	assert_true(run.choose_councillor(0), "Nella nuova era il costruttore ha edifici da proporre.")
+	Aiuti.ascolta(run)
 	var seen: bool = false
 	for attempt: int in range(40):
 		for offer: Offer in run.offers:
@@ -157,7 +156,7 @@ func test_esclusivi_della_via_solo_nella_loro_era_e_per_chi_ha_la_via() -> void:
 	other.advance_era()
 	other.way_choices[0] = war
 	other.choose_way(0)
-	other.choose_councillor(0)
+	Aiuti.ascolta(other)
 	for attempt: int in range(40):
 		for offer: Offer in other.offers:
 			assert_ne(offer.building, exclusive_building)

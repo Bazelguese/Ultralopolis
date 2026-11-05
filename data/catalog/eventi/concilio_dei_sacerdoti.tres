@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/fortificazioni.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/teocrazia.tres" id="e6"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+fede = 2
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Dottrina severa"
+description = "Paghi 2 Fede: +10 Resistenza nel prossimo scontro con il fantasma."
+cost = SubResource("RA_2")
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+influenza = 2
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Apertura al popolo"
+description = "Ricevi 2 Influenza."
+gain = SubResource("RA_4")
+
+[sub_resource type="Resource" id="RA_6"]
+script = ExtResource("e3")
+fede = 3
+
+[sub_resource type="Resource" id="OPT_5"]
+script = ExtResource("e2")
+label = "Grande processione"
+description = "Ricevi 3 Fede."
+requires_types = Array[StringName]([&"Spirituale"])
+gain = SubResource("RA_6")
+
+[resource]
+script = ExtResource("e1")
+id = &"concilio_dei_sacerdoti"
+display_name = "Il concilio dei sacerdoti"
+description = "I sacerdoti si riuniscono per fissare la dottrina."
+sphere = "Fede"
+color = &"blu"
+favored_by = Array[Resource]([ExtResource("e6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_5")])

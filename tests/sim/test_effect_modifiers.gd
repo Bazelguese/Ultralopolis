@@ -14,7 +14,7 @@ func _mod(effect: ModifierDef.Effect, amount: int, value: ModifierDef.BattleValu
 	def.effect = effect
 	def.amount = amount
 	def.battle_value = value
-	def.target_tag = tag
+	def.target_type = tag
 	def.duration_kind = ModifierDef.Duration.PERMANENTE
 	var mods: Modifiers = Modifiers.new()
 	mods.apply(def, ActiveModifier.OriginKind.ALTRO, "Prova", 1, NationBoard.new(), RandomNumberGenerator.new())
@@ -73,11 +73,11 @@ func test_valore_fisso_solo_per_chi_lo_ha_gia() -> void:
 	assert_eq(ElementStats.troop(other, BoardPiece.of_troop(other, 0), mods, 1, rules).heal, 0, "Chi non cura resta a 0.")
 
 
-func test_valore_percentuale_con_etichetta() -> void:
+func test_valore_percentuale_con_tipo() -> void:
 	var mods: Modifiers = _mod(ModifierDef.Effect.VALORE_PERCENTUALE, 25, ModifierDef.BattleValue.ASSEDIO, &"Assedio")
 	var ram: TroopDef = _troop()
 	ram.siege_damage = 8
-	ram.tags = [&"Assedio"]
+	ram.types = [&"Assedio"]
 	assert_eq(ElementStats.troop(ram, BoardPiece.of_troop(ram, 0), mods, 1, rules).siege_damage, 10)
 	var not_siege: TroopDef = _troop()
 	not_siege.siege_damage = 8
@@ -120,7 +120,7 @@ func test_corruzione_e_sabotaggio_a_inizio_scontro() -> void:
 	net.amount = 3000
 	run.modifiers.apply(net, ActiveModifier.OriginKind.FANTASMA, "Prova", 0, run.board, RandomNumberGenerator.new())
 	while run.phase != RunState.Phase.SCONTRO_FANTASMA:
-		run.pass_opportunity()
+		run.pass_round()
 	run.fight_ghost()
 	var setup: BattleSideSetup = run.last_battle_setups()[0]
 	assert_eq(setup.start_corruption, 5)

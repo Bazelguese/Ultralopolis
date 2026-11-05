@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/studiosi.tres" id="act_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/archivisti.tres" id="new_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/manuali_tecnici.tres" id="new_1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/trattati.tres" id="lv_0"]
+
+[resource]
+script = ExtResource("1_advdf")
+id = &"studioso"
+display_name = "Studioso"
+color = &"viola"
+category_name = "Conoscenza"
+description = "Raccoglie il sapere, anche quello nascosto: propone elementi accademici, legge, segreti."
+types = Array[StringName]([&"Accademico", &"Criminale", &"Legge", &"Infrastruttura Segreta"])
+upgrade_resource = 9
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("new_0"), ExtResource("new_1"), ExtResource("lv_0")])

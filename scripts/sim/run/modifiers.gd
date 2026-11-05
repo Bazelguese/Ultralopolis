@@ -97,7 +97,7 @@ func prune(board: NationBoard) -> Array[String]:
 
 
 ## Somma degli effetti in percentuale (per la nazione o per un elemento preciso).
-## Un effetto con etichetta vale solo per gli elementi che la hanno (GDD §6.6).
+## Un effetto con un tipo vale solo per gli elementi che lo hanno (GDD §6.6).
 func percent(effect: ModifierDef.Effect, piece: BoardPiece = null) -> int:
 	var total: int = 0
 	for modifier: ActiveModifier in active:
@@ -105,7 +105,7 @@ func percent(effect: ModifierDef.Effect, piece: BoardPiece = null) -> int:
 			continue
 		if modifier.target_piece != null and modifier.target_piece != piece:
 			continue
-		if not _tag_matches(modifier.def, piece):
+		if not _type_matches(modifier.def, piece):
 			continue
 		total += modifier.def.amount
 	return total
@@ -120,7 +120,7 @@ func flat_production(type: Res.Type, piece: BoardPiece) -> int:
 			continue
 		if modifier.target_piece != null and modifier.target_piece != piece:
 			continue
-		if not _tag_matches(def, piece):
+		if not _type_matches(def, piece):
 			continue
 		total += def.amount
 	return total
@@ -135,7 +135,7 @@ func battle_value(effect: ModifierDef.Effect, value: ModifierDef.BattleValue, pi
 			continue
 		if modifier.target_piece != null and modifier.target_piece != piece:
 			continue
-		if not _tag_matches(def, piece):
+		if not _type_matches(def, piece):
 			continue
 		total += def.amount
 	return total
@@ -150,22 +150,22 @@ func production_percent(type: Res.Type) -> int:
 	return total
 
 
-## true se il modificatore non ha etichetta, o se l'elemento la possiede.
-static func _tag_matches(def: ModifierDef, piece: BoardPiece) -> bool:
-	if def.target_tag == &"" and def.target_tags_any.is_empty():
+## true se il modificatore non chiede un tipo, o se l'elemento lo possiede.
+static func _type_matches(def: ModifierDef, piece: BoardPiece) -> bool:
+	if def.target_type == &"" and def.target_types_any.is_empty():
 		return true
 	if piece == null:
 		return false
-	var tags: Array[StringName] = []
+	var types: Array[StringName] = []
 	if piece.building != null:
-		tags = piece.building.tags
+		types = piece.building.types
 	elif piece.troop != null:
-		tags = piece.troop.tags
-	if def.target_tag != &"" and not tags.has(def.target_tag):
+		types = piece.troop.types
+	if def.target_type != &"" and not types.has(def.target_type):
 		return false
-	if not def.target_tags_any.is_empty():
-		for tag: StringName in def.target_tags_any:
-			if tags.has(tag):
+	if not def.target_types_any.is_empty():
+		for card_type: StringName in def.target_types_any:
+			if types.has(card_type):
 				return true
 		return false
 	return true

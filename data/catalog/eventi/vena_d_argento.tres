@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Resource" path="res://data/catalog/identita/montanari.tres" id="e4"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+ferro = 2
+oro = 2
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Prendi il dono"
+description = "Ricevi 2 Ferro, 2 Oro, moltiplicati per l'era."
+gain = SubResource("RA_2")
+
+[resource]
+script = ExtResource("e1")
+id = &"vena_d_argento"
+display_name = "Una vena d'argento"
+description = "I minatori hanno trovato una vena nuova."
+family = 1
+sphere = "Opera"
+color = &"rosso"
+favored_by = Array[Resource]([ExtResource("e4")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1")])
+scale_with_era = true

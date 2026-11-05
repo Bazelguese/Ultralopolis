@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AdvisorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="1_advdf"]
+[ext_resource type="Script" path="res://scripts/sim/data/opportunity_def.gd" id="2_opp"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/quartiermastro.tres" id="act_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/addestramento.tres" id="act_1"]
+
+[resource]
+script = ExtResource("1_advdf")
+id = &"generale"
+display_name = "Generale"
+color = &"rosso"
+category_name = "Militare"
+description = "Comanda l'esercito: propone fanti, guardiani, macchine d'assedio e infrastrutture belliche."
+types = Array[StringName]([&"Assedio", &"Infrastruttura Bellica", &"Fante", &"Guardiano"])
+upgrade_resource = 5
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1")])

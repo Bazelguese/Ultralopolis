@@ -8,5 +8,5 @@ script = ExtResource("2_r7dvs")
 id = &"tributi_feudali"
 display_name = "Tributi feudali"
 description = "I feudatari versano il dovuto: ottieni subito 5 Oro."
-councillor = &"tesoriere"
+kind = 4
 gain_gold = 5

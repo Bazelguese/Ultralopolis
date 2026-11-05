@@ -70,6 +70,7 @@ const MANA_TEXT_COLORS: Dictionary[StringName, Color] = {
 	&"rosso": Color(1.0, 0.5, 0.45),
 	&"verde": Color(0.55, 0.9, 0.55),
 	&"blu": Color(0.55, 0.75, 1.0),
+	&"viola": Color(0.8, 0.55, 1.0),
 	&"energetico": Color(1.0, 0.9, 0.45),
 }
 
@@ -92,8 +93,8 @@ static func building_details(def: BuildingDef, produced: Array[int] = []) -> Str
 		text += "\n+%d spazio edificio" % def.extra_building_slots
 	if def.extra_troop_slots > 0:
 		text += "\n+%d spazio truppa" % def.extra_troop_slots
-	if not def.tags.is_empty():
-		text += "\n[%s]" % ", ".join(def.tags)
+	if not def.types.is_empty():
+		text += "\n[%s]" % ", ".join(def.types)
 	return text
 
 
@@ -101,8 +102,8 @@ static func troop_details(def: TroopDef) -> String:
 	var cost: String = "senza mana" if def.mana_cost == 0 else "%d mana %s" % [def.mana_cost, def.mana_type]
 	var effects: String = troop_effects(def)
 	var text: String = "%s\n%s · Ricarica %s · Cibo %s" % [effects if effects != "" else "Nessun effetto", cost, seconds(def.cooldown_ms), Res.format(Res.Type.CIBO, def.food_tenths)]
-	if not def.tags.is_empty():
-		text += "\n[%s]" % ", ".join(def.tags)
+	if not def.types.is_empty():
+		text += "\n[%s]" % ", ".join(def.types)
 	return text
 
 

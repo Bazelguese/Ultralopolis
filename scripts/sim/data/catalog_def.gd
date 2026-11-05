@@ -8,10 +8,12 @@ extends Resource
 @export var eras: Array[EraDef] = []
 @export var ghosts: Array[GhostDef] = []
 @export var encounters: Array[EncounterDef] = []
-## Azioni che i consiglieri possono proporre (GDD §4.2); ognuna indica il suo consigliere.
-@export var opportunities: Array[OpportunityDef] = []
-## I consiglieri del Consiglio (GDD §4.2).
-@export var councillors: Array[CouncillorDef] = []
+## Consiglieri del Consiglio, con le loro categorie (GDD §4.2, §4.2.4).
+@export var advisors: Array[AdvisorDef] = []
+## Eventi e Fortune che possono comparire nei round (GDD §4.2.5, v0.23).
+@export var events: Array[EventDef] = []
+## Visitatori di passaggio (GDD §4.2.5, v0.23).
+@export var visitors: Array[AdvisorDef] = []
 ## Popoli, governi, credi, culture e perk fra cui scegliere (GDD §9).
 @export var identities: Array[IdentityDef] = []
 ## Regole per generare fantasmi e incontri negli anni senza dati scritti a mano.

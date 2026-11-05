@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_hn2hr"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_6vpg1"]
-
-[sub_resource type="Resource" id="Resource_6vpg1"]
-script = ExtResource("2_6vpg1")
-ferro = 4
-
-[sub_resource type="Resource" id="Resource_4p3mc"]
-script = ExtResource("2_6vpg1")
-ferro = 6
 
 [resource]
 script = ExtResource("1_hn2hr")
@@ -17,10 +8,9 @@ id = &"arieti"
 display_name = "Arieti"
 era = 2
 cost_gold = 7
-tags = Array[StringName]([&"Assedio"])
+types = Array[StringName]([&"Assedio"])
 food_tenths = 10
 mana_cost = 4
 cooldown_ms = 3000
 damage = 8
 siege_damage = 10
-upgrade_costs = Array[ExtResource("2_6vpg1")]([SubResource("Resource_6vpg1"), SubResource("Resource_4p3mc")])

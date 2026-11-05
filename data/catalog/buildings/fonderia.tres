@@ -1,15 +1,6 @@
 [gd_resource type="Resource" script_class="BuildingDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/building_def.gd" id="1_7nb0q"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_sfg0q"]
-
-[sub_resource type="Resource" id="Resource_7nb0q"]
-script = ExtResource("2_sfg0q")
-legno = 4
-
-[sub_resource type="Resource" id="Resource_sfg0q"]
-script = ExtResource("2_sfg0q")
-legno = 6
 
 [resource]
 script = ExtResource("1_7nb0q")
@@ -17,9 +8,8 @@ id = &"fonderia"
 display_name = "Fonderia"
 era = 2
 cost_gold = 7
-tags = Array[StringName]([&"Estrattivo"])
+types = Array[StringName]([&"Produzione"])
 gold_per_phase = 1
 iron_per_phase = 3
 mana_type = &"rosso"
 mana_amount = 1
-upgrade_costs = Array[ExtResource("2_sfg0q")]([SubResource("Resource_7nb0q"), SubResource("Resource_sfg0q")])

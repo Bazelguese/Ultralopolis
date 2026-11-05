@@ -1,24 +1,14 @@
 [gd_resource type="Resource" script_class="TroopDef" format=3]
 
 [ext_resource type="Script" path="res://scripts/sim/data/troop_def.gd" id="1_oxt2g"]
-[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="2_6b6h5"]
-
-[sub_resource type="Resource" id="Resource_oxt2g"]
-script = ExtResource("2_6b6h5")
-ferro = 2
-
-[sub_resource type="Resource" id="Resource_6b6h5"]
-script = ExtResource("2_6b6h5")
-ferro = 3
 
 [resource]
 script = ExtResource("1_oxt2g")
 id = &"sobillatori"
 display_name = "Sobillatori"
 cost_gold = 4
-tags = Array[StringName]([&"Fanteria"])
-mana_type = &"blu"
+types = Array[StringName]([&"Criminale"])
+mana_type = &"viola"
 mana_cost = 2
 cooldown_ms = 3000
 corruption = 4
-upgrade_costs = Array[ExtResource("2_6b6h5")]([SubResource("Resource_oxt2g"), SubResource("Resource_6b6h5")])

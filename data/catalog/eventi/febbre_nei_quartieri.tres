@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/ricerca_dimezzata.tres" id="e5"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+fede = 3
+
+[sub_resource type="Resource" id="RA_3"]
+script = ExtResource("e3")
+stabilita = 3
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Ospedali da campo"
+description = "Paghi 3 Fede, ricevi 3 Stabilità."
+cost = SubResource("RA_2")
+gain = SubResource("RA_3")
+
+[sub_resource type="Resource" id="RA_5"]
+script = ExtResource("e3")
+stabilita = 4
+
+[sub_resource type="Resource" id="OPT_4"]
+script = ExtResource("e2")
+label = "Chiudi le porte"
+description = "Ricevi 4 Stabilità, ma per un anno la Ricerca prodotta si dimezza."
+gain = SubResource("RA_5")
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_7"]
+script = ExtResource("e3")
+fede = 2
+
+[sub_resource type="Resource" id="OPT_6"]
+script = ExtResource("e2")
+label = "I monaci curano"
+description = "Ricevi 2 Fede."
+requires_types = Array[StringName]([&"Spirituale"])
+gain = SubResource("RA_7")
+
+[resource]
+script = ExtResource("e1")
+id = &"febbre_nei_quartieri"
+display_name = "Febbre nei quartieri"
+description = "Una febbre si diffonde nei quartieri poveri."
+sphere = "Fede"
+color = &"blu"
+min_era = 2
+max_era = 2
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_6")])

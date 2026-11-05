@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/censimento.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/catalog/identita/repubblica.tres" id="e6"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+oro = 3
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Campagna generosa"
+description = "Paghi 3 Oro: per un anno ogni consigliere mostra una proposta in più."
+cost = SubResource("RA_2")
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+stabilita = 2
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Lascia decidere il popolo"
+description = "Ricevi 2 Stabilità."
+gain = SubResource("RA_4")
+
+[sub_resource type="Resource" id="RA_6"]
+script = ExtResource("e3")
+documenti = 2
+
+[sub_resource type="Resource" id="RA_7"]
+script = ExtResource("e3")
+stabilita = 3
+influenza = 2
+
+[sub_resource type="Resource" id="OPT_5"]
+script = ExtResource("e2")
+label = "Riforma delle leggi"
+description = "Paghi 2 Documenti, ricevi 3 Stabilità e 2 Influenza."
+requires_types = Array[StringName]([&"Legge"])
+cost = SubResource("RA_6")
+gain = SubResource("RA_7")
+
+[resource]
+script = ExtResource("e1")
+id = &"elezioni"
+display_name = "Le elezioni"
+description = "Si vota per il nuovo consiglio della repubblica."
+sphere = "Stato"
+color = &"blu"
+favored_by = Array[Resource]([ExtResource("e6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_5")])

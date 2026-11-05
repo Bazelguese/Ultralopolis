@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="EventDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/event_def.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="e2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="e3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="e4"]
+[ext_resource type="Resource" path="res://data/catalog/modifiers/razioni.tres" id="e5"]
+
+[sub_resource type="Resource" id="RA_2"]
+script = ExtResource("e3")
+legno = 2
+
+[sub_resource type="Resource" id="OPT_1"]
+script = ExtResource("e2")
+label = "Razionamento"
+description = "Paghi 2 Legno: per un anno le truppe mangiano la metà."
+cost = SubResource("RA_2")
+modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
+
+[sub_resource type="Resource" id="RA_4"]
+script = ExtResource("e3")
+oro = 3
+
+[sub_resource type="Resource" id="RA_5"]
+script = ExtResource("e3")
+cibo = 4
+
+[sub_resource type="Resource" id="OPT_3"]
+script = ExtResource("e2")
+label = "Granai del re"
+description = "Paghi 3 Oro, ricevi 4 Cibo."
+cost = SubResource("RA_4")
+gain = SubResource("RA_5")
+
+[sub_resource type="Resource" id="RA_7"]
+script = ExtResource("e3")
+cibo = 3
+
+[sub_resource type="Resource" id="OPT_6"]
+script = ExtResource("e2")
+label = "I campi resistono"
+description = "Ricevi 3 Cibo."
+requires_types = Array[StringName]([&"Produzione"])
+gain = SubResource("RA_7")
+
+[resource]
+script = ExtResource("e1")
+id = &"inverno_lungo"
+display_name = "Un inverno lungo"
+description = "L'inverno non vuole finire e le scorte calano."
+sphere = "Terra"
+color = &"verde"
+min_era = 1
+max_era = 1
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6")])

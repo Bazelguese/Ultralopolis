@@ -6,13 +6,13 @@
 
 [sub_resource type="Resource" id="Resource_463n5"]
 script = ExtResource("1_jjuhv")
-influenza = 2
+stabilita = 2
 
 [resource]
 script = ExtResource("2_jjuhv")
 id = &"ambasciata"
 display_name = "Ambasciata"
-description = "Paghi 2 Influenza: accorcia di 1 anno un malus attivo; se si azzera, sparisce."
+description = "Paghi 2 Stabilità: accorcia di 1 anno un malus attivo; se si azzera, sparisce."
+phase = 1
 kind = 6
-councillor = &"diplomatico"
 cost_resources = SubResource("Resource_463n5")
