@@ -7,8 +7,9 @@ extends RefCounted
 ## il metodo restituisce false e spiega il motivo in last_error.
 ##
 ## Sequenza dell'anno (GDD §3.2, §4.1):
-##   PRODUZIONE (5 round del Consiglio) -> SCELTA_INCONTRO -> [RICOMPENSA_INCONTRO]
-##   -> PREPARAZIONE (5 round del Consiglio) -> SCONTRO_FANTASMA -> anno successivo.
+##   INVERNO (3 round del Consiglio) -> PRIMAVERA (3 round) -> SCELTA_INCONTRO -> [RICOMPENSA_INCONTRO]
+##   -> ESTATE (3 round) -> SCELTA_INCONTRO -> [RICOMPENSA_INCONTRO] -> AUTUNNO (3 round)
+##   -> SCONTRO_FANTASMA -> anno successivo (v0.25). I round del Consiglio sono la fase CONSIGLIO.
 ## In ogni round compaiono 3 consiglieri; se ne ascolta uno e si prende una sua proposta
 ## (GDD §4.2). Il consigliere scelto offre anche Potenzia (GDD §6.5).
 ##
@@ -17,10 +18,9 @@ extends RefCounted
 ## da spendere ma la Ricerca in attesa. Le ere si raggiungono con un numero di tecnologie.
 
 enum Phase {
-	PRODUZIONE,
+	CONSIGLIO,            ## I round del Consiglio di una stagione (GDD §3.2, v0.25).
 	SCELTA_INCONTRO,
 	RICOMPENSA_INCONTRO,
-	PREPARAZIONE,
 	SCONTRO_FANTASMA,
 	FINE_RUN,
 	CREAZIONE_NAZIONE,  ## Prima dell'anno 1: si sceglie l'identità (GDD §9).
@@ -57,11 +57,28 @@ enum BattleKind {
 	FANTASMA,
 }
 
+## Le quattro stagioni dell'anno, nell'ordine in cui arrivano (GDD §3.2, v0.25).
+enum Season {
+	INVERNO,    ## Nessuno scontro; gli edifici non producono Cibo.
+	PRIMAVERA,  ## Finisce con un incontro del mondo.
+	ESTATE,     ## Finisce con un incontro del mondo, più forte.
+	AUTUNNO,    ## Finisce con lo scontro con il fantasma, che chiude l'anno.
+}
+
+const SEASON_NAMES: Dictionary[Season, String] = {
+	Season.INVERNO: "Inverno",
+	Season.PRIMAVERA: "Primavera",
+	Season.ESTATE: "Estate",
+	Season.AUTUNNO: "Autunno",
+}
+
+const MONTH_NAMES: PackedStringArray = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+		"Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+
 const PHASE_NAMES: Dictionary[Phase, String] = {
-	Phase.PRODUZIONE: "Produzione",
+	Phase.CONSIGLIO: "Consiglio",
 	Phase.SCELTA_INCONTRO: "Incontro del mondo",
 	Phase.RICOMPENSA_INCONTRO: "Ricompensa",
-	Phase.PREPARAZIONE: "Preparazione",
 	Phase.SCONTRO_FANTASMA: "Scontro con il fantasma",
 	Phase.FINE_RUN: "Fine della run",
 	Phase.CREAZIONE_NAZIONE: "Creazione della nazione",
@@ -77,7 +94,9 @@ var run_seed: int = 0
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 var year: int = 0
-var phase: Phase = Phase.PRODUZIONE
+var phase: Phase = Phase.CONSIGLIO
+## Stagione in corso (GDD §3.2, v0.25).
+var season: Season = Season.INVERNO
 var era: int = 1
 var wins: int = 0
 var prestige: int = 0
@@ -103,12 +122,15 @@ var board: NationBoard = NationBoard.new()
 ## Malus e bonus attivi (GDD §8).
 var modifiers: Modifiers = Modifiers.new()
 
-## Round in corso nella metà dell'anno (da 1 a rules.rounds_per_half).
+## Round in corso nella stagione (da 1 a rules.rounds_per_season).
 var round_number: int = 0
 ## Tema del round in corso (GDD §4.2).
 var round_theme: RoundTheme = RoundTheme.MISTO
-## Temi dei round della metà in corso, nell'ordine pescato a inizio metà.
-var _half_themes: Array[int] = []
+## Temi dei round della stagione in corso, nell'ordine pescato a inizio stagione.
+var _season_themes: Array[int] = []
+## Incontri del mondo dell'anno, fissati a inizio anno: primavera ed estate (GDD §3.3, v0.25).
+var _spring_encounters: Array[EncounterDef] = []
+var _summer_encounters: Array[EncounterDef] = []
 ## I consiglieri del round in corso (GDD §4.2: 3, diversi fra loro).
 var advisor_choices: Array[AdvisorDef] = []
 ## Il consigliere ascoltato in questo round; null finché non lo si sceglie.
@@ -266,8 +288,24 @@ func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleR
 
 # --- Informazioni ------------------------------------------------------------
 
+## Nome della fase; durante i round del Consiglio è il nome della stagione.
 func phase_name() -> String:
+	if phase == Phase.CONSIGLIO:
+		return SEASON_NAMES[season]
 	return PHASE_NAMES[phase]
+
+
+func season_name(which: Season = season) -> String:
+	return SEASON_NAMES[which]
+
+
+## Mese del round in corso, da 1 (gennaio) a 12 (dicembre) (GDD §3.2, v0.25).
+func month() -> int:
+	return clampi(int(season) * run_rules.rounds_per_season + maxi(1, round_number), 1, MONTH_NAMES.size())
+
+
+func month_name() -> String:
+	return MONTH_NAMES[month() - 1]
 
 
 func era_name(era_number: int = era) -> String:
@@ -431,6 +469,15 @@ func production_per_phase() -> Array[int]:
 			totals[type] += produced[type]
 	for type: Res.Type in Res.NAMES:
 		totals[type] = Modifiers.apply_percent(totals[type], _production_percent(type))
+	return totals
+
+
+## Quello che gli edifici depositeranno all'inizio della prossima stagione: se la prossima è
+## l'inverno, senza Cibo (GDD §5.2, v0.25).
+func next_season_production() -> Array[int]:
+	var totals: Array[int] = production_per_phase()
+	if season == Season.AUTUNNO:
+		totals[Res.Type.CIBO] = 0
 	return totals
 
 
@@ -644,7 +691,7 @@ func _fed_cooldown(piece: BoardPiece) -> int:
 
 
 func is_shopping_phase() -> bool:
-	return phase == Phase.PRODUZIONE or phase == Phase.PREPARAZIONE
+	return phase == Phase.CONSIGLIO
 
 
 func is_over() -> bool:
@@ -913,7 +960,7 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 	if chosen_advisor != null:
 		_note_deed(DeedDef.Kind.PROPOSTE, chosen_advisor.id)
 	_check_traditions()
-	# Doppio ascolto (GDD §10.4.2): una volta per metà anno il round resta aperto per una seconda
+	# Doppio ascolto (GDD §10.4.2): una volta per stagione il round resta aperto per una seconda
 	# proposta dello stesso consigliere ordinario; la proposta presa sparisce (§16.3).
 	if has_rule(IdentityDef.Rule.DOPPIO_ASCOLTO) and not double_pick_used and chosen_advisor != null \
 			and chosen_advisor.special == AdvisorDef.Special.NESSUNO and offers.size() > 1 and offer_index < offers.size():
@@ -1788,8 +1835,11 @@ func choose_encounter(index: int) -> bool:
 	var enemy: BattleSideSetup = BattleSideSetup.new(encounter.buildings, encounter.troops, encounter.resistance)
 	var outcome: BattleSim.Outcome = _fight(BattleKind.INCONTRO, encounter.display_name, enemy)
 	if not history.is_empty():
-		history[-1].encounter_name = "%s (%s)" % [encounter.display_name, encounter.difficulty_label]
-		history[-1].encounter_result = _outcome_word(outcome)
+		# Due incontri all'anno (v0.25): il riepilogo li elenca in ordine.
+		var record: YearRecord = history[-1]
+		var separator: String = " · " if record.encounter_name != "" else ""
+		record.encounter_name += separator + "%s (%s)" % [encounter.display_name, encounter.difficulty_label]
+		record.encounter_result += separator + _outcome_word(outcome)
 
 	if _player_won_or_drew(outcome):
 		# Il pareggio vale come vittoria (GDD §3.4).
@@ -1808,7 +1858,7 @@ func choose_encounter(index: int) -> bool:
 	if last_chance:
 		_end_run(RunEnd.SCONFITTA)
 		return true
-	_enter_phase(Phase.PREPARAZIONE)
+	_enter_season(_next_season())
 	return true
 
 
@@ -1844,7 +1894,7 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 	_flow_research()
 	_check_traditions()
 	won_encounter = null
-	_enter_phase(Phase.PREPARAZIONE)
+	_enter_season(_next_season())
 	return true
 
 
@@ -1854,7 +1904,7 @@ func skip_reward() -> bool:
 		return _fail("Non ci sono ricompense da scegliere.")
 	_log("Nessuna ricompensa presa.")
 	won_encounter = null
-	_enter_phase(Phase.PREPARAZIONE)
+	_enter_season(_next_season())
 	return true
 
 
@@ -1936,7 +1986,10 @@ func _start_year(new_year: int) -> void:
 		# La prima mano delle tecnologie, con l'identità già scelta (GDD §10.5.3).
 		_draw_tech_hand()
 	current_ghost = _ghost_for_year(year)
-	encounter_choices = _encounters_for_year(year)
+	# Il fantasma e i due incontri dell'anno si fissano subito e non cambiano più (GDD §4.1).
+	_spring_encounters = _encounters_for(year, 0)
+	_summer_encounters = _encounters_for(year, 1)
+	encounter_choices = []
 	_log("— Anno %d —" % year)
 	var record: YearRecord = YearRecord.new()
 	record.year = year
@@ -1949,10 +2002,20 @@ func _start_year(new_year: int) -> void:
 	elder_upgrades_used = 0
 	spy_effects = []
 	seen_this_year = []
-	# Il consumo di Cibo avviene a inizio anno, dall'anno 2 (GDD §5.4).
+	# Il consumo di Cibo avviene a inizio anno, cioè a inizio inverno, dall'anno 2 (GDD §5.4).
 	if year >= 2:
 		_feed_troops()
-	_enter_phase(Phase.PRODUZIONE)
+	_enter_season(Season.INVERNO)
+
+
+## Entra in una stagione: gli edifici producono e cominciano i suoi round (GDD §3.2, v0.25).
+func _enter_season(new_season: Season) -> void:
+	season = new_season
+	_enter_phase(Phase.CONSIGLIO)
+
+
+func _next_season() -> Season:
+	return mini(int(season) + 1, int(Season.AUTUNNO)) as Season
 
 
 func _enter_phase(new_phase: Phase) -> void:
@@ -1964,28 +2027,34 @@ func _enter_phase(new_phase: Phase) -> void:
 	if is_shopping_phase():
 		double_pick_used = false
 		_collect_production()
-		_half_themes = _shuffled_themes()
+		_season_themes = _shuffled_themes()
 		_next_round()
 
 
-## Ogni edificio presente deposita le sue risorse, una volta per macrofase (GDD §5.2).
+## Ogni edificio presente deposita le sue risorse, una volta per stagione; d'inverno niente Cibo
+## (GDD §5.2, v0.25).
 func _collect_production() -> void:
 	var collected: Array[int] = production_per_phase()
+	if season == Season.INVERNO:
+		collected[Res.Type.CIBO] = 0
 	var parts: PackedStringArray = PackedStringArray()
 	for type: Res.Type in Res.NAMES:
 		stock[type] += collected[type]
 		if collected[type] != 0:
 			parts.append("%s %s" % [Res.format(type, collected[type]), Res.NAMES[type]])
-	_log("%s: gli edifici producono %s." % [phase_name(), ", ".join(parts) if not parts.is_empty() else "nulla"])
+	_log("%s: gli edifici producono %s%s." % [season_name(), ", ".join(parts) if not parts.is_empty() else "nulla",
+			" (d'inverno niente Cibo)" if season == Season.INVERNO else ""])
 	_note_production(collected)
 	_flow_research()
 	_check_traditions()
 
 
-## Temi dei round della metà: quelli delle regole, in un ordine pescato con il seme della run.
+## Temi dei round della stagione: quelli delle regole, in un ordine pescato con il seme della run.
 func _shuffled_themes() -> Array[int]:
 	var themes: Array[int] = []
-	for theme: int in run_rules.half_themes:
+	var all_seasons: Array[PackedInt32Array] = run_rules.season_themes
+	var current: PackedInt32Array = all_seasons[mini(int(season), all_seasons.size() - 1)] if not all_seasons.is_empty() else PackedInt32Array()
+	for theme: int in current:
 		themes.append(clampi(theme, 0, RoundTheme.size() - 1))
 	for i: int in range(themes.size() - 1, 0, -1):
 		var j: int = _rng.randi_range(0, i)
@@ -2004,15 +2073,15 @@ func _next_round() -> void:
 	event_choice = null
 	chosen_event = null
 	upgrade_used = false
-	if round_number > run_rules.rounds_per_half:
+	if round_number > run_rules.rounds_per_season:
 		_end_shopping_phase()
 		return
 	# A ogni nuovo round l'aumento accumulato del rinnovo si dimezza (GDD §4.2).
 	reroll_extra = half_down(reroll_extra)
-	if _half_themes.is_empty():
+	if _season_themes.is_empty():
 		round_theme = RoundTheme.MISTO
 	else:
-		round_theme = _half_themes[mini(round_number - 1, _half_themes.size() - 1)] as RoundTheme
+		round_theme = _season_themes[mini(round_number - 1, _season_themes.size() - 1)] as RoundTheme
 	_draw_advisors()
 
 
@@ -2022,13 +2091,19 @@ func _end_shopping_phase() -> void:
 	chosen_advisor = null
 	event_choice = null
 	chosen_event = null
-	if phase == Phase.PRODUZIONE:
-		phase = Phase.SCELTA_INCONTRO
-		if encounter_choices.is_empty():
-			push_warning("RunState: nessun incontro nei dati per l'anno %d." % year)
-			_enter_phase(Phase.PREPARAZIONE)
-	elif phase == Phase.PREPARAZIONE:
-		phase = Phase.SCONTRO_FANTASMA
+	# Fine della stagione (GDD §3.2, v0.25): l'inverno passa alla primavera, primavera ed estate
+	# finiscono con un incontro del mondo, l'autunno con il fantasma.
+	match season:
+		Season.INVERNO:
+			_enter_season(Season.PRIMAVERA)
+		Season.PRIMAVERA, Season.ESTATE:
+			encounter_choices = _spring_encounters if season == Season.PRIMAVERA else _summer_encounters
+			phase = Phase.SCELTA_INCONTRO
+			if encounter_choices.is_empty():
+				push_warning("RunState: nessun incontro nei dati per l'anno %d (%s)." % [year, season_name()])
+				_enter_season(_next_season())
+		Season.AUTUNNO:
+			phase = Phase.SCONTRO_FANTASMA
 
 
 # --- Pesca dei consiglieri e delle proposte (GDD §4.2) -----------------------------
@@ -2108,7 +2183,7 @@ func _draw_special_card() -> void:
 	if family == 1:
 		var visitor_weights: Array[int] = []
 		for visitor: AdvisorDef in visitors:
-			visitor_weights.append(_roots_weight(visitor.favored_by))
+			visitor_weights.append(_roots_weight(visitor.favored_by) + _season_bonus(visitor.favored_seasons))
 		var visitor_pick: AdvisorDef = visitors[_weighted_pick(visitor_weights)]
 		advisor_choices.append(visitor_pick)
 		seen_this_year.append(visitor_pick.id)
@@ -2116,7 +2191,7 @@ func _draw_special_card() -> void:
 	var pool: Array[EventDef] = events if family == 0 else fortunes
 	var event_weights: Array[int] = []
 	for event: EventDef in pool:
-		event_weights.append(_roots_weight(event.favored_by))
+		event_weights.append(_roots_weight(event.favored_by) + _season_bonus(event.favored_seasons))
 	event_choice = pool[_weighted_pick(event_weights)]
 	seen_events.append(event_choice.id)
 	seen_this_year.append(event_choice.id)
@@ -2131,6 +2206,8 @@ func _available_events(family: EventDef.Family) -> Array[EventDef]:
 		if family == EventDef.Family.EVENTO and not event.repeatable and seen_events.has(event.id):
 			continue
 		if not _roots_ok(event.requires_any, event.min_era, event.max_era, event.requires_types):
+			continue
+		if not event.seasons.is_empty() and not event.seasons.has(int(season)):
 			continue
 		if event.requires_stock != null and not can_pay(event.requires_stock):
 			continue
@@ -2155,6 +2232,8 @@ func _available_visitors() -> Array[AdvisorDef]:
 		if seen_this_year.has(visitor.id) or advisor_choices.has(visitor):
 			continue
 		if not _roots_ok(visitor.requires_any, visitor.min_era, visitor.max_era, visitor.requires_types):
+			continue
+		if not visitor.seasons.is_empty() and not visitor.seasons.has(int(season)):
 			continue
 		if _advisor_candidates(visitor).is_empty():
 			continue
@@ -2181,6 +2260,11 @@ func _roots_ok(requires_any: Array[Resource], min_era: int, max_era: int, requir
 
 
 ## Peso: 1, più 1 per ogni elemento dell'identità o via che favorisce la carta.
+## +1 di peso se la stagione in corso è fra quelle che favoriscono la carta (GDD §4.2.5, v0.25).
+func _season_bonus(favored: PackedInt32Array) -> int:
+	return 1 if favored.has(int(season)) else 0
+
+
 func _roots_weight(favored_by: Array[Resource]) -> int:
 	var weight: int = 1
 	for element: Resource in favored_by:
@@ -2203,6 +2287,10 @@ func _advisor_weight(advisor: AdvisorDef) -> int:
 			if def.favored_opportunities.has(action):
 				weight += 1
 				break
+	# Stagioni (GDD §4.2, v0.25): es. d'inverno più Cancelliere, meno Generale.
+	weight += _season_bonus(advisor.favored_seasons)
+	if advisor.disfavored_seasons.has(int(season)):
+		weight = maxi(1, half_down(weight))
 	return weight
 
 
@@ -2744,7 +2832,7 @@ func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> 
 	_apply_start_values(player, modifiers)
 	_apply_battle_rules(player, identity)
 	_last_setups = [player, enemy]
-	last_battle_seed = run_seed * 7919 + year * 104729 + int(kind)
+	last_battle_seed = run_seed * 7919 + year * 104729 + int(season) * 31 + int(kind)
 	last_battle = BattleSim.new(battle_rules, player, enemy, last_battle_seed)
 	last_battle_kind = kind
 	last_opponent_name = opponent_name
@@ -2825,14 +2913,17 @@ func _ghost_for_year(target_year: int) -> GhostDef:
 
 
 ## Incontri dell'anno: quelli scritti nei dati, completati fino a 3 con incontri generati (GDD §3.3).
-func _encounters_for_year(target_year: int) -> Array[EncounterDef]:
+## I 3 incontri fra cui scegliere a fine primavera (season_index 0) o a fine estate (1): quelli scritti
+## nei dati per quell'anno e quella stagione, completati dal generatore. Quelli d'estate sono
+## generati più forti, a metà strada fra quest'anno e il prossimo (GDD §3.3, §16.3).
+func _encounters_for(target_year: int, season_index: int) -> Array[EncounterDef]:
 	var found: Array[EncounterDef] = []
 	for encounter: EncounterDef in catalog.encounters:
-		if encounter.year == target_year and found.size() < 3:
+		if encounter.year == target_year and encounter.season == season_index and found.size() < 3:
 			found.append(encounter)
 	if found.size() < 3 and catalog.generator != null:
 		found.append_array(OpponentGenerator.generate_encounters(catalog, catalog.generator, run_rules,
-				target_year, run_seed, 3 - found.size(), found.size()))
+				target_year, run_seed, 3 - found.size(), found.size(), season_index == 1))
 	return found
 
 
@@ -2852,7 +2943,7 @@ func _end_run(result: RunEnd) -> void:
 
 func _require_shopping() -> bool:
 	if not is_shopping_phase():
-		return _fail("Questa azione è possibile solo in Produzione o Preparazione.")
+		return _fail("Questa azione è possibile solo durante i round del Consiglio.")
 	if not way_choices.is_empty():
 		return _fail("Prima scegli la via della nazione.")
 	if not government_choices.is_empty():

@@ -345,7 +345,7 @@ func test_revisione_dei_piani_ripesca_la_mano() -> void:
 	redraw.display_name = "Revisione"
 	redraw.kind = OpportunityDef.Kind.RIPESCA_TECNOLOGIE
 	Aiuti.consiglio_semplice(catalog, rules, [redraw])
-	rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+	rules.set_all_season_themes(PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI]))
 	var run: RunState = _run()
 	Aiuti.ascolta(run)
 	var shown: Array[TechDef] = run.tech_hand.duplicate()

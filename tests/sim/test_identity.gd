@@ -131,7 +131,7 @@ func test_creazione_valida_e_inizio_anno_1() -> void:
 	assert_true(run.found_nation("Regno di Prova", _full_choice()))
 	assert_eq(run.nation_name, "Regno di Prova")
 	assert_eq(run.year, 1)
-	assert_eq(run.phase, RunState.Phase.PRODUZIONE)
+	assert_eq(run.phase, RunState.Phase.CONSIGLIO)
 	assert_eq(run.identity.size(), 6)
 	assert_eq(run.perks().size(), 2)
 
@@ -207,7 +207,7 @@ func test_i_tratti_permanenti_non_si_accorciano() -> void:
 # --- Azioni, consiglieri ed elementi esclusivi ----------------------------------
 
 func test_azione_esclusiva_solo_con_l_identita() -> void:
-	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+	run_rules.set_all_season_themes(PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI]))
 	var with_identity: RunState = _new_run()
 	with_identity.found_nation("X", _full_choice())
 	Aiuti.ascolta(with_identity)
@@ -231,7 +231,7 @@ func test_azione_esclusiva_solo_con_l_identita() -> void:
 
 func test_azione_favorita_compare_piu_spesso() -> void:
 	run_rules.proposals_per_advisor = 1
-	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+	run_rules.set_all_season_themes(PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI]))
 	advisor.actions = [builders, collectors]
 	government.exclusive_opportunities = []
 	var run: RunState = _new_run(11)
@@ -252,11 +252,11 @@ func test_consigliere_favorito_compare_piu_spesso() -> void:
 	var other: AdvisorDef = Aiuti.consigliere(&"altro", [Aiuti.TIPO_PROVA])
 	catalog.advisors = [favored, other]
 	culture.favored_advisors = [favored]
-	run_rules.rounds_per_half = 200
+	run_rules.rounds_per_season = 200
 	var temi: PackedInt32Array = PackedInt32Array()
 	temi.resize(200)
 	temi.fill(RunState.RoundTheme.MISTO)
-	run_rules.half_themes = temi
+	run_rules.set_all_season_themes(temi)
 	var run: RunState = _new_run(13)
 	run.found_nation("X", _full_choice())
 	var counts: Dictionary[StringName, int] = {}
@@ -296,7 +296,7 @@ func test_perk_ottenuto_come_ricompensa() -> void:
 	catalog.encounters = [encounter]
 	var run: RunState = _new_run()
 	run.found_nation("X", _full_choice())
-	while run.phase == RunState.Phase.PRODUZIONE:
+	while run.phase == RunState.Phase.CONSIGLIO:
 		run.pass_round()
 	run.choose_encounter(0)
 	var before: int = run.player_resistance()

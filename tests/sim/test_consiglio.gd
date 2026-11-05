@@ -87,8 +87,8 @@ func before_each() -> void:
 	rules.starting_buildings = []
 	rules.starting_troops = [plain_troop]
 	rules.advisors_per_round = 1
-	rules.rounds_per_half = 3
-	rules.half_themes = _themes(RunState.RoundTheme.MISTO, 3)
+	rules.rounds_per_season = 3
+	rules.set_all_season_themes(_themes(RunState.RoundTheme.MISTO, 3))
 	resistance_rules = ResistanceRules.new()
 	resistance_rules.per_era = [10]
 	resistance_rules.per_year = 0
@@ -118,7 +118,7 @@ func test_tre_consiglieri_diversi_fra_quelli_che_hanno_proposte() -> void:
 func test_un_consigliere_senza_proposte_per_il_tema_non_compare() -> void:
 	catalog.advisors = [soldier, builder]
 	rules.advisors_per_round = 3
-	rules.half_themes = _themes(RunState.RoundTheme.TRUPPE, 3)
+	rules.set_all_season_themes(_themes(RunState.RoundTheme.TRUPPE, 3))
 	var run: RunState = _run()
 	assert_eq(run.advisor_choices.size(), 1, "L'architetto non ha truppe Guardiano da proporre.")
 	assert_eq(run.advisor_choices[0], soldier)
@@ -256,7 +256,7 @@ func test_lo_spionaggio_sabota_la_truppa_piu_veloce_del_fantasma() -> void:
 	spy.spy_criterion = OpportunityDef.SpyCriterion.PIU_VELOCE
 	shadow.actions = [spy]
 	catalog.advisors = [shadow]
-	rules.half_themes = _themes(RunState.RoundTheme.AZIONI, 3)
+	rules.set_all_season_themes(_themes(RunState.RoundTheme.AZIONI, 3))
 	var slow: TroopDef = _troop(&"lenti", [&"Bellico"], &"rosso", 0, 3000)
 	var fast: TroopDef = _troop(&"veloci", [&"Bellico"], &"rosso", 0, 500)
 	var ghost: GhostDef = GhostDef.new()
@@ -289,7 +289,7 @@ func test_l_incanto_aggiunge_effetto_e_mana_una_sola_volta() -> void:
 	spell.enchant_color = &"blu"
 	var priest: AdvisorDef = Aiuti.consigliere(&"sacerdote", [&"Spirituale"], [spell], Res.Type.FEDE)
 	catalog.advisors = [priest]
-	rules.half_themes = _themes(RunState.RoundTheme.AZIONI, 3)
+	rules.set_all_season_themes(_themes(RunState.RoundTheme.AZIONI, 3))
 	var run: RunState = _run()
 	Aiuti.ascolta(run)
 	assert_true(run.buy_offer(0), "Una sola truppa: nessuna scelta da fare.")
@@ -326,7 +326,7 @@ func test_l_incanto_esclusivo_del_credo_ha_due_effetti_e_solo_quel_credo_lo_vede
 	rules.starting_perks = 0
 	var priest: AdvisorDef = Aiuti.consigliere(&"sacerdote", [&"Spirituale"], [spell], Res.Type.FEDE)
 	catalog.advisors = [priest]
-	rules.half_themes = _themes(RunState.RoundTheme.AZIONI, 3)
+	rules.set_all_season_themes(_themes(RunState.RoundTheme.AZIONI, 3))
 	var outsider: RunState = _run()
 	assert_true(outsider.found_nation("Altri", [other_creed]))
 	assert_true(outsider.advisor_choices.is_empty(), "Senza il credo l'incanto esclusivo non compare.")
@@ -356,7 +356,7 @@ func test_le_azioni_di_livello_alto_arrivano_con_l_era() -> void:
 	var era2: EraDef = EraDef.new()
 	era2.techs_required = 0
 	catalog.eras = [EraDef.new(), era2]
-	rules.half_themes = _themes(RunState.RoundTheme.AZIONI, 3)
+	rules.set_all_season_themes(_themes(RunState.RoundTheme.AZIONI, 3))
 	var run: RunState = _run()
 	assert_eq(run.council_level(), 1)
 	assert_eq(run.council_level_name(), "Funzionari")

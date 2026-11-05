@@ -36,6 +36,11 @@ enum Special {
 ## Era minima e massima in cui può comparire (0 = nessun limite).
 @export var min_era: int = 0
 @export var max_era: int = 0
+## Stagioni in cui la carta può comparire (GDD §4.2.5, v0.25): 0 inverno, 1 primavera, 2 estate,
+## 3 autunno. Vuoto = tutte.
+@export var seasons: PackedInt32Array = PackedInt32Array()
+## Stagioni in cui la carta è più probabile (+1 di peso ciascuna).
+@export var favored_seasons: PackedInt32Array = PackedInt32Array()
 ## Compare solo se il Malcontento è almeno questo (0 = nessun limite; GDD §5.5, v0.24).
 @export var min_malcontent: int = 0
 ## Compare solo se sulla plancia c'è almeno una carta con uno di questi tipi.

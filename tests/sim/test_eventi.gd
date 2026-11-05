@@ -333,3 +333,31 @@ func test_un_tipo_d_identita_straniero_sblocca_l_opzione() -> void:
 	assert_eq(run.option_block_reason(by_identity_type), "", "La carta straniera porta il suo tipo.")
 	assert_true(run.take_event_option(1))
 	assert_eq(run.stock[Res.Type.FERRO], 3)
+
+
+func test_un_evento_di_stagione_compare_solo_in_quella_stagione() -> void:
+	# GDD §4.2.5 (v0.25): la stagione è una radice delle carte speciali.
+	var flood: EventDef = _event(&"piena", [_option("Prendi", {"oro": 1})])
+	flood.seasons = PackedInt32Array([RunState.Season.PRIMAVERA])
+	flood.repeatable = true
+	catalog.events = [flood]
+	var run: RunState = _run()
+	assert_eq(run.season, RunState.Season.INVERNO)
+	assert_null(run.event_choice, "D'inverno la piena non arriva.")
+	while run.season == RunState.Season.INVERNO:
+		run.pass_round()
+	assert_eq(run.event_choice, flood, "In primavera sì.")
+
+
+func test_le_stagioni_cambiano_il_peso_dei_consiglieri() -> void:
+	# GDD §4.2 (Proposta v0.25): d'inverno più Cancelliere, meno Generale.
+	var chancellor: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione"])
+	chancellor.favored_seasons = PackedInt32Array([RunState.Season.INVERNO])
+	var general: AdvisorDef = Aiuti.consigliere(&"generale", [&"Fante"])
+	general.disfavored_seasons = PackedInt32Array([RunState.Season.INVERNO])
+	var run: RunState = _run()
+	assert_eq(run.call("_advisor_weight", chancellor), 2, "Inverno: +1.")
+	assert_eq(run.call("_advisor_weight", general), 1, "Inverno: dimezzato, ma almeno 1.")
+	while run.season == RunState.Season.INVERNO:
+		run.pass_round()
+	assert_eq(run.call("_advisor_weight", chancellor), 1, "Primavera: peso normale.")

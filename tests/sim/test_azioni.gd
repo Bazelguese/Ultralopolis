@@ -73,7 +73,7 @@ func before_each() -> void:
 ## Un solo consigliere che propone queste azioni; tutti i round sono Azioni.
 func _council(actions: Array[OpportunityDef]) -> void:
 	Aiuti.consiglio_semplice(catalog, run_rules, actions)
-	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+	run_rules.set_all_season_themes(PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI]))
 
 
 ## Run in cui la prima proposta del consigliere è l'unica azione.

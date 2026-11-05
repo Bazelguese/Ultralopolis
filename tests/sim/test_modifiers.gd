@@ -92,12 +92,9 @@ func _new_run() -> RunState:
 
 
 func _play_year(run: RunState) -> void:
-	while run.is_shopping_phase() or run.phase == RunState.Phase.SCELTA_INCONTRO or run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
-		if run.is_shopping_phase():
-			run.pass_round()
-		else:
-			# Nessun incontro nei dati: si passa direttamente alla Preparazione.
-			break
+	# Nessun incontro nei dati: dopo primavera ed estate si passa direttamente alla stagione dopo.
+	while run.is_shopping_phase():
+		run.pass_round()
 	run.fight_ghost()
 
 
@@ -157,10 +154,11 @@ func test_ricerca_dimezzata_per_un_anno_e_poi_rimossa() -> void:
 func test_la_produzione_dimezzata_si_vede_nella_raccolta() -> void:
 	_set_ghosts([killer], [_modifier(&"oro_dimezzato", ModifierDef.Effect.PRODUZIONE_ORO, -50)])
 	var run: RunState = _new_run()
-	assert_eq(run.gold, 4, "Anno 1: 4 Oro dalla fattoria.")
+	assert_eq(run.gold, 4, "Anno 1, inverno: 4 Oro dalla fattoria.")
 	_play_year(run)
-	# Preparazione dell'anno 1 (+4) e Produzione dell'anno 2 con malus (+2).
-	assert_eq(run.gold, 4 + 4 + 2)
+	# Primavera, estate e autunno dell'anno 1 (+4 ciascuna), poi l'inverno dell'anno 2 con il malus (+2)
+	# (GDD §5.2, v0.25: si produce a ogni stagione).
+	assert_eq(run.gold, 4 + 4 * 3 + 2)
 
 
 # --- Cumulabilità -----------------------------------------------------------
@@ -259,7 +257,7 @@ func test_una_alternativa_in_meno() -> void:
 		opportunity.gain_gold = 1
 		list.append(opportunity)
 	Aiuti.consiglio_semplice(catalog, run_rules, list)
-	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+	run_rules.set_all_season_themes(PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI]))
 	_set_ghosts([killer], [_modifier(&"meno_offerte", ModifierDef.Effect.ALTERNATIVE_OFFERTE, -1)])
 	var run: RunState = _new_run()
 	Aiuti.ascolta(run)

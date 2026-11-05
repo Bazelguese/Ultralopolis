@@ -176,7 +176,7 @@ func _pass_all(run: RunState) -> void:
 		run.pass_round()
 
 
-## Porta la run dalla Produzione alla Preparazione vincendo l'incontro facile.
+## Porta la run dall'inverno all'estate (GDD §3.2, v0.25), affrontando l'incontro di primavera.
 func _to_preparation(run: RunState) -> void:
 	_pass_all(run)
 	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO)
@@ -185,18 +185,26 @@ func _to_preparation(run: RunState) -> void:
 		run.skip_reward()
 
 
-## Completa l'anno in corso dalla Preparazione in poi.
+## Completa l'anno in corso: passa i round, affronta gli incontri (rifiutando le ricompense)
+## e combatte il fantasma.
 func _play_year_rest(run: RunState) -> void:
-	_pass_all(run)
-	run.fight_ghost()
+	var guard: int = 0
+	while run.phase != RunState.Phase.SCONTRO_FANTASMA and not run.is_over() and guard < 200:
+		guard += 1
+		if run.is_shopping_phase():
+			run.pass_round()
+		elif run.phase == RunState.Phase.SCELTA_INCONTRO:
+			run.choose_encounter(0)
+		elif run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
+			run.skip_reward()
+	if not run.is_over():
+		run.fight_ghost()
 
 
 ## Fa un anno intero passando tutte le opportunità e combattendo il fantasma.
 func _play_year(run: RunState) -> void:
 	_to_preparation(run)
-	_pass_all(run)
-	assert_eq(run.phase, RunState.Phase.SCONTRO_FANTASMA)
-	run.fight_ghost()
+	_play_year_rest(run)
 
 
 func _offer_index(run: RunState, kind: OpportunityDef.Kind, def_id: StringName = &"") -> int:
@@ -230,11 +238,14 @@ func _find_offer(run: RunState, kind: OpportunityDef.Kind, def_id: StringName = 
 
 func test_ingresso_in_fase_una_sola_raccolta() -> void:
 	var run: RunState = _new_run()
-	assert_eq(run.phase, RunState.Phase.PRODUZIONE)
-	assert_eq(run.gold, 7, "5 Oro iniziali + 2 della fattoria all'ingresso in Produzione.")
-	run.pass_round()
-	run.pass_round()
+	assert_eq(run.phase, RunState.Phase.CONSIGLIO)
+	assert_eq(run.gold, 7, "5 Oro iniziali + 2 della fattoria all'ingresso nell'inverno.")
+	for i: int in range(run_rules.rounds_per_season - 1):
+		run.pass_round()
 	assert_eq(run.gold, 7, "I round non producono di nuovo.")
+	run.pass_round()
+	assert_eq(run.season, RunState.Season.PRIMAVERA)
+	assert_eq(run.gold, 9, "La nuova stagione produce di nuovo (GDD §5.2, v0.25).")
 
 
 func test_costruzione_in_produzione_produce_da_preparazione() -> void:
@@ -243,8 +254,9 @@ func test_costruzione_in_produzione_produce_da_preparazione() -> void:
 	run.gold = 10
 	assert_true(run.buy_offer(index))
 	assert_eq(run.research, 0, "Nessuna raccolta retroattiva.")
-	_to_preparation(run)
-	assert_eq(run.research, 3, "La biblioteca produce all'inizio della Preparazione.")
+	while run.season == RunState.Season.INVERNO:
+		run.pass_round()
+	assert_eq(run.research, 3, "La biblioteca produce all'inizio della stagione dopo.")
 
 
 func test_risorse_conservate_fra_fasi_e_anni() -> void:
@@ -253,8 +265,8 @@ func test_risorse_conservate_fra_fasi_e_anni() -> void:
 	var gold_before: int = run.gold
 	_play_year(run)
 	assert_eq(run.year, 2)
-	# Fattoria: +2 in Preparazione e +2 nella Produzione dell'anno 2.
-	assert_eq(run.gold, gold_before + 4)
+	# Fattoria: +2 in primavera, estate e autunno e +2 nell'inverno dell'anno 2 (GDD §5.2, v0.25).
+	assert_eq(run.gold, gold_before + 8)
 	assert_eq(run.research, 2, "La Ricerca non spesa resta nel Magazzino.")
 
 
@@ -268,7 +280,9 @@ func test_round_con_tre_proposte() -> void:
 		assert_true(run.choose_advisor(0))
 		assert_eq(run.offers.size(), 3, "Tre proposte del consigliere.")
 		run.pass_round()
-	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO, "Dopo i round della metà arriva l'incontro.")
+	assert_eq(run.season, RunState.Season.PRIMAVERA, "Dopo i round dell'inverno arriva la primavera, senza scontri.")
+	_pass_all(run)
+	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO, "Dopo i round della primavera arriva l'incontro.")
 
 
 func test_proposte_dell_era_in_entrambe_le_meta() -> void:
@@ -330,8 +344,10 @@ func test_rinnovo_costo_crescente_e_dimezzamento() -> void:
 	assert_eq(run.gold, 90)
 	run.pass_round()
 	assert_eq(run.reroll_cost(), 3, "Nuovo round: l'aumento +4 diventa +2.")
-	_to_preparation(run)
-	assert_eq(run.reroll_cost(), 2, "Il costo continua fra le fasi: +2 diventa +1.")
+	assert_eq(run_rules.rounds_per_season, 2)
+	run.pass_round()
+	assert_eq(run.season, RunState.Season.PRIMAVERA)
+	assert_eq(run.reroll_cost(), 2, "Il costo continua fra le stagioni: +2 diventa +1.")
 	run.pass_round()
 	assert_eq(run.reroll_cost(), 1, "+1 diventa +0: costo iniziale.")
 	_play_year_rest(run)
@@ -475,6 +491,8 @@ func test_era_senza_tecnologie_sufficienti() -> void:
 func test_fantasma_e_incontri_fissati_a_inizio_anno() -> void:
 	var run: RunState = _new_run()
 	assert_eq(run.current_ghost.year, 1)
+	_pass_all(run)
+	assert_eq(run.season, RunState.Season.PRIMAVERA, "L'incontro arriva a fine primavera.")
 	assert_eq(run.encounter_choices.size(), 3, "Si sceglie fra 3 incontri.")
 
 
@@ -485,8 +503,9 @@ func test_vittoria_incontro_ricompensa_a_scelta() -> void:
 	assert_eq(run.phase, RunState.Phase.RICOMPENSA_INCONTRO)
 	var gold_before: int = run.gold
 	assert_true(run.take_reward(0))
-	assert_eq(run.phase, RunState.Phase.PREPARAZIONE)
-	assert_eq(run.gold, gold_before + 4 + 2, "Ricompensa + produzione della Preparazione.")
+	assert_eq(run.phase, RunState.Phase.CONSIGLIO)
+	assert_eq(run.season, RunState.Season.ESTATE, "Dopo l'incontro di primavera viene l'estate.")
+	assert_eq(run.gold, gold_before + 4 + 2, "Ricompensa + produzione dell'estate.")
 
 
 func test_ricompensa_si_puo_rifiutare() -> void:
@@ -494,7 +513,8 @@ func test_ricompensa_si_puo_rifiutare() -> void:
 	_pass_all(run)
 	run.choose_encounter(0)
 	assert_true(run.skip_reward())
-	assert_eq(run.phase, RunState.Phase.PREPARAZIONE)
+	assert_eq(run.phase, RunState.Phase.CONSIGLIO)
+	assert_eq(run.season, RunState.Season.ESTATE)
 
 
 func test_sconfitta_incontro_dimezza_oro() -> void:
@@ -504,10 +524,10 @@ func test_sconfitta_incontro_dimezza_oro() -> void:
 	run.gold = 7
 	var prestige_before: int = run.prestige
 	assert_true(run.choose_encounter(0))
-	assert_eq(run.gold, 3 + 2, "7 diventa 3, poi +2 dalla Preparazione.")
+	assert_eq(run.gold, 3 + 2, "7 diventa 3, poi +2 dalla produzione dell'estate.")
 	assert_eq(run.prestige, prestige_before, "Il Prestigio non cambia.")
 	assert_eq(run.wins, 0, "Le vittorie non cambiano.")
-	assert_eq(run.phase, RunState.Phase.PREPARAZIONE)
+	assert_eq(run.phase, RunState.Phase.CONSIGLIO)
 
 
 func test_sconfitta_incontro_in_ultima_possibilita_termina_la_run() -> void:
@@ -600,7 +620,7 @@ func test_replay_della_battaglia_identico() -> void:
 # --- Temi del round, costi in altre risorse, rinnovo minimo -----------------------
 
 func test_il_tema_del_round_decide_le_proposte() -> void:
-	run_rules.half_themes = PackedInt32Array([RunState.RoundTheme.EDIFICI, RunState.RoundTheme.TRUPPE])
+	run_rules.set_all_season_themes(PackedInt32Array([RunState.RoundTheme.EDIFICI, RunState.RoundTheme.TRUPPE]))
 	var run: RunState = _new_run()
 	for n: int in range(2):
 		var theme: RunState.RoundTheme = run.round_theme
@@ -621,13 +641,13 @@ func test_il_tema_del_round_decide_le_proposte() -> void:
 
 
 func test_i_temi_della_meta_si_pescano_con_il_seme() -> void:
-	run_rules.rounds_per_half = 5
-	run_rules.half_themes = PackedInt32Array([0, 1, 2, 3, 3])
+	run_rules.rounds_per_season = 5
+	run_rules.set_all_season_themes(PackedInt32Array([0, 1, 2, 3, 3]))
 	var orders: Array[Array] = []
 	for attempt: int in range(2):
 		var run: RunState = _new_run(77)
 		var themes: Array[int] = []
-		while run.phase == RunState.Phase.PRODUZIONE:
+		while run.season == RunState.Season.INVERNO:
 			themes.append(run.round_theme)
 			run.pass_round()
 		orders.append(themes)
@@ -635,6 +655,44 @@ func test_i_temi_della_meta_si_pescano_con_il_seme() -> void:
 		sorted.sort()
 		assert_eq(sorted, [0, 1, 2, 3, 3] as Array[int], "Un round Azioni, uno Edifici, uno Truppe e due Misti.")
 	assert_eq(orders[0], orders[1], "Stesso seme, stesso ordine dei temi.")
+
+
+func test_ogni_stagione_ha_i_suoi_temi_e_i_suoi_mesi() -> void:
+	# GDD §3.2, §4.2 (v0.25): temi per stagione e nome del mese.
+	var defaults: RunRules = RunRules.new()
+	run_rules.rounds_per_season = 3
+	run_rules.season_themes = defaults.season_themes
+	var run: RunState = _new_run(5)
+	var seen: Dictionary[int, Array] = {}
+	var months: Array[String] = []
+	var guard: int = 0
+	while run.phase != RunState.Phase.SCONTRO_FANTASMA and guard < 100:
+		guard += 1
+		if run.is_shopping_phase():
+			if not seen.has(run.season):
+				seen[run.season] = []
+			seen[run.season].append(run.round_theme)
+			months.append(run.month_name())
+			run.pass_round()
+		elif run.phase == RunState.Phase.SCELTA_INCONTRO:
+			run.choose_encounter(0)
+		elif run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
+			run.skip_reward()
+	assert_eq(months, ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",
+			"Settembre", "Ottobre", "Novembre", "Dicembre"] as Array[String], "Dodici round, uno per mese.")
+	var expected: Dictionary[int, Array] = {
+		RunState.Season.INVERNO: [RunState.RoundTheme.AZIONI, RunState.RoundTheme.EDIFICI, RunState.RoundTheme.MISTO],
+		RunState.Season.PRIMAVERA: [RunState.RoundTheme.EDIFICI, RunState.RoundTheme.MISTO, RunState.RoundTheme.MISTO],
+		RunState.Season.ESTATE: [RunState.RoundTheme.EDIFICI, RunState.RoundTheme.TRUPPE, RunState.RoundTheme.MISTO],
+		RunState.Season.AUTUNNO: [RunState.RoundTheme.AZIONI, RunState.RoundTheme.TRUPPE, RunState.RoundTheme.MISTO],
+	}
+	for which: int in expected:
+		var got: Array = seen[which].duplicate()
+		got.sort()
+		var want: Array = expected[which].duplicate()
+		want.sort()
+		assert_eq(got, want, "Temi di %s" % RunState.SEASON_NAMES[which])
+	assert_false(seen[RunState.Season.INVERNO].has(RunState.RoundTheme.TRUPPE), "D'inverno nessun round Truppe.")
 
 
 func test_in_un_round_misto_almeno_un_azione() -> void:

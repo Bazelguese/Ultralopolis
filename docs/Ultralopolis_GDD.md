@@ -945,7 +945,7 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | **Disciplina ferrea** | La truppa più a destra prenota il mana: finché aspetta, le altre truppe non spendono mana | §7.3 |
 | **Mana unito** | Dopo il proprio colore e l'energetico, una truppa può pagare con gli altri colori | §5.3 |
 | **Maestria** | Le carte arrivano al livello 4 | §6.5 |
-| **Doppio ascolto** | Una volta per stagione si prendono due proposte dallo stesso consigliere (Proposta con le stagioni; nel prototipo, finché ci sono le due metà, una volta per metà) | §4.2 |
+| **Doppio ascolto** | Una volta per stagione si prendono due proposte dallo stesso consigliere (Proposta con le stagioni) | §4.2 |
 | **Esercito frugale** | Le truppe senza Cibo non rallentano | §5.4 |
 
 Le ascensioni del livello 1 (es. +1 spazio truppa e +1 spazio edificio; +20 Resistenza; +25% delle risorse prodotte) sono nel Catalogo (§4.5).
@@ -1197,7 +1197,7 @@ Verificare un ciclo completo nel quale sviluppo economico, ordine delle truppe e
 - Nuova run con dotazione iniziale comune.
 - Run completa: fino a 10 vittorie o alla sconfitta durante l’ultima possibilità, con riepilogo finale anno per anno (v0.17).
 - Quattro spazi edificio e tre spazi truppa, espandibili (§6.3).
-- Quattro stagioni con raccolta automatica all’ingresso e 3 round del Consiglio ciascuna (§3.2, v0.25; finché non è implementato, il prototipo usa ancora le due metà da 5 round della v0.21). Consiglio nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
+- Quattro stagioni con raccolta automatica all’ingresso e 3 round del Consiglio ciascuna, con il nome del mese (§3.2, v0.25). Consiglio nel prototipo dalla v0.22, con tipi, categorie, Potenzia, quattro colori di mana, incanti e spionaggio; dalla v0.23 anche Eventi, Visitatori e Fortune (§4.2.5).
 - Magazzino persistente, acquisti, vendita con rimborso dimezzato, rinnovo delle offerte.
 - Albero delle tecnologie con la mano di 3 carte; ere raggiunte con le tecnologie (v0.26).
 - Tradizioni delle vie con imprese e ascensioni (v0.27).
@@ -1340,12 +1340,12 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Disciplina ferrea: prenota il mana solo la truppa più a destra, e solo se è pronta e non sabotata; le truppe senza mana si attivano comunque | Provvisoria (v0.27). |
 | Mana unito: gli altri colori si usano nell'ordine rosso, verde, blu, viola | Provvisoria (v0.27). |
 | Maestria: il livello 4 costa 4 × era della carta nella risorsa del consigliere, come gli altri livelli | Placeholder (v0.27). |
-| Doppio ascolto: dopo la prima proposta il round non si chiude e la proposta presa sparisce; vale una volta per stagione (nel prototipo, finché ci sono le due metà, una volta per metà), con i consiglieri ordinari | Provvisoria (v0.27). |
+| Doppio ascolto: dopo la prima proposta il round non si chiude e la proposta presa sparisce; vale una volta per stagione, con i consiglieri ordinari | Provvisoria (v0.27). |
 | Fantasmi generati: tutti i passi delle vie delle ere passate e metà di quelli della via dell'era corrente, a caso con il seme della run; un'ascensione per ogni albero completo | Provvisoria (v0.27). |
 | Revisione dei piani (Studioso): 2 Documenti, ripesca la mano delle tecnologie | Placeholder (v0.26). |
 | I fantasmi generati ricevono a caso, con il seme della run, il numero di tecnologie richiesto per ogni era raggiunta; in battaglia valgono solo quelle che agiscono in battaglia | Provvisoria (v0.26). |
 | Incontro d'estate: forza a metà strada fra quella dell'anno e quella dell'anno successivo | Placeholder (v0.25). |
-| Finché le stagioni non sono implementate, il prototipo usa le due metà da 5 round della v0.21 | Provvisoria (v0.25). |
+| Stagioni nel prototipo: pesi d'inverno dei consiglieri, eventi stagionali e tre eventi invernali come nelle Proposte del §4.2 e del §4.2.5; valori in `docs/Catalogo.md` §6 quinquies | Placeholder (v0.25). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -1379,7 +1379,7 @@ Criteri di accettazione proposti per il prototipo:
 | Disciplina ferrea | Con la truppa più a destra in attesa di mana, le altre non spendono mana. |
 | Mana unito | Una truppa paga con un altro colore quando mancano il suo e l'energetico. |
 | Maestria | Potenzia porta una carta al livello 4. |
-| Doppio ascolto | Dopo una proposta il round resta aperto una volta per stagione (nel prototipo per metà anno). |
+| Doppio ascolto | Dopo una proposta il round resta aperto una volta per stagione. |
 | Esercito frugale | Una truppa senza Cibo mantiene la sua ricarica. |
 | Abbinamento dei fantasmi | Stesso anno, era qualsiasi. |
 | Truppa pronta senza mana | In attesa, senza consumi né cooldown aggiuntivo; il motivo è visibile. |

@@ -247,7 +247,7 @@ func _crea_risorse() -> void:
 		var cella: VBoxContainer = VBoxContainer.new()
 		cella.add_theme_constant_override("separation", -6)
 		cella.custom_minimum_size = Vector2(124, 0)
-		cella.tooltip_text = "%s: quantità nel Magazzino e produzione a ogni fase." % Res.NAMES[tipo]
+		cella.tooltip_text = "%s: quantità nel Magazzino e produzione della prossima stagione (d'inverno niente Cibo)." % Res.NAMES[tipo]
 		if tipo == Res.Type.RICERCA:
 			cella.tooltip_text = "Ricerca: va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende."
 
@@ -729,9 +729,10 @@ func aggiorna_partita(run: RunState) -> void:
 	_nazione.text = run.nation_name.to_upper()
 	_identita.text = run.identity_summary()
 	var comprando: bool = run.is_shopping_phase()
+	# GDD §3.2 (v0.25): anno, stagione e mese, es. "Anno 2 · Estate · Agosto".
 	_fase.text = "Anno %d · %s" % [run.year, run.phase_name()]
 	if comprando:
-		_fase.text += " · round %d di %d · tema: %s" % [run.round_number, run.run_rules.rounds_per_half, run.theme_name()]
+		_fase.text += " · %s · tema: %s" % [run.month_name(), run.theme_name()]
 	_sotto_fase.text = "Resistenza nel prossimo scontro: %d" % run.player_resistance()
 	_prestigio.text = str(run.prestige)
 	_vittorie.text = "%d/%d" % [run.wins, run.run_rules.wins_needed]
@@ -743,7 +744,7 @@ func aggiorna_partita(run: RunState) -> void:
 	_malcontento_cella.tooltip_text = "Malcontento: sale con sconfitte, carestie, malus ed eventi; scende spendendo Stabilità (Cancelliere), Fede o Cibo. A %d scoppia la Rivoluzione.%s" % [
 			run.run_rules.malcontent_threshold, "\nLa rivoluzione si avvicina!" if vicina else ""]
 
-	var produzione: Array[int] = run.production_per_phase()
+	var produzione: Array[int] = run.next_season_production()
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
@@ -797,7 +798,7 @@ func aggiorna_partita(run: RunState) -> void:
 	_pulsante_nessuna.visible = run.phase == RunState.Phase.RICOMPENSA_INCONTRO
 	_principale.visible = run.phase in [RunState.Phase.SCONTRO_FANTASMA, RunState.Phase.FINE_RUN]
 	match run.phase:
-		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
+		RunState.Phase.CONSIGLIO:
 			_suggerimento_fase.text = _testo_consiglio(run)
 		RunState.Phase.SCELTA_INCONTRO:
 			_suggerimento_fase.text = "Incontro del mondo: scegli quale minaccia affrontare. Se perdi, l'Oro si dimezza."

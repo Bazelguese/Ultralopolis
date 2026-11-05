@@ -17,7 +17,7 @@ extends Resource
 ## La Capitale non si può vendere né sostituire (GDD §6.2).
 @export var is_capital: bool = false
 
-@export_group("Produzione per fase")
+@export_group("Produzione per stagione")
 ## Risorse depositate nel Magazzino all'inizio di ogni macrofase (unità intere).
 @export var gold_per_phase: int = 0
 @export var research_per_phase: int = 0

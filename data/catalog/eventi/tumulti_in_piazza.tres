@@ -54,3 +54,4 @@ color = &"blu"
 min_malcontent = 4
 repeatable = true
 options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S4"), SubResource("S6"), SubResource("S7")])
+favored_seasons = PackedInt32Array(0)

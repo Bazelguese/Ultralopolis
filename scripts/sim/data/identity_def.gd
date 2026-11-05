@@ -39,7 +39,7 @@ enum Rule {
 	DISCIPLINA_FERREA, ## La truppa più a destra prenota il mana (§7.3).
 	MANA_UNITO,        ## Si paga anche con gli altri colori (§5.3).
 	MAESTRIA,          ## Le carte arrivano al livello 4 (§6.5).
-	DOPPIO_ASCOLTO,    ## Una volta per metà anno due proposte dallo stesso consigliere (§4.2).
+	DOPPIO_ASCOLTO,    ## Una volta per stagione due proposte dallo stesso consigliere (§4.2).
 	ESERCITO_FRUGALE,  ## Le truppe senza Cibo non rallentano (§5.4).
 }
 

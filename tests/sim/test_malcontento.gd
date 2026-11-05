@@ -130,7 +130,7 @@ func test_le_truppe_senza_cibo_fanno_salire_il_malcontento() -> void:
 
 
 func test_l_azione_che_calma_compare_solo_se_c_e_malcontento() -> void:
-	rules.half_themes = PackedInt32Array([0, 0, 0, 0, 0])
+	rules.set_all_season_themes(PackedInt32Array([0, 0, 0, 0, 0]))
 	var run: RunState = _run()
 	Aiuti.ascolta(run)
 	for offer: Offer in run.offers:

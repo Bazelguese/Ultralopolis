@@ -6,6 +6,8 @@ extends Resource
 @export_multiline var description: String = ""
 ## Anno in cui l'incontro può comparire.
 @export var year: int = 1
+## Stagione dell'incontro (GDD §3.3, v0.25): 0 = fine primavera, 1 = fine estate.
+@export_enum("Primavera", "Estate") var season: int = 0
 ## Etichetta di difficoltà mostrata al giocatore (es. "Facile").
 @export var difficulty_label: String = ""
 ## Resistenza fissa della plancia generata (niente calcolo, GDD §3.3).

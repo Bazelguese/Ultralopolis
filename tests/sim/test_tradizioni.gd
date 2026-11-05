@@ -240,7 +240,7 @@ func test_doppio_ascolto() -> void:
 	tribute.kind = OpportunityDef.Kind.SCAMBIO_RISORSE
 	tribute.gain_gold = 2
 	Aiuti.consiglio_semplice(catalog, rules, [collectors, tribute])
-	rules.half_themes = PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI])
+	rules.set_all_season_themes(PackedInt32Array([RunState.RoundTheme.AZIONI, RunState.RoundTheme.AZIONI]))
 	var run: RunState = _run()
 	run.identity.append(_ascension(&"doppio", 2, IdentityDef.Rule.DOPPIO_ASCOLTO))
 	Aiuti.ascolta(run)
@@ -254,7 +254,7 @@ func test_doppio_ascolto() -> void:
 	Aiuti.ascolta(run)
 	var round_now: int = run.round_number
 	assert_true(run.buy_offer(0))
-	assert_ne(run.round_number, round_now, "Una volta sola per metà anno.")
+	assert_ne(run.round_number, round_now, "Una volta sola per stagione.")
 
 
 # --- Regole della battaglia (GDD §10.4.2) ---------------------------------------------

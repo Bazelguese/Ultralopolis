@@ -27,7 +27,7 @@ func test_regole_confermate_nel_gdd() -> void:
 	assert_eq(rules.starting_troop_slots, 3, "GDD §6.1")
 	assert_eq(rules.max_building_slots, 10, "GDD §6.1")
 	assert_eq(rules.max_troop_slots, 12, "GDD §6.1")
-	assert_eq(rules.rounds_per_half, 5, "GDD §3.2: 5 round per metà")
+	assert_eq(rules.rounds_per_season, 3, "GDD §3.2 (v0.25): 3 round per stagione, uno per mese")
 	assert_eq(rules.advisors_per_round, 3, "GDD §4.2: 3 consiglieri per round")
 	assert_eq(rules.proposals_per_advisor, 3, "GDD §4.2: 3 proposte")
 	assert_eq(rules.elder_upgrades_per_year, 1, "GDD §4.2.2: l'Anziano potenzia una volta all'anno")
@@ -187,12 +187,12 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 	while not run.is_over() and guard < 1000:
 		guard += 1
 		match run.phase:
-			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE when run.is_revolution_round():
+			RunState.Phase.CONSIGLIO when run.is_revolution_round():
 				# La Rivoluzione arriva da sola: si sceglie il primo governo possibile (GDD §9.4.2).
 				if run.chosen_event == null:
 					run.choose_event()
 				assert_true(run.take_event_option(0), run.last_error)
-			RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
+			RunState.Phase.CONSIGLIO:
 				# Ascolta il primo consigliere, potenzia se può, compra la prima proposta che si può
 				# pagare senza sostituzioni e senza scelte, altrimenti passa.
 				if run.chosen_advisor == null and not run.advisor_choices.is_empty():
@@ -343,7 +343,7 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
 		else:
 			events += 1
-	assert_eq(events, 26, "18 eventi, la Riforma, i Tumulti in piazza e 6 eventi senza costi (v0.24).")
+	assert_eq(events, 29, "18 eventi, la Riforma, i Tumulti in piazza, 6 eventi senza costi (v0.24) e 3 invernali (v0.25).")
 	assert_eq(revolutions, 1, "Una Rivoluzione.")
 	assert_eq(fortunes, 6)
 	assert_eq(catalog.visitors.size(), 6)
