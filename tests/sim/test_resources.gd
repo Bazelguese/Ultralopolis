@@ -79,9 +79,33 @@ func _finish_year(run: RunState) -> void:
 
 func test_la_capitale_produce_un_po_di_tutto() -> void:
 	var run: RunState = _new_run()
+	# L'anno comincia d'inverno: niente Cibo (GDD §5.2, v0.25).
+	assert_eq(run.season, RunState.Season.INVERNO)
 	for type: Res.Type in Res.NAMES:
-		assert_eq(run.stock[type], 1 * Res.scale(type), "1 %s dalla Capitale" % Res.NAMES[type])
-	assert_eq(run.stock_text(Res.Type.CIBO), "1")
+		var expected: int = 0 if type == Res.Type.CIBO else 1 * Res.scale(type)
+		assert_eq(run.stock[type], expected, "Inverno: %s dalla Capitale" % Res.NAMES[type])
+	_to_spring(run)
+	assert_eq(run.stock_text(Res.Type.CIBO), "1", "In primavera la Capitale dà anche il Cibo.")
+
+
+func test_d_inverno_gli_edifici_non_producono_cibo() -> void:
+	var run: RunState = _new_run()
+	var expected: Array[int] = run.next_season_production()
+	assert_gt(expected[Res.Type.CIBO], 0, "La prossima stagione (primavera) dà Cibo.")
+	_to_spring(run)
+	while run.season != RunState.Season.AUTUNNO:
+		run.pass_round()
+		if run.phase == RunState.Phase.SCELTA_INCONTRO:
+			run.choose_encounter(0)
+		if run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
+			run.skip_reward()
+	assert_eq(run.next_season_production()[Res.Type.CIBO], 0, "In autunno la schermata mostra l'inverno senza Cibo.")
+
+
+## Passa i round dell'inverno: si arriva al primo round di primavera.
+func _to_spring(run: RunState) -> void:
+	while run.season == RunState.Season.INVERNO and run.is_shopping_phase():
+		run.pass_round()
 
 
 func test_la_capitale_non_si_vende_ne_si_sostituisce() -> void:
@@ -121,7 +145,8 @@ func test_mercato_del_cibo_in_unita_intere() -> void:
 
 func test_nel_primo_anno_non_si_mangia() -> void:
 	var run: RunState = _new_run()
-	assert_eq(run.stock[Res.Type.CIBO], 10, "Il Cibo della Capitale resta intatto.")
+	_to_spring(run)
+	assert_eq(run.stock[Res.Type.CIBO], 10, "Il Cibo della Capitale (primavera) resta intatto.")
 	for piece: BoardPiece in run.board.troops:
 		assert_false(piece.hungry)
 

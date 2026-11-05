@@ -82,11 +82,11 @@ func before_each() -> void:
 	rules.starting_troops = [soldier_troop]
 	rules.starting_perks = 0
 	rules.advisors_per_round = 3
-	rules.rounds_per_half = 5
+	rules.rounds_per_season = 5
 	var themes: PackedInt32Array = PackedInt32Array()
 	for i: int in range(5):
 		themes.append(RunState.RoundTheme.MISTO)
-	rules.half_themes = themes
+	rules.set_all_season_themes(themes)
 	rules.special_card_chance_percent = 0
 	resistance_rules = ResistanceRules.new()
 	resistance_rules.per_era = [10]
@@ -175,11 +175,11 @@ func test_il_consigliere_di_corte_compare_piu_spesso() -> void:
 	var monarchy: IdentityDef = _element(&"monarchia", IdentityDef.Dimension.GOVERNO)
 	monarchy.court_advisor_weight = 50
 	rules.advisors_per_round = 1
-	rules.rounds_per_half = 21
+	rules.rounds_per_season = 21
 	var themes: PackedInt32Array = PackedInt32Array()
 	for i: int in range(21):
 		themes.append(RunState.RoundTheme.MISTO)
-	rules.half_themes = themes
+	rules.set_all_season_themes(themes)
 	var run: RunState = _run_with(monarchy)
 	assert_true(run.choose_advisor(0))
 	var court: AdvisorDef = run.court_advisor

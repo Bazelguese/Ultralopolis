@@ -25,6 +25,12 @@ static func _scaled(base: int, per_year_tenths: int, year: int) -> int:
 	return base + year * per_year_tenths / 10
 
 
+## Come _scaled, con gli anni in decimi (per gli incontri d'estate, a metà anno).
+@warning_ignore("integer_division")
+static func _scaled_tenths(base: int, per_year_tenths: int, year_tenths: int) -> int:
+	return base + year_tenths * per_year_tenths / 100
+
+
 # --- Fantasmi -----------------------------------------------------------------
 
 static func generate_ghost(catalog: CatalogDef, rules: GeneratorRules, run_rules: RunRules, year: int, run_seed: int) -> GhostDef:
@@ -136,9 +142,13 @@ static func _pick_buildings_for(catalog: CatalogDef, era: int, count: int, troop
 
 ## Genera "count" incontri per l'anno, partendo dalla difficoltà "first_difficulty"
 ## (0 facile, 1 media, 2 difficile).
+## summer: incontri di fine estate (GDD §3.3, v0.25), forti come a metà strada fra quest'anno e il
+## prossimo (convenzione §16.3); hanno anche un seme diverso da quelli di primavera.
 static func generate_encounters(catalog: CatalogDef, rules: GeneratorRules, run_rules: RunRules,
-		year: int, run_seed: int, count: int, first_difficulty: int = 0) -> Array[EncounterDef]:
-	var rng: RandomNumberGenerator = _rng(run_seed, year, SALT_ENCOUNTERS)
+		year: int, run_seed: int, count: int, first_difficulty: int = 0, summer: bool = false) -> Array[EncounterDef]:
+	var rng: RandomNumberGenerator = _rng(run_seed, year, SALT_ENCOUNTERS + (1 if summer else 0))
+	# Anni in decimi: d'estate mezzo anno in più.
+	var year_tenths: int = year * 10 + (5 if summer else 0)
 	var era: int = era_for_year(catalog, rules, year)
 	var names: Array[int] = []
 	for i: int in range(rules.encounter_names.size()):
@@ -149,6 +159,7 @@ static func generate_encounters(catalog: CatalogDef, rules: GeneratorRules, run_
 		var strength: int = rules.difficulty_percents[difficulty]
 		var encounter: EncounterDef = EncounterDef.new()
 		encounter.year = year
+		encounter.season = 1 if summer else 0
 		encounter.difficulty_label = rules.difficulty_labels[difficulty] if difficulty < rules.difficulty_labels.size() else ""
 		if not names.is_empty():
 			var pick: int = rng.randi_range(0, names.size() - 1)
@@ -159,31 +170,33 @@ static func generate_encounters(catalog: CatalogDef, rules: GeneratorRules, run_
 				encounter.description = rules.encounter_descriptions[name_index]
 		else:
 			encounter.display_name = "Minaccia"
-		var base_resistance: int = rules.encounter_resistance_base + rules.encounter_resistance_per_year * year
+		@warning_ignore("integer_division")
+		var base_resistance: int = rules.encounter_resistance_base + rules.encounter_resistance_per_year * year_tenths / 10
 		encounter.resistance = maxi(1, Modifiers.apply_percent(base_resistance, strength - 100))
-		var troop_count: int = _scaled(rules.encounter_troops_base, rules.encounter_troops_per_year_tenths, year) + difficulty
+		var troop_count: int = _scaled_tenths(rules.encounter_troops_base, rules.encounter_troops_per_year_tenths, year_tenths) + difficulty
 		encounter.troops = _pick_troops(catalog, era, mini(troop_count, run_rules.max_troop_slots), rng)
-		encounter.buildings = _pick_buildings_for(catalog, era, mini(1 + difficulty + _scaled(0, 2, year), run_rules.max_building_slots), encounter.troops, rng)
-		encounter.rewards = _rewards(catalog, rules, era, year, difficulty, strength, rng)
+		encounter.buildings = _pick_buildings_for(catalog, era, mini(1 + difficulty + _scaled_tenths(0, 2, year_tenths), run_rules.max_building_slots), encounter.troops, rng)
+		encounter.rewards = _rewards(catalog, rules, era, year_tenths, difficulty, strength, rng)
 		encounter.loot_gold = rules.encounter_loot_gold[mini(difficulty, rules.encounter_loot_gold.size() - 1)] if not rules.encounter_loot_gold.is_empty() else 0
 		encounter.loot_research = rules.encounter_loot_research[mini(difficulty, rules.encounter_loot_research.size() - 1)] if not rules.encounter_loot_research.is_empty() else 0
 		result.append(encounter)
 	return result
 
 
-static func _rewards(catalog: CatalogDef, rules: GeneratorRules, era: int, year: int, difficulty: int,
+@warning_ignore("integer_division")
+static func _rewards(catalog: CatalogDef, rules: GeneratorRules, era: int, year_tenths: int, difficulty: int,
 		strength: int, rng: RandomNumberGenerator) -> Array[RewardDef]:
 	var rewards: Array[RewardDef] = []
 	var gold: RewardDef = RewardDef.new()
 	gold.kind = RewardDef.Kind.ORO
-	gold.amount = maxi(1, Modifiers.apply_percent(rules.reward_gold_base + rules.reward_gold_per_year * year, strength - 100))
+	gold.amount = maxi(1, Modifiers.apply_percent(rules.reward_gold_base + rules.reward_gold_per_year * year_tenths / 10, strength - 100))
 	rewards.append(gold)
 
 	var resource: RewardDef = RewardDef.new()
 	resource.kind = RewardDef.Kind.RISORSA
 	var types: Array[Res.Type] = [Res.Type.RICERCA, Res.Type.CIBO, Res.Type.LEGNO, Res.Type.PIETRA, Res.Type.FERRO, Res.Type.FEDE, Res.Type.INFLUENZA, Res.Type.STABILITA, Res.Type.DOCUMENTI]
 	resource.resource = types[rng.randi_range(0, types.size() - 1)]
-	resource.amount = maxi(1, Modifiers.apply_percent(_scaled(rules.reward_resource_base, rules.reward_resource_per_year_tenths, year), strength - 100))
+	resource.amount = maxi(1, Modifiers.apply_percent(_scaled_tenths(rules.reward_resource_base, rules.reward_resource_per_year_tenths, year_tenths), strength - 100))
 	rewards.append(resource)
 
 	if difficulty >= 1:

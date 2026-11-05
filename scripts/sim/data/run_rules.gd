@@ -47,15 +47,21 @@ extends Resource
 @export_group("Consiglio")
 ## Nomi dei livelli del Consiglio, uno per era (GDD §4.2.1, nomi placeholder).
 @export var council_level_names: PackedStringArray = PackedStringArray(["Funzionari", "Ministri", "Gran Consiglieri"])
-## Round in ogni metà dell'anno (GDD §3.2: 5).
-@export var rounds_per_half: int = 5
+## Round in ogni stagione dell'anno (GDD §3.2, v0.25: 3, uno per mese).
+@export var rounds_per_season: int = 3
 ## Consiglieri pescati in ogni round, diversi fra loro (GDD §4.2: 3).
 @export var advisors_per_round: int = 3
 ## Proposte mostrate dal consigliere scelto (GDD §4.2: 3; il Clown ne mostra una per colore più un neutro).
 @export var proposals_per_advisor: int = 3
-## Temi dei round di una metà, in un ordine pescato a caso con il seme della run (GDD §4.2, Proposta):
-## 0 = Azioni, 1 = Edifici, 2 = Truppe, 3 = Misto. Se sono meno dei round si ripete l'ultimo.
-@export var half_themes: PackedInt32Array = PackedInt32Array([0, 1, 2, 3, 3])
+## Temi dei round di ogni stagione, nell'ordine inverno, primavera, estate, autunno (GDD §4.2, v0.25),
+## pescati in ordine casuale con il seme della run: 0 = Azioni, 1 = Edifici, 2 = Truppe, 3 = Misto.
+## Se una stagione ha meno temi che round si ripete l'ultimo; se manca una stagione vale l'ultima.
+@export var season_themes: Array[PackedInt32Array] = [
+	PackedInt32Array([0, 1, 3]),
+	PackedInt32Array([1, 3, 3]),
+	PackedInt32Array([2, 1, 3]),
+	PackedInt32Array([2, 0, 3]),
+]
 ## Costo di Potenzia: per salire al livello 2 servono upgrade_cost_per_era[0] × era della carta
 ## unità della risorsa del consigliere, per il livello 3 upgrade_cost_per_era[1] × era (placeholder).
 @export var upgrade_cost_per_era: PackedInt32Array = PackedInt32Array([2, 3])
@@ -87,3 +93,8 @@ extends Resource
 @export var reroll_min_cost: int = 1
 ## Aumento del costo a ogni rinnovo.
 @export var reroll_cost_increase: int = 1
+
+
+## Stessi temi in tutte e quattro le stagioni (comodo per le prove e per i test).
+func set_all_season_themes(themes: PackedInt32Array) -> void:
+	season_themes = [themes, themes, themes, themes]

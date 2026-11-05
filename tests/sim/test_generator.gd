@@ -71,8 +71,13 @@ func test_la_run_usa_dati_scritti_poi_generati() -> void:
 	assert_eq(run.current_ghost.display_name, "Fantasma: Borgo di Valdacqua", "Anno 1: fantasma scritto a mano.")
 	var generated: GhostDef = run.call("_ghost_for_year", 6)
 	assert_eq(generated.year, 6, "Anno 6: fantasma generato.")
-	var encounters: Array[EncounterDef] = run.call("_encounters_for_year", 6)
-	assert_eq(encounters.size(), 3, "Anno 6: tre incontri generati.")
+	var spring: Array[EncounterDef] = run.call("_encounters_for", 6, 0)
+	var summer: Array[EncounterDef] = run.call("_encounters_for", 6, 1)
+	assert_eq(spring.size(), 3, "Anno 6: tre incontri generati per la primavera.")
+	assert_eq(summer.size(), 3, "E tre per l'estate (GDD §3.3, v0.25).")
+	for i: int in range(3):
+		assert_eq(summer[i].season, 1)
+		assert_gt(summer[i].resistance, spring[i].resistance, "D'estate più forti (%s)." % summer[i].difficulty_label)
 
 
 func test_ricompensa_di_una_risorsa() -> void:
@@ -88,7 +93,7 @@ func test_ricompensa_di_una_risorsa() -> void:
 	catalog.encounters = [encounter, encounter, encounter]
 	var run: RunState = RunState.new(catalog, _rules(), BattleRules.new(), ResistanceRules.new(), 3)
 	run.found_nation("Prova", _choices(run))
-	while run.phase == RunState.Phase.PRODUZIONE:
+	while run.phase == RunState.Phase.CONSIGLIO:
 		run.pass_round()
 	run.choose_encounter(0)
 	var before: int = run.stock[Res.Type.CIBO]
@@ -100,17 +105,19 @@ func test_riepilogo_anno_per_anno() -> void:
 	var run: RunState = RunState.new(_catalog(), _rules(), BattleRules.new(), ResistanceRules.new(), 3)
 	run.found_nation("Prova", _choices(run))
 	for year: int in range(2):
-		while run.is_shopping_phase():
-			run.pass_round()
-		if run.phase == RunState.Phase.SCELTA_INCONTRO:
-			run.choose_encounter(0)
-		if run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
-			run.skip_reward()
-		while run.is_shopping_phase():
-			run.pass_round()
+		var guard: int = 0
+		while run.phase != RunState.Phase.SCONTRO_FANTASMA and guard < 100:
+			guard += 1
+			if run.is_shopping_phase():
+				run.pass_round()
+			elif run.phase == RunState.Phase.SCELTA_INCONTRO:
+				run.choose_encounter(0)
+			elif run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
+				run.skip_reward()
 		run.fight_ghost()
 	assert_eq(run.history.size(), 3, "Anni 1, 2 e l'anno 3 appena iniziato.")
 	assert_ne(run.history[0].encounter_result, "")
+	assert_eq(run.history[0].encounter_result.split(" · ").size(), 2, "Due incontri nell'anno (primavera ed estate).")
 	assert_ne(run.history[0].ghost_result, "")
 	assert_eq(run.history[1].prestige_after, run.prestige)
 

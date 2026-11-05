@@ -574,7 +574,7 @@ func _costruisci_scelte() -> void:
 		origini.append(run.government())
 		fase = -1
 	match fase:
-		RunState.Phase.PRODUZIONE, RunState.Phase.PREPARAZIONE:
+		RunState.Phase.CONSIGLIO:
 			if run.chosen_event != null:
 				tipo = TipoScelta.OPZIONE
 				for opzione: EventOptionDef in run.event_options():

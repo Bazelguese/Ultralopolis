@@ -47,7 +47,7 @@ func _carte(nome: String, lato: int) -> Array:
 
 func test_senza_nazione_scelta_usa_una_nazione_di_prova() -> void:
 	var run: RunState = _run()
-	assert_eq(run.phase, RunState.Phase.PRODUZIONE)
+	assert_eq(run.phase, RunState.Phase.CONSIGLIO)
 	assert_eq(run.nation_name, "Nazione di prova")
 
 
@@ -57,21 +57,31 @@ func test_la_partita_parte_dalla_nazione_scelta_e_attraversa_un_anno() -> void:
 	_apri()
 	var run: RunState = _run()
 	var hud: HudPlancia = _scena.get("_hud")
-	assert_eq(run.phase, RunState.Phase.PRODUZIONE, "La partita comincia dall'anno 1.")
+	assert_eq(run.phase, RunState.Phase.CONSIGLIO, "La partita comincia dall'anno 1.")
 	assert_eq(run.nation_name, "Regno di Prova")
 	assert_eq(run.identity.size(), GameSession.selected_nation.identity_ids.size())
 
+	# Inverno e primavera, poi l'incontro; estate, poi il secondo incontro; autunno (GDD §3.2, v0.25).
+	var stagioni: Array[RunState.Season] = []
+	for incontro: int in range(2):
+		while run.is_shopping_phase():
+			if not stagioni.has(run.season):
+				stagioni.append(run.season)
+			hud.passa.emit()
+		assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO, "Incontro %d dell'anno." % (incontro + 1))
+		var scelte: Array = _scena.get("_scelte")
+		_scena.call("_clic_scelta", scelte[0])
+		hud.azione_principale.emit()
+		_scena.call("_mostra_esito")
+		hud.call("_on_continua_esito")
+		if run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
+			hud.nessuna_ricompensa.emit()
 	while run.is_shopping_phase():
+		if not stagioni.has(run.season):
+			stagioni.append(run.season)
 		hud.passa.emit()
-	var scelte: Array = _scena.get("_scelte")
-	_scena.call("_clic_scelta", scelte[0])
-	hud.azione_principale.emit()
-	_scena.call("_mostra_esito")
-	hud.call("_on_continua_esito")
-	if run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
-		hud.nessuna_ricompensa.emit()
-	while run.is_shopping_phase():
-		hud.passa.emit()
+	assert_eq(stagioni, [RunState.Season.INVERNO, RunState.Season.PRIMAVERA, RunState.Season.ESTATE,
+			RunState.Season.AUTUNNO] as Array[RunState.Season], "Le quattro stagioni in ordine.")
 	assert_eq(run.phase, RunState.Phase.SCONTRO_FANTASMA)
 	hud.azione_principale.emit()
 	assert_not_null(_scena.get("_sim"), "Si rigioca lo scontro con il fantasma.")
@@ -134,7 +144,7 @@ func test_potenzia_dal_pannello_della_carta() -> void:
 
 func test_uno_scontro_si_rigioca_fino_all_esito() -> void:
 	var run: RunState = _run()
-	while run.phase == RunState.Phase.PRODUZIONE:
+	while run.phase == RunState.Phase.CONSIGLIO:
 		run.pass_round()
 	_scena.call("_aggiorna_tutto")
 	assert_eq(run.phase, RunState.Phase.SCELTA_INCONTRO)
@@ -213,7 +223,7 @@ func test_le_offerte_restano_ferme_se_cambia_solo_la_plancia() -> void:
 ## Dopo uno scontro la plancia torna pulita: niente Scudo, Corruzione o riserva di mana rimasti.
 func test_dopo_lo_scontro_la_plancia_si_azzera() -> void:
 	var run: RunState = _run()
-	while run.phase == RunState.Phase.PRODUZIONE:
+	while run.phase == RunState.Phase.CONSIGLIO:
 		run.pass_round()
 	_scena.call("_aggiorna_tutto")
 	var scelte: Array = _scena.get("_scelte")

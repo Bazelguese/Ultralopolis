@@ -44,11 +44,11 @@ static func consiglio_semplice(catalogo: CatalogDef, regole: RunRules, azioni: A
 	var tutto: AdvisorDef = consigliere(&"tutto", tipi, azioni)
 	catalogo.advisors = [tutto]
 	regole.advisors_per_round = 1
-	regole.rounds_per_half = round_per_meta
+	regole.rounds_per_season = round_per_meta
 	var temi: PackedInt32Array = PackedInt32Array()
 	for i: int in range(round_per_meta):
 		temi.append(RunState.RoundTheme.MISTO)
-	regole.half_themes = temi
+	regole.set_all_season_themes(temi)
 	return tutto
 
 
