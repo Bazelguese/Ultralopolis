@@ -9,6 +9,7 @@ enum OriginKind {
 	OPPORTUNITA,
 	IDENTITA,
 	TECNOLOGIA,
+	TRADIZIONE,
 	ALTRO,
 }
 
@@ -19,6 +20,7 @@ const ORIGIN_NAMES: Dictionary[OriginKind, String] = {
 	OriginKind.OPPORTUNITA: "opportunità",
 	OriginKind.IDENTITA: "identità",
 	OriginKind.TECNOLOGIA: "tecnologia",
+	OriginKind.TRADIZIONE: "tradizione",
 	OriginKind.ALTRO: "altro",
 }
 

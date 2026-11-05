@@ -6,6 +6,7 @@ extends RefCounted
 const SALT_GHOST: int = 17
 const SALT_ENCOUNTERS: int = 31
 const SALT_TECH: int = 53
+const SALT_TRADITIONS: int = 71
 
 
 ## Generatore casuale dedicato, così la generazione non cambia le offerte pescate nella run.
@@ -74,7 +75,40 @@ static func generate_ghost(catalog: CatalogDef, rules: GeneratorRules, run_rules
 	if not rules.ghost_malus_pool.is_empty():
 		ghost.malus = [rules.ghost_malus_pool[rng.randi_range(0, rules.ghost_malus_pool.size() - 1)]]
 	ghost.technologies = _pick_technologies(catalog, ghost.era, identity, _rng(run_seed, year, SALT_TECH))
+	_pick_traditions(catalog, ghost, _rng(run_seed, year, SALT_TRADITIONS))
 	return ghost
+
+
+## Tradizioni di un fantasma generato (convenzione §16.3, v0.26): tutti i passi delle vie delle
+## ere passate e metà di quelli della via dell'era corrente, a caso; un'ascensione per ogni
+## albero completo (la prima del livello 1, poi del livello 2).
+static func _pick_traditions(catalog: CatalogDef, ghost: GhostDef, rng: RandomNumberGenerator) -> void:
+	var ways: Array[IdentityDef] = []
+	for def: IdentityDef in ghost.identity:
+		if def.dimension == IdentityDef.Dimension.VIA:
+			ways.append(def)
+	var complete: int = 0
+	for i: int in range(ways.size()):
+		var steps: Array[TraditionDef] = ways[i].traditions.duplicate()
+		if steps.is_empty():
+			continue
+		var current: bool = i == ways.size() - 1 and ways.size() == ghost.era - 1
+		@warning_ignore("integer_division")
+		var wanted: int = steps.size() / 2 if current else steps.size()
+		for n: int in range(wanted):
+			var pick: int = rng.randi_range(0, steps.size() - 1)
+			ghost.traditions.append(steps[pick])
+			steps.remove_at(pick)
+		if wanted == ways[i].traditions.size():
+			complete += 1
+	for n: int in range(complete):
+		var level: int = mini(2, n + 1)
+		var options: Array[IdentityDef] = []
+		for def: IdentityDef in catalog.ascensions:
+			if def.ascension_level == level and def.requires_any.is_empty() and not ghost.identity.has(def):
+				options.append(def)
+		if not options.is_empty():
+			ghost.identity.append(options[rng.randi_range(0, options.size() - 1)])
 
 
 ## Tecnologie di un fantasma generato (convenzione §16.3, v0.25): per ogni era da cui è uscito,

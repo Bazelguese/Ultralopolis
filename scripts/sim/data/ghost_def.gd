@@ -19,3 +19,6 @@ extends Resource
 ## Tecnologie completate dalla nazione copiata (GDD §11.4, v0.25): in battaglia valgono
 ## i loro modificatori su tutta la nazione.
 @export var technologies: Array[TechDef] = []
+## Passi delle vie completati dalla nazione copiata (GDD §10.4.1, v0.26). Le sue ascensioni
+## stanno nell'identità.
+@export var traditions: Array[TraditionDef] = []

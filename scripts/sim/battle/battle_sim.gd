@@ -29,6 +29,7 @@ enum TroopState {
 	IN_RICARICA,         ## Il tempo di ricarica non è finito.
 	IN_ATTESA_DI_MANA,   ## Pronta, ma il mana non basta: aspetta senza nuova ricarica.
 	SABOTATA,            ## Bloccata da un Sabotaggio: non si attiva.
+	MANA_PRENOTATO,      ## Pronta, ma il mana è prenotato dalla truppa più a destra (Disciplina ferrea).
 }
 
 const SIDE_A: int = 0
@@ -73,23 +74,41 @@ class SideState:
 	var troop_sabotage_ms: Array[int] = []
 	## Sacchetti della rotazione dei bersagli, uno per tipo di effetto e categoria (GDD §7.7.2).
 	var bags: Dictionary[String, Array] = {}
+	## Regole cambiate dalle ascensioni (GDD §10.4.2, v0.26).
+	var last_stand: bool = false
+	var last_stand_used: bool = false
+	var reserve_mana: bool = false
+	var any_color: bool = false
+	## Truppe che aspettano perché il mana è prenotato (Disciplina ferrea).
+	var held_by_reserve: Array[bool] = []
 
 	func get_mana(mana_type: StringName) -> int:
 		return mana.get(mana_type, 0)
 
-	## Mana spendibile da una truppa di un colore: il suo colore più l'energetico.
+	## Mana spendibile da una truppa di un colore: il suo colore più l'energetico;
+	## con Mana unito anche gli altri colori (GDD §10.4.2).
 	func spendable(mana_type: StringName) -> int:
+		if any_color:
+			return total_mana()
 		if mana_type == MANA_ENERGETICO:
 			return get_mana(MANA_ENERGETICO)
 		return get_mana(mana_type) + get_mana(MANA_ENERGETICO)
 
-	## Paga prima con il colore richiesto, poi con l'energetico (GDD §5.3).
+	## Paga prima con il colore richiesto, poi con l'energetico (GDD §5.3); con Mana unito
+	## poi con gli altri colori, nell'ordine rosso, verde, blu, viola (§16.3).
 	func pay(mana_type: StringName, cost: int) -> void:
-		var own: int = mini(get_mana(mana_type), cost)
-		mana[mana_type] = get_mana(mana_type) - own
-		var rest: int = cost - own
-		if rest > 0:
-			mana[MANA_ENERGETICO] = get_mana(MANA_ENERGETICO) - rest
+		var order: Array[StringName] = [mana_type, MANA_ENERGETICO]
+		if any_color:
+			for color: StringName in [MANA_ROSSO, MANA_VERDE, MANA_BLU, MANA_VIOLA]:
+				if not order.has(color):
+					order.append(color)
+		var rest: int = cost
+		for color: StringName in order:
+			if rest <= 0:
+				break
+			var used: int = mini(get_mana(color), rest)
+			mana[color] = get_mana(color) - used
+			rest -= used
 
 	func total_mana() -> int:
 		var total: int = 0
@@ -140,6 +159,14 @@ func _init(p_rules: BattleRules, side_a: BattleSideSetup, side_b: BattleSideSetu
 			_apply_timer_effect(side_index, EFFECT_SABOTAGE, TimerTarget.Kind.EDIFICI, setup.start_building_sabotage_ms)
 		for effect: Array in setup.start_timer_effects:
 			_apply_timer_effect_to(side_index, effect[0], effect[1], effect[2])
+		_sides[side_index].last_stand = setup.last_stand
+		_sides[side_index].reserve_mana = setup.reserve_mana
+		_sides[side_index].any_color = setup.any_color
+		if setup.first_spark:
+			# Prima scintilla (GDD §10.4.2): gli edifici partono con l'intervallo a metà.
+			for i: int in range(_sides[side_index].buildings.size()):
+				@warning_ignore("integer_division")
+				_sides[side_index].production_left_ms[i] = maxi(1, _sides[side_index].buildings[i].mana_interval_ms / 2)
 
 
 ## Fa avanzare lo scontro di un passo. Non fa nulla se lo scontro è finito.
@@ -194,6 +221,11 @@ func step() -> void:
 		var absorbed: int = mini(pending.damage[side_index], state.shield)
 		state.shield -= absorbed
 		state.resistance -= pending.damage[side_index] - absorbed
+		# Ultima trincea (GDD §10.4.2): la prima volta che la Resistenza arriva a zero torna a 1.
+		if state.last_stand and not state.last_stand_used and state.resistance <= 0:
+			state.last_stand_used = true
+			state.resistance = 1
+			_record(side_index, BattleEvent.Kind.ULTIMA_TRINCEA, -1, 1, 0)
 
 	# 6. Esito.
 	_check_outcome()
@@ -245,6 +277,8 @@ func get_troop_cooldown_left_ms(side: int, troop_index: int) -> int:
 func get_troop_state(side: int, troop_index: int) -> TroopState:
 	if _sides[side].troop_sabotage_ms[troop_index] > 0:
 		return TroopState.SABOTATA
+	if _sides[side].held_by_reserve[troop_index]:
+		return TroopState.MANA_PRENOTATO
 	if _sides[side].waiting_for_mana[troop_index]:
 		return TroopState.IN_ATTESA_DI_MANA
 	return TroopState.IN_RICARICA
@@ -293,6 +327,7 @@ func _make_side(setup: BattleSideSetup) -> SideState:
 		# Le truppe partono con la ricarica piena (GDD §7.5).
 		state.cooldown_left_ms.append(troop.cooldown_ms)
 		state.waiting_for_mana.append(false)
+		state.held_by_reserve.append(false)
 		state.troop_slow_ms.append(0)
 		state.troop_sabotage_ms.append(0)
 	return state
@@ -343,9 +378,13 @@ func _advance_timers_and_produce(side_index: int, pending: Pending) -> void:
 func _activate_troops(side_index: int, pending: Pending) -> void:
 	var state: SideState = _sides[side_index]
 	var enemy: int = _opponent(side_index)
+	# Disciplina ferrea (GDD §10.4.2): mentre la truppa più a destra aspetta il mana, le altre
+	# non ne spendono; le truppe senza mana si attivano comunque (§16.3).
+	var reserved: bool = false
 	for i: int in range(state.troops.size() - 1, -1, -1):
 		var sabotaged: bool = state.troop_sabotage_ms[i] > 0
 		state.troop_sabotage_ms[i] = maxi(0, state.troop_sabotage_ms[i] - rules.tick_ms)
+		state.held_by_reserve[i] = false
 		if state.cooldown_left_ms[i] > 0:
 			continue
 		if sabotaged:
@@ -353,12 +392,17 @@ func _activate_troops(side_index: int, pending: Pending) -> void:
 			# Il motivo si legge dallo stato della truppa (get_troop_state).
 			continue
 		var troop: TroopDef = state.troops[i]
+		if reserved and troop.mana_cost > 0:
+			state.held_by_reserve[i] = true
+			continue
 		var available: int = state.spendable(troop.mana_type)
 		if available < troop.mana_cost:
 			# Saltata: niente consumo, niente nuova ricarica, nessun mana prenotato.
 			if not state.waiting_for_mana[i]:
 				state.waiting_for_mana[i] = true
 				_record(side_index, BattleEvent.Kind.IN_ATTESA_MANA, i, 0, available)
+			if state.reserve_mana and i == state.troops.size() - 1:
+				reserved = true
 			continue
 		if troop.mana_cost > 0:
 			state.pay(troop.mana_type, troop.mana_cost)

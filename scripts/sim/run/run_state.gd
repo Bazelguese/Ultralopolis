@@ -216,6 +216,21 @@ var tech_discards: Dictionary[StringName, int] = {}
 ## Generatore dedicato alla mano, così le tecnologie non cambiano le altre pescate della run.
 var _tech_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
+## Passi delle vie completati (GDD §10.4.1, v0.26).
+var traditions_done: Array[TraditionDef] = []
+## Avanzamento delle imprese, per id del passo: quante volte è riuscito un traguardo, oppure
+## la produzione più alta raccolta da quando la via è adottata.
+var deed_counts: Dictionary[StringName, int] = {}
+## Vie con l'albero completo, che hanno già dato la loro ascensione.
+var completed_ways: Array[IdentityDef] = []
+## Ascensioni da scegliere (GDD §10.4.2): finché non se ne sceglie una, le altre azioni aspettano.
+var ascension_choices: Array[IdentityDef] = []
+## Alberi completati di cui non si è ancora scelta l'ascensione.
+var pending_ascensions: int = 0
+## Doppio ascolto già usato in questa metà dell'anno.
+var double_pick_used: bool = false
+var _tradition_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
 		p_resistance_rules: ResistanceRules, p_seed: int) -> void:
@@ -226,6 +241,7 @@ func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleR
 	run_seed = p_seed
 	_rng.seed = p_seed
 	_tech_rng.seed = p_seed * 1000003 + 7340033
+	_tradition_rng.seed = p_seed * 1000003 + 5279
 
 	prestige = run_rules.starting_prestige
 	gold = run_rules.starting_gold
@@ -386,7 +402,7 @@ func found_nation(p_name: String, choices: Array[IdentityDef]) -> bool:
 func identity_summary() -> String:
 	var names: PackedStringArray = PackedStringArray()
 	for def: IdentityDef in identity:
-		if def.dimension != IdentityDef.Dimension.PERK:
+		if def.dimension != IdentityDef.Dimension.PERK and def.dimension != IdentityDef.Dimension.ASCENSIONE:
 			names.append(def.display_name)
 	return " · ".join(names)
 
@@ -462,13 +478,15 @@ static func is_neutral_building(def: BuildingDef) -> bool:
 func upgrade_cost_of(piece: BoardPiece) -> ResourceAmounts:
 	if chosen_advisor == null or chosen_advisor.special in [AdvisorDef.Special.CLOWN, AdvisorDef.Special.VISITATORE]:
 		return null
-	if piece.level >= run_rules.max_level:
+	if piece.level >= max_level():
 		return null
 	var index: int = piece.level - 1
-	if index < 0 or index >= run_rules.upgrade_cost_per_era.size():
+	if index < 0:
 		return null
 	var card_era: int = piece.building.era if piece.building != null else piece.troop.era
-	var quantity: int = run_rules.upgrade_cost_per_era[index] * maxi(1, card_era)
+	# Oltre i livelli delle regole (Maestria, livello 4) il moltiplicatore è il livello da raggiungere (§16.3).
+	var multiplier: int = run_rules.upgrade_cost_per_era[index] if index < run_rules.upgrade_cost_per_era.size() else index + 2
+	var quantity: int = multiplier * maxi(1, card_era)
 	quantity = maxi(1, quantity - _identity_int(&"upgrade_discount"))
 	var amounts: ResourceAmounts = ResourceAmounts.new()
 	if chosen_advisor.special == AdvisorDef.Special.ANZIANO:
@@ -491,7 +509,7 @@ func upgrade_block_reason(piece: BoardPiece) -> String:
 		if chosen_event != null:
 			return "In questo round hai scelto un evento: Potenzia è un'opzione dei consiglieri."
 		return "Scegli prima un consigliere: Potenzia è una delle sue opzioni."
-	if piece.level >= run_rules.max_level:
+	if piece.level >= max_level():
 		return "Già al livello massimo."
 	match chosen_advisor.special:
 		AdvisorDef.Special.CLOWN:
@@ -549,6 +567,7 @@ func _upgrade(piece: BoardPiece) -> bool:
 	if chosen_advisor.special == AdvisorDef.Special.ANZIANO:
 		elder_upgrades_used += 1
 	_log("%s: %s sale al livello %d (%s)." % [chosen_advisor.display_name, piece.display_name(), piece.level, cost.describe()])
+	_check_traditions()
 	return true
 
 
@@ -684,10 +703,12 @@ static func _enchant_amount(amounts: PackedInt32Array, troop_era: int, bonus_per
 	return amount + amount * bonus_percent / 100
 
 
+## Con l'ascensione Seconda natura ogni truppa si incanta due volte (GDD §10.4.2).
 func _enchantable_troops() -> Array[BoardPiece]:
 	var found: Array[BoardPiece] = []
+	var twice: bool = has_rule(IdentityDef.Rule.SECONDA_NATURA)
 	for piece: BoardPiece in board.troops:
-		if piece.enchant == null:
+		if piece.enchant == null or (twice and piece.second_enchant == null):
 			found.append(piece)
 	return found
 
@@ -720,7 +741,8 @@ func effective_building(piece: BoardPiece) -> BuildingDef:
 
 ## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5, §8).
 func effective_troop(piece: BoardPiece) -> TroopDef:
-	var hunger: int = run_rules.hunger_cooldown_percent if piece.hungry else 0
+	# Con l'ascensione Esercito frugale le truppe senza Cibo non rallentano (GDD §10.4.2).
+	var hunger: int = run_rules.hunger_cooldown_percent if piece.hungry and not has_rule(IdentityDef.Rule.ESERCITO_FRUGALE) else 0
 	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger)
 
 
@@ -858,10 +880,16 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 				return false
 			var enchanted: BoardPiece = troops[choice]
 			var spell: OpportunityDef = offer.opportunity
-			enchanted.enchant = spell
 			var bonus: int = spell.enchant_no_mana_bonus_percent if enchanted.troop.mana_cost <= 0 else 0
-			enchanted.enchant_amount = _enchant_amount(spell.enchant_amounts, enchanted.troop.era, bonus)
-			enchanted.enchant_amount_2 = _enchant_amount(spell.enchant_amounts_2, enchanted.troop.era, bonus)
+			if enchanted.enchant == null:
+				enchanted.enchant = spell
+				enchanted.enchant_amount = _enchant_amount(spell.enchant_amounts, enchanted.troop.era, bonus)
+				enchanted.enchant_amount_2 = _enchant_amount(spell.enchant_amounts_2, enchanted.troop.era, bonus)
+			else:
+				# Secondo incanto (Seconda natura).
+				enchanted.second_enchant = spell
+				enchanted.second_enchant_amount = _enchant_amount(spell.enchant_amounts, enchanted.troop.era, 0)
+				enchanted.second_enchant_amount_2 = _enchant_amount(spell.enchant_amounts_2, enchanted.troop.era, 0)
 			_log("%s: %s è incantata (%s)." % [source, enchanted.display_name(), spell.description])
 		OpportunityDef.Kind.PERK:
 			if identity.has(offer.perk):
@@ -882,6 +910,17 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 	if offer.opportunity != null and offer.opportunity.malcontent_change != 0:
 		_change_malcontent(offer.opportunity.malcontent_change, IdentityDef.Grievance.EVENTI, source)
 	_flow_research()
+	if chosen_advisor != null:
+		_note_deed(DeedDef.Kind.PROPOSTE, chosen_advisor.id)
+	_check_traditions()
+	# Doppio ascolto (GDD §10.4.2): una volta per metà anno il round resta aperto per una seconda
+	# proposta dello stesso consigliere ordinario; la proposta presa sparisce (§16.3).
+	if has_rule(IdentityDef.Rule.DOPPIO_ASCOLTO) and not double_pick_used and chosen_advisor != null \
+			and chosen_advisor.special == AdvisorDef.Special.NESSUNO and offers.size() > 1 and offer_index < offers.size():
+		double_pick_used = true
+		offers.remove_at(offer_index)
+		_log("Doppio ascolto: puoi prendere un'altra proposta da %s." % chosen_advisor.display_name)
+		return true
 	_next_round()
 	return true
 
@@ -1056,6 +1095,9 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 		_log("Dopo la Rivoluzione il Malcontento si azzera.")
 	_log("%s: %s." % [source, option.label])
 	_flow_research()
+	if chosen_event.family == EventDef.Family.EVENTO:
+		_note_deed(DeedDef.Kind.EVENTI, StringName(chosen_event.sphere))
+	_check_traditions()
 	_next_round()
 	return true
 
@@ -1082,7 +1124,7 @@ func _pieces_with(card_types: Array[StringName], kind: EventOptionDef.PieceKind)
 func _option_upgrade_candidates(option: EventOptionDef) -> Array[BoardPiece]:
 	var found: Array[BoardPiece] = []
 	for piece: BoardPiece in _pieces_with(option.upgrade_types, option.upgrade_kind):
-		if piece.level < run_rules.max_level:
+		if piece.level < max_level():
 			found.append(piece)
 	return found
 
@@ -1349,7 +1391,9 @@ func _complete_tech(def: TechDef) -> void:
 		board.base_troop_slots += mini(def.extra_troop_slots, maxi(0, board.max_troop_slots - board.troop_capacity()))
 	if def.line != null:
 		_log("Nuova linea fra le proposte del Consiglio: %s." % def.line.display_name)
+	_note_deed(DeedDef.Kind.TECNOLOGIE, StringName(def.sphere))
 	_draw_tech_hand()
+	_check_traditions()
 
 
 ## Tecnologie iniziate e carte dorate, non ancora completate.
@@ -1473,6 +1517,227 @@ static func _identity_names(elements: Array[Resource]) -> String:
 	return ", ".join(names)
 
 
+# --- Tradizioni e ascensioni (GDD §10.4.1, §10.4.2, v0.26) --------------------------------
+
+## true se la nazione ha un'ascensione che cambia questa regola.
+func has_rule(rule: IdentityDef.Rule) -> bool:
+	return _identity_has_rule(identity, rule)
+
+
+static func _identity_has_rule(elements: Array[IdentityDef], rule: IdentityDef.Rule) -> bool:
+	for def: IdentityDef in elements:
+		if def.rule == rule:
+			return true
+	return false
+
+
+## Livello massimo delle carte: 3, oppure 4 con l'ascensione Maestria (GDD §6.5, §10.4.2).
+func max_level() -> int:
+	return run_rules.max_level + (1 if has_rule(IdentityDef.Rule.MAESTRIA) else 0)
+
+
+## Vie adottate, nell'ordine in cui sono state scelte.
+func adopted_ways() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.VIA:
+			found.append(def)
+	return found
+
+
+## Ascensioni prese, nell'ordine in cui sono state scelte.
+func ascensions() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.ASCENSIONE:
+			found.append(def)
+	return found
+
+
+## Avanzamento di un passo verso la sua impresa, come numero (al massimo l'obiettivo).
+func tradition_progress(tradition: TraditionDef) -> int:
+	var deed: DeedDef = tradition.deed
+	if deed == null:
+		return 0
+	if traditions_done.has(tradition):
+		return deed.amount
+	match deed.kind:
+		DeedDef.Kind.CARTE, DeedDef.Kind.CARTE_LIVELLO:
+			return mini(_deed_cards(deed), deed.amount)
+		DeedDef.Kind.MALCONTENTO_MASSIMO:
+			return malcontent
+	return mini(deed_counts.get(tradition.id, 0), deed.amount)
+
+
+## Avanzamento in parole, per l'interfaccia (P4): "2/3" oppure, per il Malcontento, il valore attuale.
+func tradition_progress_text(tradition: TraditionDef) -> String:
+	if traditions_done.has(tradition):
+		return "fatto"
+	if tradition.deed == null:
+		return ""
+	if tradition.deed.kind == DeedDef.Kind.MALCONTENTO_MASSIMO:
+		return "Malcontento ora %d" % malcontent
+	return "%d/%d" % [tradition_progress(tradition), tradition.deed.amount]
+
+
+## Sceglie una delle ascensioni proposte (GDD §10.4.2): diventa parte dell'identità per sempre.
+func choose_ascension(index: int) -> bool:
+	if index < 0 or index >= ascension_choices.size():
+		return _fail("Ascensione non valida.")
+	var chosen: IdentityDef = ascension_choices[index]
+	ascension_choices = []
+	pending_ascensions = maxi(0, pending_ascensions - 1)
+	_adopt_identity(chosen)
+	_offer_ascension()
+	_redraw_round()
+	return true
+
+
+## Un traguardo riuscito: conta per i passi non ancora fatti delle vie adottate.
+func _note_deed(kind: DeedDef.Kind, detail: StringName) -> void:
+	for way: IdentityDef in adopted_ways():
+		for tradition: TraditionDef in way.traditions:
+			var deed: DeedDef = tradition.deed
+			if deed == null or deed.kind != kind or traditions_done.has(tradition):
+				continue
+			if not _deed_matches(deed, detail):
+				continue
+			deed_counts[tradition.id] = deed_counts.get(tradition.id, 0) + 1
+
+
+static func _deed_matches(deed: DeedDef, detail: StringName) -> bool:
+	match deed.kind:
+		DeedDef.Kind.VITTORIE:
+			if deed.battles == DeedDef.Battles.FANTASMI:
+				return detail == &"fantasma"
+			if deed.battles == DeedDef.Battles.INCONTRI:
+				return detail == &"incontro"
+			return true
+		DeedDef.Kind.TECNOLOGIE, DeedDef.Kind.EVENTI:
+			return deed.spheres.is_empty() or deed.spheres.has(String(detail))
+		DeedDef.Kind.PROPOSTE:
+			return deed.advisor_id == detail
+	return false
+
+
+## Una produzione: per le imprese PRODUZIONE si ricorda la più alta da quando la via è adottata.
+func _note_production(collected: Array[int]) -> void:
+	for way: IdentityDef in adopted_ways():
+		for tradition: TraditionDef in way.traditions:
+			var deed: DeedDef = tradition.deed
+			if deed == null or deed.kind != DeedDef.Kind.PRODUZIONE or traditions_done.has(tradition):
+				continue
+			@warning_ignore("integer_division")
+			var units: int = collected[deed.resource] / Res.scale(deed.resource)
+			deed_counts[tradition.id] = maxi(deed_counts.get(tradition.id, 0), units)
+
+
+## Carte sulla plancia che contano per un'impresa CARTE o CARTE_LIVELLO.
+func _deed_cards(deed: DeedDef) -> int:
+	var kind: EventOptionDef.PieceKind = EventOptionDef.PieceKind.QUALSIASI
+	if deed.pieces == DeedDef.Pieces.EDIFICI:
+		kind = EventOptionDef.PieceKind.EDIFICIO
+	elif deed.pieces == DeedDef.Pieces.TRUPPE:
+		kind = EventOptionDef.PieceKind.TRUPPA
+	var count: int = 0
+	for piece: BoardPiece in _pieces_with(deed.types, kind):
+		if deed.kind == DeedDef.Kind.CARTE or piece.level >= deed.min_level:
+			count += 1
+	return count
+
+
+func _deed_done(tradition: TraditionDef, closing_year: bool) -> bool:
+	var deed: DeedDef = tradition.deed
+	if deed == null:
+		return false
+	match deed.kind:
+		DeedDef.Kind.CARTE, DeedDef.Kind.CARTE_LIVELLO:
+			return _deed_cards(deed) >= deed.amount
+		DeedDef.Kind.MALCONTENTO_MASSIMO:
+			return closing_year and malcontent <= deed.amount
+	return deed_counts.get(tradition.id, 0) >= deed.amount
+
+
+## Completa i passi le cui imprese sono riuscite; un albero completo dà un'ascensione.
+func _check_traditions(closing_year: bool = false) -> void:
+	for way: IdentityDef in adopted_ways():
+		for tradition: TraditionDef in way.traditions:
+			if not traditions_done.has(tradition) and _deed_done(tradition, closing_year):
+				_complete_tradition(tradition)
+		if not way.traditions.is_empty() and not completed_ways.has(way):
+			var all_done: bool = true
+			for tradition: TraditionDef in way.traditions:
+				if not traditions_done.has(tradition):
+					all_done = false
+			if all_done:
+				completed_ways.append(way)
+				pending_ascensions += 1
+				_log("L'albero della %s è completo: scegli un'ascensione." % way.display_name)
+	_offer_ascension()
+
+
+func _complete_tradition(tradition: TraditionDef) -> void:
+	traditions_done.append(tradition)
+	deed_counts.erase(tradition.id)
+	_log("Tradizione: %s (%s). %s" % [tradition.display_name, tradition.deed.describe() if tradition.deed != null else "", tradition.description])
+	for modifier: ModifierDef in tradition.permanent_modifiers:
+		_log(modifiers.apply(modifier, ActiveModifier.OriginKind.TRADIZIONE, tradition.display_name, year, board, _rng))
+	if tradition.extra_building_slots > 0:
+		board.base_building_slots += mini(tradition.extra_building_slots, maxi(0, board.max_building_slots - board.building_capacity()))
+	if tradition.extra_troop_slots > 0:
+		board.base_troop_slots += mini(tradition.extra_troop_slots, maxi(0, board.max_troop_slots - board.troop_capacity()))
+
+
+## Se c'è un albero completo in attesa, pesca 3 ascensioni (GDD §10.4.2, §16.3): del livello 1
+## la prima, del livello 2 le successive; pesate dalle radici, senza quelle già prese.
+func _offer_ascension() -> void:
+	if pending_ascensions <= 0 or not ascension_choices.is_empty():
+		return
+	var wanted_level: int = mini(2, ascensions().size() + 1)
+	var pool: Array[IdentityDef] = _ascension_pool(wanted_level)
+	if pool.is_empty():
+		pool = _ascension_pool(0)
+	if pool.is_empty():
+		pending_ascensions = 0
+		_log("Nessuna ascensione disponibile.")
+		return
+	var weights: Array[int] = []
+	for def: IdentityDef in pool:
+		weights.append(_roots_weight(def.favored_by))
+	for i: int in range(mini(3, pool.size())):
+		var total: int = 0
+		for weight: int in weights:
+			total += weight
+		var roll: int = _tradition_rng.randi_range(0, total - 1)
+		var pick: int = 0
+		while roll >= weights[pick]:
+			roll -= weights[pick]
+			pick += 1
+		ascension_choices.append(pool[pick])
+		pool.remove_at(pick)
+		weights.remove_at(pick)
+
+
+## Ascensioni del livello indicato (0 = qualsiasi) che la nazione può prendere.
+func _ascension_pool(level: int) -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in catalog.ascensions:
+		if identity.has(def) or (level > 0 and def.ascension_level != level):
+			continue
+		if not def.requires_any.is_empty() and not _has_any_identity(def.requires_any):
+			continue
+		found.append(def)
+	return found
+
+
+## Regole della battaglia cambiate dalle ascensioni di una nazione (GDD §10.4.2).
+static func _apply_battle_rules(setup: BattleSideSetup, elements: Array[IdentityDef]) -> void:
+	setup.last_stand = _identity_has_rule(elements, IdentityDef.Rule.ULTIMA_TRINCEA)
+	setup.first_spark = _identity_has_rule(elements, IdentityDef.Rule.PRIMA_SCINTILLA)
+	setup.reserve_mana = _identity_has_rule(elements, IdentityDef.Rule.DISCIPLINA_FERREA)
+	setup.any_color = _identity_has_rule(elements, IdentityDef.Rule.MANA_UNITO)
+
+
 # --- Azioni sulla plancia (in qualunque momento fuori dal combattimento) -----
 
 func sell_building(index: int) -> bool:
@@ -1530,7 +1795,9 @@ func choose_encounter(index: int) -> bool:
 		# Il pareggio vale come vittoria (GDD §3.4).
 		won_encounter = encounter
 		_log("Incontro superato: %s." % encounter.display_name)
+		_note_deed(DeedDef.Kind.VITTORIE, &"incontro")
 		_gain_loot(encounter.loot_gold, encounter.loot_research)
+		_check_traditions()
 		phase = Phase.RICOMPENSA_INCONTRO
 		return true
 
@@ -1575,6 +1842,7 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 			_give_golden(reward.tech if reward.tech != null else _random_golden(""))
 	_log("Ricompensa presa: %s." % reward.describe())
 	_flow_research()
+	_check_traditions()
 	won_encounter = null
 	_enter_phase(Phase.PREPARAZIONE)
 	return true
@@ -1617,6 +1885,7 @@ func fight_ghost() -> bool:
 			_apply_ghost_malus(ghost_name)
 		else:
 			_log("Vittoria contro %s (%d)." % [ghost_name, wins])
+		_note_deed(DeedDef.Kind.VITTORIE, &"fantasma")
 		_gain_loot(run_rules.ghost_loot_gold, run_rules.ghost_loot_research)
 		if wins >= run_rules.wins_needed:
 			_end_run(RunEnd.VITTORIA)
@@ -1635,6 +1904,8 @@ func fight_ghost() -> bool:
 			last_chance = true
 			_log("Il Prestigio è esaurito: ultima possibilità.")
 
+	# Fine dell'anno: si controllano anche le imprese sul Malcontento (GDD §10.4.1).
+	_check_traditions(true)
 	if run_rules.prototype_years > 0 and year >= run_rules.prototype_years:
 		_end_run(RunEnd.FINE_PROVA)
 		return true
@@ -1691,6 +1962,7 @@ func _enter_phase(new_phase: Phase) -> void:
 	chosen_advisor = null
 	round_number = 0
 	if is_shopping_phase():
+		double_pick_used = false
 		_collect_production()
 		_half_themes = _shuffled_themes()
 		_next_round()
@@ -1705,7 +1977,9 @@ func _collect_production() -> void:
 		if collected[type] != 0:
 			parts.append("%s %s" % [Res.format(type, collected[type]), Res.NAMES[type]])
 	_log("%s: gli edifici producono %s." % [phase_name(), ", ".join(parts) if not parts.is_empty() else "nulla"])
+	_note_production(collected)
 	_flow_research()
+	_check_traditions()
 
 
 ## Temi dei round della metà: quelli delle regole, in un ordine pescato con il seme della run.
@@ -2468,6 +2742,7 @@ func _refund(piece: BoardPiece) -> void:
 func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> BattleSim.Outcome:
 	var player: BattleSideSetup = BattleSideSetup.new(_battle_buildings(), _battle_troops(), player_resistance())
 	_apply_start_values(player, modifiers)
+	_apply_battle_rules(player, identity)
 	_last_setups = [player, enemy]
 	last_battle_seed = run_seed * 7919 + year * 104729 + int(kind)
 	last_battle = BattleSim.new(battle_rules, player, enemy, last_battle_seed)
@@ -2582,6 +2857,8 @@ func _require_shopping() -> bool:
 		return _fail("Prima scegli la via della nazione.")
 	if not government_choices.is_empty():
 		return _fail("Prima decidi se far evolvere il governo.")
+	if not ascension_choices.is_empty():
+		return _fail("Prima scegli l'ascensione della nazione.")
 	return true
 
 
@@ -2596,6 +2873,8 @@ func choose_way(index: int) -> bool:
 	_adopt_identity(way)
 	# La via arriva entrando in un'era: la mano si ripesca gratis con le nuove tecnologie.
 	_draw_tech_hand()
+	# Le imprese di stato già vere si completano subito (GDD §10.4.1).
+	_check_traditions()
 	# Le proposte in corso tengono conto della via appena scelta.
 	_redraw_round()
 	return true
@@ -2853,6 +3132,10 @@ func _identity_modifiers(elements: Array[IdentityDef]) -> Modifiers:
 func _ghost_modifiers() -> Modifiers:
 	var result: Modifiers = _identity_modifiers(current_ghost.identity)
 	var empty_board: NationBoard = NationBoard.new()
+	for tradition: TraditionDef in current_ghost.traditions:
+		for modifier: ModifierDef in tradition.permanent_modifiers:
+			if modifier.target == ModifierDef.Target.NAZIONE:
+				result.apply(modifier, ActiveModifier.OriginKind.TRADIZIONE, tradition.display_name, year, empty_board, _rng)
 	for tech: TechDef in current_ghost.technologies:
 		var mods: Array[ModifierDef] = tech.permanent_modifiers.duplicate()
 		if tech.perk != null:
@@ -2873,6 +3156,7 @@ func _ghost_setup() -> BattleSideSetup:
 	for def: TroopDef in current_ghost.troops:
 		troops.append(ElementStats.troop(def, BoardPiece.of_troop(def, 0), ghost_modifiers, 1, run_rules))
 	var setup: BattleSideSetup = BattleSideSetup.new(buildings, troops, ghost_resistance())
+	_apply_battle_rules(setup, current_ghost.identity)
 	_apply_start_values(setup, ghost_modifiers)
 	return setup
 
