@@ -2,7 +2,7 @@
 ## Tipi, categorie, potenziamenti tramite il Consiglio, quattro colori di mana
 
 **Data:** 5 novembre 2026
-**Stato:** **bozza da approvare.** Niente di questo documento è ancora nel GDD. Raccoglie le decisioni prese con Davide nella discussione sul sistema di risorse e propone come scriverle nel GDD.
+**Stato:** **approvata e riportata nel GDD v0.22** (5 novembre 2026). Il GDD resta la fonte di verità; questo file serve ancora per l’**Appendice A** (assegnazione provvisoria di tipi e colori), da riportare nel Catalogo quando si aggiornano i dati.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.21
 
 Le voci seguono gli stati del GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Da definire** = ancora aperto.

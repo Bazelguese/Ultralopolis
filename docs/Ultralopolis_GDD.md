@@ -1,7 +1,7 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.21
+## Game Design Document — v0.22
 
-**Data:** 4 novembre 2026
+**Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
@@ -186,6 +186,8 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 | In ogni round compaiono **3 consiglieri** pescati a caso, diversi fra loro | Confermato |
 | Il giocatore ne sceglie **uno**; la scelta è definitiva per il round | Confermato |
 | Il consigliere mostra **3 proposte** dal suo pool; il giocatore ne prende **una sola** | Confermato |
+| Il pool di un consigliere è dato dalla sua **categoria** (§4.2.4): propone gli edifici e le truppe che hanno almeno un tipo della categoria | Confermato (v0.22) |
+| Oltre alle proposte, ogni consigliere ordinario offre l’opzione **Potenzia** (§6.5): non consuma la scelta del round e si usa una volta per round | Confermato (v0.22) |
 | Ogni round ha un **tipo**, che decide che cosa propongono i consiglieri: **Azioni** (solo azioni), **Edifici** (solo edifici affini), **Truppe** (solo truppe affini), **Misto** (azioni ed elementi) | Confermato |
 | In ogni metà un round Azioni, uno Edifici, uno Truppe e due Misti, in ordine pescato a caso con il seme della run; il tipo è visibile prima di scegliere il consigliere | Proposta |
 | Un consigliere che non ha niente da proporre per il tipo del round non viene pescato in quel round | Proposta |
@@ -206,30 +208,61 @@ I consiglieri hanno **3 livelli**, legati all’**era**: Funzionari, Ministri e 
 
 #### 4.2.2 Consiglieri speciali — Confermato (v0.21)
 
-- **Clown:** propone **4 elementi**, edifici e truppe mescolati, ciascuno con un mana diverso. Proposta: i quattro mana sono rosso, verde, blu e neutro (un edificio neutro).
-- **Anziano:** propone **perk** ed **elementi neutrali**. Proposta: gli elementi neutrali sono gli edifici neutri, perché non esistono truppe neutre.
+- **Clown:** propone **5 elementi**, edifici e truppe mescolati: uno per ciascun colore di mana (rosso, verde, blu, viola) e un edificio neutro — Confermato (v0.22). Non offre Potenzia.
+- **Anziano:** propone **perk** ed **elementi neutrali**. Proposta: gli elementi neutrali sono gli edifici neutri, perché non esistono truppe neutre. Offre Potenzia **solo per gli edifici neutri**, qualunque tipo abbiano, e **una volta all’anno** — Confermato (v0.22).
 - **Proposta:** Clown e Anziano ignorano il tipo del round.
 
 #### 4.2.3 Consiglio del prototipo — Proposta
 
-Nomi, pool e costi placeholder. Le azioni riprendono le opportunità del prototipo precedente. L’affinità di un elemento si legge dalle sue etichette (§6.6), con eccezioni per singoli elementi nei dati.
+Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del prototipo precedente. Gli elementi proposti da ciascun consigliere dipendono dalla sua categoria (§4.2.4). Dalla v0.22 le azioni “Potenzia un edificio” e “Potenzia una truppa” non esistono più: le sostituisce l’opzione Potenzia di tutti i consiglieri (§6.5).
 
-| Consigliere | Azioni | Elementi affini | Paga le azioni con |
+| Consigliere | Categoria | Azioni | Paga le azioni con |
 |---|---|---|---|
-| Tesoriere (economico) | Esattori: Oro subito · Mercante: Ricerca in Oro · Assemblea: +50% Oro o Ricerca per un anno | edifici Commerciali | Ricerca, Influenza |
-| Fattore (agricolo) | Scorte: Cibo e Fauna in cambio di Legno · Razioni: per un anno le truppe mangiano meno | edifici Agricoli e Fauna; truppe Cavalleria | Legno, Fauna |
-| Architetto (costruttore) | Architetti: spazio edificio · Potenzia un edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | edifici Estrattivi e Difensivi; truppe Assedio | Pietra, Legno (lo spazio in Oro) |
-| Generale (comandante) | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno · Potenzia una truppa | edifici Militari; truppe Fanteria e Tiratori | Ferro (lo spazio in Oro) |
-| Studioso | Studiosi: Legno in Ricerca | edifici del Sapere | Legno |
-| Sacerdote | Incanta una truppa (§4.3), un’azione per ogni effetto | edifici e truppe Sacri | Fede |
-| Diplomatico | Ambasciata: accorcia un malus attivo | Consolato, Sobillatori | Influenza |
-| Maestro delle spie | Sabotaggio o rallentamento del fantasma (§12) | elementi che rallentano o sabotano | Influenza |
-| Clown | — | 4 elementi di mana diverso | — |
-| Anziano | Un perk (§9.3) | edifici neutri | Fede e Influenza |
+| Tesoriere | Ricchezza | Esattori: Oro subito · Mercante: Ricerca in Oro · Assemblea: +50% Oro o Ricerca per un anno | Ricerca, Influenza |
+| Fattore | Terra | Scorte: Cibo e Fauna in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno, Fauna |
+| Architetto | Opera | Architetti: spazio edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | Pietra, Legno (lo spazio in Oro) |
+| Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
+| Studioso | Conoscenza | Studiosi: Legno in Ricerca | Legno |
+| Sacerdote | Fede | Incanta una truppa (§4.3), un’azione per ogni effetto | Fede |
+| Cancelliere (ex Diplomatico) | Stato | Ambasciata: accorcia un malus attivo | Influenza |
+| Maestro delle spie | Ombra | Sabotaggio o rallentamento del fantasma (§12) | Influenza |
+| Clown | — | 5 elementi di mana diverso (§4.2.2) | — |
+| Anziano | — | Un perk (§9.3) | Fede e Influenza |
+
+Le risorse con cui si pagano le azioni sono quelle del prototipo precedente: vanno riviste insieme alle risorse delle categorie (§4.2.4, Da definire).
 
 Un tipo di proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
 
+**Da definire:** Studioso e Cancelliere hanno una sola azione: in un round Azioni mostrerebbero una sola proposta.
+
 **Da definire:** catalogo definitivo del Consiglio e dei pool, frequenza dei consiglieri, eventi.
+
+#### 4.2.4 Categorie — Confermato (modifica del nucleo, v0.22)
+
+Una **categoria** è un insieme di tipi (§6.6) ed è il campo di un consigliere. Le carte non hanno una categoria: hanno solo tipi.
+
+| Regola | Stato |
+|---|---|
+| Ogni consigliere ordinario ha una categoria; Clown e Anziano non ne hanno | Confermato |
+| Un consigliere propone gli edifici e le truppe che hanno **almeno un tipo** della sua categoria | Confermato |
+| Lo stesso tipo può stare in più categorie: le sue carte possono allora essere proposte da più consiglieri | Confermato |
+| Un consigliere può potenziare (§6.5) le carte che hanno almeno un tipo della sua categoria; il costo lo decide la categoria | Confermato |
+| Quale risorsa chiede ogni categoria, per i potenziamenti e per le azioni | Da definire |
+
+| Categoria | Tipi | Consigliere | Colore tendenziale (§5.3) |
+|---|---|---|---|
+| Militare | Assedio, Infrastruttura Bellica, Fante, Guardiano | Generale | rosso |
+| Opera | Infrastruttura Strategica, Produzione, Assedio | Architetto | rosso |
+| Terra | Fauna, Produzione, Guardiano, Economico | Fattore | verde |
+| Ricchezza | Economico, Fante, Infrastruttura Strategica, Nobile | Tesoriere | verde |
+| Conoscenza | Accademico, Criminale, Legge, Infrastruttura Segreta | Studioso | viola |
+| Fede | Spirituale, Patriota, Fauna, Guardiano | Sacerdote | blu |
+| Stato | Legge, Patriota, Accademico, Nobile | Cancelliere | blu |
+| Ombra | Criminale, Infrastruttura Strategica, Infrastruttura Bellica, Infrastruttura Segreta | Maestro delle spie | viola |
+
+Categorie e tipi: Confermato nella struttura, nomi placeholder. Fante sta anche in Ricchezza perché i soldati si possono comprare (mercenari). Ombra rappresenta i servizi segreti, che fanno il lavoro sporco: per questo propone anche infrastrutture belliche e strategiche.
+
+Nota per il catalogo: un tipo presente in molte categorie rende le sue carte “comuni” (le propongono e le potenziano molti consiglieri); un tipo presente in una sola categoria le rende “mirate”. Dare un tipo a una carta significa decidere quali consiglieri la propongono.
 
 ### 4.3 Incanto — Confermato (v0.21), valori placeholder
 
@@ -285,19 +318,26 @@ Le risorse sono molte, come in uno strategico. L’Oro resta la moneta comune; l
 - Tutte le risorse stanno nel **Magazzino**, senza limite di capacità.
 - Un edificio può produrre più risorse a ogni fase.
 - I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
+- **Da definire (v0.22):** dalla v0.22 la risorsa dei potenziamenti la decide il consigliere che li esegue (§6.5, §4.2.4); gli impieghi indicati in questa tabella vanno rivisti insieme alle risorse delle categorie.
 
 **Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
 
 **Mana — Confermato.** Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia. Mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
 
-| Colore | Tema |
-|---|---|
-| Rosso | Guerra |
-| Verde | Ricchezza |
-| Blu | Diplomazia e sapere |
-| Energetico | Vale come mana di qualsiasi colore |
+**Quattro colori — Confermato (modifica del nucleo, v0.22).**
 
-- Un edificio che produce mana ha un colore, che indica anche la sua famiglia.
+| Colore | Tema | Categorie a cui tende (§4.2.4) |
+|---|---|---|
+| Rosso | Guerra e opere | Militare, Opera |
+| Verde | Ricchezza e terra | Terra, Ricchezza |
+| Blu | Ordine: fede, Stato, diplomazia | Fede, Stato |
+| Viola | Segreti: sapere e lavoro sporco (nome e tema placeholder) | Conoscenza, Ombra |
+| Energetico | Vale come mana di qualsiasi colore | — |
+
+- Il colore appartiene solo al mana: **i tipi non hanno colore** (§6.6). Un edificio che produce mana ha un colore; una truppa che chiede mana ha un colore.
+- Le categorie della tabella sono una **tendenza per scrivere il catalogo**, non una regola: una carta può avere qualsiasi colore. Ogni coppia di categorie condivide almeno un tipo.
+- L’energetico resta della Capitale e non appartiene a nessun tipo.
+- Con 4 colori la plancia iniziale non può coprirli tutti: si sceglie presto una direzione. Da osservare nel playtest.
 - Un edificio **senza mana** è **neutro**: non ha colore. Come ogni altro edificio, può essere disponibile a tutti oppure peculiare di certe nazioni, come esclusivo dell’identità o di una via (§9.2, §10.4) — Confermato (modifica del nucleo, v0.16).
 - Ogni truppa chiede mana di un colore, oppure nessuno.
 - Una truppa paga **prima con il proprio colore e poi con l’energetico**.
@@ -371,18 +411,49 @@ Una mappa a distretti con adiacenze era stata discussa come alternativa preceden
 ### 6.5 Potenziamenti — Confermato
 
 - Ogni edificio e ogni truppa ha dei **livelli** (3 livelli).
-- Il costo di ogni livello è scritto nei dati dell’elemento e usa le risorse della sua famiglia (es. Ferro per le truppe, Legno o Pietra per gli edifici, Fauna per la cavalleria).
-- La maggior parte dei potenziamenti si fa **in qualunque momento fuori dal combattimento** e non consuma il round; alcuni potenziamenti arrivano anche da eventi o dalle proposte del Consiglio (§4.2.3).
+- **Potenzia — Confermato (modifica del nucleo, v0.22).** Si potenzia **solo con il Consiglio**, oltre che con eventi e ricompense; non più in qualunque momento.
+  - Ogni consigliere ordinario offre, oltre alle 3 proposte, una quarta opzione: **Potenzia**.
+  - Potenzia porta di livello un edificio o una truppa della plancia che abbia **almeno un tipo** della categoria del consigliere (§4.2.4).
+  - Usare Potenzia **non consuma la scelta** del round: si può prendere anche una delle proposte. Una volta usata, l’opzione sparisce per quel round.
+  - Potenzia è disponibile in **ogni tipo di round**, per edifici e truppe.
+  - Il **costo** lo decide il consigliere: la stessa carta può costare risorse diverse a seconda di chi la potenzia. Risorse di ogni categoria: Da definire.
+  - Potenzia non compare se nessuna carta ha un tipo del consigliere o se sono tutte al livello massimo.
+  - Il Clown non offre Potenzia; l’Anziano solo per gli edifici neutri, una volta all’anno (§4.2.2).
 - Effetti: ogni livello aumenta **tutti i valori d’effetto** dell’elemento (danno, scudo, cura, Corruzione, danno agli scudi, durate di Inefficienza e Sabotaggio); gli edifici producono anche più risorse per fase (valori placeholder, §16.3) — Confermato (v0.16).
 
-### 6.6 Etichette — Confermato
+### 6.6 Tipi — Confermato (modifica del nucleo, v0.22)
 
-Ogni edificio e ogni truppa ha **una o più etichette**, come i tipi degli oggetti di The Bazaar. Per ora servono a perk, modificatori e potenziamenti (es. “le truppe Cavalleria ricaricano più in fretta”); altri usi verranno in seguito.
+Ogni edificio e ogni truppa ha **uno o più tipi**, presi da **un’unica lista** comune a edifici e truppe, come i tipi degli oggetti di The Bazaar. Dalla v0.22 i tipi sostituiscono le etichette.
 
-| Elementi | Etichette iniziali |
+| Regola | Stato |
 |---|---|
-| Edifici | Capitale, Agricolo, Estrattivo, Commerciale, Sapere, Sacro, Militare, Difensivo, Fauna |
-| Truppe | Fanteria, Tiratori, Cavalleria, Assedio, Sacro, Fauna |
+| Un’unica lista di tipi per edifici e truppe; ogni carta ha uno o più tipi | Confermato |
+| Le vecchie etichette di ruolo delle truppe sono tipi come gli altri; Tiratori e Cavalleria non esistono più | Confermato |
+| I tipi decidono quali consiglieri propongono e potenziano la carta (§4.2.4) e a quali perk e modificatori risponde (es. “le truppe Fante ricaricano più in fretta”) | Confermato |
+| I tipi non hanno colore (§5.3) | Confermato |
+| Alcuni tipi valgono soprattutto per edifici (le Infrastrutture), altri soprattutto per truppe (Fante); la distinzione non è una regola | Confermato |
+| La Capitale ha un tipo proprio, **Capitale**, fuori da tutte le categorie | Proposta |
+| Ogni carta ha **1 o 2 tipi**, 3 solo per carte speciali (esclusivi): un tipo dice che cosa fa la carta, l’eventuale secondo chi rappresenta. Con 3 tipi per carta ogni consigliere proporrebbe metà del catalogo | Proposta |
+
+| Tipo | Significato (placeholder) |
+|---|---|
+| Fante | Soldati a piedi; si possono anche comprare (mercenari). |
+| Assedio | Macchine e truppe d’assedio; può valere anche per edifici. |
+| Guardiano | Chi protegge: mura, scorte, protettori sacri o della natura. |
+| Infrastruttura Bellica | Edifici militari; in Ombra, le strutture del lavoro sporco. |
+| Infrastruttura Strategica | Porti, cantieri, vie commerciali, edifici che danno spazi. |
+| Infrastruttura Segreta | Logge, reti di informatori, basi nascoste. |
+| Produzione | Edifici che producono materie prime. |
+| Economico | Commercio, denaro, economia anche agricola. |
+| Fauna | Animali: allevamenti, cavalcature. |
+| Nobile | Aristocrazia, alta finanza, diplomazia. |
+| Accademico | Sapere, studio, ingegneria. |
+| Legge | Ordine, giustizia, diplomazia di Stato. |
+| Criminale | Spie, sobillatori, assassini, sabotatori. |
+| Spirituale | Fede, culto, cura. |
+| Patriota | Amore per la nazione, milizie e legioni. |
+
+L’assegnazione dei tipi e dei colori alle carte del prototipo è una proposta in `docs/Bozza_v0.22_tipi_consiglio_mana.md` (Appendice A), da riportare nel Catalogo.
 
 ## 7. Combattimento automatico
 
@@ -471,7 +542,7 @@ Oltre al danno, la battaglia conosce due forme di difesa (**Scudo** e **Cura**),
 | Cura | Recupera la Resistenza persa | Allontana la soglia, alzando la Resistenza |
 | Attacco d’assedio | Serve solo a togliere lo scudo avversario | — |
 
-Scudo e cura sono disponibili **dalla prima era**. Nessuno di questi effetti ha un legame fisso con temi, risorse o etichette, salvo l’attacco d’assedio (§7.6.4): si decide elemento per elemento nel catalogo. Tutti i valori sono placeholder (§16.3).
+Scudo e cura sono disponibili **dalla prima era**. Nessuno di questi effetti ha un legame fisso con temi, risorse o tipi, salvo l’attacco d’assedio (§7.6.4): si decide elemento per elemento nel catalogo. Tutti i valori sono placeholder (§16.3).
 
 #### 7.6.1 Scudo
 
@@ -499,7 +570,7 @@ La Corruzione sostituisce la precedente proposta di un’erosione continua simil
 
 #### 7.6.4 Attacco d’assedio
 
-- Solo le truppe con etichetta **Assedio** (§6.6) possono avere un attacco d’assedio.
+- Solo le truppe con tipo **Assedio** (§6.6) possono avere un attacco d’assedio.
 - È un **secondo valore** della truppa, il danno agli scudi, che colpisce **solo lo scudo**, prima del danno normale. Esempio placeholder: Arieti, 10 agli scudi + 3 di danno.
 - Se l’avversario non ha scudo, il danno agli scudi va perso.
 - La truppa paga il suo normale costo in mana all’attivazione, come ogni altra truppa (§7.2).
@@ -709,11 +780,11 @@ Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una 
 | Ogni era ha un **pool di vie**. Le 3 proposte sono pescate dal pool, con più probabilità per le vie coerenti con l’identità e con le vie già scelte; alcune vie possono essere esclusive di certe identità o di certe vie precedenti | Confermato |
 | Una via usa la **stessa scheda degli elementi dell’identità** (§9.2) | Confermato |
 | Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi; dare un tratto permanente (§8); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
-| Gli effetti sono **liberi**: possono riferirsi a etichette o a elementi specifici, caso per caso nel catalogo | Confermato |
+| Gli effetti sono **liberi**: possono riferirsi a tipi o a elementi specifici, caso per caso nel catalogo | Confermato |
 | Gli **elementi esclusivi** di una via sono **diversi per ogni era**: una via scelta nell’era 2 ha esclusivi propri per l’era 2, per l’era 3 e per le successive. Gli esclusivi di un’era passata spariscono come le altre offerte | Confermato |
 | Le vie si accumulano: nessuna sostituisce le precedenti o gli elementi scelti alla creazione | Confermato |
 
-Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un’etichetta continua a contare.
+Nota per il catalogo: un effetto legato a un elemento specifico perde valore quando l’elemento esce dalle offerte con il cambio d’era; un effetto legato a un tipo continua a contare.
 
 Le vie sono nel prototipo dalla v0.18, con il catalogo di `docs/Catalogo.md`.
 
@@ -962,6 +1033,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Dei tratti di un fantasma valgono in battaglia solo quelli su tutta la nazione | Provvisoria. |
 | Se si arriva alla creazione da Gioca (nessuna nazione salvata), dopo il salvataggio si torna alla lista delle nazioni | Provvisoria. |
 | Tasso del mercato: 2 unità di una risorsa → 1 Oro, uguale per tutte | Placeholder. |
+| Ogni uso di Potenzia sale di un livello | Provvisoria (v0.22). |
 | Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto; gli edifici anche +1 a ogni risorsa che producono per fase. Il mana prodotto non cambia | Placeholder. |
 | I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
@@ -1028,7 +1100,11 @@ Criteri di accettazione proposti per il prototipo:
 | Vittoria contro un incontro del mondo | Bottino fisso di Oro e Ricerca; poi il giocatore può scegliere una ricompensa dal pool dell’incontro, oppure nessuna. |
 | Vittoria o pareggio contro il fantasma | Bottino fisso di Oro e Ricerca; nessun bottino in caso di sconfitta. |
 | Anno | 5 round, incontro del mondo, 5 round, fantasma; produzione solo all’inizio delle due metà. |
-| Round | 3 consiglieri diversi; scelto uno, 3 proposte (4 dal Clown), se ne prende una sola o si passa. |
+| Round | 3 consiglieri diversi; scelto uno, 3 proposte (5 dal Clown), se ne prende una sola o si passa. |
+| Pool del consigliere | Propone solo carte con almeno un tipo della sua categoria. |
+| Potenzia | Sale di livello una carta con almeno un tipo della categoria del consigliere; non consuma la scelta; una sola volta per round; non compare senza carte valide o con tutte al massimo. |
+| Potenzia dell’Anziano | Solo edifici neutri, una volta all’anno; il Clown non lo offre. |
+| Fuori dal Consiglio | Non si può potenziare (salvo eventi e ricompense). |
 | Tipo del round | Un round Edifici propone solo edifici, Truppe solo truppe, Azioni solo azioni; Clown e Anziano fanno eccezione. |
 | Incanto | Una sola volta per truppa; aggiunge l’effetto e il costo di mana, anche a una truppa che non usava mana. |
 | Spionaggio | Lo scontro con il fantasma parte con l’elemento scelto dal criterio della proposta già sabotato o rallentato; con lo stesso seme è sempre lo stesso. |
@@ -1044,7 +1120,7 @@ Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il mot
 | Prima di ampliare la ricerca | Numero definitivo delle ere; costo del passaggio; catalogo delle vie e dei loro esclusivi (§10.4). |
 | Per la componente GDR | Identità iniziale, sue modifiche, eventi a scelta. |
 | Per lo spionaggio | Informazioni visibili sul fantasma, statistica di spionaggio, contromisure. |
-| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno. |
+| Per il Consiglio | Pool definitivi dei consiglieri, prezzi per livello, nomi delle due metà dell’anno; risorse di ogni categoria (§4.2.4); nuove azioni per Studioso e Cancelliere. |
 | Per l’online | Pubblicazione dei fantasmi, matchmaking, versionamento. |
 | Più avanti | Progressione fra run, audio, monetizzazione, stile visivo. |
 
@@ -1060,7 +1136,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Anno | Unità di progressione con due macrofasi, incontri del mondo e uno scontro finale contro un fantasma. |
 | Produzione | Macrofase dedicata principalmente allo sviluppo della nazione. |
 | Preparazione | Macrofase dedicata principalmente all’organizzazione per lo scontro. |
-| Opportunità | Momento di scelta interno a una macrofase. |
+| Opportunità | Momento di scelta interno a una macrofase; dalla v0.21 sostituita dai round del Consiglio. |
+| Tipo | Caratteristica di un edificio o di una truppa che decide quali consiglieri lo propongono e lo potenziano e a quali perk risponde (§6.6). Sostituisce le etichette. |
+| Categoria | Insieme di tipi che forma il campo di un consigliere (§4.2.4). |
+| Potenzia | Opzione dei consiglieri che porta di livello una carta senza consumare la scelta del round (§6.5). |
 | Incontro del mondo | Minaccia o evento dell’anno (es. barbari, pirati); inizialmente uno scontro contro una plancia generata. |
 | Plancia generata | Plancia avversaria creata dal gioco per un incontro del mondo. |
 | Magazzino | Riserva persistente di tutte le risorse (§5.3). |
@@ -1081,6 +1160,14 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.22 — 5 novembre 2026** (modifica del nucleo)
+- Le etichette diventano **tipi**: un’unica lista per edifici e truppe; Tiratori e Cavalleria non esistono più (§6.6).
+- **Categorie**: insiemi di tipi che formano il campo di ogni consigliere; un consigliere propone le carte con almeno un tipo della sua categoria (§4.2.4).
+- **Potenzia**: si potenzia solo con il Consiglio (quarta opzione che non consuma la scelta), oltre che con eventi e ricompense; il costo lo decide il consigliere (§6.5). Tolte le azioni di potenziamento di Architetto e Generale (§4.2.3).
+- **Quattro colori** di mana: rosso, verde, blu, viola, più l’energetico; i tipi non hanno colore, le categorie danno solo una tendenza (§5.3).
+- Clown con 5 elementi; Anziano con Potenzia sugli edifici neutri una volta all’anno (§4.2.2). Diplomatico rinominato Cancelliere (placeholder).
+- Da definire: risorse di ogni categoria; revisione degli impieghi delle risorse (§5.3).
 
 **v0.21 — 4 novembre 2026** (dopo le partite di Davide)
 - L’anno ha 5 round, l’incontro del mondo, altri 5 round e il fantasma; edifici e truppe si ottengono in entrambe le metà (§3.2, §4.1). L’economia non cambia.
