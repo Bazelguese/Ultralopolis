@@ -181,7 +181,7 @@ static func _rewards(catalog: CatalogDef, rules: GeneratorRules, era: int, year:
 
 	var resource: RewardDef = RewardDef.new()
 	resource.kind = RewardDef.Kind.RISORSA
-	var types: Array[Res.Type] = [Res.Type.RICERCA, Res.Type.CIBO, Res.Type.LEGNO, Res.Type.PIETRA, Res.Type.FERRO, Res.Type.FAUNA, Res.Type.FEDE, Res.Type.INFLUENZA]
+	var types: Array[Res.Type] = [Res.Type.RICERCA, Res.Type.CIBO, Res.Type.LEGNO, Res.Type.PIETRA, Res.Type.FERRO, Res.Type.FEDE, Res.Type.INFLUENZA, Res.Type.STABILITA, Res.Type.DOCUMENTI]
 	resource.resource = types[rng.randi_range(0, types.size() - 1)]
 	resource.amount = maxi(1, Modifiers.apply_percent(_scaled(rules.reward_resource_base, rules.reward_resource_per_year_tenths, year), strength - 100))
 	rewards.append(resource)

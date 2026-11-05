@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_y0h2u")
-id = &"capitale_popolo_del_delta_oro"
-display_name = "Capitale: +1 Oro"
-description = "La Capitale produce 1 Oro in più a ogni fase."
+id = &"capitale_popolo_del_delta_influenza"
+display_name = "Capitale: +1 Influenza"
+description = "La Capitale produce 1 Influenza in più a ogni fase."
 is_malus = false
 effect = 8
 target_tag = &"Capitale"

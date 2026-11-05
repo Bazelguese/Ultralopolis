@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_ptn3m")
-id = &"capitale_monarchia_pietra"
-display_name = "Capitale: +1 Pietra"
-description = "La Capitale produce 1 Pietra in più a ogni fase."
+id = &"capitale_monarchia_stabilita"
+display_name = "Capitale: +1 Stabilità"
+description = "La Capitale produce 1 Stabilità in più a ogni fase."
 is_malus = false
 effect = 8
 target_tag = &"Capitale"
-resource = 4
+resource = 8
 amount = 1
 duration_kind = 2
 stacking = 1

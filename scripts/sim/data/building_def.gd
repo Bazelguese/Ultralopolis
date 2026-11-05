@@ -24,9 +24,10 @@ extends Resource
 @export var wood_per_phase: int = 0
 @export var stone_per_phase: int = 0
 @export var iron_per_phase: int = 0
-@export var fauna_per_phase: int = 0
 @export var faith_per_phase: int = 0
 @export var influence_per_phase: int = 0
+@export var stability_per_phase: int = 0
+@export var documents_per_phase: int = 0
 
 @export_group("In battaglia")
 ## Colore del mana prodotto: rosso, verde, blu o energetico (GDD §5.3).
@@ -66,7 +67,8 @@ func production(type: Res.Type) -> int:
 		Res.Type.LEGNO: return wood_per_phase
 		Res.Type.PIETRA: return stone_per_phase
 		Res.Type.FERRO: return iron_per_phase
-		Res.Type.FAUNA: return fauna_per_phase
 		Res.Type.FEDE: return faith_per_phase
 		Res.Type.INFLUENZA: return influence_per_phase
+		Res.Type.STABILITA: return stability_per_phase
+		Res.Type.DOCUMENTI: return documents_per_phase
 	return 0

@@ -5,11 +5,11 @@
 
 [sub_resource type="Resource" id="Resource_axl6g"]
 script = ExtResource("2_axl6g")
-fauna = 4
+legno = 4
 
 [sub_resource type="Resource" id="Resource_j7rf3"]
 script = ExtResource("2_axl6g")
-fauna = 6
+legno = 6
 
 [resource]
 script = ExtResource("1_18pbt")

@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_iubkx")
-id = &"capitale_cultura_erudita_ricerca"
-display_name = "Capitale: +1 Ricerca"
-description = "La Capitale produce 1 Ricerca in più a ogni fase."
+id = &"capitale_cultura_erudita_documenti"
+display_name = "Capitale: +1 Documenti"
+description = "La Capitale produce 1 Documenti in più a ogni fase."
 is_malus = false
 effect = 8
 target_tag = &"Capitale"
-resource = 1
+resource = 9
 amount = 1
 duration_kind = 2
 stacking = 1

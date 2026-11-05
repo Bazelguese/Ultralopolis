@@ -14,13 +14,13 @@
 
 [sub_resource type="Resource" id="Resource_asojx"]
 script = ExtResource("5_jyrfm")
-fauna = 4
+legno = 4
 
 [resource]
 script = ExtResource("10_kx25f")
 id = &"via_degli_spiriti"
 display_name = "Via degli Spiriti"
-description = "Esclusiva di chi segue gli Antichi spiriti. +1 Cibo per fase da ogni edificio Fauna o Agricolo; Esattori più frequenti. Bonus: +4 Fauna."
+description = "Esclusiva di chi segue gli Antichi spiriti. +1 Cibo per fase da ogni edificio Fauna o Agricolo; Esattori più frequenti. Bonus: +4 Legno."
 dimension = 5
 extra_resources = SubResource("Resource_asojx")
 favored_opportunities = Array[ExtResource("3_7b624")]([ExtResource("7_jrftg")])

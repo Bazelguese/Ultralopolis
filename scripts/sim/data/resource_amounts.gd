@@ -9,9 +9,10 @@ extends Resource
 @export var legno: int = 0
 @export var pietra: int = 0
 @export var ferro: int = 0
-@export var fauna: int = 0
 @export var fede: int = 0
 @export var influenza: int = 0
+@export var stabilita: int = 0
+@export var documenti: int = 0
 
 
 ## Quantità di una risorsa in unità intere.
@@ -23,9 +24,10 @@ func whole(type: Res.Type) -> int:
 		Res.Type.LEGNO: return legno
 		Res.Type.PIETRA: return pietra
 		Res.Type.FERRO: return ferro
-		Res.Type.FAUNA: return fauna
 		Res.Type.FEDE: return fede
 		Res.Type.INFLUENZA: return influenza
+		Res.Type.STABILITA: return stabilita
+		Res.Type.DOCUMENTI: return documenti
 	return 0
 
 

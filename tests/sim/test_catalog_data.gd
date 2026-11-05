@@ -66,8 +66,27 @@ func test_colori_etichette_e_capitale() -> void:
 		assert_eq(def.upgrade_costs.size(), rules.max_level - 1, "Costi di potenziamento di %s" % def.id)
 	assert_eq(rules.starting_buildings.size(), 1)
 	assert_true(rules.starting_buildings[0].is_capital, "Si parte dalla Capitale.")
+	# GDD §6.2 (v0.22): la Capitale produce di base solo Oro, Cibo e Ricerca.
+	var base: Array[Res.Type] = [Res.Type.ORO, Res.Type.CIBO, Res.Type.RICERCA]
 	for type: Res.Type in Res.NAMES:
-		assert_gt(rules.starting_buildings[0].production(type), 0, "La Capitale produce %s" % Res.NAMES[type])
+		if base.has(type):
+			assert_gt(rules.starting_buildings[0].production(type), 0, "La Capitale produce %s" % Res.NAMES[type])
+		else:
+			assert_eq(rules.starting_buildings[0].production(type), 0, "Di base la Capitale non produce %s" % Res.NAMES[type])
+
+
+func test_ogni_elemento_dell_identita_indica_una_risorsa_della_capitale() -> void:
+	# GDD §6.2, §9.2 (v0.22): popolo, governo, credo e cultura indicano una risorsa ciascuno.
+	var catalog: CatalogDef = _catalog()
+	for def: IdentityDef in catalog.identities:
+		if def.dimension == IdentityDef.Dimension.PERK:
+			continue
+		var capital_bonus: int = 0
+		for modifier: ModifierDef in def.permanent_modifiers:
+			if modifier.effect == ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO and modifier.target_tag == &"Capitale":
+				capital_bonus += 1
+				assert_eq(modifier.amount, 1, "+1 a fase (%s)" % def.id)
+		assert_eq(capital_bonus, 1, "Una sola risorsa della Capitale per %s" % def.id)
 
 
 func test_catalogo_bozza_3() -> void:

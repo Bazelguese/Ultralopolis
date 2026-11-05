@@ -25,9 +25,10 @@ const COLORI_RISORSE: Dictionary[int, Color] = {
 	Res.Type.LEGNO: Color("d9a066"),
 	Res.Type.PIETRA: Color("c9d0dc"),
 	Res.Type.FERRO: Color("a9bfd6"),
-	Res.Type.FAUNA: Color("e8b98a"),
 	Res.Type.FEDE: Color("f5e6a8"),
 	Res.Type.INFLUENZA: Color("d6a6ff"),
+	Res.Type.STABILITA: Color("8fd6d0"),
+	Res.Type.DOCUMENTI: Color("e8b98a"),
 }
 
 var _nazione: Label

@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_gtl3d")
-id = &"capitale_antichi_spiriti_fauna"
-display_name = "Capitale: +1 Fauna"
-description = "La Capitale produce 1 Fauna in più a ogni fase."
+id = &"capitale_antichi_spiriti_legno"
+display_name = "Capitale: +1 Legno"
+description = "La Capitale produce 1 Legno in più a ogni fase."
 is_malus = false
 effect = 8
 target_tag = &"Capitale"
-resource = 6
+resource = 3
 amount = 1
 duration_kind = 2
 stacking = 1

@@ -8,13 +8,12 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/passo_leggero.tres" id="6_bbu62"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="7_jx418"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_popolo_delle_foreste_legno.tres" id="7_sqijv"]
-[ext_resource type="Resource" path="res://data/catalog/modifiers/capitale/capitale_popolo_delle_foreste_fauna.tres" id="8_u62ts"]
 
 [resource]
 script = ExtResource("7_jx418")
 id = &"popolo_delle_foreste"
 display_name = "Popolo delle foreste"
-description = "Cacciatori silenziosi. Le truppe ricaricano del 10% più in fretta; può reclutare gli Arcieri dei boschi. Capitale: +1 Legno, +1 Fauna."
+description = "Cacciatori silenziosi. Le truppe ricaricano del 10% più in fretta; può reclutare gli Arcieri dei boschi. Capitale: +1 Legno."
 resistance_bonus = 4
 exclusive_troops = Array[ExtResource("3_sqijv")]([ExtResource("4_u62ts")])
-permanent_modifiers = Array[ExtResource("5_8lc61")]([ExtResource("6_bbu62"), ExtResource("7_sqijv"), ExtResource("8_u62ts")])
+permanent_modifiers = Array[ExtResource("5_8lc61")]([ExtResource("6_bbu62"), ExtResource("7_sqijv")])

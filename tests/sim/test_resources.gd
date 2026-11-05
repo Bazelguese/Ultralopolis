@@ -17,7 +17,7 @@ func before_each() -> void:
 	capital.display_name = "Capitale"
 	capital.is_capital = true
 	capital.tags = [&"Capitale"]
-	for field: String in ["gold_per_phase", "research_per_phase", "food_per_phase", "wood_per_phase", "stone_per_phase", "iron_per_phase", "fauna_per_phase", "faith_per_phase", "influence_per_phase"]:
+	for field: String in ["gold_per_phase", "research_per_phase", "food_per_phase", "wood_per_phase", "stone_per_phase", "iron_per_phase", "faith_per_phase", "influence_per_phase", "stability_per_phase", "documents_per_phase"]:
 		capital.set(field, 1)
 	farm = BuildingDef.new()
 	farm.id = &"fattoria"
