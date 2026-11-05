@@ -10,6 +10,114 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="9_hmfog"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_sapere_ricerca.tres" id="10_1an0x"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="11_7fj4r"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
+
+[sub_resource type="Resource" id="tr_deed_scuole"]
+script = ExtResource("tr_deed")
+kind = 1
+amount = 2
+
+[sub_resource type="Resource" id="tr_mod_scuole"]
+script = ExtResource("tr_mod")
+id = &"trad_scuole"
+display_name = "Scuole"
+description = "+1 Documenti per fase dalla Capitale."
+is_malus = false
+effect = 8
+target_type = &"Capitale"
+resource = 9
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_scuole"]
+script = ExtResource("tr_trad")
+id = &"scuole"
+display_name = "Scuole"
+description = "+1 Documenti per fase dalla Capitale."
+deed = SubResource("tr_deed_scuole")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_scuole")])
+
+[sub_resource type="Resource" id="tr_deed_biblioteche"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 2
+types = Array[StringName]([&"Accademico"])
+pieces = 1
+
+[sub_resource type="Resource" id="tr_mod_biblioteche"]
+script = ExtResource("tr_mod")
+id = &"trad_biblioteche"
+display_name = "Biblioteche"
+description = "+1 Documenti per fase da ogni edificio Accademico."
+is_malus = false
+effect = 8
+target_type = &"Accademico"
+resource = 9
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_biblioteche"]
+script = ExtResource("tr_trad")
+id = &"biblioteche"
+display_name = "Biblioteche"
+description = "+1 Documenti per fase da ogni edificio Accademico."
+deed = SubResource("tr_deed_biblioteche")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_biblioteche")])
+
+[sub_resource type="Resource" id="tr_deed_accademie"]
+script = ExtResource("tr_deed")
+kind = 1
+amount = 3
+spheres = PackedStringArray("Conoscenza")
+
+[sub_resource type="Resource" id="tr_mod_accademie"]
+script = ExtResource("tr_mod")
+id = &"trad_accademie"
+display_name = "Accademie"
+description = "+10% Ricerca prodotta."
+is_malus = false
+effect = 7
+resource = 1
+amount = 10
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_accademie"]
+script = ExtResource("tr_trad")
+id = &"accademie"
+display_name = "Accademie"
+description = "+10% Ricerca prodotta."
+deed = SubResource("tr_deed_accademie")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_accademie")])
+
+[sub_resource type="Resource" id="tr_deed_enciclopedisti"]
+script = ExtResource("tr_deed")
+kind = 6
+amount = 8
+resource = 1
+
+[sub_resource type="Resource" id="tr_mod_enciclopedisti"]
+script = ExtResource("tr_mod")
+id = &"trad_enciclopedisti"
+display_name = "Enciclopedisti"
+description = "Ogni consigliere mostra una proposta in più."
+is_malus = false
+effect = 5
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_enciclopedisti"]
+script = ExtResource("tr_trad")
+id = &"enciclopedisti"
+display_name = "Enciclopedisti"
+description = "Ogni consigliere mostra una proposta in più."
+deed = SubResource("tr_deed_enciclopedisti")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_enciclopedisti")])
 
 [resource]
 script = ExtResource("11_7fj4r")
@@ -23,3 +131,4 @@ exclusive_buildings = Array[ExtResource("1_oje80")]([ExtResource("2_75bnx")])
 exclusive_troops = Array[ExtResource("4_1fc32")]([ExtResource("5_f1vi2")])
 favored_by = Array[Resource]([ExtResource("6_7ywfp")])
 permanent_modifiers = Array[ExtResource("9_hmfog")]([ExtResource("10_1an0x")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_scuole"), SubResource("tr_step_biblioteche"), SubResource("tr_step_accademie"), SubResource("tr_step_enciclopedisti")])

@@ -1,0 +1,136 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="1_id"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_mod"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_del_commercio.tres" id="fav_0"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_oro.tres" id="fav_1"]
+
+[sub_resource type="Resource" id="m_0"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_0"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 0
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_1"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_1"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 1
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_2"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_2"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 2
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_3"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_3"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 3
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_4"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_4"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 4
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_5"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_5"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 5
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_6"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_6"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 6
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_7"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_7"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 7
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_8"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_8"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 8
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="m_9"]
+script = ExtResource("2_mod")
+id = &"asc_eta_dell_oro_9"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+is_malus = false
+effect = 7
+resource = 9
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_id")
+id = &"eta_dell_oro"
+display_name = "Età dell'oro"
+description = "+25% di tutte le risorse prodotte."
+dimension = 6
+ascension_level = 1
+favored_by = Array[Resource]([ExtResource("fav_0"), ExtResource("fav_1")])
+permanent_modifiers = Array[ExtResource("2_mod")]([SubResource("m_0"), SubResource("m_1"), SubResource("m_2"), SubResource("m_3"), SubResource("m_4"), SubResource("m_5"), SubResource("m_6"), SubResource("m_7"), SubResource("m_8"), SubResource("m_9")])

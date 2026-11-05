@@ -14,10 +14,118 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="12_yykii"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_fede_sacri.tres" id="13_anhjq"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="14_ug0ki"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
 
 [sub_resource type="Resource" id="Resource_y3npq"]
 script = ExtResource("6_whn32")
 fede = 4
+
+[sub_resource type="Resource" id="tr_deed_pellegrini_tradizione"]
+script = ExtResource("tr_deed")
+kind = 3
+amount = 1
+spheres = PackedStringArray("Fede")
+
+[sub_resource type="Resource" id="tr_mod_pellegrini_tradizione"]
+script = ExtResource("tr_mod")
+id = &"trad_pellegrini_tradizione"
+display_name = "Pellegrini"
+description = "+1 Fede per fase dalla Capitale."
+is_malus = false
+effect = 8
+target_type = &"Capitale"
+resource = 6
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_pellegrini_tradizione"]
+script = ExtResource("tr_trad")
+id = &"pellegrini_tradizione"
+display_name = "Pellegrini"
+description = "+1 Fede per fase dalla Capitale."
+deed = SubResource("tr_deed_pellegrini_tradizione")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_pellegrini_tradizione")])
+
+[sub_resource type="Resource" id="tr_deed_confraternite"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 3
+types = Array[StringName]([&"Spirituale"])
+
+[sub_resource type="Resource" id="tr_mod_confraternite"]
+script = ExtResource("tr_mod")
+id = &"trad_confraternite"
+display_name = "Confraternite"
+description = "Gli elementi Spirituali che curano curano 1 in più."
+is_malus = false
+effect = 11
+target_type = &"Spirituale"
+battle_value = 2
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_confraternite"]
+script = ExtResource("tr_trad")
+id = &"confraternite"
+display_name = "Confraternite"
+description = "Gli elementi Spirituali che curano curano 1 in più."
+deed = SubResource("tr_deed_confraternite")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_confraternite")])
+
+[sub_resource type="Resource" id="tr_deed_concilio_tradizione"]
+script = ExtResource("tr_deed")
+kind = 2
+amount = 4
+advisor_id = &"sacerdote"
+advisor_name = "Sacerdote"
+
+[sub_resource type="Resource" id="tr_mod_concilio_tradizione"]
+script = ExtResource("tr_mod")
+id = &"trad_concilio_tradizione"
+display_name = "Concilio"
+description = "+6 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 6
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_concilio_tradizione"]
+script = ExtResource("tr_trad")
+id = &"concilio_tradizione"
+display_name = "Concilio"
+description = "+6 Resistenza in ogni scontro."
+deed = SubResource("tr_deed_concilio_tradizione")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_concilio_tradizione")])
+
+[sub_resource type="Resource" id="tr_deed_santita"]
+script = ExtResource("tr_deed")
+kind = 7
+amount = 2
+
+[sub_resource type="Resource" id="tr_mod_santita"]
+script = ExtResource("tr_mod")
+id = &"trad_santita"
+display_name = "Santità"
+description = "Gli edifici Spirituali producono il 10% più in fretta."
+is_malus = false
+effect = 2
+target_type = &"Spirituale"
+amount = -10
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_santita"]
+script = ExtResource("tr_trad")
+id = &"santita"
+display_name = "Santità"
+description = "Gli edifici Spirituali producono il 10% più in fretta."
+deed = SubResource("tr_deed_santita")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_santita")])
 
 [resource]
 script = ExtResource("14_ug0ki")
@@ -31,3 +139,4 @@ exclusive_buildings = Array[ExtResource("1_qcsre")]([ExtResource("2_x1kqd")])
 exclusive_troops = Array[ExtResource("4_vbxca")]([ExtResource("5_uaykm")])
 favored_by = Array[Resource]([ExtResource("7_yxujh"), ExtResource("8_kvynt"), ExtResource("9_cxq6c")])
 permanent_modifiers = Array[ExtResource("12_yykii")]([ExtResource("13_anhjq")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_pellegrini_tradizione"), SubResource("tr_step_confraternite"), SubResource("tr_step_concilio_tradizione"), SubResource("tr_step_santita")])

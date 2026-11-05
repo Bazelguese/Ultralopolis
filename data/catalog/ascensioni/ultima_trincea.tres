@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="1_id"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_mod"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_impero.tres" id="fav_0"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_della_guerra.tres" id="fav_1"]
+
+[resource]
+script = ExtResource("1_id")
+id = &"ultima_trincea"
+display_name = "Ultima trincea"
+description = "La prima volta in ogni scontro che la Resistenza arriva a zero, torna a 1. Non salva dalla Corruzione."
+dimension = 6
+ascension_level = 2
+rule = 2
+favored_by = Array[Resource]([ExtResource("fav_0"), ExtResource("fav_1")])

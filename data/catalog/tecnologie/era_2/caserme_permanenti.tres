@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+
+[resource]
+script = ExtResource("1_tech")
+id = &"caserme_permanenti"
+display_name = "Caserme permanenti"
+description = "+1 spazio truppa."
+sphere = "Opera"
+era = 2
+tier = 2
+cost = 6
+extra_troop_slots = 1

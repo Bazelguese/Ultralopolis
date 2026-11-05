@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+[ext_resource type="Resource" path="res://data/catalog/tecnologie/era_2/ingegneria_d_assedio.tres" id="3_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_polvere_da_sparo"
+display_name = "Polvere da sparo"
+description = "Le truppe Assedio fanno il 15% di danno in più."
+is_malus = false
+effect = 10
+target_type = &"Assedio"
+battle_value = 0
+amount = 15
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"polvere_da_sparo"
+display_name = "Polvere da sparo"
+description = "Le truppe Assedio fanno il 15% di danno in più."
+sphere = "Militare"
+era = 3
+cost = 7
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])
+prerequisites = Array[Resource]([ExtResource("3_x")])

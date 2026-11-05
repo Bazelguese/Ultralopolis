@@ -27,6 +27,20 @@ enum Dimension {
 	CULTURA,
 	PERK,  ## Abilità passive, come quelle di The Bazaar: alcune all'inizio, altre durante la run.
 	VIA,   ## Direzione scelta entrando in un'era, dalla seconda in poi (GDD §10.4).
+	ASCENSIONE,  ## Scelta completando l'albero di una via (GDD §10.4.2, v0.27).
+}
+
+## Regole del nucleo che un'ascensione del livello 2 cambia (GDD §10.4.2, v0.27).
+enum Rule {
+	NESSUNA,
+	SECONDA_NATURA,    ## Ogni truppa si incanta due volte (§4.3).
+	ULTIMA_TRINCEA,    ## La prima volta che la Resistenza arriva a zero torna a 1 (§7.1).
+	PRIMA_SCINTILLA,   ## Gli edifici iniziano lo scontro con l'intervallo a metà (§7.5).
+	DISCIPLINA_FERREA, ## La truppa più a destra prenota il mana (§7.3).
+	MANA_UNITO,        ## Si paga anche con gli altri colori (§5.3).
+	MAESTRIA,          ## Le carte arrivano al livello 4 (§6.5).
+	DOPPIO_ASCOLTO,    ## Una volta per metà anno due proposte dallo stesso consigliere (§4.2).
+	ESERCITO_FRUGALE,  ## Le truppe senza Cibo non rallentano (§5.4).
 }
 
 const DIMENSION_NAMES: Dictionary[Dimension, String] = {
@@ -36,6 +50,7 @@ const DIMENSION_NAMES: Dictionary[Dimension, String] = {
 	Dimension.CULTURA: "Cultura",
 	Dimension.PERK: "Perk",
 	Dimension.VIA: "Via",
+	Dimension.ASCENSIONE: "Ascensione",
 }
 
 ## Dimensioni scelte alla creazione della nazione (le vie arrivano dopo, con le ere).
@@ -137,6 +152,16 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export var requires_any: Array[Resource] = []
 ## Elementi dell'identità o vie precedenti che rendono la via più probabile (peso +1 ciascuno).
 @export var favored_by: Array[Resource] = []
+
+@export_group("Tradizioni (solo per le vie, GDD §10.4.1)")
+## I 4 passi dell'albero della via, ognuno con la sua impresa.
+@export var traditions: Array[TraditionDef] = []
+
+@export_group("Ascensione (GDD §10.4.2)")
+## Livello dell'ascensione: 1 = effetti di oggi, 2 = cambia una regola. 0 per chi non è un'ascensione.
+@export var ascension_level: int = 0
+## Regola cambiata dalle ascensioni del livello 2.
+@export var rule: Rule = Rule.NESSUNA
 
 @export_group("Tratto permanente")
 ## Modificatori che valgono per tutta la run.

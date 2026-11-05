@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+[ext_resource type="Resource" path="res://data/catalog/identita/cinerali.tres" id="3_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_vedette_delle_scogliere"
+display_name = "Vedette delle scogliere"
+description = "Le truppe Cinerali ricaricano il 10% più in fretta."
+is_malus = false
+effect = 3
+target_type = &"Cinerale"
+amount = -10
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"vedette_delle_scogliere"
+display_name = "Vedette delle scogliere"
+description = "Le truppe Cinerali ricaricano il 10% più in fretta."
+sphere = "Militare"
+cost = 3
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])
+requires_any = Array[Resource]([ExtResource("3_x")])

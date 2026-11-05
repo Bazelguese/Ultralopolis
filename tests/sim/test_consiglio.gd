@@ -354,7 +354,7 @@ func test_le_azioni_di_livello_alto_arrivano_con_l_era() -> void:
 	big.min_level = 2
 	soldier.actions = [small, big]
 	var era2: EraDef = EraDef.new()
-	era2.research_cost = 1
+	era2.techs_required = 0
 	catalog.eras = [EraDef.new(), era2]
 	rules.half_themes = _themes(RunState.RoundTheme.AZIONI, 3)
 	var run: RunState = _run()

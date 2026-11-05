@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Resource" path="res://data/catalog/perk/veleni_sottili.tres" id="2_x"]
+
+[resource]
+script = ExtResource("1_tech")
+id = &"alchimia_dei_veleni"
+display_name = "Alchimia dei veleni"
+description = "Perk Veleni sottili: gli elementi che infliggono Corruzione ne infliggono 1 in più."
+sphere = "Ombra"
+era = 2
+cost = 5
+perk = ExtResource("2_x")

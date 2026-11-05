@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+[ext_resource type="Resource" path="res://data/catalog/identita/maremani.tres" id="3_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_canali"
+display_name = "Canali"
+description = "+1 Cibo per fase da ogni edificio di Produzione."
+is_malus = false
+effect = 8
+target_type = &"Produzione"
+resource = 2
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"canali"
+display_name = "Canali"
+description = "+1 Cibo per fase da ogni edificio di Produzione."
+sphere = "Terra"
+era = 2
+cost = 5
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])
+requires_any = Array[Resource]([ExtResource("3_x")])

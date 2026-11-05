@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Resource" path="res://data/catalog/linee/scriptorium.tres" id="2_x"]
+
+[resource]
+script = ExtResource("1_tech")
+id = &"scrittura"
+display_name = "Scrittura"
+description = "Linea dello Scriptorium: edifici Accademici viola."
+sphere = "Conoscenza"
+cost = 3
+line = ExtResource("2_x")

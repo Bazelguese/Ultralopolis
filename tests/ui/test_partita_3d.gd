@@ -155,7 +155,7 @@ func test_uno_scontro_si_rigioca_fino_all_esito() -> void:
 
 func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 	var run: RunState = _run()
-	run.stock[Res.Type.RICERCA] += run.next_era_cost()
+	_completa_tecnologie_dell_era(run)
 	assert_true(run.advance_era(), "Si può avanzare di era.")
 	_scena.call("_aggiorna_tutto")
 	if run.way_choices.is_empty():
@@ -179,7 +179,7 @@ func test_entrando_in_una_nuova_era_si_sceglie_la_via() -> void:
 
 func test_entrando_in_una_nuova_era_il_governo_puo_evolvere() -> void:
 	var run: RunState = _run()
-	run.stock[Res.Type.RICERCA] += run.next_era_cost()
+	_completa_tecnologie_dell_era(run)
 	assert_true(run.advance_era())
 	while not run.way_choices.is_empty():
 		run.choose_way(0)
@@ -256,6 +256,13 @@ func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
 
 
+## Le tecnologie dell'era corrente richieste per la prossima era (GDD §10.3, v0.26).
+func _completa_tecnologie_dell_era(run: RunState) -> void:
+	for def: TechDef in run.catalog.technologies:
+		if def.era == run.era and run.techs_done_in_era(run.era) < run.next_era_techs_needed():
+			run.techs_done.append(def)
+
+
 ## Carte attese prima di scegliere: i consiglieri del round più l'evento, se c'è (GDD §4.2.5).
 func _carte_del_round(run: RunState) -> int:
 	return run.advisor_choices.size() + (1 if run.event_choice != null else 0)
@@ -280,3 +287,38 @@ func test_la_rivoluzione_occupa_il_tavolo_e_non_si_puo_passare() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_eq(run.government(), nuovo)
 	assert_eq(run.malcontent, 0)
+
+
+## La Ricerca si sceglie dal pannello (GDD §10.5, §14.3): la mano mostra le carte vere della run
+## e la scelta passa dal segnale dell'interfaccia, senza consumare il round.
+func test_dal_pannello_della_ricerca_si_sceglie_la_tecnologia() -> void:
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var carte: Array[TechDef] = run.tech_hand_cards()
+	assert_eq(carte.size(), run.run_rules.tech_hand_size, "La mano ha 3 carte.")
+	var mano: HBoxContainer = hud.get("_mano_ricerca")
+	assert_eq(mano.get_child_count(), carte.size(), "Una carta del pannello per ogni tecnologia della mano.")
+	var round_prima: int = run.round_number
+	hud.scegli_tecnologia.emit(0)
+	assert_eq(run.current_tech, carte[0], "La carta scelta è in studio.")
+	assert_eq(run.round_number, round_prima, "Non consuma il round.")
+	var pulsante_era: Button = hud.get("_pulsante_era")
+	assert_true(pulsante_era.disabled, "Senza le tecnologie richieste non si entra nell'era.")
+	assert_string_contains(pulsante_era.text, "0/%d" % run.next_era_techs_needed())
+
+
+## Le tradizioni si leggono dal loro pannello e l'ascensione si sceglie con le carte (GDD §10.4).
+func test_ascensione_scelta_con_le_carte_e_pannello_tradizioni() -> void:
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var lista: VBoxContainer = hud.get("_lista_tradizioni")
+	assert_gt(lista.get_child_count(), 0, "Il pannello spiega quando cominciano le tradizioni.")
+	run.ascension_choices = run.catalog.ascensions.slice(0, 3)
+	run.pending_ascensions = 1
+	_scena.call("_aggiorna_tutto")
+	var scelte: Array = _scena.get("_scelte")
+	assert_eq(scelte.size(), 3, "Una carta per ascensione.")
+	var scelta: IdentityDef = run.ascension_choices[0]
+	_scena.call("_clic_scelta", scelte[0])
+	assert_true(run.identity.has(scelta), "Cliccando la carta l'ascensione è presa.")
+	assert_true(run.ascension_choices.is_empty())

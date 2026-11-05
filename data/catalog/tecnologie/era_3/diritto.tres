@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="TechDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/tech_def.gd" id="1_tech"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_x"]
+
+[sub_resource type="Resource" id="mod_1"]
+script = ExtResource("2_x")
+id = &"tec_diritto"
+display_name = "Diritto"
+description = "Gli elementi di Legge che producono scudo ne producono 2 in più."
+is_malus = false
+effect = 11
+target_type = &"Legge"
+battle_value = 1
+amount = 2
+duration_kind = 2
+stacking = 1
+
+[resource]
+script = ExtResource("1_tech")
+id = &"diritto"
+display_name = "Diritto"
+description = "Gli elementi di Legge che producono scudo ne producono 2 in più."
+sphere = "Stato"
+era = 3
+cost = 7
+permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])

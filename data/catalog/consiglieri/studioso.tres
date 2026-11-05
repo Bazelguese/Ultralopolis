@@ -6,6 +6,7 @@
 [ext_resource type="Resource" path="res://data/catalog/opportunities/archivisti.tres" id="new_0"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/manuali_tecnici.tres" id="new_1"]
 [ext_resource type="Resource" path="res://data/catalog/opportunities/trattati.tres" id="lv_0"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/revisione_dei_piani.tres" id="tec_0"]
 
 [resource]
 script = ExtResource("1_advdf")
@@ -16,4 +17,4 @@ category_name = "Conoscenza"
 description = "Raccoglie il sapere, anche quello nascosto: propone elementi accademici, legge, segreti."
 types = Array[StringName]([&"Accademico", &"Criminale", &"Legge", &"Infrastruttura Segreta"])
 upgrade_resource = 9
-actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("new_0"), ExtResource("new_1"), ExtResource("lv_0")])
+actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("new_0"), ExtResource("new_1"), ExtResource("tec_0"), ExtResource("lv_0")])

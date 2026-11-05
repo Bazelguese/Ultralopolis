@@ -10,6 +10,7 @@ signal rinnova_risorsa
 signal passa
 signal nessuna_ricompensa
 signal avanza_era
+signal scegli_tecnologia(indice: int)
 signal vendi_risorsa(tipo: int)
 signal ricomincia
 signal menu
@@ -48,6 +49,14 @@ var _pulsante_era: Button
 var _magazzino: PanelContainer
 var _righe_magazzino: Dictionary[int, Label] = {}
 var _vendite: Dictionary[int, Button] = {}
+var _pulsante_ricerca: Button
+var _ricerca: PanelContainer
+var _stato_ricerca: Label
+var _mano_ricerca: HBoxContainer
+var _colonne_albero: Dictionary[StringName, VBoxContainer] = {}
+var _pulsante_tradizioni: Button
+var _tradizioni: PanelContainer
+var _lista_tradizioni: VBoxContainer
 var _effetti: PanelContainer
 var _lista_effetti: VBoxContainer
 var _pulsante_effetti: Button
@@ -97,6 +106,8 @@ func _ready() -> void:
 	_crea_run()
 	_crea_risorse()
 	_crea_magazzino()
+	_crea_ricerca()
+	_crea_tradizioni()
 	_crea_pannelli_destra()
 	_crea_comandi()
 	_crea_principale()
@@ -237,6 +248,9 @@ func _crea_risorse() -> void:
 		cella.add_theme_constant_override("separation", -6)
 		cella.custom_minimum_size = Vector2(124, 0)
 		cella.tooltip_text = "%s: quantità nel Magazzino e produzione a ogni fase." % Res.NAMES[tipo]
+		if tipo == Res.Type.RICERCA:
+			cella.tooltip_text = "Ricerca: va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende."
+
 		cella.mouse_filter = Control.MOUSE_FILTER_PASS
 		cella.add_child(StileVisivo.etichetta(Res.NAMES[tipo].to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
 		var valori: HBoxContainer = HBoxContainer.new()
@@ -253,6 +267,12 @@ func _crea_risorse() -> void:
 	var spinta: Control = Control.new()
 	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	riga.add_child(spinta)
+	_pulsante_ricerca = _pulsante("Ricerca", func() -> void: _ricerca.visible = not _ricerca.visible)
+	_pulsante_ricerca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	riga.add_child(_pulsante_ricerca)
+	_pulsante_tradizioni = _pulsante("Tradizioni", func() -> void: _tradizioni.visible = not _tradizioni.visible)
+	_pulsante_tradizioni.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	riga.add_child(_pulsante_tradizioni)
 	var mercato: Button = _pulsante("Mercato", func() -> void: _magazzino.visible = not _magazzino.visible)
 	mercato.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(mercato)
@@ -288,7 +308,8 @@ func _crea_magazzino() -> void:
 		riga.custom_minimum_size = Vector2(240, 0)
 		griglia.add_child(riga)
 		_righe_magazzino[tipo] = riga
-		if tipo == Res.Type.ORO:
+		if tipo == Res.Type.ORO or tipo == Res.Type.RICERCA:
+			# L'Oro non si vende; la Ricerca va nelle tecnologie (GDD §10.5).
 			griglia.add_child(Control.new())
 		else:
 			var vendi: Button = _pulsante("Vendi", _on_vendi.bind(tipo))
@@ -297,6 +318,209 @@ func _crea_magazzino() -> void:
 			_vendite[tipo] = vendi
 	_ancora(_magazzino, Control.PRESET_BOTTOM_LEFT, Vector2(24, SOPRA_BARRA))
 	_magazzino.visible = false
+
+
+## Pannello della Ricerca (GDD §10.5, §14.3): tecnologia in studio, mano di carte e albero.
+func _crea_ricerca() -> void:
+	_ricerca = PanelContainer.new()
+	_ricerca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.96), StileVisivo.ORO))
+	var colonna: VBoxContainer = VBoxContainer.new()
+	colonna.add_theme_constant_override("separation", 10)
+	_ricerca.add_child(colonna)
+	var testa: HBoxContainer = HBoxContainer.new()
+	testa.add_child(StileVisivo.etichetta("RICERCA", StileVisivo.FONT_TITOLI, 34, StileVisivo.ORO_LUCE))
+	var spinta: Control = Control.new()
+	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	testa.add_child(spinta)
+	testa.add_child(_pulsante("Chiudi", func() -> void: _ricerca.visible = false))
+	colonna.add_child(testa)
+	_stato_ricerca = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 18)
+	_stato_ricerca.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_stato_ricerca.custom_minimum_size = Vector2(1400, 0)
+	colonna.add_child(_stato_ricerca)
+	colonna.add_child(StileVisivo.etichetta("LA MANO · scegli che cosa studiare (non consuma il round)", StileVisivo.FONT_TESTO_FORTE, 16, StileVisivo.TESTO_TENUE))
+	_mano_ricerca = HBoxContainer.new()
+	_mano_ricerca.add_theme_constant_override("separation", 12)
+	colonna.add_child(_mano_ricerca)
+	colonna.add_child(StileVisivo.etichetta("L'ALBERO · passa il mouse su una tecnologia per i dettagli", StileVisivo.FONT_TESTO_FORTE, 16, StileVisivo.TESTO_TENUE))
+	var scorri: ScrollContainer = ScrollContainer.new()
+	scorri.custom_minimum_size = Vector2(1400, 430)
+	scorri.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	colonna.add_child(scorri)
+	var rami: HBoxContainer = HBoxContainer.new()
+	rami.add_theme_constant_override("separation", 18)
+	rami.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scorri.add_child(rami)
+	for ramo: StringName in TechDef.BRANCHES:
+		var lista: VBoxContainer = VBoxContainer.new()
+		lista.add_theme_constant_override("separation", 2)
+		lista.custom_minimum_size = Vector2(335, 0)
+		rami.add_child(lista)
+		_colonne_albero[ramo] = lista
+	_ancora(_ricerca, Control.PRESET_CENTER, Vector2.ZERO)
+	_ricerca.visible = false
+
+
+## Pannello delle Tradizioni (GDD §10.4.1, §14.3): per ogni via adottata i suoi passi,
+## l'impresa con quanto manca e l'effetto; poi le ascensioni prese.
+func _crea_tradizioni() -> void:
+	_tradizioni = PanelContainer.new()
+	_tradizioni.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.96), StileVisivo.ORO))
+	var colonna: VBoxContainer = VBoxContainer.new()
+	colonna.add_theme_constant_override("separation", 10)
+	_tradizioni.add_child(colonna)
+	var testa: HBoxContainer = HBoxContainer.new()
+	testa.add_child(StileVisivo.etichetta("TRADIZIONI", StileVisivo.FONT_TITOLI, 34, StileVisivo.ORO_LUCE))
+	var spinta: Control = Control.new()
+	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	testa.add_child(spinta)
+	testa.add_child(_pulsante("Chiudi", func() -> void: _tradizioni.visible = false))
+	colonna.add_child(testa)
+	var scorri: ScrollContainer = ScrollContainer.new()
+	scorri.custom_minimum_size = Vector2(1000, 560)
+	scorri.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	colonna.add_child(scorri)
+	_lista_tradizioni = VBoxContainer.new()
+	_lista_tradizioni.add_theme_constant_override("separation", 6)
+	_lista_tradizioni.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scorri.add_child(_lista_tradizioni)
+	_ancora(_tradizioni, Control.PRESET_CENTER, Vector2.ZERO)
+	_tradizioni.visible = false
+
+
+func _aggiorna_tradizioni(run: RunState) -> void:
+	for figlio: Node in _lista_tradizioni.get_children():
+		figlio.queue_free()
+	var vie: Array[IdentityDef] = run.adopted_ways()
+	var fatti: int = 0
+	if vie.is_empty():
+		_lista_tradizioni.add_child(_riga_tradizioni("Le tradizioni cominciano con la prima via, entrando nell'era 2.", StileVisivo.TESTO_TENUE, 18))
+	for via: IdentityDef in vie:
+		var completa: bool = run.completed_ways.has(via)
+		_lista_tradizioni.add_child(_riga_tradizioni("%s%s" % [via.display_name.to_upper(), " · albero completo" if completa else ""], StileVisivo.ORO_LUCE, 22))
+		for passo: TraditionDef in via.traditions:
+			var fatto: bool = run.traditions_done.has(passo)
+			if fatto:
+				fatti += 1
+			var impresa: String = passo.deed.describe() if passo.deed != null else ""
+			var testo: String = "%s — %s (%s) → %s" % [passo.display_name, impresa, run.tradition_progress_text(passo), passo.description]
+			_lista_tradizioni.add_child(_riga_tradizioni(testo, Color("9be8a5") if fatto else StileVisivo.TESTO, 17))
+	var prese: Array[IdentityDef] = run.ascensions()
+	if not prese.is_empty():
+		_lista_tradizioni.add_child(_riga_tradizioni("ASCENSIONI", StileVisivo.ORO_LUCE, 22))
+		for ascensione: IdentityDef in prese:
+			_lista_tradizioni.add_child(_riga_tradizioni("%s (livello %d) → %s" % [ascensione.display_name, ascensione.ascension_level, ascensione.description], Color("c7b8ff"), 17))
+	_pulsante_tradizioni.text = "Tradizioni · %d" % fatti
+
+
+func _riga_tradizioni(testo: String, colore: Color, dimensione: int) -> Label:
+	var riga: Label = StileVisivo.etichetta(testo, StileVisivo.FONT_TESTO, dimensione, colore)
+	riga.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	riga.custom_minimum_size = Vector2(960, 0)
+	return riga
+
+
+## true se il pannello delle Tradizioni è aperto.
+func tradizioni_visibile() -> bool:
+	return _tradizioni.visible
+
+
+## true se il pannello della Ricerca è aperto.
+func ricerca_visibile() -> bool:
+	return _ricerca.visible
+
+
+func _on_scegli_tecnologia(indice: int) -> void:
+	scegli_tecnologia.emit(indice)
+
+
+func _aggiorna_ricerca(run: RunState) -> void:
+	var righe: PackedStringArray = PackedStringArray()
+	if run.current_tech != null:
+		righe.append("In studio: %s — %d/%d Ricerca. %s" % [run.current_tech.display_name, run.tech_progress_of(run.current_tech), run.current_tech.cost, run.current_tech.description])
+	else:
+		righe.append("Nessuna tecnologia in studio: la Ricerca resta in attesa (%d) e passa alla prima che scegli." % run.research_waiting())
+	var produzione: int = run.production_per_phase()[Res.Type.RICERCA]
+	righe.append("Ricerca alla prossima produzione: +%d." % produzione)
+	var servono: int = run.next_era_techs_needed()
+	if servono >= 0:
+		righe.append("Prossima era (%s): %d/%d tecnologie dell'era %s." % [run.era_name(run.era + 1), mini(run.techs_done_in_era(run.era), servono), servono, run.era_name()])
+	_stato_ricerca.text = "\n".join(righe)
+
+	for figlio: Node in _mano_ricerca.get_children():
+		figlio.queue_free()
+	var carte: Array[TechDef] = run.tech_hand_cards()
+	for i: int in range(carte.size()):
+		var tecnologia: TechDef = carte[i]
+		var carta: Button = Button.new()
+		carta.text = _testo_carta(run, tecnologia)
+		carta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		carta.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		carta.custom_minimum_size = Vector2(330, 150)
+		carta.add_theme_font_size_override("font_size", 17)
+		carta.disabled = tecnologia == run.current_tech
+		var motivo: String = run.tech_block_reason(tecnologia, run.is_golden(tecnologia))
+		if motivo != "":
+			carta.disabled = true
+			carta.tooltip_text = motivo
+		carta.pressed.connect(_on_scegli_tecnologia.bind(i))
+		_mano_ricerca.add_child(carta)
+	if carte.is_empty():
+		_mano_ricerca.add_child(StileVisivo.etichetta("Nessuna tecnologia da studiare per ora.", StileVisivo.FONT_TESTO, 17, StileVisivo.TESTO_TENUE))
+
+	for ramo: StringName in _colonne_albero:
+		var lista: VBoxContainer = _colonne_albero[ramo]
+		for figlio: Node in lista.get_children():
+			figlio.queue_free()
+		lista.add_child(StileVisivo.etichetta("RAMO %s" % TechDef.BRANCH_NAMES[ramo].to_upper(), StileVisivo.FONT_TITOLI, 22, StileVisivo.colore_mana_nome(ramo)))
+		var era_mostrata: int = 0
+		for tecnologia: TechDef in run.tree_technologies():
+			if tecnologia.branch() != ramo:
+				continue
+			if tecnologia.era != era_mostrata:
+				era_mostrata = tecnologia.era
+				lista.add_child(StileVisivo.etichetta(run.era_name(era_mostrata), StileVisivo.FONT_TESTO_FORTE, 15, StileVisivo.TESTO_TENUE))
+			lista.add_child(_voce_albero(run, tecnologia))
+
+
+func _testo_carta(run: RunState, tecnologia: TechDef) -> String:
+	var stato: String = ""
+	if run.is_golden(tecnologia):
+		stato = "Carta dorata · "
+	elif tecnologia == run.current_tech:
+		stato = "In studio · "
+	elif run.tech_status(tecnologia) == RunState.TechStatus.INIZIATA:
+		stato = "Iniziata · "
+	return "%s\n%s%s · %s · altezza %d\n%d/%d Ricerca\n%s" % [tecnologia.display_name, stato,
+			TechDef.BRANCH_NAMES.get(tecnologia.branch(), "?"), tecnologia.sphere, tecnologia.tier,
+			run.tech_progress_of(tecnologia), tecnologia.cost, tecnologia.description]
+
+
+## Una tecnologia dell'albero: colore e parola dicono lo stato, il suggerimento il perché (P4).
+func _voce_albero(run: RunState, tecnologia: TechDef) -> Label:
+	var stato: RunState.TechStatus = run.tech_status(tecnologia)
+	var colore: Color = StileVisivo.TESTO
+	var nota: String = ""
+	match stato:
+		RunState.TechStatus.COMPLETATA:
+			colore = Color("9be8a5")
+			nota = " · fatta"
+		RunState.TechStatus.IN_CORSO:
+			colore = StileVisivo.ORO_LUCE
+			nota = " · in studio %d/%d" % [run.tech_progress_of(tecnologia), tecnologia.cost]
+		RunState.TechStatus.INIZIATA:
+			colore = Color("7fb4ff")
+			nota = " · iniziata %d/%d" % [run.tech_progress_of(tecnologia), tecnologia.cost]
+		RunState.TechStatus.BLOCCATA:
+			colore = StileVisivo.TESTO_TENUE
+			nota = " · bloccata"
+	var voce: Label = StileVisivo.etichetta("%s%s (%d)%s" % ["  " if tecnologia.tier == 2 else "", tecnologia.display_name, tecnologia.cost, nota], StileVisivo.FONT_TESTO, 16, colore)
+	voce.mouse_filter = Control.MOUSE_FILTER_PASS
+	var aiuto: String = "%s (%s, altezza %d)\n%s" % [tecnologia.display_name, tecnologia.sphere, tecnologia.tier, tecnologia.description]
+	if stato == RunState.TechStatus.BLOCCATA:
+		aiuto += "\nBloccata: %s" % run.tech_block_reason(tecnologia)
+	voce.tooltip_text = aiuto
+	return voce
 
 
 func _on_vendi(tipo: int) -> void:
@@ -523,14 +747,21 @@ func aggiorna_partita(run: RunState) -> void:
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
-	var costo_era: int = run.next_era_cost()
-	if costo_era >= 0:
-		_valori_risorse[Res.Type.RICERCA].text = "%s/%d" % [run.stock_text(Res.Type.RICERCA), costo_era]
-		_pulsante_era.text = "Avanza a %s · %d Ricerca" % [run.era_name(run.era + 1), costo_era]
+	# La Ricerca va nella tecnologia in studio (GDD §10.5): raccolta / costo, oppure in attesa.
+	if run.current_tech != null:
+		_valori_risorse[Res.Type.RICERCA].text = "%d/%d" % [run.tech_progress_of(run.current_tech), run.current_tech.cost]
+	_pulsante_ricerca.text = "Ricerca · %s" % (run.current_tech.display_name if run.current_tech != null else "scegli")
+	var tecnologie_era: int = run.next_era_techs_needed()
+	if tecnologie_era >= 0:
+		var fatte: int = mini(run.techs_done_in_era(run.era), tecnologie_era)
+		_pulsante_era.text = "Entra in %s · %d/%d tecnologie" % [run.era_name(run.era + 1), fatte, tecnologie_era]
 		_pulsante_era.visible = true
-		_pulsante_era.disabled = not comprando or run.research < costo_era
+		_pulsante_era.disabled = not comprando or run.era_block_reason() != ""
+		_pulsante_era.tooltip_text = run.era_block_reason() if run.era_block_reason() != "" else "Entri quando vuoi: le offerte dell'era attuale spariscono."
 	else:
 		_pulsante_era.visible = false
+	_aggiorna_ricerca(run)
+	_aggiorna_tradizioni(run)
 	var lotto: int = run.market_rate()
 	for tipo: int in _righe_magazzino:
 		_righe_magazzino[tipo].text = "%s  %s" % [Res.NAMES[tipo], run.stock_text(tipo)]
@@ -552,7 +783,7 @@ func aggiorna_partita(run: RunState) -> void:
 	ultime.reverse()
 	_testo_cronaca.text = "\n".join(ultime)
 
-	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty()
+	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty() or not run.ascension_choices.is_empty()
 	var consigliere: AdvisorDef = run.chosen_advisor
 	_pulsante_rinnova.visible = comprando and not scelta_via and consigliere != null
 	_pulsante_passa.visible = comprando and not scelta_via and not run.is_revolution_round()
@@ -582,6 +813,8 @@ func aggiorna_partita(run: RunState) -> void:
 			_suggerimento_fase.text = ""
 	if not run.way_choices.is_empty():
 		_suggerimento_fase.text = "Nuova era: scegli la via della nazione. Diventa parte della tua identità."
+	elif not run.ascension_choices.is_empty():
+		_suggerimento_fase.text = "Albero di una via completo: scegli un'ascensione. È per sempre."
 	elif not run.government_choices.is_empty():
 		_suggerimento_fase.text = "Nuova era: il governo può evolvere. Scegli la nuova forma, oppure resta com'è."
 

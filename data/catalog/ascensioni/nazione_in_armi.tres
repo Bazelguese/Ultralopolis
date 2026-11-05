@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="1_id"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="2_mod"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_della_guerra.tres" id="fav_0"]
+[ext_resource type="Resource" path="res://data/catalog/vie/via_dell_impero.tres" id="fav_1"]
+
+[resource]
+script = ExtResource("1_id")
+id = &"nazione_in_armi"
+display_name = "Nazione in armi"
+description = "+1 spazio truppa e +1 spazio edificio."
+dimension = 6
+ascension_level = 1
+extra_building_slots = 1
+extra_troop_slots = 1
+favored_by = Array[Resource]([ExtResource("fav_0"), ExtResource("fav_1")])

@@ -12,10 +12,119 @@
 [ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="10_x2x6o"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_rivelazione_sacri.tres" id="11_gkcfo"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="12_ixs8d"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
 
 [sub_resource type="Resource" id="Resource_ubc51"]
 script = ExtResource("5_d4xso")
 fede = 6
+
+[sub_resource type="Resource" id="tr_deed_visioni"]
+script = ExtResource("tr_deed")
+kind = 3
+amount = 1
+spheres = PackedStringArray("Fede")
+
+[sub_resource type="Resource" id="tr_mod_visioni"]
+script = ExtResource("tr_mod")
+id = &"trad_visioni"
+display_name = "Visioni"
+description = "+1 Fede per fase da ogni edificio Spirituale."
+is_malus = false
+effect = 8
+target_type = &"Spirituale"
+resource = 6
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_visioni"]
+script = ExtResource("tr_trad")
+id = &"visioni"
+display_name = "Visioni"
+description = "+1 Fede per fase da ogni edificio Spirituale."
+deed = SubResource("tr_deed_visioni")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_visioni")])
+
+[sub_resource type="Resource" id="tr_deed_martiri"]
+script = ExtResource("tr_deed")
+kind = 0
+amount = 2
+
+[sub_resource type="Resource" id="tr_mod_martiri"]
+script = ExtResource("tr_mod")
+id = &"trad_martiri"
+display_name = "Martiri"
+description = "Gli elementi Spirituali che producono scudo ne producono 1 in più."
+is_malus = false
+effect = 11
+target_type = &"Spirituale"
+battle_value = 1
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_martiri"]
+script = ExtResource("tr_trad")
+id = &"martiri"
+display_name = "Martiri"
+description = "Gli elementi Spirituali che producono scudo ne producono 1 in più."
+deed = SubResource("tr_deed_martiri")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_martiri")])
+
+[sub_resource type="Resource" id="tr_deed_profeti"]
+script = ExtResource("tr_deed")
+kind = 2
+amount = 3
+advisor_id = &"sacerdote"
+advisor_name = "Sacerdote"
+
+[sub_resource type="Resource" id="tr_mod_profeti"]
+script = ExtResource("tr_mod")
+id = &"trad_profeti"
+display_name = "Profeti"
+description = "+8 Resistenza in ogni scontro."
+is_malus = false
+effect = 6
+amount = 8
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_profeti"]
+script = ExtResource("tr_trad")
+id = &"profeti"
+display_name = "Profeti"
+description = "+8 Resistenza in ogni scontro."
+deed = SubResource("tr_deed_profeti")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_profeti")])
+
+[sub_resource type="Resource" id="tr_deed_ultima_rivelazione"]
+script = ExtResource("tr_deed")
+kind = 5
+amount = 2
+types = Array[StringName]([&"Spirituale"])
+min_level = 3
+
+[sub_resource type="Resource" id="tr_mod_ultima_rivelazione"]
+script = ExtResource("tr_mod")
+id = &"trad_ultima_rivelazione"
+display_name = "Ultima rivelazione"
+description = "Gli elementi che curano curano 2 in più."
+is_malus = false
+effect = 11
+battle_value = 2
+amount = 2
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_ultima_rivelazione"]
+script = ExtResource("tr_trad")
+id = &"ultima_rivelazione"
+display_name = "Ultima rivelazione"
+description = "Gli elementi che curano curano 2 in più."
+deed = SubResource("tr_deed_ultima_rivelazione")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_ultima_rivelazione")])
 
 [resource]
 script = ExtResource("12_ixs8d")
@@ -28,3 +137,4 @@ favored_opportunities = Array[ExtResource("3_3s4ww")]([ExtResource("9_hmu3w")])
 exclusive_buildings = Array[ExtResource("1_sv6m2")]([ExtResource("2_nwiv0")])
 favored_by = Array[Resource]([ExtResource("6_fiq73"), ExtResource("7_neduf"), ExtResource("8_2gtfw")])
 permanent_modifiers = Array[ExtResource("10_x2x6o")]([ExtResource("11_gkcfo")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_visioni"), SubResource("tr_step_martiri"), SubResource("tr_step_profeti"), SubResource("tr_step_ultima_rivelazione")])

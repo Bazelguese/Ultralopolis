@@ -10,7 +10,7 @@
 [resource]
 script = ExtResource("1_8fyso")
 display_name = "Sviluppo"
-research_cost = 8
+techs_required = 4
 bonus_building_slots = 1
 bonus_troop_slots = 1
 ways = Array[ExtResource("2_vnfkn")]([ExtResource("3_c0bw7"), ExtResource("4_g87fj"), ExtResource("5_ulrsb"), ExtResource("6_j8b12")])

@@ -19,6 +19,15 @@ var start_building_sabotage_ms: int = 0
 ## ogni voce è [effetto (BattleSim.EFFECT_SLOW o EFFECT_SABOTAGE), indice dell'elemento
 ## (edifici da 0, truppe da BattleSim.TROOP_INDEX_OFFSET), millisecondi].
 var start_timer_effects: Array[Array] = []
+## Regole della battaglia cambiate dalle ascensioni (GDD §10.4.2, v0.27).
+## Ultima trincea: la prima volta che la Resistenza arriva a zero torna a 1.
+var last_stand: bool = false
+## Prima scintilla: gli edifici iniziano con l'intervallo a metà.
+var first_spark: bool = false
+## Disciplina ferrea: la truppa più a destra prenota il mana.
+var reserve_mana: bool = false
+## Mana unito: dopo il proprio colore e l'energetico si paga con gli altri colori.
+var any_color: bool = false
 
 
 func _init(p_buildings: Array[BuildingDef] = [], p_troops: Array[TroopDef] = [], p_max_resistance: int = 0) -> void:

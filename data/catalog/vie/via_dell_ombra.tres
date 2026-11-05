@@ -14,10 +14,120 @@
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_ombra_inefficienza.tres" id="12_j6pe2"]
 [ext_resource type="Resource" path="res://data/catalog/modifiers/via_ombra_sabotaggio.tres" id="13_xnhog"]
 [ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="14_r05ox"]
+[ext_resource type="Script" path="res://scripts/sim/data/deed_def.gd" id="tr_deed"]
+[ext_resource type="Script" path="res://scripts/sim/data/tradition_def.gd" id="tr_trad"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="tr_mod"]
 
 [sub_resource type="Resource" id="Resource_78wfa"]
 script = ExtResource("5_tso7f")
 influenza = 5
+
+[sub_resource type="Resource" id="tr_deed_informatori"]
+script = ExtResource("tr_deed")
+kind = 2
+amount = 3
+advisor_id = &"maestro_delle_spie"
+advisor_name = "Maestro delle spie"
+
+[sub_resource type="Resource" id="tr_mod_informatori"]
+script = ExtResource("tr_mod")
+id = &"trad_informatori"
+display_name = "Informatori"
+description = "Le truppe Criminali ricaricano il 10% più in fretta."
+is_malus = false
+effect = 3
+target_type = &"Criminale"
+amount = -10
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_informatori"]
+script = ExtResource("tr_trad")
+id = &"informatori"
+display_name = "Informatori"
+description = "Le truppe Criminali ricaricano il 10% più in fretta."
+deed = SubResource("tr_deed_informatori")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_informatori")])
+
+[sub_resource type="Resource" id="tr_deed_covi"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 2
+types = Array[StringName]([&"Infrastruttura Segreta"])
+pieces = 1
+
+[sub_resource type="Resource" id="tr_mod_covi"]
+script = ExtResource("tr_mod")
+id = &"trad_covi"
+display_name = "Covi"
+description = "+1 Documenti per fase da ogni edificio Infrastruttura Segreta."
+is_malus = false
+effect = 8
+target_type = &"Infrastruttura Segreta"
+resource = 9
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_covi"]
+script = ExtResource("tr_trad")
+id = &"covi"
+display_name = "Covi"
+description = "+1 Documenti per fase da ogni edificio Infrastruttura Segreta."
+deed = SubResource("tr_deed_covi")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_covi")])
+
+[sub_resource type="Resource" id="tr_deed_sicari"]
+script = ExtResource("tr_deed")
+kind = 0
+amount = 2
+battles = 1
+
+[sub_resource type="Resource" id="tr_mod_sicari"]
+script = ExtResource("tr_mod")
+id = &"trad_sicari"
+display_name = "Sicari"
+description = "Il Sabotaggio inflitto dura il 25% in più."
+is_malus = false
+effect = 10
+battle_value = 6
+amount = 25
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_sicari"]
+script = ExtResource("tr_trad")
+id = &"sicari"
+display_name = "Sicari"
+description = "Il Sabotaggio inflitto dura il 25% in più."
+deed = SubResource("tr_deed_sicari")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_sicari")])
+
+[sub_resource type="Resource" id="tr_deed_ombra_lunga"]
+script = ExtResource("tr_deed")
+kind = 4
+amount = 4
+types = Array[StringName]([&"Criminale"])
+
+[sub_resource type="Resource" id="tr_mod_ombra_lunga"]
+script = ExtResource("tr_mod")
+id = &"trad_ombra_lunga"
+display_name = "Ombra lunga"
+description = "Gli elementi che infliggono Corruzione ne infliggono 1 in più."
+is_malus = false
+effect = 11
+battle_value = 3
+amount = 1
+duration_kind = 2
+stacking = 1
+
+[sub_resource type="Resource" id="tr_step_ombra_lunga"]
+script = ExtResource("tr_trad")
+id = &"ombra_lunga"
+display_name = "Ombra lunga"
+description = "Gli elementi che infliggono Corruzione ne infliggono 1 in più."
+deed = SubResource("tr_deed_ombra_lunga")
+permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_ombra_lunga")])
 
 [resource]
 script = ExtResource("14_r05ox")
@@ -30,3 +140,4 @@ favored_opportunities = Array[ExtResource("2_gvfs3")]([ExtResource("9_ig2le"), E
 exclusive_troops = Array[ExtResource("3_dphoi")]([ExtResource("4_pm6jo")])
 favored_by = Array[Resource]([ExtResource("6_wst1v"), ExtResource("7_nuugu"), ExtResource("8_paywp")])
 permanent_modifiers = Array[ExtResource("11_ifuga")]([ExtResource("12_j6pe2"), ExtResource("13_xnhog")])
+traditions = Array[ExtResource("tr_trad")]([SubResource("tr_step_informatori"), SubResource("tr_step_covi"), SubResource("tr_step_sicari"), SubResource("tr_step_ombra_lunga")])
