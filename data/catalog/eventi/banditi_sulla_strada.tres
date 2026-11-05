@@ -42,6 +42,17 @@ description = "Ricevi 2 Documenti."
 requires_types = Array[StringName]([&"Criminale"])
 gain = SubResource("RA_7")
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+ferro = 1
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Arma i contadini"
+description = "Ricevi 1 Ferro, ma il Malcontento sale di 1."
+gain = SubResource("N100_gain")
+malcontent_change = 1
+
 [resource]
 script = ExtResource("e1")
 id = &"banditi_sulla_strada"
@@ -51,4 +62,4 @@ sphere = "Ombra"
 color = &"viola"
 min_era = 1
 max_era = 1
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_6"), SubResource("N100")])

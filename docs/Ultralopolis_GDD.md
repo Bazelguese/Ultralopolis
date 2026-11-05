@@ -281,7 +281,7 @@ Nei round, oltre ai consiglieri, possono comparire carte di altre famiglie, lega
 | Un Evento compare una sola volta per run, salvo quelli ripetibili; Visitatori e Fortune possono tornare, ma non nello stesso anno | Confermato |
 | Ogni carta ha una **sfera**: una delle 8 categorie (§4.2.4), che ne dà il tema e la cornice | Confermato |
 | Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo) | Confermato |
-| Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una carta con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione senza requisiti | Confermato |
+| Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una carta con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione **gratuita e senza requisiti**, così si può sempre scegliere qualcosa (v0.24) | Confermato |
 | Nessun evento arriva da solo senza essere scelto, con una sola eccezione: la **Rivoluzione** (§9.4.2) | Confermato (eccezione dalla v0.24) |
 | Le opzioni possono anche **cambiare il governo** (Riforma, Rivoluzione) e far salire o scendere il **Malcontento** (§5.5) | Confermato (v0.24) |
 
@@ -1320,6 +1320,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - **Tipi d'identità** fuori dalle categorie, sulle carte esclusive; massimo 3 tipi per carta (§6.6).
 - La **Rivoluzione** è il primo evento che arriva da solo (§4.2.5); le opzioni possono cambiare governo e Malcontento.
 - Nuovi effetti della scheda dell'identità sul Consiglio e sulle risorse (§9.2).
+- Ogni evento ha almeno un'opzione gratuita e senza requisiti (§4.2.5); sei eventi nuovi senza costi in risorse (Catalogo).
 
 **v0.23 — 5 novembre 2026** (modifica del nucleo)
 - Nei round possono comparire **Eventi**, **Visitatori** e **Fortune** al posto di un consigliere: al massimo una carta per round, in media 1 round su 3 (§4.2.5).

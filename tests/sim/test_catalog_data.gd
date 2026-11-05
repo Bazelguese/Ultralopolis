@@ -315,7 +315,7 @@ func test_ogni_consigliere_ha_edifici_truppe_e_azioni_in_ogni_era() -> void:
 
 
 func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
-	# Bozza v0.23: 18 eventi, 6 fortune, 6 visitatori; ogni evento ha un'opzione senza requisiti.
+	# Bozza v0.23: 18 eventi, 6 fortune, 6 visitatori; ogni evento ha un'opzione gratuita senza requisiti.
 	var catalog: CatalogDef = _catalog()
 	var categories: Array[String] = []
 	for advisor: AdvisorDef in catalog.advisors:
@@ -333,15 +333,17 @@ func test_eventi_visitatori_e_fortune_del_catalogo() -> void:
 		assert_false(event.options.is_empty(), "Opzioni di %s" % event.id)
 		var free: bool = false
 		for option: EventOptionDef in event.options:
-			if option.requires_identity.is_empty() and option.requires_types.is_empty():
+			# Si può sempre scegliere qualcosa, anche senza risorse né carte adatte (Davide, 5 novembre).
+			if option.requires_identity.is_empty() and option.requires_types.is_empty() \
+					and (option.cost == null or option.cost.is_empty()):
 				free = true
-		assert_true(free, "%s ha un'opzione senza requisiti" % event.id)
+		assert_true(free, "%s ha un'opzione gratuita e senza requisiti" % event.id)
 		if event.family == EventDef.Family.FORTUNA:
 			fortunes += 1
 			assert_eq(event.options.size(), 1, "Una Fortuna è un dono solo (%s)" % event.id)
 		else:
 			events += 1
-	assert_eq(events, 20, "18 eventi più la Riforma e i Tumulti in piazza (v0.24).")
+	assert_eq(events, 26, "18 eventi, la Riforma, i Tumulti in piazza e 6 eventi senza costi (v0.24).")
 	assert_eq(revolutions, 1, "Una Rivoluzione.")
 	assert_eq(fortunes, 6)
 	assert_eq(catalog.visitors.size(), 6)

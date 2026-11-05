@@ -40,6 +40,17 @@ description = "Ricevi 4 Stabilità."
 requires_types = Array[StringName]([&"Legge"])
 gain = SubResource("RA_6")
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+documenti = 2
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Fingi di non sapere"
+description = "Ricevi 2 Documenti, ma il Malcontento sale di 1."
+gain = SubResource("N100_gain")
+malcontent_change = 1
+
 [resource]
 script = ExtResource("e1")
 id = &"congiura_a_corte"
@@ -49,4 +60,4 @@ sphere = "Ombra"
 color = &"viola"
 min_era = 3
 max_era = 3
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_5")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_5"), SubResource("N100")])

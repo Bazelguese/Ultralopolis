@@ -47,6 +47,16 @@ description = "Ricevi 2 Ricerca e 2 Documenti."
 requires_types = Array[StringName]([&"Accademico"])
 gain = SubResource("RA_8")
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+ricerca = 1
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Ascolta entrambi"
+description = "Ricevi 1 Ricerca."
+gain = SubResource("N100_gain")
+
 [resource]
 script = ExtResource("e1")
 id = &"disputa_dei_dotti"
@@ -55,4 +65,4 @@ description = "Due scuole di pensiero si contendono la capitale."
 sphere = "Conoscenza"
 color = &"viola"
 favored_by = Array[Resource]([ExtResource("e4")])
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_4"), SubResource("OPT_7"), SubResource("N100")])

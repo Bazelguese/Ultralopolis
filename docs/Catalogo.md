@@ -380,7 +380,7 @@ Le azioni che fanno scendere il Malcontento compaiono solo se c'è Malcontento. 
 
 Compaiono nei round al posto di un consigliere. File dati: `data/catalog/eventi/` (eventi e fortune) e `data/catalog/visitatori/`. Ogni carta ha una sfera (una categoria del Consiglio) e delle radici; le opzioni fra parentesi quadre richiedono qualcosa alla nazione e, se manca, restano visibili ma spente.
 
-### Eventi (18 + Riforma, Tumulti e Rivoluzione)
+### Eventi (24 + Riforma, Tumulti e Rivoluzione)
 
 Notazione delle opzioni: **[requisito]** = opzione sbloccata solo con quel requisito. "Per un anno" segue §8.2.1. I valori seguono più o meno il budget del Catalogo (1 Oro ≈ 1 Ricerca ≈ 2 unità delle altre risorse).
 
@@ -391,26 +391,37 @@ Notazione delle opzioni: **[requisito]** = opzione sbloccata solo con quel requi
 | **Il passo innevato** | Opera | favorito da Pietrosangue | Spala la neve: 2 Pietra → 3 Ferro · Aspetta il disgelo: per un anno la Capitale produce 1 Pietra in più · **[Guardiano]** Le guardie aprono la strada: +2 Ferro · **[Pietrosangue]** La roccia viva apre il passo: +3 Pietra e +2 Ferro |
 | **La piena del fiume** | Terra | favorito da Maremani | Alza gli argini: 3 Legno → +2 Stabilità · Lascia allagare i campi: per un anno +1 Cibo per fase dagli edifici di Produzione · **[Economico]** I mercanti noleggiano chiatte: +4 Oro · **[Maremano]** I barcaioli salvano il raccolto: +3 Cibo e +2 Influenza |
 | **La montagna si sveglia** | Terra | favorito da Cinerali | Evacua i villaggi: 2 Cibo → +3 Stabilità · Raccogli l'ossidiana: +3 Ferro e +1 Pietra · **[edificio di Produzione]** Forgia nella lava: un edificio di Produzione sale di livello · **[Cinerale]** Volano sopra la cenere: +3 Ferro e +2 Documenti |
-| **L'erede al trono** | Stato | favorito da Monarchia | Festa di corte: 3 Oro → +3 Stabilità · Matrimonio politico: 2 Stabilità → +4 Influenza · **[Nobile]** Il giuramento dei nobili: per un anno le truppe Nobili ricaricano il 10% più in fretta |
+| **L'erede al trono** | Stato | favorito da Monarchia | Festa di corte: 3 Oro → +3 Stabilità · Matrimonio politico: 2 Stabilità → +4 Influenza · **[Nobile]** Il giuramento dei nobili: per un anno le truppe Nobili ricaricano il 10% più in fretta · Annuncio in piazza: +1 Stabilità |
 | **Le elezioni** | Stato | favorito da Repubblica | Campagna generosa: 3 Oro → per un anno ogni consigliere mostra una proposta in più · Lascia decidere il popolo: +2 Stabilità · **[Legge]** Riforma delle leggi: 2 Documenti → +3 Stabilità e +2 Influenza |
 | **Il concilio dei sacerdoti** | Fede | favorito da Teocrazia | Dottrina severa: 2 Fede → +10 Resistenza nel prossimo scontro con il fantasma · Apertura al popolo: +2 Influenza · **[Spirituale]** Grande processione: +3 Fede |
 | **L'eclissi** | Fede | favorito da Culto solare | Rito di riparazione: 3 Fede → +5 Oro · Presagio di guerra: fino al prossimo fantasma le truppe ricaricano il 10% più in fretta · **[Accademico]** Gli astronomi la spiegano: +3 Ricerca |
 | **Il bosco che sussurra** | Fede | favorito da Spiriti dei luoghi | Offerta agli spiriti: 2 Cibo → +3 Fede · Abbatti il bosco: +4 Legno · **[Guardiano]** I guardiani del bosco: ricevi gli Esploratori (se c'è spazio) |
-| **La disputa dei dotti** | Conoscenza | favorito da Cultura erudita | Finanzia la scuola: 3 Oro → +3 Ricerca · Pubblica gli atti: 2 Documenti → +3 Influenza · **[Accademico]** Il trattato fondamentale: +2 Ricerca e +2 Documenti |
-| **Il torneo** | Militare | favorito da Cultura guerriera | Premi ricchi: 3 Oro → per un anno una truppa a scelta fa il 25% di danno in più · Torneo modesto: 1 Ferro → +2 Stabilità · **[Fante]** Il campione: una truppa Fante a scelta sale di livello |
-| **La grande fiera** | Ricchezza | favorito da Cultura mercantile | Fiera delle meraviglie: 4 Oro → ricevi un edificio Economico dell'era, a caso · Banchi per tutti: 2 Influenza → +5 Oro · **[Infrastruttura Strategica]** Le strade portano mercanti: +2 Oro e +2 Influenza |
-| **Il manoscritto perduto** | Conoscenza | favorito da Cultura erudita | Compralo: 4 Oro → +4 Documenti · Fallo copiare: 2 Documenti → +3 Ricerca · **[Criminale]** Rubalo: 1 Stabilità → +4 Documenti |
+| **La disputa dei dotti** | Conoscenza | favorito da Cultura erudita | Finanzia la scuola: 3 Oro → +3 Ricerca · Pubblica gli atti: 2 Documenti → +3 Influenza · **[Accademico]** Il trattato fondamentale: +2 Ricerca e +2 Documenti · Ascolta entrambi: +1 Ricerca |
+| **Il torneo** | Militare | favorito da Cultura guerriera | Premi ricchi: 3 Oro → per un anno una truppa a scelta fa il 25% di danno in più · Torneo modesto: 1 Ferro → +2 Stabilità · **[Fante]** Il campione: una truppa Fante a scelta sale di livello · Giostra di paese: +1 Influenza |
+| **La grande fiera** | Ricchezza | favorito da Cultura mercantile | Fiera delle meraviglie: 4 Oro → ricevi un edificio Economico dell'era, a caso · Banchi per tutti: 2 Influenza → +5 Oro · **[Infrastruttura Strategica]** Le strade portano mercanti: +2 Oro e +2 Influenza · Passeggia fra i banchi: +1 Oro |
+| **Il manoscritto perduto** | Conoscenza | favorito da Cultura erudita | Compralo: 4 Oro → +4 Documenti · Fallo copiare: 2 Documenti → +3 Ricerca · **[Criminale]** Rubalo: 1 Stabilità → +4 Documenti · Leggilo in biblioteca: +1 Documenti |
 
 **Generici, legati all'era**
 
 | Evento | Sfera | Radici | Opzioni |
 |---|---|---|---|
-| **Banditi sulla strada** | Ombra | era 1 | Scorta armata: 2 Ferro → +3 Oro · Assoldali: 3 Oro → ricevi i Tagliagole (se c'è spazio) · **[Criminale]** Un accordo nell'ombra: +2 Documenti |
-| **Un inverno lungo** | Terra | era 1 | Razionamento: 2 Legno → per un anno le truppe mangiano la metà · Granai del re: 3 Oro → +4 Cibo · **[Produzione]** I campi resistono: +3 Cibo |
-| **Gli esuli** | Stato | era 2 | Accoglili: 2 Cibo → +3 Stabilità · Arruolali: 4 Oro → ricevi una truppa dell'era, a caso · **[Patriota]** Nuovi patrioti: +2 Stabilità e +2 Influenza |
+| **Banditi sulla strada** | Ombra | era 1 | Scorta armata: 2 Ferro → +3 Oro · Assoldali: 3 Oro → ricevi i Tagliagole (se c'è spazio) · **[Criminale]** Un accordo nell'ombra: +2 Documenti · Arma i contadini: +1 Ferro, Malcontento +1 |
+| **Un inverno lungo** | Terra | era 1 | Razionamento: 2 Legno → per un anno le truppe mangiano la metà · Granai del re: 3 Oro → +4 Cibo · **[Produzione]** I campi resistono: +3 Cibo · Taglia i boschi del re: +2 Legno, Malcontento +1 |
+| **Gli esuli** | Stato | era 2 | Accoglili: 2 Cibo → +3 Stabilità · Arruolali: 4 Oro → ricevi una truppa dell'era, a caso · **[Patriota]** Nuovi patrioti: +2 Stabilità e +2 Influenza · Confisca i loro beni: +3 Oro, Malcontento +1 |
 | **Febbre nei quartieri** | Fede | era 2 | Ospedali da campo: 3 Fede → +3 Stabilità · Chiudi le porte: +4 Stabilità, ma per un anno la Ricerca prodotta si dimezza · **[Spirituale]** I monaci curano: +2 Fede |
 | **La grande opera** | Opera | era 3 | Costruiscila: 5 Pietra → +1 spazio edificio · Rimandala: +2 Pietra · **[Infrastruttura Strategica]** Ingegneri esperti: 3 Pietra → +1 spazio edificio |
-| **Congiura a corte** | Ombra | era 3 | Reprimi: 3 Stabilità → +10 Resistenza nel prossimo scontro con il fantasma · Infiltra i congiurati: 3 Documenti → la truppa più veloce del fantasma parte sabotata per 5 s · **[Legge]** Processo pubblico: +4 Stabilità |
+| **Congiura a corte** | Ombra | era 3 | Reprimi: 3 Stabilità → +10 Resistenza nel prossimo scontro con il fantasma · Infiltra i congiurati: 3 Documenti → la truppa più veloce del fantasma parte sabotata per 5 s · **[Legge]** Processo pubblico: +4 Stabilità · Fingi di non sapere: +2 Documenti, Malcontento +1 |
+
+**Senza costi (v0.24).** Davide: ogni evento ha almeno un'opzione gratuita e senza requisiti, così si può sempre scegliere qualcosa. Le opzioni gratuite aggiunte agli eventi qui sopra sono più deboli, oppure fanno salire il Malcontento. Questi sei eventi non chiedono mai risorse: si sceglie fra vantaggi diversi, o fra un vantaggio e una conseguenza.
+
+| Evento | Sfera | Radici | Opzioni |
+|---|---|---|---|
+| **Il pellegrino cieco** | Fede | — | Accoglilo: +2 Fede · Chiedigli una profezia: fino al prossimo fantasma le truppe ricaricano il 10% più in fretta, Malcontento +1 · **[Spirituale]** Benedizione: +2 Fede e +1 Stabilità |
+| **Una cometa nel cielo** | Conoscenza | — | Studiala: +2 Ricerca · Annuncia un presagio: +3 Fede, Malcontento +1 · **[Accademico]** Calcola l'orbita: +2 Ricerca e +2 Documenti |
+| **La carovana smarrita** | Ricchezza | — | Guidala in città: +2 Influenza · Saccheggiala: +5 Oro, Malcontento +2 · **[truppa Fante]** Scortala: +3 Oro e +1 Influenza |
+| **Il disertore** | Militare | — | Interrogalo: +2 Documenti · Arruolalo: una truppa dell'era a caso, Malcontento +1 · **[Legge]** Processo militare: +2 Stabilità e +1 Documenti |
+| **Le terre di confine** | Terra | — | Coltivala: +3 Cibo · Disbosca tutto: +4 Legno, Malcontento +1 · **[edificio di Produzione]** Fattorie nuove: +1 spazio edificio |
+| **Il cantastorie** | Stato | — | Ascoltalo: Malcontento −1 · Fallo tacere: +2 Stabilità, Malcontento +1 · **[Patriota]** Canti di gloria: +2 Influenza, Malcontento −1 |
 
 **Governo e Malcontento (v0.24)**
 
@@ -588,4 +599,4 @@ Tutte le questioni della bozza 1 sono decise.
 | Malus | 12 (6 esistenti + 6 nuovi) | | | 12 |
 | Consiglieri | 8 ordinari + Clown e Anziano | | | 10 |
 | Azioni del Consiglio | 40 (di cui 6 esclusive dell’identità, compresi 4 incanti dei credi, e 3 dal livello Ministri) | | | 40 |
-| Eventi / Fortune / Visitatori | 21 (18 + Riforma, Tumulti, Rivoluzione) / 6 / 6 | | | 33 |
+| Eventi / Fortune / Visitatori | 27 (24 + Riforma, Tumulti, Rivoluzione) / 6 / 6 | | | 39 |

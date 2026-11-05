@@ -44,6 +44,16 @@ upgrade = true
 upgrade_types = Array[StringName]([&"Fante"])
 upgrade_kind = 2
 
+[sub_resource type="Resource" id="N100_gain"]
+script = ExtResource("e3")
+influenza = 1
+
+[sub_resource type="Resource" id="N100"]
+script = ExtResource("e2")
+label = "Giostra di paese"
+description = "Ricevi 1 Influenza."
+gain = SubResource("N100_gain")
+
 [resource]
 script = ExtResource("e1")
 id = &"torneo"
@@ -52,4 +62,4 @@ description = "I guerrieri della nazione chiedono un torneo."
 sphere = "Militare"
 color = &"rosso"
 favored_by = Array[Resource]([ExtResource("e6")])
-options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6")])
+options = Array[ExtResource("e2")]([SubResource("OPT_1"), SubResource("OPT_3"), SubResource("OPT_6"), SubResource("N100")])
