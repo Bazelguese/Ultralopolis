@@ -230,3 +230,15 @@ func test_ogni_tipo_delle_carte_sta_in_una_categoria() -> void:
 			assert_true(in_categories.has(card_type), "Il tipo %s di %s sta in una categoria" % [card_type, card[0]])
 	for card_type: StringName in in_categories:
 		assert_true(used.has(card_type), "Il tipo %s è usato da almeno una carta" % card_type)
+
+
+func test_ogni_era_ha_truppe_di_tutti_e_quattro_i_colori() -> void:
+	# GDD §5.3 (v0.22): quattro colori; il catalogo ne offre in ogni era.
+	var catalog: CatalogDef = _catalog()
+	for era: int in range(1, catalog.eras.size() + 1):
+		var colors: Dictionary[StringName, bool] = {}
+		for def: TroopDef in catalog.troops:
+			if def.era == era and def.mana_cost > 0:
+				colors[def.mana_type] = true
+		for color: StringName in [BattleSim.MANA_ROSSO, BattleSim.MANA_VERDE, BattleSim.MANA_BLU, BattleSim.MANA_VIOLA]:
+			assert_true(colors.has(color), "Era %d: truppe %s" % [era, color])

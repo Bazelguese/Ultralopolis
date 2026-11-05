@@ -31,8 +31,8 @@ extends Resource
 @export var documents_per_phase: int = 0
 
 @export_group("In battaglia")
-## Colore del mana prodotto: rosso, verde, blu o energetico (GDD §5.3).
-## Indica anche la famiglia dell'edificio.
+## Colore del mana prodotto: rosso, verde, blu, viola o energetico (GDD §5.3).
+## Il colore non dipende dai tipi (GDD v0.22).
 @export var mana_type: StringName = &"energetico"
 ## Mana prodotto a ogni intervallo. Zero = edificio neutro, senza colore (GDD §5.3).
 @export var mana_amount: int = 0

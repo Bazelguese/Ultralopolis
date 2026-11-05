@@ -18,6 +18,7 @@ display_name = "Guastatori"
 era = 2
 cost_gold = 7
 types = Array[StringName]([&"Fante", &"Criminale"])
+mana_type = &"viola"
 mana_cost = 3
 cooldown_ms = 3000
 damage = 7

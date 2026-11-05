@@ -34,12 +34,13 @@ enum TroopState {
 const SIDE_A: int = 0
 const SIDE_B: int = 1
 
-## Colori del mana (GDD §5.3). L'energetico vale come qualsiasi colore.
+## Colori del mana (GDD §5.3, v0.22: quattro colori). L'energetico vale come qualsiasi colore.
 const MANA_ROSSO: StringName = &"rosso"
 const MANA_VERDE: StringName = &"verde"
 const MANA_BLU: StringName = &"blu"
+const MANA_VIOLA: StringName = &"viola"
 const MANA_ENERGETICO: StringName = &"energetico"
-const MANA_COLORS: Array[StringName] = [&"rosso", &"verde", &"blu", &"energetico"]
+const MANA_COLORS: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola", &"energetico"]
 ## Gli edifici senza mana sono neutri (GDD §5.3).
 const MANA_NEUTRO: StringName = &"neutro"
 

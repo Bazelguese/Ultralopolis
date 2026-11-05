@@ -31,7 +31,7 @@ const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
 const SPAZI_TRUPPE: int = 12
 const SPAZI_EDIFICI: int = 10
-const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"energetico"]
+const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola", &"energetico"]
 ## Oltre questo numero di gemme in volo non se ne lanciano altre (solo effetto visivo).
 const MASSIMO_GEMME_IN_VOLO: int = 24
 
@@ -426,7 +426,7 @@ func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
 	_riserve[lato] = nodo
 	for i: int in range(COLORI_RISERVA.size()):
 		var mana: StringName = COLORI_RISERVA[i]
-		var x: float = (i - 1.5) * 0.55
+		var x: float = (i - (COLORI_RISERVA.size() - 1) * 0.5) * 0.55
 		var gemma: MeshInstance3D = MeshInstance3D.new()
 		var forma: CylinderMesh = CylinderMesh.new()
 		forma.top_radius = 0.19

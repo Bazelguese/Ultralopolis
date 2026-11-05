@@ -18,6 +18,7 @@ display_name = "Moschettieri"
 era = 3
 cost_gold = 9
 types = Array[StringName]([&"Fante"])
+mana_type = &"verde"
 mana_cost = 2
 cooldown_ms = 2500
 damage = 10

@@ -70,6 +70,7 @@ const MANA_TEXT_COLORS: Dictionary[StringName, Color] = {
 	&"rosso": Color(1.0, 0.5, 0.45),
 	&"verde": Color(0.55, 0.9, 0.55),
 	&"blu": Color(0.55, 0.75, 1.0),
+	&"viola": Color(0.8, 0.55, 1.0),
 	&"energetico": Color(1.0, 0.9, 0.45),
 }
 

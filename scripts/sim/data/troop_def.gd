@@ -18,7 +18,7 @@ extends Resource
 @export var food_tenths: int = 5
 
 @export_group("In battaglia")
-## Colore del mana richiesto: rosso, verde o blu (GDD §5.3). Ignorato se mana_cost è 0.
+## Colore del mana richiesto: rosso, verde, blu o viola (GDD §5.3). Ignorato se mana_cost è 0.
 @export var mana_type: StringName = &"rosso"
 ## Mana consumato a ogni attivazione. Zero = truppa senza richiesta di mana.
 @export var mana_cost: int = 0
