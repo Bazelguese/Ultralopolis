@@ -194,6 +194,8 @@ La produzione di risorse avviene all’inizio delle **due metà**, non a ogni ro
 | Si può **passare**: senza scegliere un consigliere, oppure dopo averlo scelto senza prendere nulla. Passare non dà nulla | Passare: Confermato; dopo la scelta del consigliere: Proposta |
 | Il **rinnovo** a pagamento ripesca le proposte del consigliere scelto | Proposta |
 | Il rinnovo costa Oro, almeno 1; il costo aumenta a ogni rinnovo e a ogni nuovo round si dimezza l’aumento accumulato (arrotondato per difetto), senza scendere sotto il costo iniziale | Confermato |
+| Il rinnovo si può pagare, in alternativa all’Oro, con la **risorsa della categoria** del consigliere (§4.2.4) | Confermato (v0.22) |
+| Il costo del rinnovo pagato con la risorsa della categoria segue lo stesso aumento e lo stesso contatore del rinnovo in Oro; il Maestro delle spie si rinnova con la risorsa casuale del round; Clown e Anziano, senza categoria, solo in Oro | Proposta |
 | Le azioni **non costano Oro**, ma altre risorse coerenti con il tema; edifici, truppe e spazi si pagano in Oro | Confermato (v0.20) |
 | L’**identità** della nazione (popolo, governo, credo, cultura, vie) rende più frequenti alcuni consiglieri, già nel prototipo | Confermato |
 | Gli edifici e le truppe proposti sono dell’era corrente, esclusivi delle vie compresi | Confermato |
@@ -224,12 +226,12 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 | Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
 | Studioso | Conoscenza | Studiosi: Legno in Ricerca | Legno |
 | Sacerdote | Fede | Incanta una truppa (§4.3), un’azione per ogni effetto | Fede |
-| Cancelliere (ex Diplomatico) | Stato | Ambasciata: accorcia un malus attivo | Influenza |
-| Maestro delle spie | Ombra | Sabotaggio o rallentamento del fantasma (§12) | Influenza |
+| Cancelliere (ex Diplomatico) | Stato | Ambasciata: accorcia un malus attivo | Stabilità |
+| Maestro delle spie | Ombra | Sabotaggio o rallentamento del fantasma (§12) | Documenti |
 | Clown | — | 5 elementi di mana diverso (§4.2.2) | — |
 | Anziano | — | Un perk (§9.3) | Fede e Influenza |
 
-Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
+Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Ogni risorsa di categoria (§5.3) deve pagare **almeno un’azione** del Consiglio — Confermato (v0.22). L’assegnazione attuale (Ambasciata in Stabilità, spionaggio in Documenti) è una Proposta. Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
 
 Una proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
 
@@ -323,13 +325,15 @@ Dalla v0.22 **ogni categoria del Consiglio ha la sua risorsa** (§4.2.4): è que
 
 - La **Fauna** non è più una risorsa (v0.22): resta solo come tipo (§6.6).
 - Le **azioni** dei consiglieri non seguono la risorsa della categoria: si pagano come indicato in §4.2.3 — Confermato (v0.22).
+- **Altri impieghi — Confermato (v0.22).** Le risorse di categoria non servono solo a Potenzia: pagano anche il **rinnovo** delle proposte del proprio consigliere (§4.2) e **almeno un’azione** del Consiglio (§4.2.3). Così restano utili anche quando le carte sono al livello massimo.
+- **Direzione (v0.22):** gli eventi a scelta (§13) e le tecnologie (§10.5) potranno chiedere risorse, comprese quelle di categoria.
 - La colonna “Prodotta soprattutto da” è una tendenza per il catalogo, non una regola.
 
 - Tutte le risorse stanno nel **Magazzino**, senza limite di capacità.
 - Un edificio può produrre più risorse a ogni fase.
 - I costi di base (edifici, truppe, spazi, rinnovi) restano in Oro.
 
-**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
+**Mercato delle risorse — Confermato.** In Produzione e in Preparazione il giocatore può sempre vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Il mercato funziona **solo in vendita**: con l’Oro non si comprano risorse, così l’Oro raccoglie le eccedenze ma non sostituisce la specializzazione (confermato in v0.22). Una nazione generalista che produce un po’ di tutto può così vivere comprando con l’Oro. Tasso: placeholder (§16.3).
 
 **Mana — Confermato.** Il mana è distinto dal Magazzino e non finanzia acquisti fuori battaglia. Mana iniziale pari a zero, nessun limite di accumulo durante lo scontro, azzeramento a fine battaglia.
 
@@ -381,7 +385,8 @@ Sono ammesse **copie multiple** dello stesso edificio o della stessa truppa — 
 ### 6.2 Dotazione iniziale — Base approvata
 
 - Prima era.
-- La **Capitale** (Confermato): produce 1 di ogni risorsa a ogni fase e 1 mana energetico in battaglia; non si può vendere né sostituire; perk e caratteristiche dell’identità possono potenziarla.
+- La **Capitale** (Confermato): produce 1 mana energetico in battaglia; non si può vendere né sostituire; perk e caratteristiche dell’identità possono potenziarla.
+- **Produzione della Capitale — Confermato (modifica del nucleo, v0.22):** a ogni fase produce 1 **Oro**, 1 **Cibo** e 1 **Ricerca**, più **+1 di una risorsa indicata da ciascun elemento dell’identità** (popolo, governo, credo, cultura). Anche le **vie** (§10.4) possono aggiungerne, come tratto permanente. Se più elementi indicano la stessa risorsa, si sommano: la nazione nasce con una vocazione. Prima della v0.22 la Capitale produceva 1 di ogni risorsa.
 - Una truppa di base con cooldown, senza richiesta di mana.
 - Tre spazi edificio e due spazi truppa vuoti.
 - Una dotazione di Oro per un primo acquisto.
@@ -728,6 +733,7 @@ Popoli, governi, credi, culture e perk usano la stessa scheda. Ogni elemento pu�
 
 - dare una **quota di Resistenza** (§7.1.1);
 - cambiare la **dotazione iniziale** (Oro, Ricerca, edifici, truppe);
+- indicare **una risorsa che la Capitale produce** a ogni fase (§6.2, v0.22): ogni popolo, governo, credo e cultura ne indica una;
 - rendere alcuni **consiglieri o proposte esclusivi o più frequenti** (§4.2);
 - concedere **edifici o truppe esclusivi**;
 - dare un **tratto permanente**, cioè un modificatore che dura tutta la run (§8).
@@ -788,7 +794,7 @@ Entrando in un’era, dalla seconda in poi, la nazione sceglie una **via**: una 
 | Si sceglie **fra 3 vie** | Confermato |
 | Ogni era ha un **pool di vie**. Le 3 proposte sono pescate dal pool, con più probabilità per le vie coerenti con l’identità e con le vie già scelte; alcune vie possono essere esclusive di certe identità o di certe vie precedenti | Confermato |
 | Una via usa la **stessa scheda degli elementi dell’identità** (§9.2) | Confermato |
-| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi; dare un tratto permanente (§8); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
+| Una via può: influenzare le offerte (più frequenti o esclusive); concedere elementi esclusivi; dare un tratto permanente (§8), anche una risorsa in più prodotta dalla Capitale (§6.2, v0.22); dare un **bonus immediato** al momento della scelta (risorse, spazi, un elemento) | Confermato |
 | Gli effetti sono **liberi**: possono riferirsi a tipi o a elementi specifici, caso per caso nel catalogo | Confermato |
 | Gli **elementi esclusivi** di una via sono **diversi per ogni era**: una via scelta nell’era 2 ha esclusivi propri per l’era 2, per l’era 3 e per le successive. Gli esclusivi di un’era passata spariscono come le altre offerte | Confermato |
 | Le vie si accumulano: nessuna sostituisce le precedenti o gli elementi scelti alla creazione | Confermato |
@@ -845,7 +851,7 @@ Ottenere informazioni sull’avversario prima dello scontro e poter intervenire 
 | Il bersaglio dipende dalla proposta: **a caso**, a un’**estremità** della fila, il **più lento** o il **più veloce** (§7.7.1) | Confermato |
 | Il Maestro delle spie propone anche edifici e truppe che rallentano o sabotano | Confermato |
 | Vale per lo scontro con il fantasma dell’anno, anche se comprato nella prima metà | Proposta |
-| Durate: 5 s di Sabotaggio, 10 s di Inefficienza; si paga in Influenza | Proposta (placeholder) |
+| Durate: 5 s di Sabotaggio, 10 s di Inefficienza; si paga in Documenti (v0.22; prima in Influenza) | Proposta (placeholder) |
 | Una proposta indica se colpisce truppe, edifici o qualsiasi elemento | Proposta |
 | Il fantasma non spia il giocatore: è una registrazione (§11.1) | Proposta |
 
@@ -1032,7 +1038,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
 | Almeno 1 proposta per consigliere (prima del Consiglio: 1 alternativa per opportunità) | Provvisoria. |
-| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Influenza; Processione 2 Fede. Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
+| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; spionaggio in Documenti (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
 | Bottino dei nemici sconfitti: fantasma 3 Oro e 2 Ricerca; incontri facile 2 Oro e 1 Ricerca, media 3 e 2, difficile 4 e 3 | Placeholder (v0.21). |
 | Un consigliere o una proposta favoriti da un elemento dell’identità hanno peso +1 per ogni elemento che li favorisce (peso base 1) | Provvisoria (estesa ai consiglieri, v0.21). |
@@ -1094,7 +1100,9 @@ Criteri di accettazione proposti per il prototipo:
 | Rallentato e sabotato insieme | Il blocco prevale; le durate di entrambi scorrono. |
 | Resistenza | Somma di era, identità, anni, edifici e truppe all’inizio dello scontro. |
 | Vendita | Rimborso pari a metà del prezzo pagato, arrotondato per difetto. |
-| Rinnovo delle offerte | Costa Oro; il costo cresce a ogni rinnovo e l’aumento si dimezza a ogni nuovo round. |
+| Rinnovo delle offerte | Costa Oro, oppure la risorsa della categoria del consigliere; il costo cresce a ogni rinnovo e l’aumento si dimezza a ogni nuovo round. |
+| Produzione della Capitale | 1 Oro, 1 Cibo, 1 Ricerca, più 1 della risorsa indicata da ogni elemento dell’identità e dalle vie con quel tratto; risorse uguali si sommano. |
+| Mercato | Vende risorse per Oro; non permette di comprare risorse. |
 | Avvio di un nuovo combattimento | Resistenza ripristinata; mana secondo la convenzione scelta. |
 | Sconfitta nell’anno N | Perdita di N Prestigio, salvo ultima possibilità già attiva. |
 | Prima discesa a zero Prestigio | Run ancora attiva in ultima possibilità. |
@@ -1183,6 +1191,9 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - Il “tipo del round” si chiama ora **tema del round**, per non confonderlo con i tipi delle carte (§4.2).
 - Direzione: la Ricerca servirà anche per le tecnologie (§10.5).
 - **Risorse riviste** (§5.3, §4.2.4): ogni categoria ha la sua risorsa per Potenzia (Ferro, Pietra, Legno, Influenza, Documenti, Fede, Stabilità; Ombra Oro più una risorsa casuale). Nuove risorse **Stabilità** e **Documenti**; la **Fauna** non è più una risorsa (resta come tipo). Le azioni si pagano come prima.
+- Le risorse di categoria pagano anche il **rinnovo** del proprio consigliere e almeno un’azione (Ambasciata in Stabilità, spionaggio in Documenti: Proposta); direzione: eventi a scelta e tecnologie potranno chiedere risorse (§5.3).
+- La **Capitale** produce Oro, Cibo e Ricerca più una risorsa per ogni elemento dell’identità e per le vie con quel tratto (§6.2, §9.2, §10.4).
+- Il **mercato** è solo in vendita (§5.3).
 
 **v0.21 — 4 novembre 2026** (dopo le partite di Davide)
 - L’anno ha 5 round, l’incontro del mondo, altri 5 round e il fantasma; edifici e truppe si ottengono in entrambe le metà (§3.2, §4.1). L’economia non cambia.
