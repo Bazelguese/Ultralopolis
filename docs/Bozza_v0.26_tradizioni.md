@@ -2,12 +2,14 @@
 ## Tradizioni e ascensioni: le vie diventano alberi
 
 **Data:** 5 novembre 2026
-**Stato:** bozza da approvare. Il GDD non è ancora stato modificato.
+**Stato:** bozza 2, da approvare. Il GDD non è ancora stato modificato.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.25
 
 Stati come nel GDD (§0.2): **Confermato** = deciso da Davide; **Proposta** = suggerito da Claude, da approvare; **Da definire** = manca una regola; **Spunto** = idea per il futuro, da non implementare.
 
-**Portata.** Le vie stanno nella Parte II del GDD (§10.4): questa bozza le amplia senza toccare il nucleo. Non serve una risorsa nuova, perché i passi si sbloccano con le **imprese**. Gli effetti dei passi e delle ascensioni usano il linguaggio del nucleo (P5). Fa eccezione qualche ascensione che cambierebbe una regola: è segnata come tale in §6 e resta fuori dal primo prototipo.
+**Portata.** Le vie stanno nella Parte II del GDD (§10.4): passi e imprese le ampliano senza toccare il nucleo. Non serve una risorsa nuova, perché i passi si sbloccano con le **imprese**, e gli effetti dei passi usano il linguaggio del nucleo (P5).
+
+**Le ascensioni del livello 2 sono invece modifiche del nucleo.** Ognuna cambia una regola della Parte I (§6.2): va approvata una per una, ed entra nel GDD come modifica del nucleo.
 
 Riferimento verificato (Stellaris Wiki, pagine *Traditions* e *Ascension perks*): in Stellaris ogni albero ha un'adozione, 5 tradizioni e un completamento, e si compra con l'Unità. Completando un albero si apre uno spazio per un'ascensione; le ascensioni sono permanenti e a livelli.
 
@@ -21,6 +23,10 @@ Riferimento verificato (Stellaris Wiki, pagine *Traditions* e *Ascension perks*)
 | 2 | I passi dell'albero si sbloccano con le **imprese** della nazione, cioè facendo cose, non pagando una risorsa | Confermato |
 | 3 | Un'**ascensione** si ottiene **completando un albero** | Confermato |
 | 4 | Si progetta subito, insieme alle tecnologie | Confermato |
+| 5 | L'era 1 **non ha un albero**: le tradizioni cominciano con la prima via, nell'era 2 | Confermato |
+| 6 | **4 passi** per via | Confermato |
+| 7 | Le **imprese si vedono prima di scegliere la via**, sulla sua carta | Confermato |
+| 8 | Piacciono soprattutto le ascensioni che **cambiano una regola**, come "Seconda natura" | Confermato nella direzione; ogni ascensione va approvata (§6.2) |
 
 ---
 
@@ -29,15 +35,16 @@ Riferimento verificato (Stellaris Wiki, pagine *Traditions* e *Ascension perks*)
 | Parte dell'albero | Che cosa è | Stato |
 |---|---|---|
 | **Adozione** | Scegliere la via entrando nell'era, come oggi. Dà ciò che la via dà già: tratto permanente, bonus immediato, offerte più frequenti, esclusivi e tecnologie esclusive (§10.4) | Proposta (nessun cambiamento alle vie di oggi) |
-| **Passi** | **4 tradizioni** per via (Stellaris ne ha 5), ognuna con la sua impresa e il suo effetto | Proposta; numero placeholder |
-| **Completamento** | Quando tutti i passi sono fatti, la nazione sceglie un'**ascensione** (§5) | Confermato (decisione 3) |
+| **Passi** | **4 tradizioni** per via, ognuna con la sua impresa e il suo effetto | Confermato (decisione 6) |
+| **Completamento** | Quando i 4 passi sono fatti, la nazione sceglie un'**ascensione** (§5) | Confermato (decisione 3) |
 
 | Regola | Stato |
 |---|---|
 | I passi si possono completare **in qualsiasi ordine**: tutte le imprese della via sono attive insieme, e l'ordine nasce da come gioca la nazione | Proposta |
 | Un passo si completa **da solo** appena l'impresa riesce, e il suo effetto vale subito e **per sempre** | Proposta |
 | L'albero di una via **resta aperto anche nelle ere successive**: una via scelta nell'era 2 si può completare nell'era 3 | Proposta |
-| Le vie restano al massimo una per era, dalla seconda (§10.4): nel prototipo, con 3 ere, sono **2 alberi per run** | Confermato (regola esistente) |
+| La carta della via mostra, prima della scelta, le **4 imprese** e i loro effetti (decisione 7) | Confermato |
+| Le vie restano una per era, dalla seconda (§10.4): nel prototipo, con 3 ere, sono **2 alberi per run**. L'era 1 non ha albero (decisione 5) | Confermato |
 
 ---
 
@@ -59,11 +66,11 @@ Sono tutte cose che il gioco conosce già, quindi non servono regole nuove.
 | Impresa | Genere | Stato |
 |---|---|---|
 | Vincere N scontri: fantasmi, incontri o entrambi; un pareggio conta come vittoria (§3.4) | Traguardo | Proposta |
-| Completare N tecnologie di una sfera (§10.5) | Traguardo | Proposta |
-| Prendere N proposte da un consigliere, o da una categoria | Traguardo | Proposta |
+| Completare N tecnologie, di qualsiasi sfera o di una sfera (§10.5) | Traguardo | Proposta |
+| Prendere N proposte da un consigliere | Traguardo | Proposta |
 | Scegliere N Eventi di una sfera (§4.2.5) | Traguardo | Proposta |
 | Avere sulla plancia N carte con un tipo | Stato | Proposta |
-| Avere N carte con un tipo al livello 2 o 3 | Stato | Proposta |
+| Avere N carte con un tipo al livello 2 o più | Stato | Proposta |
 | Raccogliere in una sola produzione almeno N di una risorsa | Stato | Proposta |
 | Chiudere un anno con il Malcontento a N o meno (§5.5) | Stato | Proposta |
 
@@ -75,18 +82,55 @@ Sono tutte cose che il gioco conosce già, quindi non servono regole nuove.
 
 ---
 
-## 4. Esempio completo: Via della Guerra
+## 4. Catalogo dei passi (placeholder)
 
-È un esempio placeholder per vedere la forma; il catalogo di tutte le vie arriva dopo l'approvazione.
+Gli effetti usano modificatori che il gioco ha già. I numeri sono placeholder.
 
-| Passo | Impresa | Effetto |
-|---|---|---|
-| **Veterani** | Vinci 2 scontri | Le truppe Fante fanno 1 danno in più |
-| **Arsenali** | Abbi 2 edifici Infrastruttura Bellica sulla plancia | +1 Ferro per fase da ogni edificio Infrastruttura Bellica |
-| **Dottrina** | Prendi 4 proposte dal Generale | +1 spazio truppa |
-| **Esercito di popolo** | Abbi 6 carte Fante sulla plancia, di cui 2 al livello 2 o più | +8 Resistenza in ogni scontro |
+### 4.1 Vie dell'era 2
 
-**Completamento:** si sceglie un'ascensione (§5).
+| Via | Passo | Impresa | Effetto |
+|---|---|---|---|
+| **Commercio** | Botteghe | Prendi 3 proposte dal Tesoriere | +1 Oro per fase dalla Capitale |
+| | Carovane | Abbi 2 edifici Infrastruttura Strategica | +1 Influenza per fase da ogni edificio Infrastruttura Strategica |
+| | Fiere annuali | Raccogli almeno 12 Oro in una sola produzione | Rinnovare le proposte costa 1 Oro in meno |
+| | Gilde | Abbi 3 edifici Economici al livello 2 o più | +10% Oro prodotto |
+| **Guerra** | Veterani | Vinci 2 scontri | Le truppe Fante che fanno danno ne fanno 1 in più |
+| | Arsenali | Abbi 2 edifici Infrastruttura Bellica | +1 Ferro per fase da ogni edificio Infrastruttura Bellica |
+| | Dottrina | Prendi 4 proposte dal Generale | +1 spazio truppa |
+| | Esercito di popolo | Abbi 6 carte Fante, di cui 2 al livello 2 o più | +8 Resistenza in ogni scontro |
+| **Fede** | Pellegrini | Scegli 1 Evento di Fede | +1 Fede per fase dalla Capitale |
+| | Confraternite | Abbi 3 carte Spirituali | Gli elementi Spirituali che curano curano 1 in più |
+| | Concilio | Prendi 4 proposte dal Sacerdote | +6 Resistenza in ogni scontro |
+| | Santità | Chiudi un anno con il Malcontento a 2 o meno | Gli edifici Spirituali producono il 10% più in fretta |
+| **Sapere** | Scuole | Completa 2 tecnologie | +1 Documenti per fase dalla Capitale |
+| | Biblioteche | Abbi 2 edifici Accademici | +1 Documenti per fase da ogni edificio Accademico |
+| | Accademie | Completa 3 tecnologie di Conoscenza | +10% Ricerca prodotta |
+| | Enciclopedisti | Raccogli almeno 8 Ricerca in una sola produzione | Ogni consigliere mostra una proposta in più |
+
+### 4.2 Vie dell'era 3
+
+| Via | Passo | Impresa | Effetto |
+|---|---|---|---|
+| **Impero** | Legati | Vinci 2 scontri | +1 spazio edificio |
+| | Strade | Abbi 2 edifici Infrastruttura Strategica | +1 Pietra per fase da ogni edificio Infrastruttura Strategica |
+| | Legioni | Abbi 4 carte Fante al livello 2 o più | Le truppe Fante fanno il 10% di danno in più |
+| | Pax | Vinci 3 scontri con il fantasma | +10 Resistenza in ogni scontro |
+| **Oro** | Zecche | Prendi 3 proposte dal Tesoriere | +2 Oro per fase dalla Capitale |
+| | Banchieri | Abbi 3 edifici Economici | +1 Influenza per fase da ogni edificio Economico |
+| | Credito | Raccogli almeno 20 Oro in una sola produzione | Rinnovare le proposte costa 1 Oro in meno |
+| | Monopolio | Abbi 2 edifici Economici al livello 3 | +15% Oro prodotto |
+| **Rivelazione** | Visioni | Scegli 1 Evento di Fede | +1 Fede per fase da ogni edificio Spirituale |
+| | Martiri | Vinci 2 scontri | Gli elementi Spirituali che producono scudo ne producono 1 in più |
+| | Profeti | Prendi 3 proposte dal Sacerdote | +8 Resistenza in ogni scontro |
+| | Ultima rivelazione | Abbi 2 carte Spirituali al livello 3 | Gli elementi che curano curano 2 in più |
+| **Ombra** | Informatori | Prendi 3 proposte dal Maestro delle spie | Le truppe Criminali ricaricano il 10% più in fretta |
+| | Covi | Abbi 2 edifici Infrastruttura Segreta | +1 Documenti per fase da ogni edificio Infrastruttura Segreta |
+| | Sicari | Vinci 2 scontri con il fantasma | Il Sabotaggio inflitto dura il 25% in più |
+| | Ombra lunga | Abbi 4 carte Criminali | Gli elementi che infliggono Corruzione ne infliggono 1 in più |
+| **Spiriti** | Boschi sacri | Abbi 2 edifici di Produzione o Fauna | +1 Legno per fase dalla Capitale |
+| | Branchi | Abbi 3 carte Fauna | Le truppe Fauna ricaricano il 10% più in fretta |
+| | Antenati | Scegli 2 Eventi di Terra o di Fede | +8 Resistenza in ogni scontro |
+| | Grande madre | Raccogli almeno 10 Cibo in una sola produzione | +1 Cibo per fase da ogni edificio Fauna o di Produzione |
 
 ---
 
@@ -96,25 +140,40 @@ Sono tutte cose che il gioco conosce già, quindi non servono regole nuove.
 |---|---|
 | Completando un albero si sceglie **1 ascensione fra 3** pescate, con più probabilità per quelle coerenti con l'identità e le vie (stessa regola delle vie, §16.3) | Proposta |
 | Le ascensioni sono **permanenti** e non si cambiano | Proposta (come in Stellaris) |
-| Due **livelli**: quelle del livello 2 compaiono solo a chi ha già un'ascensione. Così la seconda è più forte della prima (P2a) | Proposta |
+| **Livello 1**: effetti forti con il linguaggio di oggi. **Livello 2**: cambiano una regola del gioco (decisione 8) e compaiono solo a chi ha già un'ascensione. Nel prototipo, con 2 alberi per run, la prima ascensione è di livello 1 e la seconda di livello 2 | Proposta |
 | Un'ascensione già presa non si ripresenta | Proposta |
 | Alcune ascensioni possono essere esclusive di una via o di un elemento dell'identità (radice "richiede") | Proposta |
+| Un'ascensione che cambia una regola **si vede in battaglia** (P4): per esempio la truppa incantata due volte mostra entrambi gli incanti, e "Ultima trincea" mostra il momento in cui salva la nazione | Proposta |
 
 ---
 
-## 6. Primo catalogo di ascensioni (placeholder)
+## 6. Catalogo delle ascensioni (placeholder)
 
-| Ascensione | Livello | Effetto | Linguaggio |
-|---|---:|---|---|
-| **Nazione in armi** | 1 | +1 spazio truppa e +1 spazio edificio | Esistente |
-| **Consiglio ristretto** | 1 | In ogni round compare un consigliere in più | Esistente (effetti dei governi, v0.24) |
-| **Botteghe maestre** | 1 | Potenzia costa 1 in meno (mai sotto 1) | Esistente (cultura artigiana, v0.24) |
-| **Ordine e decoro** | 1 | Il Malcontento sale di 1 in meno per ogni causa | Da verificare nel codice dell'identità |
-| **Eredità imperiale** | 2 | +20 Resistenza in ogni scontro | Esistente |
-| **Età dell'oro** | 2 | +25% di tutte le risorse prodotte | Esistente |
-| **Maestri d'armi** | 2 | Tutte le truppe fanno il 15% di danno in più | Esistente |
-| **Illuminismo** | 2 | La mano delle tecnologie ha 4 carte | Piccolo effetto nuovo sulle offerte (bersaglio già previsto in §8.2) |
-| **Seconda natura** | 2 | Una truppa può essere incantata due volte | **Cambia una regola** (§4.3): fuori dal primo prototipo |
+### 6.1 Livello 1 — effetti forti con il linguaggio di oggi
+
+| Ascensione | Effetto |
+|---|---|
+| **Nazione in armi** | +1 spazio truppa e +1 spazio edificio |
+| **Consiglio ristretto** | In ogni round compare un consigliere in più (effetto già usato dai governi, v0.24) |
+| **Botteghe maestre** | Potenzia costa 1 in meno, mai sotto 1 (effetto già usato dalla cultura artigiana, v0.24) |
+| **Eredità imperiale** | +20 Resistenza in ogni scontro |
+| **Età dell'oro** | +25% di tutte le risorse prodotte |
+| **Maestri d'armi** | Tutte le truppe fanno il 15% di danno in più |
+
+### 6.2 Livello 2 — cambiano una regola (modifiche del nucleo, da approvare una per una)
+
+| Ascensione | Effetto | Regola che cambia | Rischio da tenere d'occhio |
+|---|---|---|---|
+| **Seconda natura** | Ogni truppa si può incantare **due volte** | §4.3: "ogni truppa si può incantare una sola volta" | Truppe con due effetti e +4 mana: forti ma lente da alimentare |
+| **Ultima trincea** | La prima volta in ogni scontro che la Resistenza arriva a zero, torna a **1** | §7.1: "arrivare a zero significa perdere" | Non salva dalla Corruzione: resta il contro |
+| **Prima scintilla** | Gli edifici iniziano lo scontro con l'intervallo **a metà**, non pieno | §7.5: "truppe ed edifici iniziano con l'intervallo pieno" | Rende più veloce l'inizio: da provare con il logoramento |
+| **Disciplina ferrea** | La truppa più a destra **prenota** il mana: le altre non lo usano finché lei non si attiva | §7.3: "il mana non viene prenotato per la truppa saltata" | Cambia l'ordine delle truppe: la regola di priorità va spiegata bene a schermo |
+| **Mana unito** | Una truppa può pagare con il mana di **qualsiasi colore**, dopo il proprio e l'energetico | §5.3: "una truppa paga prima con il proprio colore e poi con l'energetico" | Molto forte per le nazioni a più colori |
+| **Maestria** | Le carte possono arrivare al **livello 4** | §6.5: "3 livelli" | Serve un costo di Potenzia per il livello 4 |
+| **Doppio ascolto** | Una volta per metà anno si prendono **due proposte** dallo stesso consigliere | §4.2: "se ne prende una sola" | Da limitare (una volta per metà) per non svuotare la scelta |
+| **Esercito frugale** | Le truppe senza Cibo **non rallentano** | §5.4: "ricarica ×1,5 senza cibo" | Toglie peso al Cibo: da accoppiare a nazioni che ne hanno poco |
+
+I fantasmi registrano anche le ascensioni del livello 2 (§8): la versione delle regole salvata nel fantasma deve dire quali regole cambiano per lui.
 
 ---
 
@@ -132,14 +191,13 @@ Sono tutte cose che il gioco conosce già, quindi non servono regole nuove.
 
 | Regola | Stato |
 |---|---|
-| Un fantasma salvato registra i passi e le ascensioni fra i suoi modificatori; in battaglia valgono quelli su tutta la nazione, come per le tecnologie | Proposta tecnica |
+| Un fantasma salvato registra i passi e le ascensioni; in battaglia valgono i passi su tutta la nazione e le ascensioni che cambiano le regole della battaglia | Proposta tecnica |
 | Fantasmi generati: tutti i passi delle vie delle ere passate e metà di quelli della via dell'era corrente, scelti a caso con il seme della run; un'ascensione per ogni albero completo | Convenzione provvisoria (§16.3) |
 
 ---
 
 ## 9. Domande per Davide
 
-1. **Era 1 senza albero.** La prima via arriva nell'era 2, quindi nell'era 1 non c'è nessuna tradizione da costruire. Va bene così, oppure vuoi un albero dall'inizio? Per esempio la **cultura** potrebbe fare da primo albero, oppure si potrebbe scegliere una "via della fondazione" alla creazione della nazione.
-2. **Quanti passi:** 4 per via (proposta) o 5 come in Stellaris? Con 5 è più difficile completare gli alberi nel prototipo, che ha solo 2 vie per run.
-3. **Le imprese si vedono prima di scegliere la via?** Proposta: sì, sulla carta della via, così la scelta dice anche "che cosa dovrai fare".
-4. **Ascensioni:** il catalogo di §6 ti piace come punto di partenza? E le ascensioni che cambiano una regola, come "Seconda natura", le vuoi più avanti?
+1. **Ascensioni del livello 2 (§6.2):** quali approvi? Ognuna è una modifica del nucleo. Puoi approvarle tutte, solo alcune, o proporne altre.
+2. **Livelli:** va bene che la prima ascensione sia di livello 1 (effetti forti di oggi) e la seconda di livello 2 (regole che cambiano)? Oppure vuoi che anche la prima possa cambiare una regola?
+3. **Catalogo dei passi (§4):** va bene come punto di partenza, o vuoi cambiare qualche impresa?
