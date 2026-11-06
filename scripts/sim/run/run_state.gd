@@ -815,10 +815,16 @@ func offer_choices(offer: Offer) -> Array[String]:
 				for modifier: ActiveModifier in malus:
 					labels.append(modifier.describe())
 		OpportunityDef.Kind.INCANTO:
+			# Ogni voce dice come cambia il mana della truppa (GDD §4.3): +2 dello stesso colore,
+			# oppure 2 del colore dell'incanto se prima non ne chiedeva.
 			var troops: Array[BoardPiece] = _enchantable_troops()
 			if troops.size() > 1:
+				var spell: OpportunityDef = offer.opportunity
 				for piece: BoardPiece in troops:
-					labels.append(piece.display_name())
+					var now: TroopDef = effective_troop(piece)
+					var before: String = "nessun mana" if now.mana_cost <= 0 else "%d %s" % [now.mana_cost, now.mana_type]
+					var after: String = "%d %s" % [maxi(0, now.mana_cost) + spell.enchant_mana, now.mana_type if now.mana_cost > 0 else spell.enchant_color]
+					labels.append("%s · mana: %s → %s" % [piece.display_name(), before, after])
 	return labels
 
 

@@ -393,3 +393,23 @@ func test_si_vede_in_anticipo_che_cosa_un_consigliere_puo_potenziare() -> void:
 	assert_true(run.choose_advisor(index))
 	assert_true(run.upgrade_building(0))
 	assert_true(run.affordable_upgrades(soldier).is_empty(), "Potenzia una volta per round: niente più segnali.")
+
+
+func test_la_scelta_dell_incanto_dice_come_cambia_il_mana() -> void:
+	# Richiesta di Davide (6 novembre): chiarire che il mana si aggiunge senza cambiare colore.
+	var spell: OpportunityDef = OpportunityDef.new()
+	spell.id = &"incanto_cura"
+	spell.display_name = "Incanto: grazia"
+	spell.kind = OpportunityDef.Kind.INCANTO
+	spell.enchant_value = ModifierDef.BattleValue.CURA
+	spell.enchant_color = &"blu"
+	var priest: AdvisorDef = Aiuti.consigliere(&"sacerdote", [&"Spirituale"], [spell], Res.Type.FEDE)
+	catalog.advisors = [priest]
+	rules.starting_troops = [plain_troop, violet_troop]
+	rules.set_all_season_themes(_themes(RunState.RoundTheme.AZIONI, 3))
+	var run: RunState = _run()
+	Aiuti.ascolta(run)
+	var labels: Array[String] = run.offer_choices(run.offers[0])
+	assert_eq(labels.size(), 2)
+	assert_string_contains(labels[0], "nessun mana → 2 blu", "Senza mana: 2 del colore dell'incanto.")
+	assert_string_contains(labels[1], "1 viola → 3 viola", "Con il mana: +2 dello stesso colore.")
