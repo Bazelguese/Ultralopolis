@@ -1,7 +1,7 @@
 class_name FlussoAnno
 extends Control
-## Il flusso dell'anno in alto sulla schermata (GDD §3.2, v0.25): quattro stagioni, dodici mesi,
-## gli scontri fra una stagione e l'altra e il mese in corso. Nei mesi della stagione in corso
+## Il flusso dell'anno, in verticale a sinistra (GDD §3.2, v0.25): una riga per stagione con i
+## suoi tre mesi e lo scontro che la chiude, e il mese in corso. Nei mesi della stagione in corso
 ## un'icona disegnata dice il tema del round. Solo presentazione: legge RunState.
 
 const LATO_MESE: float = 38.0
@@ -9,7 +9,8 @@ const ALTEZZA_MESE: float = 34.0
 const LATO_SCONTRO: float = 34.0
 const SPAZIO: float = 4.0
 const SPAZIO_STAGIONE: float = 10.0
-const ALTEZZA_TESTA: float = 16.0
+## Colonna con il nome della stagione, a sinistra dei mesi.
+const LARGHEZZA_NOME: float = 100.0
 const INIZIALI: PackedStringArray = ["G", "F", "M", "A", "M", "G", "L", "A", "S", "O", "N", "D"]
 
 const COLORE_AZIONI: Color = Color("c7b8ff")
@@ -24,7 +25,7 @@ var _zone: Array[Array] = []
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
-	custom_minimum_size = Vector2(_larghezza_totale(), ALTEZZA_TESTA + ALTEZZA_MESE + 2.0)
+	custom_minimum_size = Vector2(_larghezza_totale(), 4.0 * ALTEZZA_MESE + 3.0 * SPAZIO_STAGIONE + 2.0)
 
 
 func aggiorna(run: RunState) -> void:
@@ -34,7 +35,7 @@ func aggiorna(run: RunState) -> void:
 
 
 static func _larghezza_totale() -> float:
-	return 12.0 * LATO_MESE + 9.0 * SPAZIO + 4.0 * SPAZIO_STAGIONE + 3.0 * (LATO_SCONTRO + SPAZIO_STAGIONE)
+	return LARGHEZZA_NOME + 3.0 * LATO_MESE + 2.0 * SPAZIO + SPAZIO_STAGIONE + LATO_SCONTRO + 2.0
 
 
 func _get_tooltip(at_position: Vector2) -> String:
@@ -51,8 +52,9 @@ func _prepara_zone() -> void:
 		return
 	var mese_corrente: int = _run.month() if _run.is_shopping_phase() else -1
 	var temi: Array[int] = _run.season_round_themes()
-	var x: float = 0.0
 	for stagione: int in range(4):
+		var x: float = LARGHEZZA_NOME
+		var y: float = stagione * (ALTEZZA_MESE + SPAZIO_STAGIONE)
 		var attuale: bool = stagione == int(_run.season)
 		for i: int in range(3):
 			var mese: int = stagione * 3 + i + 1
@@ -64,12 +66,11 @@ func _prepara_zone() -> void:
 				testo += " (adesso)"
 			elif stagione == int(RunState.Season.INVERNO):
 				testo += " · niente Cibo, nessuno scontro"
-			_zone.append([Rect2(x, ALTEZZA_TESTA, LATO_MESE, ALTEZZA_MESE), testo, stagione, mese, tema])
+			_zone.append([Rect2(x, y, LATO_MESE, ALTEZZA_MESE), testo, stagione, mese, tema])
 			x += LATO_MESE + (SPAZIO if i < 2 else 0.0)
 		x += SPAZIO_STAGIONE
 		if stagione >= int(RunState.Season.PRIMAVERA):
-			_zone.append([Rect2(x, ALTEZZA_TESTA, LATO_SCONTRO, ALTEZZA_MESE), _testo_scontro(stagione), stagione, 0, -1])
-			x += LATO_SCONTRO + SPAZIO_STAGIONE
+			_zone.append([Rect2(x, y, LATO_SCONTRO, ALTEZZA_MESE), _testo_scontro(stagione), stagione, 0, -1])
 
 
 func _draw() -> void:
@@ -77,17 +78,19 @@ func _draw() -> void:
 		return
 	var font: Font = StileVisivo.FONT_TITOLI
 	var mese_corrente: int = _run.month() if _run.is_shopping_phase() else -1
-	# Nomi delle stagioni sopra i loro tre mesi.
+	# Nome di ogni stagione a sinistra della sua riga; la stagione in corso ha una freccia.
 	for stagione: int in range(4):
 		var primo: Rect2 = _zone[_indice_primo_mese(stagione)][0]
-		var larghezza_gruppo: float = 3.0 * LATO_MESE + 2.0 * SPAZIO
 		var attuale: bool = stagione == int(_run.season)
 		var passata: bool = stagione < int(_run.season)
 		var colore_testa: Color = StileVisivo.ORO_LUCE if attuale else (StileVisivo.TESTO_TENUE if not passata else Color(StileVisivo.TESTO_TENUE, 0.45))
-		draw_string(font, Vector2(primo.position.x, ALTEZZA_TESTA - 3.0), RunState.SEASON_NAMES[stagione].to_upper(),
-				HORIZONTAL_ALIGNMENT_CENTER, larghezza_gruppo, 13, colore_testa)
+		var y_testo: float = primo.position.y + primo.size.y * 0.5 + 5.0
+		if attuale:
+			draw_colored_polygon(PackedVector2Array([Vector2(2.0, y_testo - 10.0), Vector2(10.0, y_testo - 5.0), Vector2(2.0, y_testo)]), StileVisivo.ORO_LUCE)
+		draw_string(font, Vector2(14.0, y_testo), RunState.SEASON_NAMES[stagione].to_upper(),
+				HORIZONTAL_ALIGNMENT_LEFT, LARGHEZZA_NOME - 18.0, 14, colore_testa)
 		if stagione == int(RunState.Season.INVERNO):
-			_fiocco(Vector2(primo.position.x + larghezza_gruppo - 6.0, ALTEZZA_TESTA * 0.5 - 1.0), 5.0, Color(COLORE_INVERNO, 0.9 if not passata else 0.4))
+			_fiocco(Vector2(LARGHEZZA_NOME - 8.0, y_testo - 14.0), 5.0, Color(COLORE_INVERNO, 0.9 if not passata else 0.4))
 	for zona: Array in _zone:
 		if int(zona[3]) > 0:
 			_casella_mese(zona[0], int(zona[3]), mese_corrente, int(zona[2]), int(zona[4]), font)

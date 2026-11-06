@@ -639,6 +639,48 @@ func upkeep_of(piece: BoardPiece) -> ResourceAmounts:
 	return amounts
 
 
+## Chi chiede una risorsa (principio P4): i consiglieri che la vogliono per il Potenzia o per
+## le loro azioni (solo quelle che la nazione può vedere), i Visitatori e il Cibo delle truppe.
+## Il mantenimento ha le sue righe (upkeep_lines).
+func resource_demand_lines(type: Res.Type) -> PackedStringArray:
+	var lines: PackedStringArray = PackedStringArray()
+	var excluded: Array[AdvisorDef] = _excluded_advisors()
+	for advisor: AdvisorDef in catalog.advisors:
+		if excluded.has(advisor):
+			continue
+		var uses: PackedStringArray = PackedStringArray()
+		if advisor.upgrade_resource == type and advisor.special == AdvisorDef.Special.NESSUNO:
+			uses.append("Potenzia")
+		elif advisor.random_resource and type != Res.Type.ORO and type != Res.Type.RICERCA:
+			uses.append("Potenzia, quando esce questa risorsa")
+		var actions: PackedStringArray = PackedStringArray()
+		for action: OpportunityDef in advisor.actions:
+			if action.cost_resources == null or action.cost_resources.whole(type) <= 0:
+				continue
+			if _is_exclusive_action(action) and not _has_exclusive_action(action):
+				continue
+			if action.min_level > council_level():
+				continue
+			var cost: ResourceAmounts = _discounted_action_cost(advisor, action)
+			actions.append("%s %d" % [action.display_name, cost.whole(type) if cost != null else action.cost_resources.whole(type)])
+		if not actions.is_empty():
+			uses.append("azioni: %s" % ", ".join(actions))
+		if not uses.is_empty():
+			lines.append("• %s — %s" % [advisor.display_name, "; ".join(uses)])
+	var visitors: PackedStringArray = PackedStringArray()
+	for visitor: AdvisorDef in catalog.visitors:
+		if visitor.extra_cost != null and visitor.extra_cost.whole(type) > 0 and _roots_ok(visitor.requires_any, 0, 0, []):
+			visitors.append(visitor.display_name)
+	if not visitors.is_empty():
+		lines.append("• Visitatori — %s" % ", ".join(visitors))
+	if type == Res.Type.CIBO and not board.troops.is_empty():
+		var ration: int = 0
+		for piece: BoardPiece in board.troops:
+			ration += troop_ration(piece)
+		lines.append("• Le truppe a inizio anno — %s" % Res.format(type, ration))
+	return lines
+
+
 ## Carte nell'ordine in cui pagano: da destra, prima le truppe e poi gli edifici.
 func _upkeep_order() -> Array[BoardPiece]:
 	var order: Array[BoardPiece] = []
