@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/generale.tres" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Combatti"
+description = "Il generale esce dalla storia; il Malcontento sale di 2."
+malcontent_change = 2
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+character_leaves = true
+story = "Si combatté per le strade della capitale, e {personaggio} morì sulle barricate."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x2")
+label = "Cedi parte del potere"
+description = "Il Malcontento scende di 1; il generale si fida di più."
+malcontent_change = -1
+inclination_shift = PackedInt32Array(0, 0, 0, -2)
+character_affinity = 3
+story = "{personaggio} entrò nel governo, con la spada sul tavolo."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x3")
+documenti = 2
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x2")
+label = "Fallo sparire"
+description = "Paghi 2 Documenti: il generale esce dalla storia."
+cost = SubResource("S3")
+inclination_shift = PackedInt32Array(0, 0, -1, 1)
+character_leaves = true
+story = "Di {personaggio} non si seppe più nulla."
+
+[resource]
+script = ExtResource("x1")
+id = &"colpo_di_stato"
+display_name = "Il colpo di stato"
+description = "{personaggio} marcia sulla capitale con metà dell'esercito."
+sphere = "Ombra"
+color = &"viola"
+options = Array[ExtResource("x2")]([SubResource("S1"), SubResource("S2"), SubResource("S4")])
+max_affinity = -2
+requires_character = ExtResource("x4")

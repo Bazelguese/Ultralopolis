@@ -12,6 +12,9 @@ var paid: int = 0
 var level: int = 1
 ## true se la truppa non ha mangiato all'ultimo consumo di Cibo (GDD §5.4).
 var hungry: bool = false
+## true se all'ultimo pagamento del mantenimento la carta non è stata pagata (GDD §5.6):
+## nello scontro lavora più piano.
+var neglected: bool = false
 ## Incanto del Sacerdote (GDD §4.3): una sola volta per truppa, per tutta la run.
 var enchant: OpportunityDef
 ## Quantità dell'effetto dell'incanto, fissata quando la truppa viene incantata.

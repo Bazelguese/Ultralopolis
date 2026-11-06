@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/advisor_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/consiglieri/maestro_delle_spie.tres" id="x3"]
+
+[resource]
+script = ExtResource("x1")
+id = &"mercato_nero_tollerato"
+display_name = "Mercato nero tollerato"
+description = "Le azioni del Maestro delle spie costano 1 unità in meno (almeno 1)."
+dimension = 7
+inclination_axis = 3
+inclination_pole = -1
+story = "Dall'anno {anno} le guardie guardano altrove quando passano i contrabbandieri."
+cheaper_advisors = Array[ExtResource("x2")]([ExtResource("x3")])
+action_discount = 1

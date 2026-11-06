@@ -1,7 +1,7 @@
 # ULTRALOPOLIS — Catalogo placeholder
 
-**Versione:** bozza 7 — 5 novembre 2026 (identità v0.24, tecnologie v0.26, tradizioni v0.27)
-**Riferimento:** Game Design Document v0.27 (`docs/Ultralopolis_GDD.md`)
+**Versione:** bozza 8 — 6 novembre 2026 (identità v0.24, tecnologie v0.26, tradizioni v0.27, cronache v0.29)
+**Riferimento:** Game Design Document v0.29 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **tutto placeholder.** Nomi, numeri ed effetti servono a provare le regole, non sono bilanciamento approvato. Dalla v0.18 del GDD questo catalogo **è nel gioco**: i file dati sono in `data/catalog/` (edifici, truppe, `consiglieri/`, `opportunities/` per le azioni, `vie/`, `perk/`, `modifiers/`) e si modificano dall’Ispettore di Godot.
 
 **Bozza 4 (GDD v0.22):** le etichette diventano **tipi** (1–2 per carta), i colori del mana sono **quattro** (viola nuovo), le risorse cambiano (via la Fauna, nuove **Stabilità** e **Documenti**), i potenziamenti si fanno con l’opzione **Potenzia** del Consiglio. Il Consiglio è in §6 bis.
@@ -817,6 +817,110 @@ Una linea ha una versione per era (GDD §10.5.5). Le versioni **non sono nel cat
 - **Carte dorate** (GDD §10.5.6), primi esempi: l’evento **La disputa dei dotti** e la fortuna **La biblioteca ritrovata** danno, oltre ai loro effetti, una tecnologia di Conoscenza già iniziata a metà; gli incontri del mondo generati possono offrire fra le ricompense una tecnologia già iniziata.
 
 ---
+
+## 6 sexies. Cronache della nazione (GDD §9.6, v0.29)
+
+Tutto placeholder. File in `data/catalog/cronache/`, `usanze/`, `vocazioni/`, `personaggi/`. Le reazioni mostrano in gioco dove spingono la nazione; ogni cronaca ha almeno una reazione gratuita.
+
+### 6 sexies.1 Spinte iniziali sulle inclinazioni
+
+| Elemento | Spinta |
+|---|---|
+| Pietrosangue | → Chiusa |
+| Cinerali | → Conquistatrice |
+| Maremani | → Aperta |
+| Monarchia | → Ordinata |
+| Monarchia assoluta | → Ordinata ×2 |
+| Monarchia costituzionale | → Pacifica, → Ordinata |
+| Repubblica | → Libera |
+| Repubblica parlamentare | → Pacifica, → Libera |
+| Oligarchia | → Aperta |
+| Plutocrazia | → Aperta |
+| Dittatura | → Conquistatrice, → Ordinata |
+| Totalitarismo | → Chiusa, → Ordinata ×2 |
+| Teocrazia | → Devota |
+| Ierocrazia | → Devota ×2 |
+| Culto solare | → Devota |
+| Culto degli antenati | → Chiusa, → Devota |
+| Culto del vuoto | → Conquistatrice, → Devota |
+| Spiriti dei luoghi | → Pacifica, → Devota |
+| Cultura guerriera | → Conquistatrice |
+| Cultura mercantile | → Aperta |
+| Cultura erudita | → Profana |
+| Cultura artigiana | → Ordinata |
+
+### 6 sexies.2 Usanze (a ±5)
+
+| Usanza | Polo | Effetto | Storia |
+|---|---|---|---|
+| Trofei di guerra | Conquistatrice | +1 Oro per ogni incontro del mondo vinto. | Dall'anno {anno} il popolo espone nelle piazze i trofei dei vinti. |
+| Ambasciate permanenti | Pacifica | +1 Influenza all'inizio di ogni stagione. | Dall'anno {anno} le ambasciate non chiudono mai, nemmeno in guerra. |
+| Porti franchi | Aperta | I Visitatori compaiono più spesso fra le carte del Consiglio. | Dall'anno {anno} chiunque può attraccare e vendere senza pagare dazio. |
+| Mura dei padri | Chiusa | +5 Resistenza in ogni scontro; i Visitatori compaiono più di rado. | Dall'anno {anno} nessuno straniero dorme dentro le mura. |
+| Processioni | Devota | +1 Fede all'inizio di ogni stagione. | Dall'anno {anno} a ogni stagione le statue degli dei girano per le strade. |
+| Accademie laiche | Profana | +1 Ricerca all'inizio di ogni stagione. | Dall'anno {anno} nelle accademie si insegna che gli dei non rispondono. |
+| Il grande catasto | Ordinata | +1 Documenti all'inizio di ogni stagione. | Dall'anno {anno} ogni campo, casa e famiglia è scritta in un registro. |
+| Mercato nero tollerato | Libera | Le azioni del Maestro delle spie costano 1 unità in meno (almeno 1). | Dall'anno {anno} le guardie guardano altrove quando passano i contrabbandieri. |
+
+### 6 sexies.3 Vocazioni
+
+| Vocazione | Nasce da | Che cosa cambia |
+|---|---|---|
+| Assimilatori | Trofei di guerra + Mura dei padri | Dopo un incontro vinto puoi prendere, al posto della ricompensa, una truppa del nemico: diventa tua, con il tipo Assimilato e quello della tua razza. Ogni assimilazione porta +1 Malcontento. |
+| Repubblica mercantile | Porti franchi + Mercato nero tollerato | Le proposte costano 1 Oro in meno, i Visitatori compaiono molto più spesso e al mercato basta 1 unità in meno per 1 Oro. |
+| Teocrazia profetica | Processioni + Il grande catasto | All'inizio di ogni anno una profezia rivela una truppa del fantasma. |
+| Popolo errante | Porti franchi + Ambasciate permanenti | Nel primo round di ogni stagione c'è sempre un Visitatore fra le carte del Consiglio. |
+| Stato di polizia | Il grande catasto + Mura dei padri | Il Malcontento non supera mai la soglia di avviso, ma la Stabilità chiesta dalle azioni costa il doppio. |
+
+### 6 sexies.4 Personaggi
+
+| Personaggio | Nomi |
+|---|---|
+| Generale | Varo, Ilda, Brenno, Sefra, Taddeo, Orsola |
+| Erede | Aurelio, Mirta, Leandro, Isaura, Corrado, Viola |
+| Profeta | Anselmo, Ysolde, Gaspare, Nives, Orfeo |
+| Mercante straniero | Dario di Calce, Zenobia, Ismail, Fiorenza, Lucano |
+
+### 6 sexies.5 Cronache (35)
+
+| Cronaca | Momento | Condizioni | Reazioni |
+|---|---|---|---|
+| **La notte più lunga** — Nel solstizio d'inverno {nazione} accende i fuochi sulle colline e conta chi non è tornato dall'anno passato. | Solstizio d'inverno | ripetibile | Onora i caduti (Il loro sangue chiede altre vittorie.; → Conquistatrice) · Prega per un anno di pace (→ Pacifica, → Devota) · Fai festa fino all'alba (Paghi 2 Oro; il Malcontento scende di 1.; → Libera) |
+| **I conti dell'inverno** — I granai di {nazione} sono mezzi vuoti e gli scribi portano i registri dell'anno. | Solstizio d'inverno | ripetibile | Razionamento severo (Ricevi 1 Stabilità.; → Ordinata) · Apri i granai al popolo (Paghi 1 Cibo; il Malcontento scende di 1.; → Libera) · Compra grano dagli stranieri (Paghi 3 Oro, ricevi 2 Cibo.; → Aperta) |
+| **Il disgelo** — La neve si ritira dai passi. I giovani di {nazione} guardano oltre i confini. | Equinozio di primavera | ripetibile | Mandali a esplorare (Ricevi 1 Ricerca.; → Aperta) · Arruolali (Ricevi 1 Ferro.; → Conquistatrice) · Tienili a casa, nei campi (Ricevi 1 Cibo.; → Chiusa) |
+| **Le nascite di primavera** — È una primavera di molte nascite. Le levatrici di {nazione} dicono che è un segno. | Equinozio di primavera | ripetibile | Un segno degli dei (Ricevi 1 Fede.; → Devota) · Più braccia per lo Stato (Ricevi 1 Legno.; → Ordinata) · Solo bocche da sfamare (→ Profana) |
+| **La festa del giorno più lungo** — Nel solstizio d'estate {nazione} si ferma per tre giorni. Come vuoi che si festeggi? | Solstizio d'estate | ripetibile | Giochi di guerra (Ricevi 1 Ferro.; → Conquistatrice) · Fiera degli stranieri (Ricevi 2 Oro.; → Aperta) · Riti nei templi (Ricevi 1 Fede.; → Devota) |
+| **La calura** — Un'estate feroce: fiumi bassi, animi accesi. Nelle piazze scoppiano risse. | Solstizio d'estate | ripetibile | Pugno duro sulle risse (Ricevi 1 Stabilità.; → Ordinata) · Lascia sfogare il popolo (Il Malcontento scende di 1.; → Libera) · Scava nuovi pozzi (Paghi 1 Pietra, ricevi 1 Cibo.; → Chiusa) |
+| **Il raccolto** — L'equinozio d'autunno porta il raccolto. Che cosa ne fa {nazione}? | Equinozio d'autunno | ripetibile | La decima al tempio (Paghi 1 Cibo, ricevi 2 Fede.; → Devota) · Vendi l'eccedenza (Paghi 1 Cibo, ricevi 3 Oro.; → Aperta) · Riempi i magazzini dell'esercito (→ Conquistatrice, → Chiusa) |
+| **I presagi d'autunno** — Corvi sulla capitale. Si dice che il fantasma dell'anno sia già in cammino. | Equinozio d'autunno | ripetibile | Consulta gli indovini (Paghi 1 Fede: un elemento del fantasma partirà rallentato.; → Devota) · Rafforza le mura (Paghi 2 Pietra: +5 Resistenza nel prossimo scontro con il fantasma.; → Chiusa) · Sono solo uccelli (→ Profana) |
+| **Tre vittorie di fila** — Tre vittorie di fila. Per le strade si canta il nome di {nazione}, e qualcuno comincia a dire che il mondo è nostro. | Solstizio d'inverno, Solstizio d'estate, Equinozio d'autunno | 3 vittorie di fila | Celebra il trionfo (Il Malcontento scende di 1.; → Conquistatrice ×2) · Resta umile (→ Pacifica, → Devota) · Fai sfilare i prigionieri in catene (Ricevi 1 Stabilità.; → Conquistatrice, → Chiusa) |
+| **La sconfitta brucia** — La sconfitta contro {nemico} brucia ancora. Il popolo cerca qualcuno da incolpare. | Solstizio d'inverno, Solstizio d'estate, Equinozio d'autunno | ripetibile; ultimo scontro perso | Trova un colpevole (Il Malcontento scende di 1.; → Ordinata) · Giura vendetta (+5 Resistenza nel prossimo scontro con il fantasma.; → Conquistatrice) · Accetta il verdetto degli dei (→ Pacifica, → Devota) |
+| **Il popolo mormora** — Nelle taverne si parla male del governo di {nazione}. Qualcuno ha scritto parole d'odio sui muri. | qualsiasi | ripetibile; Malcontento almeno 4 | Reprimi (Il Malcontento scende di 1.; → Chiusa, → Ordinata) · Ascolta le richieste (Paghi 3 Oro; il Malcontento scende di 2.; → Libera) · Lascia correre (→ Libera) |
+| **La città dei ladri** — Nei vicoli di {nazione} c'è più legge dei ladri che legge dello Stato. | qualsiasi | almeno 3 carte Criminale | Tollera, in cambio di una parte (Ricevi 2 Documenti e 1 Oro.; → Libera) · Una grande retata (Il Malcontento sale di 1.; → Ordinata ×2) · Arruola i migliori (Ricevi 1 Ferro.; → Conquistatrice, → Libera) |
+| **Stranieri alle porte** — Una carovana di profughi chiede di entrare in {nazione}: fuggono da una guerra lontana. | Equinozio di primavera, Solstizio d'estate | — | Accoglili (Ricevi 1 Legno; il Malcontento sale di 1.; → Aperta ×2) · Respingili (→ Chiusa ×2) · Prendi i forti, respingi i deboli (Ricevi 1 Ferro.; → Conquistatrice, → Chiusa) |
+| **Il tempio e il palazzo** — I sacerdoti chiedono che sia il tempio a scegliere i giudici di {nazione}. | qualsiasi | dall'anno 2 | Concedi (Ricevi 1 Fede.; → Devota, → Ordinata) · La legge è dello Stato (Ricevi 1 Stabilità.; → Profana, → Ordinata) · Decidano le città (→ Libera ×2) |
+| **La processione infinita** — {nazione} è sempre più devota. Una processione blocca la capitale da giorni. | qualsiasi | 3 passi verso Devota | Unisciti alla processione (Ricevi 2 Fede.; → Devota) · Disperdi la folla (Il Malcontento sale di 1.; → Profana, → Ordinata) |
+| **I veterani affamati di guerra** — {nazione} ha fame di guerra. I veterani chiedono nuove campagne. | qualsiasi | 3 passi verso Conquistatrice | Prepara la prossima campagna (Le truppe fanno il 10% di danno in più per un anno.; → Conquistatrice) · Calma gli animi (Ricevi 1 Stabilità.; → Pacifica) |
+| **Le porte sbarrate** — Le porte di {nazione} restano chiuse anche di giorno. I mercanti stranieri smettono di venire. | qualsiasi | 3 passi verso Chiusa | Va bene così (Ricevi 1 Pietra.; → Chiusa) · Riapri il mercato (Ricevi 2 Oro.; → Aperta) |
+| **I libelli** — In {nazione} circolano libelli e canzoni che deridono il governo. | qualsiasi | 3 passi verso Libera | Lasciali scrivere (Ricevi 1 Documenti; il Malcontento scende di 1.; → Libera) · Censura (Ricevi 1 Stabilità.; → Ordinata) |
+| **Il prigioniero** — Dopo la vittoria su {nemico} i soldati portano un prigioniero illustre: il figlio del loro capo. | Solstizio d'estate, Equinozio d'autunno | ultimo scontro vinto | Liberalo con onore (→ Pacifica, → Aperta; ricordo prigioniero_liberato) · Tienilo come ostaggio (Ricevi 2 Influenza.; → Ordinata; ricordo prigioniero_ostaggio) · Giustizialo davanti al popolo (Il Malcontento scende di 1.; → Conquistatrice, → Chiusa; ricordo prigioniero_giustiziato) |
+| **Il dono del liberato** — Il prigioniero liberato è tornato dai suoi. Oggi suo padre manda doni e parole di amicizia. | qualsiasi | ricordo: prigioniero_liberato | Accetta l'amicizia (Ricevi 3 Oro e 1 Influenza.; → Aperta) · Prendi i doni, non l'amicizia (Ricevi 2 Oro.; → Chiusa) |
+| **Il riscatto dell'ostaggio** — La famiglia dell'ostaggio offre un riscatto per riaverlo. | qualsiasi | ricordo: prigioniero_ostaggio | Accetta il riscatto (Ricevi 5 Oro.) · Tienilo: vale di più qui (Ricevi 1 Influenza.; → Ordinata) |
+| **L'ombra del giustiziato** — Il popolo del prigioniero giustiziato non ha dimenticato. Ai confini compaiono bande che portano il suo nome. | qualsiasi | ricordo: prigioniero_giustiziato | Schiacciali (Paghi 1 Ferro, ricevi 1 Stabilità.; → Conquistatrice) · Paga per la pace (Paghi 4 Oro.; → Pacifica) · Lasciali venire (−5 Resistenza nel prossimo scontro con il fantasma.) |
+| **Il giovane capitano** — Un giovane capitano si è distinto in battaglia. I soldati di {nazione} lo seguirebbero ovunque. | Equinozio di primavera, Solstizio d'estate, Equinozio d'autunno | dall'anno 2 | Promuovilo generale (Entra nella storia un generale, fedele.; → Conquistatrice) · Promuovilo, ma tienilo d'occhio (Entra nella storia un generale, sospettoso.; → Ordinata) · Rimandalo nei ranghi |
+| **Il generale chiede gloria** — {personaggio}, il tuo generale, chiede di guidare la prossima campagna. | qualsiasi | con il generale (fiducia ≥ 0) | Concedigli il comando (Una truppa sale di un livello; il generale si fida di più.; → Conquistatrice) · Il comando resta a corte (Il generale si fida di meno.; → Ordinata) |
+| **Il generale trama** — Le spie riferiscono che {personaggio} incontra di notte i capi dell'esercito. | qualsiasi | con il generale (fiducia ≤ -1) | Arrestalo (Il generale esce dalla storia; il Malcontento sale di 1.; → Ordinata; ricordo generale_arrestato) · Compralo (Paghi 5 Oro; il generale si fida di più.) · Fingi di non sapere (Il generale si fida ancora di meno.) |
+| **Il colpo di stato** — {personaggio} marcia sulla capitale con metà dell'esercito. | qualsiasi | con il generale (fiducia ≤ -2) | Combatti (Il generale esce dalla storia; il Malcontento sale di 2.; → Conquistatrice) · Cedi parte del potere (Il Malcontento scende di 1; il generale si fida di più.; → Libera ×2) · Fallo sparire (Paghi 2 Documenti: il generale esce dalla storia.; → Profana, → Ordinata) |
+| **Nasce un erede** — Nella notte del solstizio nasce l'erede di {nazione}. Bisogna decidere chi lo crescerà. | Solstizio d'inverno | dall'anno 2 | Fra i soldati (Entra nella storia l'erede.; → Conquistatrice; ricordo erede_soldato) · Fra i sacerdoti (Entra nella storia l'erede.; → Devota; ricordo erede_devoto) · Fra gli studiosi (Entra nella storia l'erede; ricevi 1 Ricerca.; → Profana; ricordo erede_studioso) |
+| **L'erede parla al consiglio** — {personaggio} è cresciuto. Oggi parla per la prima volta davanti al consiglio di {nazione}. | qualsiasi | dall'anno 4; con il erede | Ascoltalo (Ricevi 2 Influenza; l'erede si fida di più.) · Mettilo a tacere (L'erede si fida di meno.; → Ordinata) |
+| **Il profeta** — Un eremita scende dai monti: dice di aver visto in sogno il fantasma dell'anno. | Equinozio d'autunno | dall'anno 2 | Ascoltalo (Entra nella storia un profeta; ricevi 1 Fede.; → Devota) · Scaccialo (→ Profana) |
+| **La profezia** — {personaggio} il profeta ha parlato di nuovo: sa dove colpirà il fantasma. | Equinozio d'autunno | con il profeta (fiducia ≥ 0) | Segui la profezia (Un elemento del fantasma partirà sabotato; il profeta si fida di più.; → Devota) · Basta profezie (Il profeta esce dalla storia.; → Profana) |
+| **Il mercante straniero** — Un mercante dai porti lontani chiede il permesso di aprire un banco nella capitale di {nazione}. | Equinozio di primavera, Solstizio d'estate | dall'anno 2 | Concedi il banco (Entra nella storia un mercante; ricevi 2 Oro.; → Aperta) · Concedi, con una tassa pesante (Entra nella storia un mercante, scontento; ricevi 4 Oro.; → Ordinata) · Mandalo via (→ Chiusa) |
+| **L'affare del mercante** — {personaggio} propone un affare: le sue navi in cambio del tuo ferro. | qualsiasi | con il mercante (fiducia ≥ 0) | Accetta (Paghi 2 Ferro, ricevi 6 Oro.; → Aperta) · Rifiuta (Il mercante si fida di meno.) |
+| **Gli assimilati** — Gli assimilati lavorano nei campi di {nazione}, ma di notte cantano nella loro lingua. | qualsiasi | ricordo: assimilati | Proibisci la loro lingua (Ricevi 1 Stabilità.; → Chiusa, → Ordinata) · Lasciali cantare (→ Aperta) · Convertili alla nostra fede (Paghi 1 Fede; il Malcontento scende di 1.; → Devota) |
+| **La rivolta degli assimilati** — Gli assimilati si sono ribellati: chiedono di tornare quello che erano. | qualsiasi | Malcontento almeno 3; ricordo: assimilati | Reprimi (Il Malcontento scende di 1.; → Conquistatrice, → Ordinata) · Concedi diritti (Paghi 2 Oro; il Malcontento scende di 2.; → Aperta, → Libera) |
+| **Una nazione diversa** — Le usanze di {nazione} si sono intrecciate. Gli anziani dicono che il popolo è pronto a diventare qualcosa di nuovo: {vocazione}. | qualsiasi | offre una vocazione | Restiamo come siamo (Rifiuti la vocazione: non tornerà.) |
+
 
 ## 7. Questioni per Davide
 

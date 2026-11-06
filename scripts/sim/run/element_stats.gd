@@ -73,9 +73,10 @@ static func _add_enchant_value(result: TroopDef, value: ModifierDef.BattleValue,
 			result.siege_damage += amount
 
 
-static func building(def: BuildingDef, piece: BoardPiece, mods: Modifiers, level: int, rules: RunRules) -> BuildingDef:
+static func building(def: BuildingDef, piece: BoardPiece, mods: Modifiers, level: int, rules: RunRules,
+		extra_interval_percent: int = 0) -> BuildingDef:
 	var copy: BuildingDef = def.duplicate() as BuildingDef
-	var interval_change: int = mods.percent(ModifierDef.Effect.INTERVALLO_MANA, piece) if mods != null else 0
+	var interval_change: int = extra_interval_percent + (mods.percent(ModifierDef.Effect.INTERVALLO_MANA, piece) if mods != null else 0)
 	copy.mana_interval_ms = maxi(1, Modifiers.apply_percent(def.mana_interval_ms, interval_change))
 	copy.shield = _value(def.shield, ModifierDef.BattleValue.SCUDO, piece, mods, level, rules)
 	copy.heal = _value(def.heal, ModifierDef.BattleValue.CURA, piece, mods, level, rules)

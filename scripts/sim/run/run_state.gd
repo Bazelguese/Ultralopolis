@@ -24,6 +24,7 @@ enum Phase {
 	SCONTRO_FANTASMA,
 	FINE_RUN,
 	CREAZIONE_NAZIONE,  ## Prima dell'anno 1: si sceglie l'identità (GDD §9).
+	CRONACA,  ## All'inizio di una stagione la nazione vive una cronaca (GDD §9.6, v0.29).
 }
 
 enum RunEnd {
@@ -82,6 +83,15 @@ const PHASE_NAMES: Dictionary[Phase, String] = {
 	Phase.SCONTRO_FANTASMA: "Scontro con il fantasma",
 	Phase.FINE_RUN: "Fine della run",
 	Phase.CREAZIONE_NAZIONE: "Creazione della nazione",
+	Phase.CRONACA: "Cronaca",
+}
+
+## Momento di cronaca all'inizio di ogni stagione (GDD §9.6, v0.29).
+const CHRONICLE_MOMENTS: Dictionary[Season, String] = {
+	Season.INVERNO: "Solstizio d'inverno",
+	Season.PRIMAVERA: "Equinozio di primavera",
+	Season.ESTATE: "Solstizio d'estate",
+	Season.AUTUNNO: "Equinozio d'autunno",
 }
 
 var catalog: CatalogDef
@@ -253,6 +263,37 @@ var pending_ascensions: int = 0
 var double_pick_used: bool = false
 var _tradition_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
+# Cronache della nazione (GDD §9.6, v0.29).
+## Cronaca in corso (fase CRONACA).
+var current_chronicle: ChronicleDef
+## Opzioni costruite dalle regole per la cronaca in corso (la vocazione), prima di quelle dei dati.
+var _chronicle_built: Array[EventOptionDef] = []
+## Vocazione offerta dalla cronaca in corso.
+var offered_vocation: IdentityDef
+var seen_chronicles: Array[StringName] = []
+## Anno in cui ogni cronaca è arrivata l'ultima volta (per non ripetere sempre le stesse).
+var chronicle_last_year: Dictionary[StringName, int] = {}
+## Inclinazioni: Spada, Porta, Altare, Legge (Inclination.Axis), da -limite a +limite.
+var inclinations: PackedInt32Array = Inclination.empty()
+## Ricordi della nazione, per le catene di cronache: nome → anno in cui è nato.
+var flags: Dictionary[StringName, int] = {}
+## Personaggi ricorrenti presenti nella storia.
+var characters: Array[NationCharacter] = []
+## Storia della nazione: le righe delle cronache, delle usanze e delle vocazioni.
+var story: Array[String] = []
+## Anno in cui la nazione ha preso ogni usanza o vocazione (id → anno).
+var custom_years: Dictionary[StringName, int] = {}
+## Vocazioni già offerte (accettate o rifiutate): non tornano.
+var vocations_offered: Array[StringName] = []
+## Scontri vinti (o pareggiati) di fila e risultato dell'ultimo (-1 nessuno, 0 perso, 1 vinto).
+var win_streak: int = 0
+var last_battle_result: int = -1
+## Truppe assimilate (vocazione Assimilatori).
+var assimilated: int = 0
+## Profezia dell'anno (vocazione Teocrazia profetica): il nome di una truppa del fantasma.
+var prophecy: String = ""
+var _chronicle_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
 
 func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleRules,
 		p_resistance_rules: ResistanceRules, p_seed: int) -> void:
@@ -264,6 +305,7 @@ func _init(p_catalog: CatalogDef, p_run_rules: RunRules, p_battle_rules: BattleR
 	_rng.seed = p_seed
 	_tech_rng.seed = p_seed * 1000003 + 7340033
 	_tradition_rng.seed = p_seed * 1000003 + 5279
+	_chronicle_rng.seed = p_seed * 1000003 + 92821
 
 	prestige = run_rules.starting_prestige
 	gold = run_rules.starting_gold
@@ -437,6 +479,10 @@ func found_nation(p_name: String, choices: Array[IdentityDef]) -> bool:
 	_log("Nasce %s (seme %d)." % [nation_name, run_seed])
 	for def: IdentityDef in choices:
 		_adopt_identity(def)
+	# Le inclinazioni partono dall'identità (GDD §9.6, v0.29).
+	for def: IdentityDef in choices:
+		for axis: int in range(mini(def.inclinations.size(), Inclination.Axis.size())):
+			inclinations[axis] = clampi(inclinations[axis] + def.inclinations[axis], -run_rules.inclination_limit, run_rules.inclination_limit)
 	_start_year(1)
 	return true
 
@@ -445,7 +491,7 @@ func found_nation(p_name: String, choices: Array[IdentityDef]) -> bool:
 func identity_summary() -> String:
 	var names: PackedStringArray = PackedStringArray()
 	for def: IdentityDef in identity:
-		if def.dimension != IdentityDef.Dimension.PERK and def.dimension != IdentityDef.Dimension.ASCENSIONE:
+		if def.dimension not in [IdentityDef.Dimension.PERK, IdentityDef.Dimension.ASCENSIONE, IdentityDef.Dimension.USANZA]:
 			names.append(def.display_name)
 	return " · ".join(names)
 
@@ -483,6 +529,9 @@ func next_season_production() -> Array[int]:
 	var totals: Array[int] = production_per_phase()
 	if season == Season.AUTUNNO:
 		totals[Res.Type.CIBO] = 0
+	var customs: Array[int] = _season_custom_resources()
+	for type: Res.Type in Res.NAMES:
+		totals[type] += customs[type]
 	return totals
 
 
@@ -514,6 +563,9 @@ func production_origin_lines(type: Res.Type) -> PackedStringArray:
 		elif piece.level > 1:
 			line += " (livello %d)" % piece.level
 		lines.append(line)
+	for def: IdentityDef in identity:
+		if def.season_resources != null and def.season_resources.internal(type) > 0:
+			lines.append("• %s +%s (%s)" % [def.display_name, Res.format(type, def.season_resources.internal(type)), IdentityDef.DIMENSION_NAMES[def.dimension].to_lower()])
 	var percent_effect: int = -1
 	if type == Res.Type.ORO:
 		percent_effect = ModifierDef.Effect.PRODUZIONE_ORO
@@ -530,6 +582,116 @@ func production_origin_lines(type: Res.Type) -> PackedStringArray:
 	if lines.is_empty():
 		lines.append("• Nessun edificio la produce.")
 	return lines
+
+
+# --- Mantenimento delle carte (GDD §5.6, v0.28) ----------------------------------------------
+
+var _special_cards: Dictionary = {}
+var _special_cards_ready: bool = false
+
+
+## Carta speciale: esclusiva di un elemento dell'identità o di una via, oppure di una linea.
+func is_special_card(def: Resource) -> bool:
+	if not _special_cards_ready:
+		_special_cards_ready = true
+		var owners: Array[IdentityDef] = catalog.identities.duplicate()
+		for era_def: EraDef in catalog.eras:
+			owners.append_array(era_def.ways)
+		for owner: IdentityDef in owners:
+			for card: BuildingDef in owner.exclusive_buildings:
+				_special_cards[card] = true
+			for card: TroopDef in owner.exclusive_troops:
+				_special_cards[card] = true
+		for tech: TechDef in catalog.technologies:
+			if tech.line != null:
+				for card: BuildingDef in tech.line.buildings:
+					_special_cards[card] = true
+				for card: TroopDef in tech.line.troops:
+					_special_cards[card] = true
+	return _special_cards.has(def)
+
+
+## Risorsa del mantenimento: quella della categoria del primo tipo della carta che sta in una
+## categoria; per l'Ombra Oro (GDD §5.6).
+func upkeep_resource(card_types: Array[StringName]) -> int:
+	for card_type: StringName in card_types:
+		for advisor: AdvisorDef in catalog.advisors:
+			if advisor.special == AdvisorDef.Special.NESSUNO and advisor.types.has(card_type):
+				return Res.Type.ORO if advisor.random_resource else advisor.upgrade_resource
+	return -1
+
+
+## Che cosa costa una carta prima di ogni scontro; null se non paga nulla.
+func upkeep_of(piece: BoardPiece) -> ResourceAmounts:
+	var def: Resource = piece.building if piece.building != null else piece.troop
+	if piece.building != null and piece.building.is_capital:
+		return null
+	var quantity: int = run_rules.upkeep_per_level * maxi(0, piece.level - 1)
+	if is_special_card(def):
+		quantity += run_rules.special_upkeep
+	if quantity <= 0:
+		return null
+	var resource: int = upkeep_resource(piece_types(piece))
+	if resource < 0:
+		return null
+	var amounts: ResourceAmounts = ResourceAmounts.new()
+	amounts.add(resource as Res.Type, quantity)
+	return amounts
+
+
+## Carte nell'ordine in cui pagano: da destra, prima le truppe e poi gli edifici.
+func _upkeep_order() -> Array[BoardPiece]:
+	var order: Array[BoardPiece] = []
+	for i: int in range(board.troops.size() - 1, -1, -1):
+		order.append(board.troops[i])
+	for i: int in range(board.buildings.size() - 1, -1, -1):
+		order.append(board.buildings[i])
+	return order
+
+
+## Totale del mantenimento al prossimo scontro (per la barra delle risorse).
+func upkeep_total() -> ResourceAmounts:
+	var total: ResourceAmounts = ResourceAmounts.new()
+	for piece: BoardPiece in _upkeep_order():
+		var cost: ResourceAmounts = upkeep_of(piece)
+		if cost != null:
+			for type: Res.Type in Res.NAMES:
+				total.add(type, cost.whole(type))
+	return total
+
+
+## Righe "Colossi di pietra: 1 Pietra" per il tooltip della risorsa indicata.
+func upkeep_lines(type: Res.Type) -> PackedStringArray:
+	var lines: PackedStringArray = PackedStringArray()
+	for piece: BoardPiece in _upkeep_order():
+		var cost: ResourceAmounts = upkeep_of(piece)
+		if cost != null and cost.whole(type) > 0:
+			lines.append("• %s −%d" % [piece.display_name(), cost.whole(type)])
+	return lines
+
+
+## Prima di ogni scontro: si paga da destra; chi non si può pagare è trascurato (×1,5) e porta
+## +1 Malcontento (GDD §5.6).
+func _pay_upkeep() -> void:
+	var neglected_names: PackedStringArray = PackedStringArray()
+	var paid: ResourceAmounts = ResourceAmounts.new()
+	for piece: BoardPiece in _upkeep_order():
+		piece.neglected = false
+		var cost: ResourceAmounts = upkeep_of(piece)
+		if cost == null:
+			continue
+		if can_pay(cost):
+			for type: Res.Type in Res.NAMES:
+				stock[type] -= cost.internal(type)
+				paid.add(type, cost.whole(type))
+		else:
+			piece.neglected = true
+			neglected_names.append(piece.display_name())
+	if not paid.is_empty():
+		_log("Mantenimento pagato: %s." % paid.describe())
+	if not neglected_names.is_empty():
+		_log("Mantenimento non pagato, carte trascurate in questo scontro: %s." % ", ".join(neglected_names))
+		_change_malcontent(neglected_names.size() * run_rules.malcontent_per_neglected, IdentityDef.Grievance.CARESTIE, "Mantenimento non pagato")
 
 
 # --- Interazioni fra tipi (GDD §6.6): che cosa potenzia che cosa ---------------------------
@@ -923,19 +1085,59 @@ func reward_choices() -> Array[RewardDef]:
 		if reward.kind == RewardDef.Kind.TECNOLOGIA and reward.tech != null and techs_done.has(reward.tech):
 			continue
 		found.append(reward)
+	# Vocazione Assimilatori (GDD §9.6, v0.29): in alternativa, una truppa del nemico vinto.
+	if has_rule(IdentityDef.Rule.ASSIMILATORI):
+		if _assimilation_cache_for != won_encounter:
+			_assimilation_cache_for = won_encounter
+			_assimilation_cache = []
+			for enemy: TroopDef in won_encounter.troops:
+				var reward: RewardDef = RewardDef.new()
+				reward.kind = RewardDef.Kind.TRUPPA
+				reward.troop = _assimilated_troop(enemy)
+				reward.assimilation = true
+				_assimilation_cache.append(reward)
+		found.append_array(_assimilation_cache)
 	return found
+
+
+var _assimilation_cache_for: EncounterDef
+var _assimilation_cache: Array[RewardDef] = []
+
+
+## Una truppa nemica che diventa della nazione: stessi valori, con il tipo "Assimilato" e il tipo
+## della razza (GDD §9.6, v0.29).
+func _assimilated_troop(enemy: TroopDef) -> TroopDef:
+	var troop: TroopDef = enemy.duplicate() as TroopDef
+	troop.id = StringName("assimilati_%s" % enemy.id)
+	troop.display_name = "%s assimilati" % enemy.display_name
+	var new_types: Array[StringName] = enemy.types.duplicate()
+	for extra: StringName in [&"Assimilato", race_type()]:
+		if extra != &"" and not new_types.has(extra):
+			new_types.append(extra)
+	troop.types = new_types
+	return troop
+
+
+## Tipo d'identità della razza della nazione, es. "Pietrosangue"; vuoto se non c'è.
+func race_type() -> StringName:
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.POPOLO:
+			return def.identity_type
+	return &""
 
 
 ## Edificio come entrerà in battaglia: livello e modificatori (GDD §6.5, §8).
 func effective_building(piece: BoardPiece) -> BuildingDef:
-	return ElementStats.building(piece.building, piece, modifiers, piece.level, run_rules)
+	var neglect: int = run_rules.neglect_slowdown_percent if piece.neglected else 0
+	return ElementStats.building(piece.building, piece, modifiers, piece.level, run_rules, neglect)
 
 
 ## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5, §8).
 func effective_troop(piece: BoardPiece) -> TroopDef:
 	# Con l'ascensione Esercito frugale le truppe senza Cibo non rallentano (GDD §10.4.2).
 	var hunger: int = run_rules.hunger_cooldown_percent if piece.hungry and not has_rule(IdentityDef.Rule.ESERCITO_FRUGALE) else 0
-	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger)
+	var neglect: int = run_rules.neglect_slowdown_percent if piece.neglected else 0
+	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger + neglect)
 
 
 ## Cibo consumato da una truppa a inizio anno, in decimi (GDD §5.4).
@@ -1245,11 +1447,27 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 		return _fail("Scegli su quale carta applicarla.")
 	var chosen_piece: BoardPiece = pieces[choice] if not pieces.is_empty() else null
 	var source: String = chosen_event.display_name
+	_apply_option_effects(option, source, chosen_piece, era if chosen_event.scale_with_era else 1)
+	if chosen_event.special == EventDef.Special.RIVOLUZIONE:
+		malcontent = 0
+		malcontent_sources = {}
+		_log("Dopo la Rivoluzione il Malcontento si azzera.")
+	_log("%s: %s." % [source, option.label])
+	_flow_research()
+	if chosen_event.family == EventDef.Family.EVENTO:
+		_note_deed(DeedDef.Kind.EVENTI, StringName(chosen_event.sphere))
+	_check_traditions()
+	_next_round()
+	return true
+
+
+## Costi ed effetti di un'opzione di evento o di cronaca, nel linguaggio del nucleo (P5).
+## scale moltiplica le risorse ricevute (le Fortune crescono con l'era).
+func _apply_option_effects(option: EventOptionDef, source: String, chosen_piece: BoardPiece, scale: int) -> void:
 	if option.cost != null:
 		for type: Res.Type in Res.NAMES:
 			stock[type] -= option.cost.internal(type)
 	if option.gain != null:
-		var scale: int = era if chosen_event.scale_with_era else 1
 		for type: Res.Type in Res.NAMES:
 			stock[type] += option.gain.internal(type) * scale
 	for def: ModifierDef in option.modifiers:
@@ -1281,17 +1499,6 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 		_change_government(option.change_government as IdentityDef, source)
 	if option.malcontent_change != 0:
 		_change_malcontent(option.malcontent_change, IdentityDef.Grievance.EVENTI, source)
-	if chosen_event.special == EventDef.Special.RIVOLUZIONE:
-		malcontent = 0
-		malcontent_sources = {}
-		_log("Dopo la Rivoluzione il Malcontento si azzera.")
-	_log("%s: %s." % [source, option.label])
-	_flow_research()
-	if chosen_event.family == EventDef.Family.EVENTO:
-		_note_deed(DeedDef.Kind.EVENTI, StringName(chosen_event.sphere))
-	_check_traditions()
-	_next_round()
-	return true
 
 
 ## Elementi della plancia con almeno uno di questi tipi, del genere indicato.
@@ -1979,6 +2186,7 @@ func choose_encounter(index: int) -> bool:
 		return _fail("Incontro non valido.")
 	var encounter: EncounterDef = encounter_choices[index]
 	var enemy: BattleSideSetup = BattleSideSetup.new(encounter.buildings, encounter.troops, encounter.resistance)
+	_pay_upkeep()
 	var outcome: BattleSim.Outcome = _fight(BattleKind.INCONTRO, encounter.display_name, enemy)
 	if not history.is_empty():
 		# Due incontri all'anno (v0.25): il riepilogo li elenca in ordine.
@@ -1993,6 +2201,10 @@ func choose_encounter(index: int) -> bool:
 		_log("Incontro superato: %s." % encounter.display_name)
 		_note_deed(DeedDef.Kind.VITTORIE, &"incontro")
 		_gain_loot(encounter.loot_gold, encounter.loot_research)
+		var trophies: int = _identity_int(&"win_gold")
+		if trophies > 0:
+			gold += trophies
+			_log("Usanze: +%d Oro per la vittoria." % trophies)
 		_check_traditions()
 		phase = Phase.RICOMPENSA_INCONTRO
 		return true
@@ -2036,6 +2248,11 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 			_adopt_identity(reward.perk)
 		RewardDef.Kind.TECNOLOGIA:
 			_give_golden(reward.tech if reward.tech != null else _random_golden(""))
+	if reward.assimilation:
+		assimilated += 1
+		flags[&"assimilati"] = flags.get(&"assimilati", year)
+		_change_malcontent(run_rules.malcontent_per_assimilation, IdentityDef.Grievance.EVENTI, "Assimilazione")
+		_story("Anno %d: %s entrano nella nazione, che lo vogliano o no." % [year, reward.troop.display_name])
 	_log("Ricompensa presa: %s." % reward.describe())
 	_flow_research()
 	_check_traditions()
@@ -2066,6 +2283,7 @@ func fight_ghost() -> bool:
 		# Lo spionaggio dell'anno colpisce gli elementi scelti (GDD §12).
 		enemy.start_timer_effects = spy_effects.duplicate()
 	spy_effects = []
+	_pay_upkeep()
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
 	for message: String in modifiers.on_ghost_fight_done():
 		_log(message)
@@ -2109,6 +2327,352 @@ func fight_ghost() -> bool:
 	return true
 
 
+# --- Cronache della nazione (GDD §9.6, v0.29) ------------------------------------
+
+## Nome del momento di cronaca della stagione, es. "Solstizio d'estate".
+func chronicle_moment(which: Season = season) -> String:
+	return CHRONICLE_MOMENTS[which]
+
+
+## All'inizio di una stagione pesca la cronaca, se ce n'è una: la fase diventa CRONACA e i round
+## aspettano la reazione della nazione. D'inverno solo dall'anno 2 (il primo anno parte da subito).
+func _start_chronicle() -> bool:
+	current_chronicle = null
+	offered_vocation = null
+	_chronicle_built = []
+	if not run_rules.chronicles_enabled or catalog.chronicles.is_empty():
+		return false
+	if season == Season.INVERNO and year <= 1:
+		return false
+	var pick: ChronicleDef = _draw_chronicle()
+	if pick == null:
+		return false
+	current_chronicle = pick
+	if not pick.repeatable:
+		seen_chronicles.append(pick.id)
+	chronicle_last_year[pick.id] = year
+	_chronicle_built = _chronicle_special_options(pick)
+	phase = Phase.CRONACA
+	offers = []
+	advisor_choices = []
+	chosen_advisor = null
+	event_choice = null
+	chosen_event = null
+	round_number = 0
+	_log("%s: %s." % [chronicle_moment(), pick.display_name])
+	return true
+
+
+## La vocazione pronta, se c'è, ha la precedenza; poi una cronaca a caso fra quelle possibili,
+## più probabile se è più personale (ogni condizione soddisfatta pesa di più).
+func _draw_chronicle() -> ChronicleDef:
+	var vocation: IdentityDef = _ready_vocation()
+	if vocation != null:
+		for def: ChronicleDef in catalog.chronicles:
+			if def.special == EventDef.Special.VOCAZIONE:
+				offered_vocation = vocation
+				vocations_offered.append(vocation.id)
+				return def
+	# Prima si evitano le cronache arrivate da poco; se non resta nulla, valgono anche quelle.
+	for gap: int in [run_rules.chronicle_repeat_gap_years, 0]:
+		var pool: Array[ChronicleDef] = []
+		var weights: Array[int] = []
+		for def: ChronicleDef in catalog.chronicles:
+			if not _chronicle_available(def):
+				continue
+			if gap > 0 and chronicle_last_year.has(def.id) and year - chronicle_last_year[def.id] < gap:
+				continue
+			pool.append(def)
+			weights.append(_roots_weight(def.favored_by) + _season_bonus(def.favored_seasons)
+					+ run_rules.chronicle_specific_weight * _chronicle_specificity(def))
+		if not pool.is_empty():
+			return pool[_weighted_pick_with(_chronicle_rng, weights)]
+	return null
+
+
+## Una cronaca può arrivare adesso: momento, anno, radici, ricordi, inclinazioni e personaggi.
+func _chronicle_available(def: ChronicleDef) -> bool:
+	if def.special == EventDef.Special.VOCAZIONE or def.options.is_empty():
+		return false
+	if not def.repeatable and seen_chronicles.has(def.id):
+		return false
+	if not def.seasons.is_empty() and not def.seasons.has(int(season)):
+		return false
+	if def.min_year > 0 and year < def.min_year:
+		return false
+	if not _roots_ok(def.requires_any, def.min_era, def.max_era, def.requires_types):
+		return false
+	if def.min_type_count > 1 and _pieces_with(def.requires_types, EventOptionDef.PieceKind.QUALSIASI).size() < def.min_type_count:
+		return false
+	if def.requires_stock != null and not can_pay(def.requires_stock):
+		return false
+	if def.min_malcontent > 0 and malcontent < def.min_malcontent:
+		return false
+	if def.requires_malus and modifiers.year_malus().is_empty():
+		return false
+	if def.min_win_streak > 0 and win_streak < def.min_win_streak:
+		return false
+	if def.last_battle == ChronicleDef.LastBattle.VINTO and last_battle_result != 1:
+		return false
+	if def.last_battle == ChronicleDef.LastBattle.PERSO and last_battle_result != 0:
+		return false
+	for flag: StringName in def.requires_flags:
+		if not flags.has(flag):
+			return false
+	for flag: StringName in def.forbids_flags:
+		if flags.has(flag):
+			return false
+	if def.inclination_axis >= 0 and inclinations[def.inclination_axis] * signi(def.inclination_pole) < def.inclination_steps:
+		return false
+	if def.requires_character != null:
+		var who: NationCharacter = character_of(def.requires_character)
+		if who == null or who.affinity < def.min_affinity or who.affinity > def.max_affinity:
+			return false
+	# I personaggi entrano nella storia solo dopo il primo fantasma, e una volta sola.
+	for option: EventOptionDef in def.options:
+		if option.introduce_character != null:
+			if year < run_rules.characters_from_year or character_of(option.introduce_character) != null:
+				return false
+	return true
+
+
+## Quante condizioni personali ha la cronaca: le più legate alla partita escono più spesso.
+func _chronicle_specificity(def: ChronicleDef) -> int:
+	var count: int = 0
+	for present: bool in [not def.requires_any.is_empty(), not def.requires_types.is_empty(), def.min_malcontent > 0,
+			def.min_win_streak > 0, def.last_battle != ChronicleDef.LastBattle.QUALSIASI, not def.requires_flags.is_empty(),
+			def.inclination_axis >= 0, def.requires_character != null, def.requires_malus]:
+		if present:
+			count += 1
+	return count
+
+
+## Posizione pescata con questi pesi da un generatore a parte (le cronache non spostano la pesca
+## dei consiglieri).
+static func _weighted_pick_with(rng: RandomNumberGenerator, weights: Array[int]) -> int:
+	var total: int = 0
+	for weight: int in weights:
+		total += weight
+	var roll: int = rng.randi_range(0, total - 1)
+	var pick: int = 0
+	while roll >= weights[pick]:
+		roll -= weights[pick]
+		pick += 1
+	return pick
+
+
+## Per la cronaca della vocazione: l'opzione che la accetta, prima di quelle scritte nei dati.
+func _chronicle_special_options(def: ChronicleDef) -> Array[EventOptionDef]:
+	var built: Array[EventOptionDef] = []
+	if def.special == EventDef.Special.VOCAZIONE and offered_vocation != null:
+		var accept: EventOptionDef = EventOptionDef.new()
+		accept.label = "Diventa: %s" % offered_vocation.display_name
+		accept.description = offered_vocation.description
+		accept.vocation = offered_vocation
+		accept.story = offered_vocation.story
+		built.append(accept)
+	return built
+
+
+## Opzioni della cronaca in corso: quelle costruite dalle regole, poi quelle dei dati.
+func chronicle_options() -> Array[EventOptionDef]:
+	if current_chronicle == null:
+		return []
+	var all: Array[EventOptionDef] = _chronicle_built.duplicate()
+	all.append_array(current_chronicle.options)
+	return all
+
+
+## Testo della cronaca con i nomi della run al posto dei segnaposto.
+func chronicle_text(text: String) -> String:
+	var who: NationCharacter = null
+	if current_chronicle != null:
+		if current_chronicle.requires_character != null:
+			who = character_of(current_chronicle.requires_character)
+	var values: Dictionary = {
+		"nazione": nation_name,
+		"anno": str(year),
+		"momento": chronicle_moment(),
+		"razza": _identity_name(IdentityDef.Dimension.POPOLO),
+		"governo": _identity_name(IdentityDef.Dimension.GOVERNO),
+		"credo": _identity_name(IdentityDef.Dimension.CREDO),
+		"nemico": last_opponent_name.trim_prefix("Fantasma: ") if last_opponent_name != "" else "il nemico",
+		"personaggio": who.name if who != null else "",
+		"ruolo": who.def.role.to_lower() if who != null else "",
+		"vocazione": offered_vocation.display_name if offered_vocation != null else "",
+	}
+	return text.format(values)
+
+
+func _identity_name(dimension: IdentityDef.Dimension) -> String:
+	for def: IdentityDef in identity:
+		if def.dimension == dimension:
+			return def.display_name
+	return ""
+
+
+## La reazione della nazione: paga, applica gli effetti, sposta le inclinazioni, lascia i ricordi
+## e poi comincia la stagione (con la sua produzione).
+func choose_chronicle_option(index: int, choice: int = -1) -> bool:
+	if phase != Phase.CRONACA or current_chronicle == null:
+		return _fail("Ora non c'è nessuna cronaca.")
+	var options: Array[EventOptionDef] = chronicle_options()
+	if index < 0 or index >= options.size():
+		return _fail("Reazione non valida.")
+	var option: EventOptionDef = options[index]
+	var reason: String = option_block_reason(option)
+	if reason != "":
+		return _fail(reason)
+	var pieces: Array[BoardPiece] = _option_choice_pieces(option)
+	if pieces.size() == 1:
+		choice = 0
+	if not pieces.is_empty() and (choice < 0 or choice >= pieces.size()):
+		return _fail("Scegli su quale carta applicarla.")
+	var chosen_piece: BoardPiece = pieces[choice] if not pieces.is_empty() else null
+	var source: String = current_chronicle.display_name
+	var who: NationCharacter = character_of(current_chronicle.requires_character) if current_chronicle.requires_character != null else null
+	# Un personaggio nuovo entra prima del testo, così la storia può chiamarlo per nome.
+	if option.introduce_character != null and character_of(option.introduce_character) == null:
+		var def: CharacterDef = option.introduce_character
+		var picked: String = def.names[_chronicle_rng.randi_range(0, def.names.size() - 1)] if not def.names.is_empty() else def.role
+		who = NationCharacter.new(def, picked, 0, year)
+		characters.append(who)
+		_log("Entra nella storia: %s." % who.describe())
+	_apply_option_effects(option, source, chosen_piece, 1)
+	if who != null and option.character_affinity != 0:
+		who.affinity += option.character_affinity
+		_log("%s: fiducia %+d (ora %d)." % [who.describe(), option.character_affinity, who.affinity])
+	var line: String = option.story if option.story != "" else option.label
+	if line != "":
+		var named: String = chronicle_text(line.replace("{personaggio}", who.name if who != null else ""))
+		_story("Anno %d, %s — %s: %s" % [year, chronicle_moment().to_lower(), chronicle_text(current_chronicle.display_name), named])
+	if who != null and option.character_leaves:
+		characters.erase(who)
+		_log("Esce dalla storia: %s." % who.describe())
+	for flag: StringName in option.set_flags:
+		flags[flag] = year
+	for flag: StringName in option.clear_flags:
+		flags.erase(flag)
+	if option.vocation != null:
+		_take_vocation(option.vocation as IdentityDef)
+	_log("%s: %s." % [source, option.label])
+	for axis: int in range(mini(option.inclination_shift.size(), Inclination.Axis.size())):
+		if option.inclination_shift[axis] != 0:
+			shift_inclination(axis, option.inclination_shift[axis], source)
+	_flow_research()
+	_check_traditions()
+	current_chronicle = null
+	offered_vocation = null
+	_chronicle_built = []
+	_enter_phase(Phase.CONSIGLIO)
+	return true
+
+
+## Sposta un'inclinazione; all'estremo la nazione prende l'usanza di quel polo (una volta sola).
+func shift_inclination(axis: int, steps: int, source: String) -> void:
+	var limit: int = run_rules.inclination_limit
+	var before: int = inclinations[axis]
+	inclinations[axis] = clampi(before + steps, -limit, limit)
+	if inclinations[axis] == before:
+		return
+	_log("%s: la nazione si fa più %s (%s %+d)." % [source, Inclination.pole_name(axis, steps).to_lower(),
+			Inclination.AXIS_NAMES[axis as Inclination.Axis], inclinations[axis]])
+	if absi(inclinations[axis]) < limit:
+		return
+	var custom: IdentityDef = custom_for(axis, signi(inclinations[axis]))
+	if custom != null and not identity.has(custom):
+		_adopt_identity(custom)
+		custom_years[custom.id] = year
+		_story("Anno %d — Nasce un'usanza: %s. %s" % [year, custom.display_name, custom.story.format({"anno": str(year)})])
+
+
+## Usanza del catalogo legata a un polo di un asse.
+func custom_for(axis: int, pole: int) -> IdentityDef:
+	for def: IdentityDef in catalog.customs:
+		if def.inclination_axis == axis and signi(def.inclination_pole) == pole:
+			return def
+	return null
+
+
+## Usanze della nazione, nell'ordine in cui sono nate.
+func customs() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.USANZA:
+			found.append(def)
+	return found
+
+
+## Vocazioni della nazione.
+func vocations() -> Array[IdentityDef]:
+	var found: Array[IdentityDef] = []
+	for def: IdentityDef in identity:
+		if def.dimension == IdentityDef.Dimension.VOCAZIONE:
+			found.append(def)
+	return found
+
+
+## Prima vocazione che la nazione può accogliere: tutte le sue usanze presenti, mai offerta prima,
+## sotto il massimo della run.
+func _ready_vocation() -> IdentityDef:
+	if vocations().size() >= run_rules.max_vocations:
+		return null
+	for def: IdentityDef in catalog.vocations:
+		if vocations_offered.has(def.id) or identity.has(def) or def.requires_customs.is_empty():
+			continue
+		var ready: bool = true
+		for needed: Resource in def.requires_customs:
+			if not identity.has(needed):
+				ready = false
+		if ready:
+			return def
+	return null
+
+
+func _take_vocation(def: IdentityDef) -> void:
+	if identity.has(def):
+		return
+	_adopt_identity(def)
+	custom_years[def.id] = year
+	_story("Anno %d — %s diventa: %s. %s" % [year, nation_name, def.display_name, def.story.format({"anno": str(year)})])
+	if def.rule == IdentityDef.Rule.PROFEZIA:
+		_make_prophecy()
+
+
+## Personaggio presente con questa scheda, oppure null.
+func character_of(def: CharacterDef) -> NationCharacter:
+	for who: NationCharacter in characters:
+		if who.def == def:
+			return who
+	return null
+
+
+## Riga della storia della nazione (anche nel registro della partita).
+func _story(line: String) -> void:
+	story.append(line)
+	_log(line)
+
+
+## Vocazione Teocrazia profetica (GDD §9.6, v0.29): a inizio anno si vede una truppa del fantasma.
+func _make_prophecy() -> void:
+	prophecy = ""
+	if not has_rule(IdentityDef.Rule.PROFEZIA) or current_ghost == null or current_ghost.troops.is_empty():
+		return
+	var seen: TroopDef = current_ghost.troops[_chronicle_rng.randi_range(0, current_ghost.troops.size() - 1)]
+	prophecy = seen.display_name
+	_log("Profezia: il fantasma dell'anno schiera %s." % prophecy)
+
+
+## Risorse che le usanze danno all'inizio di ogni stagione, in unità interne.
+func _season_custom_resources() -> Array[int]:
+	var totals: Array[int] = Res.empty()
+	for def: IdentityDef in identity:
+		if def.season_resources != null:
+			for type: Res.Type in Res.NAMES:
+				totals[type] += def.season_resources.internal(type)
+	return totals
+
+
 # --- Parti interne ----------------------------------------------------------
 
 ## Bottino fisso di un nemico sconfitto: Oro e Ricerca nel Magazzino (convenzione provvisoria).
@@ -2132,6 +2696,7 @@ func _start_year(new_year: int) -> void:
 		# La prima mano delle tecnologie, con l'identità già scelta (GDD §10.5.3).
 		_draw_tech_hand()
 	current_ghost = _ghost_for_year(year)
+	_make_prophecy()
 	# Il fantasma e i due incontri dell'anno si fissano subito e non cambiano più (GDD §4.1).
 	_spring_encounters = _encounters_for(year, 0)
 	_summer_encounters = _encounters_for(year, 1)
@@ -2157,6 +2722,9 @@ func _start_year(new_year: int) -> void:
 ## Entra in una stagione: gli edifici producono e cominciano i suoi round (GDD §3.2, v0.25).
 func _enter_season(new_season: Season) -> void:
 	season = new_season
+	# Prima dei round la nazione vive la cronaca della stagione (GDD §9.6, v0.29).
+	if _start_chronicle():
+		return
 	_enter_phase(Phase.CONSIGLIO)
 
 
@@ -2183,6 +2751,9 @@ func _collect_production() -> void:
 	var collected: Array[int] = production_per_phase()
 	if season == Season.INVERNO:
 		collected[Res.Type.CIBO] = 0
+	var customs: Array[int] = _season_custom_resources()
+	for type: Res.Type in Res.NAMES:
+		collected[type] += customs[type]
 	var parts: PackedStringArray = PackedStringArray()
 	for type: Res.Type in Res.NAMES:
 		stock[type] += collected[type]
@@ -2301,10 +2872,15 @@ func _draw_special_card() -> void:
 	event_choice = null
 	if catalog.events.is_empty() and catalog.visitors.is_empty():
 		return
-	if _rng.randi_range(1, 100) > run_rules.special_card_chance_percent:
+	# Vocazione Popolo errante (GDD §9.6, v0.29): nel primo round della stagione c'è sempre un Visitatore.
+	var wanderers: bool = has_rule(IdentityDef.Rule.POPOLO_ERRANTE) and round_number == 1 and not _available_visitors().is_empty()
+	if not wanderers and _rng.randi_range(1, 100) > run_rules.special_card_chance_percent:
 		return
-	var events: Array[EventDef] = _available_events(EventDef.Family.EVENTO)
-	var fortunes: Array[EventDef] = _available_events(EventDef.Family.FORTUNA)
+	var events: Array[EventDef] = []
+	var fortunes: Array[EventDef] = []
+	if not wanderers:
+		events = _available_events(EventDef.Family.EVENTO)
+		fortunes = _available_events(EventDef.Family.FORTUNA)
 	var visitors: Array[AdvisorDef] = _available_visitors()
 	var families: Array[int] = []
 	var weights: Array[int] = []
@@ -2687,6 +3263,17 @@ func _discounted_action_cost(advisor: AdvisorDef, opportunity: OpportunityDef) -
 	for def: IdentityDef in identity:
 		if def.cheaper_advisors.has(advisor) or def.cheaper_actions.has(opportunity):
 			discount += def.action_discount
+	# Vocazione Stato di polizia (GDD §9.6, v0.29): la Stabilità delle azioni costa il doppio.
+	if has_rule(IdentityDef.Rule.STATO_DI_POLIZIA) and original.whole(Res.Type.STABILITA) > 0:
+		var police: ResourceAmounts = ResourceAmounts.new()
+		for type: Res.Type in Res.NAMES:
+			var units: int = original.whole(type)
+			if units > 0 and type != Res.Type.ORO:
+				units = maxi(1, units - discount)
+			if type == Res.Type.STABILITA:
+				units *= 2
+			police.add(type, units)
+		return police
 	if discount <= 0:
 		return original
 	var cheaper: ResourceAmounts = ResourceAmounts.new()
@@ -2985,6 +3572,13 @@ func _fight(kind: BattleKind, opponent_name: String, enemy: BattleSideSetup) -> 
 	var outcome: BattleSim.Outcome = last_battle.run_to_end()
 	if outcome == BattleSim.Outcome.INTERROTTA:
 		push_warning("RunState: scontro interrotto per il limite di sicurezza, trattato come pareggio.")
+	# Per le cronache (GDD §9.6): vittorie di fila ed esito dell'ultimo scontro.
+	if _player_won_or_drew(outcome):
+		win_streak += 1
+		last_battle_result = 1
+	else:
+		win_streak = 0
+		last_battle_result = 0
 	return outcome
 
 
@@ -3125,6 +3719,9 @@ func _change_malcontent(amount: int, cause: IdentityDef.Grievance, reason: Strin
 		return
 	var before: int = malcontent
 	malcontent = maxi(0, malcontent + amount)
+	# Vocazione Stato di polizia (GDD §9.6, v0.29): il Malcontento non supera la soglia di avviso.
+	if has_rule(IdentityDef.Rule.STATO_DI_POLIZIA):
+		malcontent = mini(malcontent, maxi(before, run_rules.malcontent_warning))
 	if amount > 0:
 		malcontent_sources[cause] = malcontent_sources.get(cause, 0) + amount
 	_log("%s: Malcontento %s %d (ora %d su %d)." % [reason, "+" if amount > 0 else "−", absi(malcontent - before), malcontent, run_rules.malcontent_threshold])

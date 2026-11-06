@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CharacterDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/character_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"mercante"
+role = "Mercante straniero"
+names = PackedStringArray("Dario di Calce", "Zenobia", "Ismail", "Fiorenza", "Lucano")
+description = "{nome}, mercante dei porti lontani: porta oro e domande."

@@ -253,6 +253,60 @@
 [ext_resource type="Resource" path="res://data/catalog/ascensioni/maestria.tres" id="asc_11"]
 [ext_resource type="Resource" path="res://data/catalog/ascensioni/doppio_ascolto.tres" id="asc_12"]
 [ext_resource type="Resource" path="res://data/catalog/ascensioni/esercito_frugale.tres" id="asc_13"]
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="cr_s_chr"]
+[ext_resource type="Script" path="res://scripts/sim/data/character_def.gd" id="cr_s_char"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/notte_piu_lunga.tres" id="cr_c0"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/conti_dell_inverno.tres" id="cr_c1"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/il_disgelo.tres" id="cr_c2"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/nascite_di_primavera.tres" id="cr_c3"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/giorno_piu_lungo.tres" id="cr_c4"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/la_calura.tres" id="cr_c5"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/il_raccolto.tres" id="cr_c6"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/i_presagi.tres" id="cr_c7"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/tre_vittorie.tres" id="cr_c8"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/sconfitta_brucia.tres" id="cr_c9"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/popolo_mormora.tres" id="cr_c10"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/citta_dei_ladri.tres" id="cr_c11"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/stranieri_alle_porte.tres" id="cr_c12"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/tempio_e_palazzo.tres" id="cr_c13"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/processione_infinita.tres" id="cr_c14"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/veterani_affamati.tres" id="cr_c15"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/porte_sbarrate.tres" id="cr_c16"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/libelli.tres" id="cr_c17"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/il_prigioniero.tres" id="cr_c18"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/dono_del_liberato.tres" id="cr_c19"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/riscatto_dell_ostaggio.tres" id="cr_c20"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/ombra_del_giustiziato.tres" id="cr_c21"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/il_giovane_capitano.tres" id="cr_c22"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/generale_chiede_gloria.tres" id="cr_c23"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/generale_trama.tres" id="cr_c24"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/colpo_di_stato.tres" id="cr_c25"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/nasce_un_erede.tres" id="cr_c26"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/erede_parla.tres" id="cr_c27"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/il_profeta.tres" id="cr_c28"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/la_profezia.tres" id="cr_c29"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/il_mercante_straniero.tres" id="cr_c30"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/affare_del_mercante.tres" id="cr_c31"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/gli_assimilati.tres" id="cr_c32"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/rivolta_degli_assimilati.tres" id="cr_c33"]
+[ext_resource type="Resource" path="res://data/catalog/cronache/una_nazione_diversa.tres" id="cr_c34"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/trofei_di_guerra.tres" id="cr_u0"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/ambasciate_permanenti.tres" id="cr_u1"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/porti_franchi.tres" id="cr_u2"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/mura_dei_padri.tres" id="cr_u3"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/processioni.tres" id="cr_u4"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/accademie_laiche.tres" id="cr_u5"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/catasto.tres" id="cr_u6"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/mercato_nero_tollerato.tres" id="cr_u7"]
+[ext_resource type="Resource" path="res://data/catalog/vocazioni/assimilatori.tres" id="cr_v0"]
+[ext_resource type="Resource" path="res://data/catalog/vocazioni/repubblica_mercantile.tres" id="cr_v1"]
+[ext_resource type="Resource" path="res://data/catalog/vocazioni/teocrazia_profetica.tres" id="cr_v2"]
+[ext_resource type="Resource" path="res://data/catalog/vocazioni/popolo_errante.tres" id="cr_v3"]
+[ext_resource type="Resource" path="res://data/catalog/vocazioni/stato_di_polizia.tres" id="cr_v4"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/generale.tres" id="cr_p0"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/erede.tres" id="cr_p1"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/profeta.tres" id="cr_p2"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/mercante.tres" id="cr_p3"]
 
 [resource]
 script = ExtResource("34_2n8s1")
@@ -268,3 +322,10 @@ generator = ExtResource("35_hkuyl")
 advisors = Array[ExtResource("adv_script")]([ExtResource("adv_0"), ExtResource("adv_1"), ExtResource("adv_2"), ExtResource("adv_3"), ExtResource("adv_4"), ExtResource("adv_5"), ExtResource("adv_6"), ExtResource("adv_7"), ExtResource("adv_8"), ExtResource("adv_9")])
 events = Array[ExtResource("ev_script")]([ExtResource("ev_0"), ExtResource("ev_1"), ExtResource("ev_2"), ExtResource("ev_3"), ExtResource("ev_4"), ExtResource("ev_5"), ExtResource("ev_6"), ExtResource("ev_7"), ExtResource("ev_8"), ExtResource("ev_9"), ExtResource("ev_10"), ExtResource("ev_11"), ExtResource("ev_12"), ExtResource("ev_13"), ExtResource("ev_14"), ExtResource("ev_15"), ExtResource("ev_16"), ExtResource("ev_17"), ExtResource("ev_18"), ExtResource("ev_19"), ExtResource("ev_20"), ExtResource("ev_21"), ExtResource("ev_22"), ExtResource("ev_23"), ExtResource("ev_riforma"), ExtResource("ev_rivoluzione"), ExtResource("ev_tumulti"), ExtResource("ev_pellegrino_cieco"), ExtResource("ev_cometa"), ExtResource("ev_carovana_smarrita"), ExtResource("ev_disertore"), ExtResource("ev_terre_di_confine"), ExtResource("ev_cantastorie"), ExtResource("ev_festa_di_mezzo_inverno"), ExtResource("ev_il_gelo"), ExtResource("ev_veglie_al_focolare")])
 visitors = Array[ExtResource("adv_script")]([ExtResource("vi_0"), ExtResource("vi_1"), ExtResource("vi_2"), ExtResource("vi_3"), ExtResource("vi_4"), ExtResource("vi_5")])
+
+
+
+chronicles = Array[ExtResource("cr_s_chr")]([ExtResource("cr_c0"), ExtResource("cr_c1"), ExtResource("cr_c2"), ExtResource("cr_c3"), ExtResource("cr_c4"), ExtResource("cr_c5"), ExtResource("cr_c6"), ExtResource("cr_c7"), ExtResource("cr_c8"), ExtResource("cr_c9"), ExtResource("cr_c10"), ExtResource("cr_c11"), ExtResource("cr_c12"), ExtResource("cr_c13"), ExtResource("cr_c14"), ExtResource("cr_c15"), ExtResource("cr_c16"), ExtResource("cr_c17"), ExtResource("cr_c18"), ExtResource("cr_c19"), ExtResource("cr_c20"), ExtResource("cr_c21"), ExtResource("cr_c22"), ExtResource("cr_c23"), ExtResource("cr_c24"), ExtResource("cr_c25"), ExtResource("cr_c26"), ExtResource("cr_c27"), ExtResource("cr_c28"), ExtResource("cr_c29"), ExtResource("cr_c30"), ExtResource("cr_c31"), ExtResource("cr_c32"), ExtResource("cr_c33"), ExtResource("cr_c34")])
+customs = Array[ExtResource("34_uymuy")]([ExtResource("cr_u0"), ExtResource("cr_u1"), ExtResource("cr_u2"), ExtResource("cr_u3"), ExtResource("cr_u4"), ExtResource("cr_u5"), ExtResource("cr_u6"), ExtResource("cr_u7")])
+vocations = Array[ExtResource("34_uymuy")]([ExtResource("cr_v0"), ExtResource("cr_v1"), ExtResource("cr_v2"), ExtResource("cr_v3"), ExtResource("cr_v4")])
+characters = Array[ExtResource("cr_s_char")]([ExtResource("cr_p0"), ExtResource("cr_p1"), ExtResource("cr_p2"), ExtResource("cr_p3")])

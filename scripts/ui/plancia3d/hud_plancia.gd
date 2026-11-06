@@ -17,6 +17,8 @@ signal menu
 signal pausa
 signal velocita(fattore: float)
 signal annulla
+## Reazione scelta nella cronaca della stagione (GDD §9.6).
+signal scegli_cronaca(indice: int)
 
 ## Distanza dal fondo dello schermo dei comandi che stanno sopra la barra delle risorse.
 const SOPRA_BARRA: float = -112.0
@@ -99,6 +101,15 @@ var _suggerimento: PanelContainer
 var _titolo_suggerimento: Label
 var _testo_suggerimento: Label
 var _messaggio: Label
+var _inclinazioni: BarreInclinazioni
+var _usanze: Label
+var _pannello_cronaca: PanelContainer
+var _momento_cronaca: Label
+var _titolo_cronaca: Label
+var _racconto_cronaca: Label
+var _personaggio_cronaca: Label
+var _reazioni_cronaca: VBoxContainer
+var _firma_cronaca: String = ""
 var _animazione_messaggio: Tween
 
 
@@ -122,6 +133,7 @@ func _ready() -> void:
 	_crea_sostituzione()
 	_crea_scelte()
 	_crea_esito()
+	_crea_pannello_cronaca()
 	_crea_suggerimento()
 	_crea_messaggio()
 
@@ -198,6 +210,14 @@ func _crea_nazione() -> void:
 	_identita.custom_minimum_size = Vector2(320, 0)
 	_identita.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	colonna.add_child(_identita)
+	# Inclinazioni, usanze e vocazioni (GDD §9.6, v0.29).
+	_inclinazioni = BarreInclinazioni.new()
+	colonna.add_child(_inclinazioni)
+	_usanze = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 15, StileVisivo.ORO_LUCE)
+	_usanze.custom_minimum_size = Vector2(320, 0)
+	_usanze.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_usanze.mouse_filter = Control.MOUSE_FILTER_STOP
+	colonna.add_child(_usanze)
 	_ancora(riquadro, Control.PRESET_TOP_LEFT, Vector2(24, 20))
 
 
@@ -729,6 +749,139 @@ func _crea_esito() -> void:
 	_esito.visible = false
 
 
+## Pannello della cronaca: il momento, la scena e le reazioni possibili della nazione.
+func _crea_pannello_cronaca() -> void:
+	_pannello_cronaca = PanelContainer.new()
+	_pannello_cronaca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.09, 0.07, 0.05, 0.96), StileVisivo.ORO))
+	var colonna: VBoxContainer = VBoxContainer.new()
+	colonna.add_theme_constant_override("separation", 10)
+	colonna.custom_minimum_size = Vector2(700, 0)
+	_pannello_cronaca.add_child(colonna)
+	_momento_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 20, StileVisivo.ORO)
+	_momento_cronaca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	colonna.add_child(_momento_cronaca)
+	_titolo_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 46, StileVisivo.ORO_LUCE)
+	_titolo_cronaca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	colonna.add_child(_titolo_cronaca)
+	_racconto_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 21)
+	_racconto_cronaca.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_racconto_cronaca.custom_minimum_size = Vector2(700, 0)
+	_racconto_cronaca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	colonna.add_child(_racconto_cronaca)
+	_personaggio_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 17, StileVisivo.TESTO_TENUE)
+	_personaggio_cronaca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_personaggio_cronaca.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_personaggio_cronaca.custom_minimum_size = Vector2(700, 0)
+	colonna.add_child(_personaggio_cronaca)
+	colonna.add_child(StileVisivo.etichetta("Come reagisce la nazione?", StileVisivo.FONT_TITOLI, 22, StileVisivo.TESTO))
+	_reazioni_cronaca = VBoxContainer.new()
+	_reazioni_cronaca.add_theme_constant_override("separation", 8)
+	colonna.add_child(_reazioni_cronaca)
+	_ancora(_pannello_cronaca, Control.PRESET_CENTER, Vector2.ZERO)
+	_pannello_cronaca.visible = false
+
+
+## Mostra la cronaca della stagione quando la nazione deve reagire; le carte e lo scontro hanno la
+## precedenza (P4: si vede sempre perché una reazione non si può scegliere).
+func _aggiorna_cronaca(run: RunState) -> void:
+	var attiva: bool = run.phase == RunState.Phase.CRONACA and run.current_chronicle != null \
+			and run.way_choices.is_empty() and run.ascension_choices.is_empty() and run.government_choices.is_empty() \
+			and not _esito.visible and not _barra_scontro.visible
+	if not attiva:
+		_pannello_cronaca.visible = false
+		_firma_cronaca = ""
+		return
+	var cronaca: ChronicleDef = run.current_chronicle
+	var opzioni: Array[EventOptionDef] = run.chronicle_options()
+	var firma: String = "%s|%d|%d" % [cronaca.id, run.year, run.season]
+	for opzione: EventOptionDef in opzioni:
+		firma += "|%s" % run.option_block_reason(opzione)
+	if firma == _firma_cronaca and _pannello_cronaca.visible:
+		return
+	_firma_cronaca = firma
+	_momento_cronaca.text = "%s · anno %d" % [run.chronicle_moment().to_upper(), run.year]
+	_titolo_cronaca.text = run.chronicle_text(cronaca.display_name)
+	_racconto_cronaca.text = run.chronicle_text(cronaca.description)
+	_personaggio_cronaca.text = ""
+	if cronaca.requires_character != null:
+		var chi: NationCharacter = run.character_of(cronaca.requires_character)
+		if chi != null:
+			_personaggio_cronaca.text = "%s · fiducia %+d" % [chi.describe(), chi.affinity]
+	elif run.offered_vocation != null:
+		_personaggio_cronaca.text = "Nasce dalle usanze: %s" % " + ".join(_nomi(run.offered_vocation.requires_customs))
+	_personaggio_cronaca.visible = _personaggio_cronaca.text != ""
+	for figlio: Node in _reazioni_cronaca.get_children():
+		figlio.queue_free()
+	for i: int in range(opzioni.size()):
+		_reazioni_cronaca.add_child(_reazione(run, opzioni[i], i))
+	_pannello_cronaca.visible = true
+	_centra(_pannello_cronaca)
+	_ricentra_dopo_impaginazione(_pannello_cronaca)
+
+
+static func _nomi(elementi: Array[Resource]) -> PackedStringArray:
+	var nomi: PackedStringArray = PackedStringArray()
+	for elemento: Resource in elementi:
+		nomi.append((elemento as IdentityDef).display_name)
+	return nomi
+
+
+## Una reazione: il pulsante con il nome, sotto che cosa fa, dove spinge la nazione e che cosa costa.
+func _reazione(run: RunState, opzione: EventOptionDef, indice: int) -> Control:
+	var riga: VBoxContainer = VBoxContainer.new()
+	riga.add_theme_constant_override("separation", 2)
+	var pulsante: Button = _pulsante(run.chronicle_text(opzione.label), func() -> void: scegli_cronaca.emit(indice))
+	pulsante.custom_minimum_size = Vector2(0, 48)
+	var motivo: String = run.option_block_reason(opzione)
+	pulsante.disabled = motivo != ""
+	pulsante.tooltip_text = motivo
+	riga.add_child(pulsante)
+	var parti: PackedStringArray = PackedStringArray()
+	if opzione.description != "":
+		parti.append(run.chronicle_text(opzione.description))
+	var spinta: String = Inclination.describe_shift(opzione.inclination_shift)
+	if spinta != "":
+		parti.append(spinta)
+	if motivo != "":
+		parti.append(motivo)
+	if not parti.is_empty():
+		var nota: Label = StileVisivo.etichetta("  ".join(parti), StileVisivo.FONT_TESTO, 16, StileVisivo.PERICOLO if motivo != "" else StileVisivo.TESTO_TENUE)
+		nota.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		nota.custom_minimum_size = Vector2(700, 0)
+		riga.add_child(nota)
+	return riga
+
+
+func cronaca_visibile() -> bool:
+	return _pannello_cronaca.visible
+
+
+## Inclinazioni, usanze, vocazioni e personaggi sulla scheda della nazione.
+func _aggiorna_nazione(run: RunState) -> void:
+	var usanze: PackedStringArray = PackedStringArray()
+	var aiuto: PackedStringArray = PackedStringArray()
+	for usanza: IdentityDef in run.customs():
+		usanze.append(usanza.display_name)
+		aiuto.append("Usanza %s (dall'anno %d): %s" % [usanza.display_name, run.custom_years.get(usanza.id, run.year), usanza.description])
+	var testo: PackedStringArray = PackedStringArray()
+	for vocazione: IdentityDef in run.vocations():
+		testo.append("Vocazione: %s" % vocazione.display_name)
+		aiuto.append("Vocazione %s: %s" % [vocazione.display_name, vocazione.description])
+	if not usanze.is_empty():
+		testo.append("Usanze: %s" % " · ".join(usanze))
+	var persone: PackedStringArray = PackedStringArray()
+	for chi: NationCharacter in run.characters:
+		persone.append("%s (%s)" % [chi.name, chi.def.role.to_lower()])
+		aiuto.append("%s · fiducia %+d" % [chi.describe(), chi.affinity])
+	if not persone.is_empty():
+		testo.append("Personaggi: %s" % " · ".join(persone))
+	_usanze.text = "\n".join(testo)
+	_usanze.visible = not testo.is_empty()
+	_usanze.tooltip_text = "\n".join(aiuto)
+	var spiegazione: String = "Inclinazioni della nazione: le cronache le spostano con le tue scelte. A %d passi da un lato nasce un'usanza; due usanze adatte aprono una vocazione." % run.run_rules.inclination_limit
+	_inclinazioni.aggiorna(run.inclinations, run.run_rules.inclination_limit, spiegazione)
+
+
 func _crea_suggerimento() -> void:
 	_suggerimento = PanelContainer.new()
 	_suggerimento.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -760,6 +913,7 @@ func _crea_messaggio() -> void:
 func aggiorna_partita(run: RunState) -> void:
 	_nazione.text = run.nation_name.to_upper()
 	_identita.text = run.identity_summary()
+	_aggiorna_nazione(run)
 	var comprando: bool = run.is_shopping_phase()
 	# GDD §3.2 (v0.25): anno, stagione e mese, es. "Anno 2 · Estate · Agosto".
 	_flusso.visible = true
@@ -785,6 +939,9 @@ func aggiorna_partita(run: RunState) -> void:
 			testa = "Ricerca: va nella tecnologia che stai studiando. Senza una tecnologia in studio resta in attesa. Non si vende."
 		_celle_risorse[tipo].tooltip_text = "%s\nProssima stagione +%s:\n%s" % [testa, Res.format(tipo, produzione[tipo]),
 				"\n".join(run.production_origin_lines(tipo))]
+		var mantenimento: PackedStringArray = run.upkeep_lines(tipo)
+		if not mantenimento.is_empty():
+			_celle_risorse[tipo].tooltip_text += "\nMantenimento prima di ogni scontro:\n%s" % "\n".join(mantenimento)
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
@@ -823,7 +980,9 @@ func aggiorna_partita(run: RunState) -> void:
 	_pulsante_effetti.text = "Effetti (%d)" % run.modifiers.active.size()
 	var ultime: Array[String] = run.chronicle.slice(maxi(0, run.chronicle.size() - 14))
 	ultime.reverse()
-	_testo_cronaca.text = "\n".join(ultime)
+	var storia: Array[String] = run.story.slice(maxi(0, run.story.size() - 5))
+	storia.reverse()
+	_testo_cronaca.text = ("STORIA DELLA NAZIONE\n%s\n\nREGISTRO\n" % "\n".join(storia) if not storia.is_empty() else "") + "\n".join(ultime)
 
 	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty() or not run.ascension_choices.is_empty()
 	var consigliere: AdvisorDef = run.chosen_advisor
@@ -842,15 +1001,17 @@ func aggiorna_partita(run: RunState) -> void:
 		RunState.Phase.CONSIGLIO:
 			_suggerimento_fase.text = _testo_consiglio(run)
 		RunState.Phase.SCELTA_INCONTRO:
-			_suggerimento_fase.text = "Incontro del mondo: scegli quale minaccia affrontare. Se perdi, l'Oro si dimezza."
+			_suggerimento_fase.text = "Incontro del mondo: scegli quale minaccia affrontare. Se perdi, l'Oro si dimezza." + _testo_mantenimento(run)
 		RunState.Phase.RICOMPENSA_INCONTRO:
 			_suggerimento_fase.text = "Hai vinto l'incontro: scegli una ricompensa."
 		RunState.Phase.SCONTRO_FANTASMA:
-			_suggerimento_fase.text = "Il fantasma ti aspetta. Puoi ancora riordinare o vendere le truppe."
+			_suggerimento_fase.text = "Il fantasma ti aspetta. Puoi ancora riordinare o vendere le truppe." + _testo_mantenimento(run)
 			_principale.text = "Affronta il fantasma"
 		RunState.Phase.FINE_RUN:
 			_suggerimento_fase.text = _testo_fine(run)
 			_principale.text = "Nuova partita"
+		RunState.Phase.CRONACA:
+			_suggerimento_fase.text = "%s: scegli come reagisce la nazione. Poi comincia la stagione." % run.chronicle_moment()
 		_:
 			_suggerimento_fase.text = ""
 	if not run.way_choices.is_empty():
@@ -859,6 +1020,7 @@ func aggiorna_partita(run: RunState) -> void:
 		_suggerimento_fase.text = "Albero di una via completo: scegli un'ascensione. È per sempre."
 	elif not run.government_choices.is_empty():
 		_suggerimento_fase.text = "Nuova era: il governo può evolvere. Scegli la nuova forma, oppure resta com'è."
+	_aggiorna_cronaca(run)
 
 
 ## Suggerimento durante i round del Consiglio (GDD §4.2).
@@ -925,6 +1087,17 @@ func _aggiorna_avviso_ricerca(run: RunState) -> void:
 		if _pulsazione_ricerca != null and _pulsazione_ricerca.is_valid():
 			_pulsazione_ricerca.kill()
 		_pulsante_ricerca.modulate = Color.WHITE
+
+
+## Prima di uno scontro: quanto si paga di mantenimento e chi resterebbe trascurato (GDD §5.6).
+static func _testo_mantenimento(run: RunState) -> String:
+	var totale: ResourceAmounts = run.upkeep_total()
+	if totale.is_empty():
+		return ""
+	var testo: String = "\nMantenimento prima dello scontro: %s." % totale.describe()
+	if not run.can_pay(totale):
+		testo += " Non basta: alcune carte saranno trascurate (+1 Malcontento ciascuna)."
+	return testo
 
 
 ## In battaglia restano solo i comandi dello scontro.

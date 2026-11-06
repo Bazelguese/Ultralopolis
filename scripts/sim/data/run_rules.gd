@@ -46,6 +46,12 @@ extends Resource
 @export var market_units_per_gold: int = 2
 ## Aumento della ricarica di una truppa affamata, in percentuale (GDD §5.4: +50%).
 @export var hunger_cooldown_percent: int = 50
+## Mantenimento delle carte (GDD §5.6, v0.28): unità per ogni livello sopra il primo, unità in
+## più per le carte speciali, Malcontento per carta non pagata, rallentamento di una carta trascurata.
+@export var upkeep_per_level: int = 1
+@export var special_upkeep: int = 1
+@export var malcontent_per_neglected: int = 1
+@export var neglect_slowdown_percent: int = 50
 
 @export_group("Potenziamenti")
 ## Livello massimo di edifici e truppe (GDD §6.5).
@@ -99,6 +105,21 @@ extends Resource
 @export var event_weight: int = 5
 @export var visitor_weight: int = 3
 @export var fortune_weight: int = 2
+## Cronache della nazione (GDD §9.6, v0.29). Valori placeholder.
+## Le cronache arrivano all'inizio di ogni stagione; d'inverno solo dall'anno 2.
+@export var chronicles_enabled: bool = true
+## Ogni inclinazione va da -limite a +limite; all'estremo nasce un'usanza.
+@export var inclination_limit: int = 5
+## I personaggi ricorrenti entrano nella storia solo da quest'anno (dopo il primo fantasma).
+@export var characters_from_year: int = 2
+## Vocazioni al massimo in una run.
+@export var max_vocations: int = 2
+## Una cronaca ripetibile non torna prima di tanti anni (se ce n'è un'altra possibile).
+@export var chronicle_repeat_gap_years: int = 2
+## Peso di una cronaca: 1, più questo per ogni condizione personale che soddisfa.
+@export var chronicle_specific_weight: int = 3
+## Malcontento per ogni truppa assimilata (vocazione Assimilatori).
+@export var malcontent_per_assimilation: int = 1
 ## Costo del primo rinnovo delle proposte.
 @export var reroll_base_cost: int = 1
 ## Il rinnovo non costa mai meno di così, nemmeno con i bonus che lo riducono.

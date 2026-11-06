@@ -1,10 +1,22 @@
 # ULTRALOPOLIS — Bozza: mantenimento in risorse
 
 **Data:** 6 novembre 2026
-**Stato:** **bozza di discussione.** Non cambia né il GDD né il gioco. Le idee qui sono **Proposte** da scegliere.
+**Stato:** **approvata da Davide il 6 novembre 2026 e riportata nel GDD v0.28** (§5.6). Questo file resta come memoria della discussione.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.27, §5 Economia
 
 **Modifica del nucleo.** Il mantenimento oggi esiste solo per il Cibo delle truppe (§5.4). Estenderlo ad altre risorse cambia l'economia della Parte I. Non serve una risorsa nuova; serve una **famiglia di effetti nuova** ("costo che si paga nel tempo") e una regola su che cosa succede se non si paga (principio P5).
+
+---
+
+## 0. Decisioni di Davide (6 novembre)
+
+| Tema | Decisione | Stato |
+|---|---|---|
+| Metodo | **A + B**: pagano le carte potenziate (per livello) e le carte speciali | Confermato |
+| Quando | **Prima di ogni scontro**: i due incontri del mondo e il fantasma | Confermato |
+| Se non si paga | **Trascurata** (lavora peggio in quello scontro) **e Malcontento** | Confermato |
+| Ordine di pagamento | **Da destra**, come il Cibo | Confermato |
+| Valori | Placeholder piccoli, da tarare giocando | Confermato |
 
 ---
 
@@ -72,10 +84,18 @@
 
 ---
 
-## 6. Domande per Davide
+## 6. Domande ancora aperte (bozza 2)
 
-1. **Metodo:** A, B, C, D, E, o una combinazione (proposta A + B)?
-2. **Momento:** a ogni stagione, una volta all'anno, o prima degli scontri?
-3. **Se non si paga:** trascurata, spenta, Malcontento, perde il livello, debito, o una combinazione?
-4. **Ordine di pagamento:** come il Cibo (da destra) o lo sceglie il giocatore?
-5. **Valori:** per ora placeholder piccoli (1 unità a stagione per livello o carta speciale), da tarare giocando?
+1. **Quali sono le carte speciali?** Proposta: le esclusive (di razza, governo, credo, cultura e vie) e quelle delle linee di elementi. Le carte dell'era 3 normali no.
+2. **Con che risorsa paga una carta potenziata?** Proposta: la risorsa della categoria del suo primo tipo (per esempio una truppa Fante paga Ferro, una Spirituale paga Fede). Ricordare chi l'ha potenziata, invece, chiede di salvarlo sulla carta.
+3. **Il Malcontento:** +1 per ogni carta non pagata (proposta), oppure +1 per scontro se almeno una carta resta trascurata?
+4. **"Trascurata":** proposta ricarica e intervallo ×1,5 in quello scontro, come una truppa affamata. Va bene?
+5. **Le carte senza combattimento** (edifici che producono e basta) pagano anche loro prima degli scontri? Proposta: sì, tutte le carte sulla plancia.
+
+## 6 bis. Domande della bozza 1, con le risposte
+
+1. **Metodo:** A + B (Davide).
+2. **Momento:** prima di ogni scontro (Davide).
+3. **Se non si paga:** trascurata e Malcontento (Davide).
+4. **Ordine di pagamento:** da destra (Davide).
+5. **Valori:** placeholder piccoli, da tarare giocando (Davide).

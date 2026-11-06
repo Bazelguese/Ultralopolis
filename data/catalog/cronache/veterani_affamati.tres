@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+display_name = "Fame di guerra"
+description = "Danno delle truppe +10% per un anno."
+is_malus = false
+effect = 9
+amount = 10
+duration_kind = 0
+duration_years = 1
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Prepara la prossima campagna"
+description = "Le truppe fanno il 10% di danno in più per un anno."
+modifiers = Array[ExtResource("x2")]([SubResource("S1")])
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+story = "Si affilarono le spade per la prossima campagna."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x4")
+stabilita = 1
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x3")
+label = "Calma gli animi"
+description = "Ricevi 1 Stabilità."
+gain = SubResource("S3")
+inclination_shift = PackedInt32Array(-1, 0, 0, 0)
+story = "I veterani ebbero terre e una pensione."
+
+[resource]
+script = ExtResource("x1")
+id = &"veterani_affamati"
+display_name = "I veterani affamati di guerra"
+description = "{nazione} ha fame di guerra. I veterani chiedono nuove campagne."
+sphere = "Guerra"
+color = &"rosso"
+options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S4")])
+inclination_axis = 0
+inclination_pole = 1
+inclination_steps = 3

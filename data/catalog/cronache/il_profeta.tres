@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/profeta.tres" id="x3"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+fede = 1
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x4")
+label = "Ascoltalo"
+description = "Entra nella storia un profeta; ricevi 1 Fede."
+gain = SubResource("S1")
+inclination_shift = PackedInt32Array(0, 0, 1, 0)
+introduce_character = ExtResource("x3")
+character_affinity = 1
+story = "{personaggio} fu accolto alla corte."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x4")
+label = "Scaccialo"
+description = ""
+inclination_shift = PackedInt32Array(0, 0, -1, 0)
+story = "L'eremita fu cacciato a sassate."
+
+[resource]
+script = ExtResource("x1")
+id = &"il_profeta"
+display_name = "Il profeta"
+description = "Un eremita scende dai monti: dice di aver visto in sogno il fantasma dell'anno."
+sphere = "Fede"
+color = &"energetico"
+seasons = PackedInt32Array(3)
+options = Array[ExtResource("x4")]([SubResource("S2"), SubResource("S3")])
+min_year = 2

@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+oro = 5
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Accetta il riscatto"
+description = "Ricevi 5 Oro."
+gain = SubResource("S1")
+clear_flags = Array[StringName]([&"prigioniero_ostaggio"])
+story = "L'ostaggio fu venduto alla sua famiglia."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x2")
+influenza = 1
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x3")
+label = "Tienilo: vale di più qui"
+description = "Ricevi 1 Influenza."
+gain = SubResource("S3")
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+story = "L'ostaggio restò a corte, e i suoi impararono a obbedire."
+
+[resource]
+script = ExtResource("x1")
+id = &"riscatto_dell_ostaggio"
+display_name = "Il riscatto dell'ostaggio"
+description = "La famiglia dell'ostaggio offre un riscatto per riaverlo."
+sphere = "Stato"
+color = &"blu"
+options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S4")])
+requires_flags = Array[StringName]([&"prigioniero_ostaggio"])

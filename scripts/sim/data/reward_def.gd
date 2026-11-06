@@ -26,6 +26,8 @@ enum Kind {
 ## Tecnologia già iniziata (per TECNOLOGIA). Se manca, una tecnologia a caso fra quelle che la
 ## nazione può ricercare nella sua era.
 @export var tech: TechDef
+## Truppa nemica assimilata (vocazione Assimilatori, GDD §9.6): costruita dalle regole, porta Malcontento.
+var assimilation: bool = false
 
 
 func describe() -> String:
@@ -37,6 +39,8 @@ func describe() -> String:
 		Kind.EDIFICIO:
 			return "Edificio: %s" % (building.display_name if building != null else "?")
 		Kind.TRUPPA:
+			if assimilation:
+				return "Assimila: %s" % (troop.display_name if troop != null else "?")
 			return "Truppa: %s" % (troop.display_name if troop != null else "?")
 		Kind.PERK:
 			return "Perk: %s" % (perk.display_name if perk != null else "?")

@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/mercante.tres" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+ferro = 2
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x2")
+oro = 6
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x3")
+label = "Accetta"
+description = "Paghi 2 Ferro, ricevi 6 Oro."
+cost = SubResource("S1")
+gain = SubResource("S2")
+inclination_shift = PackedInt32Array(0, 1, 0, 0)
+character_affinity = 1
+story = "Il ferro partì sulle navi di {personaggio}."
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x3")
+label = "Rifiuta"
+description = "Il mercante si fida di meno."
+character_affinity = -1
+story = "{personaggio} non insistette, ma non dimenticò."
+
+[resource]
+script = ExtResource("x1")
+id = &"affare_del_mercante"
+display_name = "L'affare del mercante"
+description = "{personaggio} propone un affare: le sue navi in cambio del tuo ferro."
+sphere = "Oro"
+color = &"energetico"
+options = Array[ExtResource("x3")]([SubResource("S3"), SubResource("S4")])
+min_affinity = 0
+requires_character = ExtResource("x4")

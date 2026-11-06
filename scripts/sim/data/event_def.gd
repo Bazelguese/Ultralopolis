@@ -14,6 +14,7 @@ enum Special {
 	NESSUNO,
 	RIFORMA,  ## Un'opzione per ogni governo a cui il governo attuale può evolvere, pagata in Influenza.
 	RIVOLUZIONE,  ## Arriva da sola quando il Malcontento tocca la soglia; un'opzione gratuita per governo possibile.
+	VOCAZIONE,  ## Cronaca che offre una vocazione (GDD §9.6, v0.29): accettarla o rifiutarla.
 }
 
 @export var id: StringName = &""

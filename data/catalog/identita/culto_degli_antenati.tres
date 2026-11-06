@@ -20,3 +20,4 @@ resistance_bonus = 3
 permanent_modifiers = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("x4")])
 exclusive_opportunities = Array[ExtResource("p1")]([ExtResource("p2")])
 exclusive_buildings = Array[ExtResource("p4")]([ExtResource("p3")])
+inclinations = PackedInt32Array(0, -1, 1, 0)

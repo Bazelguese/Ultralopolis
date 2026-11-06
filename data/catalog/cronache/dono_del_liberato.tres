@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+oro = 3
+influenza = 1
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Accetta l'amicizia"
+description = "Ricevi 3 Oro e 1 Influenza."
+gain = SubResource("S1")
+inclination_shift = PackedInt32Array(0, 1, 0, 0)
+clear_flags = Array[StringName]([&"prigioniero_liberato"])
+story = "Due popoli nemici divennero amici."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x2")
+oro = 2
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x3")
+label = "Prendi i doni, non l'amicizia"
+description = "Ricevi 2 Oro."
+gain = SubResource("S3")
+inclination_shift = PackedInt32Array(0, -1, 0, 0)
+clear_flags = Array[StringName]([&"prigioniero_liberato"])
+story = "I doni furono accettati, la mano no."
+
+[resource]
+script = ExtResource("x1")
+id = &"dono_del_liberato"
+display_name = "Il dono del liberato"
+description = "Il prigioniero liberato è tornato dai suoi. Oggi suo padre manda doni e parole di amicizia."
+sphere = "Stato"
+color = &"blu"
+options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S4")])
+requires_flags = Array[StringName]([&"prigioniero_liberato"])

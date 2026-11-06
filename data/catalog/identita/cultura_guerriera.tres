@@ -26,3 +26,4 @@ permanent_modifiers = Array[ExtResource("7_16yuh")]([ExtResource("8_yyspv")])
 cheaper_advisors = Array[ExtResource("p1")]([ExtResource("p2")])
 action_discount = 1
 exclusive_troops = Array[ExtResource("3_rdfd6")]([ExtResource("p3")])
+inclinations = PackedInt32Array(1, 0, 0, 0)

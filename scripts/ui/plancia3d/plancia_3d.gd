@@ -135,6 +135,7 @@ func _collega_hud() -> void:
 	_hud.pausa.connect(_on_pausa)
 	_hud.velocita.connect(func(fattore: float) -> void: _velocita = fattore)
 	_hud.annulla.connect(_annulla)
+	_hud.scegli_cronaca.connect(_on_scegli_cronaca)
 
 
 ## Nuova run con la nazione scelta nel menu, o con una nazione di prova
@@ -152,6 +153,20 @@ func _nuova_run() -> void:
 	_disponi_subito = true
 	_firma_scelte = ""
 	_aggiorna_tutto()
+
+
+## Reazione della nazione alla cronaca (GDD §9.6): se agisce su una carta, prima si sceglie quale.
+func _on_scegli_cronaca(indice: int) -> void:
+	var opzioni: Array[EventOptionDef] = run.chronicle_options()
+	if indice < 0 or indice >= opzioni.size():
+		return
+	var opzione: EventOptionDef = opzioni[indice]
+	var voci: Array[String] = run.option_choices(opzione)
+	var nome: String = run.chronicle_text(opzione.label)
+	if not voci.is_empty():
+		_hud.mostra_scelte(nome, run.chronicle_text(opzione.description), voci, func(voce: int) -> void: _esegui(run.choose_chronicle_option(indice, voce), nome))
+	else:
+		_esegui(run.choose_chronicle_option(indice), nome)
 
 
 func _nazione_di_prova(catalogo: CatalogDef, regole_run: RunRules) -> NationTemplate:
@@ -840,7 +855,7 @@ func _on_azione_principale() -> void:
 
 func _unhandled_input(evento: InputEvent) -> void:
 	var clic: InputEventMouseButton = evento as InputEventMouseButton
-	if clic == null or not clic.pressed or _modo == Modo.SCONTRO or _hud.esito_visibile():
+	if clic == null or not clic.pressed or _modo == Modo.SCONTRO or _hud.esito_visibile() or _hud.cronaca_visibile():
 		return
 	if clic.button_index == MOUSE_BUTTON_RIGHT:
 		_annulla()
@@ -1185,6 +1200,8 @@ func _aggiorna_visuale_scontro() -> void:
 				edificio.imposta_stato("Sabotato", Color("8b3fc9"))
 			elif _sim.get_building_slow_ms(lato, i) > 0:
 				edificio.imposta_stato("Rallentato", Color("e08a2e"))
+			elif _trascurata(lato, false, i):
+				edificio.imposta_stato("Trascurato: mantenimento non pagato", Color("e08a2e"))
 			else:
 				edificio.imposta_stato("", StileVisivo.NOTTE)
 		for mana: StringName in COLORI_RISERVA:
@@ -1211,8 +1228,18 @@ func _aggiorna_visuale_scontro() -> void:
 					tessera.imposta_stato("Si attiva!", StileVisivo.ORO_LUCE)
 				elif _sim.get_troop_slow_ms(lato, i) > 0:
 					tessera.imposta_stato("Rallentata", Color("e08a2e"))
+				elif _trascurata(lato, true, i):
+					tessera.imposta_stato("Trascurata: mantenimento non pagato", Color("e08a2e"))
 				else:
 					tessera.imposta_stato("", StileVisivo.NOTTE)
+
+
+## Carta del giocatore che in questo scontro lavora più piano perché non è stata pagata (GDD §5.6).
+func _trascurata(lato: int, truppa: bool, i: int) -> bool:
+	if lato != Lato.GIOCATORE or run == null:
+		return false
+	var fila: Array[BoardPiece] = run.board.troops if truppa else run.board.buildings
+	return i >= 0 and i < fila.size() and fila[i].neglected
 
 
 ## Una gemma vola dall'edificio alla riserva di mana del suo lato, lasciando una scia.
@@ -1390,7 +1417,7 @@ func _physics_process(_delta: float) -> void:
 			_mostra_beneficiari(beneficiari)
 		else:
 			_mostra_potenziabili(_consigliere_sotto(tessera) if _consigliere_sotto(tessera) != null else run.chosen_advisor)
-	if tessera != null and not _hud.esito_visibile():
+	if tessera != null and not _hud.esito_visibile() and not _hud.cronaca_visibile():
 		var scheda: SchedaCarta = tessera.scheda
 		var titolo: String = scheda.titolo
 		if scheda.sopratitolo != "" and scheda.sopratitolo != scheda.titolo:

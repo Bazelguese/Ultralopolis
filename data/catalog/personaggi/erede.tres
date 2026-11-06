@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CharacterDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/character_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"erede"
+role = "Erede"
+names = PackedStringArray("Aurelio", "Mirta", "Leandro", "Isaura", "Corrado", "Viola")
+description = "{nome}, l'erede: crescerà con le scelte che farai per lui."

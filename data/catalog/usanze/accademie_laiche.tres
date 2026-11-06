@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+ricerca = 1
+
+[resource]
+script = ExtResource("x1")
+id = &"accademie_laiche"
+display_name = "Accademie laiche"
+description = "+1 Ricerca all'inizio di ogni stagione."
+dimension = 7
+inclination_axis = 2
+inclination_pole = -1
+story = "Dall'anno {anno} nelle accademie si insegna che gli dei non rispondono."
+season_resources = SubResource("S1")

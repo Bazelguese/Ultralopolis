@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/porti_franchi.tres" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/mercato_nero_tollerato.tres" id="x3"]
+
+[resource]
+script = ExtResource("x1")
+id = &"repubblica_mercantile"
+display_name = "Repubblica mercantile"
+description = "Le proposte costano 1 Oro in meno, i Visitatori compaiono molto più spesso e al mercato basta 1 unità in meno per 1 Oro."
+dimension = 8
+proposal_gold_change = -1
+visitor_weight_change = 3
+market_rate_change = 1
+story = "Da allora a governare sono i banchi dei mercanti."
+requires_customs = Array[Resource]([ExtResource("x2"), ExtResource("x3")])

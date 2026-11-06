@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/generale.tres" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x3")
+label = "Promuovilo generale"
+description = "Entra nella storia un generale, fedele."
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+introduce_character = ExtResource("x2")
+character_affinity = 1
+story = "{personaggio} divenne generale, acclamato dai soldati."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Promuovilo, ma tienilo d'occhio"
+description = "Entra nella storia un generale, sospettoso."
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+introduce_character = ExtResource("x2")
+character_affinity = -1
+story = "{personaggio} divenne generale, con una spia al fianco."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x3")
+label = "Rimandalo nei ranghi"
+description = ""
+story = "Il capitano tornò nei ranghi, e nessuno ricordò il suo nome."
+
+[resource]
+script = ExtResource("x1")
+id = &"il_giovane_capitano"
+display_name = "Il giovane capitano"
+description = "Un giovane capitano si è distinto in battaglia. I soldati di {nazione} lo seguirebbero ovunque."
+sphere = "Guerra"
+color = &"rosso"
+seasons = PackedInt32Array(1, 2, 3)
+options = Array[ExtResource("x3")]([SubResource("S1"), SubResource("S2"), SubResource("S3")])
+min_year = 2

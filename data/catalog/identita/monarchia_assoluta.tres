@@ -22,3 +22,4 @@ court_advisor_always = true
 permanent_modifiers = Array[ExtResource("x3")]([ExtResource("x4")])
 revolution_causes = Array[int]([0])
 exclusive_troops = Array[ExtResource("p1")]([ExtResource("p2")])
+inclinations = PackedInt32Array(0, 0, 0, 2)

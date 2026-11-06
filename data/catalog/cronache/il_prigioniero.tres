@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Liberalo con onore"
+description = ""
+inclination_shift = PackedInt32Array(-1, 1, 0, 0)
+set_flags = Array[StringName]([&"prigioniero_liberato"])
+story = "Il prigioniero tornò a casa con un mantello nuovo."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+influenza = 2
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x2")
+label = "Tienilo come ostaggio"
+description = "Ricevi 2 Influenza."
+gain = SubResource("S2")
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+set_flags = Array[StringName]([&"prigioniero_ostaggio"])
+story = "Il prigioniero divenne un ostaggio di corte."
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x2")
+label = "Giustizialo davanti al popolo"
+description = "Il Malcontento scende di 1."
+malcontent_change = -1
+inclination_shift = PackedInt32Array(1, -1, 0, 0)
+set_flags = Array[StringName]([&"prigioniero_giustiziato"])
+story = "La testa del prigioniero fu esposta sulle mura."
+
+[resource]
+script = ExtResource("x1")
+id = &"il_prigioniero"
+display_name = "Il prigioniero"
+description = "Dopo la vittoria su {nemico} i soldati portano un prigioniero illustre: il figlio del loro capo."
+sphere = "Guerra"
+color = &"rosso"
+seasons = PackedInt32Array(2, 3)
+options = Array[ExtResource("x2")]([SubResource("S1"), SubResource("S3"), SubResource("S4")])
+last_battle = 1

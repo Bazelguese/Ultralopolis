@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/catasto.tres" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/mura_dei_padri.tres" id="x3"]
+
+[resource]
+script = ExtResource("x1")
+id = &"stato_di_polizia"
+display_name = "Stato di polizia"
+description = "Il Malcontento non supera mai la soglia di avviso, ma la Stabilità chiesta dalle azioni costa il doppio."
+dimension = 8
+rule = 12
+story = "Da allora ogni strada ha un informatore e ogni porta un registro."
+requires_customs = Array[Resource]([ExtResource("x2"), ExtResource("x3")])

@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/spia_sabotaggio_veloce.tres" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/profeta.tres" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x3")
+label = "Segui la profezia"
+description = "Un elemento del fantasma partirà sabotato; il profeta si fida di più."
+spy = ExtResource("x2")
+inclination_shift = PackedInt32Array(0, 0, 1, 0)
+character_affinity = 1
+story = "La profezia di {personaggio} guidò le spie."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Basta profezie"
+description = "Il profeta esce dalla storia."
+inclination_shift = PackedInt32Array(0, 0, -1, 0)
+character_leaves = true
+story = "{personaggio} fu rimandato sui monti."
+
+[resource]
+script = ExtResource("x1")
+id = &"la_profezia"
+display_name = "La profezia"
+description = "{personaggio} il profeta ha parlato di nuovo: sa dove colpirà il fantasma."
+sphere = "Fede"
+color = &"energetico"
+seasons = PackedInt32Array(3)
+options = Array[ExtResource("x3")]([SubResource("S1"), SubResource("S2")])
+min_affinity = 0
+requires_character = ExtResource("x4")

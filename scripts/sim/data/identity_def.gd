@@ -28,6 +28,8 @@ enum Dimension {
 	PERK,  ## Abilità passive, come quelle di The Bazaar: alcune all'inizio, altre durante la run.
 	VIA,   ## Direzione scelta entrando in un'era, dalla seconda in poi (GDD §10.4).
 	ASCENSIONE,  ## Scelta completando l'albero di una via (GDD §10.4.2, v0.27).
+	USANZA,      ## Tratto preso quando un'inclinazione arriva a un estremo (GDD §9.6, v0.29).
+	VOCAZIONE,   ## Modo di giocare aperto da due usanze, accettato in una cronaca (GDD §9.6).
 }
 
 ## Regole del nucleo che un'ascensione del livello 2 cambia (GDD §10.4.2, v0.27).
@@ -41,6 +43,11 @@ enum Rule {
 	MAESTRIA,          ## Le carte arrivano al livello 4 (§6.5).
 	DOPPIO_ASCOLTO,    ## Una volta per stagione due proposte dallo stesso consigliere (§4.2).
 	ESERCITO_FRUGALE,  ## Le truppe senza Cibo non rallentano (§5.4).
+	# Vocazioni (GDD §9.6, v0.29): possibilità nuove in momenti che esistono già.
+	ASSIMILATORI,        ## Dopo un incontro vinto si può prendere una truppa nemica (§3.3).
+	PROFEZIA,            ## A inizio anno si vede una truppa del fantasma (§11).
+	POPOLO_ERRANTE,      ## Nel primo round di ogni stagione c'è sempre un Visitatore (§4.2.5).
+	STATO_DI_POLIZIA,    ## Il Malcontento non supera la soglia di avviso; la Stabilità delle azioni costa il doppio (§5.5).
 }
 
 const DIMENSION_NAMES: Dictionary[Dimension, String] = {
@@ -51,6 +58,8 @@ const DIMENSION_NAMES: Dictionary[Dimension, String] = {
 	Dimension.PERK: "Perk",
 	Dimension.VIA: "Via",
 	Dimension.ASCENSIONE: "Ascensione",
+	Dimension.USANZA: "Usanza",
+	Dimension.VOCAZIONE: "Vocazione",
 }
 
 ## Dimensioni scelte alla creazione della nazione (le vie arrivano dopo, con le ere).
@@ -162,6 +171,22 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 @export var ascension_level: int = 0
 ## Regola cambiata dalle ascensioni del livello 2.
 @export var rule: Rule = Rule.NESSUNA
+
+@export_group("Cronache (GDD §9.6, v0.29)")
+## Spinta iniziale sulle inclinazioni (Spada, Porta, Altare, Legge) per razze, governi, credi e
+## culture scelti alla creazione.
+@export var inclinations: PackedInt32Array = PackedInt32Array()
+## Usanze: l'asse (Inclination.Axis) e il polo (+1 o -1) che la fanno nascere all'estremo.
+@export var inclination_axis: int = -1
+@export var inclination_pole: int = 1
+## Usanze e vocazioni: come la ricorda la storia della nazione. {anno} diventa l'anno.
+@export var story: String = ""
+## Risorse ricevute all'inizio di ogni stagione, con la produzione.
+@export var season_resources: ResourceAmounts
+## Oro in più per ogni incontro del mondo vinto.
+@export var win_gold: int = 0
+## Vocazioni: le usanze (IdentityDef) che servono tutte per aprirla.
+@export var requires_customs: Array[Resource] = []
 
 @export_group("Tratto permanente")
 ## Modificatori che valgono per tutta la run.
