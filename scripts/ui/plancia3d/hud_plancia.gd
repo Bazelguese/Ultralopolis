@@ -77,7 +77,7 @@ var _pulsanti_velocita: Array[Button] = []
 var _pezzo: PanelContainer
 var _titolo_pezzo: Label
 var _testo_pezzo: Label
-var _azioni_pezzo: HBoxContainer
+var _azioni_pezzo: HFlowContainer
 var _scelte: PanelContainer
 var _titolo_scelte: Label
 var _testo_scelte: Label
@@ -246,7 +246,7 @@ func _crea_risorse() -> void:
 	for tipo: int in Res.NAMES:
 		var cella: VBoxContainer = VBoxContainer.new()
 		cella.add_theme_constant_override("separation", -6)
-		cella.custom_minimum_size = Vector2(124, 0)
+		cella.custom_minimum_size = Vector2(100, 0)
 		cella.tooltip_text = "%s: quantità nel Magazzino e produzione della prossima stagione (d'inverno niente Cibo)." % Res.NAMES[tipo]
 		if tipo == Res.Type.RICERCA:
 			cella.tooltip_text = "Ricerca: va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende."
@@ -631,10 +631,12 @@ func _crea_pezzo() -> void:
 	colonna.add_child(_titolo_pezzo)
 	_testo_pezzo = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 18)
 	_testo_pezzo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_testo_pezzo.custom_minimum_size = Vector2(400, 0)
+	# Larghezza fissa: testo e pulsanti vanno a capo invece di allargare il pannello oltre lo schermo.
+	_testo_pezzo.custom_minimum_size = Vector2(560, 0)
 	colonna.add_child(_testo_pezzo)
-	_azioni_pezzo = HBoxContainer.new()
-	_azioni_pezzo.add_theme_constant_override("separation", 8)
+	_azioni_pezzo = HFlowContainer.new()
+	_azioni_pezzo.add_theme_constant_override("h_separation", 8)
+	_azioni_pezzo.add_theme_constant_override("v_separation", 8)
 	colonna.add_child(_azioni_pezzo)
 	_ancora(_pezzo, Control.PRESET_BOTTOM_RIGHT, Vector2(-24, SOPRA_BARRA - 166.0))
 	_pezzo.visible = false

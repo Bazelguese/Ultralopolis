@@ -876,6 +876,7 @@ func _seleziona(truppa: bool, i: int) -> void:
 	tessera.imposta_alone(Color(StileVisivo.ORO_LUCE, 0.55))
 	var pezzo: BoardPiece = run.board.troops[i] if truppa else run.board.buildings[i]
 	var azioni: Array[Dictionary] = []
+	var dettagli: String = tessera.scheda.dettagli
 	if truppa:
 		azioni.append({"testo": "◀ Sposta", "attiva": i > 0, "clic": func() -> void: _sposta(i, i - 1)})
 		azioni.append({"testo": "Sposta ▶", "attiva": i < run.board.troops.size() - 1, "clic": func() -> void: _sposta(i, i + 1)})
@@ -886,11 +887,13 @@ func _seleziona(truppa: bool, i: int) -> void:
 		if motivo == "" and costo != null:
 			azioni.append({"testo": "Potenzia · %s" % costo.describe(), "attiva": run.can_pay(costo), "clic": func() -> void: _potenzia(truppa, i)})
 		else:
-			azioni.append({"testo": "Potenzia: %s" % motivo, "attiva": false, "clic": func() -> void: pass})
+			# Il motivo va nel testo, non sul pulsante: una frase lunga allargava il pannello.
+			azioni.append({"testo": "Potenzia", "attiva": false, "clic": func() -> void: pass})
+			dettagli += "\nPotenzia non disponibile: %s" % motivo
 	if pezzo.building == null or not pezzo.building.is_capital:
 		var vendibile: bool = truppa or run.board.can_sell_building(i)
 		azioni.append({"testo": "Vendi · +%d Oro" % RunState.half_down(pezzo.paid), "attiva": vendibile, "clic": func() -> void: _vendi(truppa, i)})
-	_hud.mostra_pezzo(tessera.scheda.titolo, tessera.scheda.dettagli, azioni)
+	_hud.mostra_pezzo(tessera.scheda.titolo, dettagli, azioni)
 
 
 func _sposta(da: int, a: int) -> void:
