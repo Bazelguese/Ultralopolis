@@ -182,6 +182,13 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda.dettagli = offerta.opportunity.description
 			scheda.illustrazione = _carica("azioni/%s.png" % offerta.opportunity.id)
 			scheda.sopratitolo = "Azione"
+	# Bonus già attivi che la carta riceverebbe per i suoi tipi (GDD §6.6): si vedono prima di comprarla.
+	if offerta.is_element():
+		var tipi: Array[StringName] = offerta.building.types if offerta.building != null else offerta.troop.types
+		var bonus: PackedStringArray = run.type_bonuses_for(tipi, offerta.building != null)
+		if not bonus.is_empty():
+			scheda.sopratitolo += " · ▲ %d bonus" % bonus.size()
+			scheda.dettagli += "\nNe beneficia: " + "; ".join(bonus) + "."
 	scheda.costo = offerta.cost_text()
 	scheda.disponibile = run.can_afford(offerta)
 	if run.offer_needs_replacement(offerta):

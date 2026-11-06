@@ -532,6 +532,63 @@ func production_origin_lines(type: Res.Type) -> PackedStringArray:
 	return lines
 
 
+# --- Interazioni fra tipi (GDD §6.6): che cosa potenzia che cosa ---------------------------
+
+const _EFFETTI_EDIFICI: Array[ModifierDef.Effect] = [ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO,
+		ModifierDef.Effect.INTERVALLO_MANA]
+const _EFFETTI_TRUPPE: Array[ModifierDef.Effect] = [ModifierDef.Effect.RICARICA_TRUPPA,
+		ModifierDef.Effect.DANNO_TRUPPA, ModifierDef.Effect.CIBO_TRUPPA]
+const _EFFETTI_ENTRAMBI: Array[ModifierDef.Effect] = [ModifierDef.Effect.VALORE_PERCENTUALE,
+		ModifierDef.Effect.VALORE_FISSO]
+
+
+## true se il modificatore vale per le carte di un certo tipo (non per tutta la nazione).
+static func is_type_bonus(def: ModifierDef) -> bool:
+	return def.target == ModifierDef.Target.NAZIONE and (def.target_type != &"" or not def.target_types_any.is_empty())
+
+
+## true se il modificatore legato a un tipo tocca una carta con questi tipi (edificio o truppa).
+static func type_bonus_applies(def: ModifierDef, card_types: Array[StringName], is_building: bool) -> bool:
+	if not is_type_bonus(def):
+		return false
+	var kind_ok: bool = _EFFETTI_ENTRAMBI.has(def.effect) or (is_building and _EFFETTI_EDIFICI.has(def.effect)) \
+			or (not is_building and _EFFETTI_TRUPPE.has(def.effect))
+	if not kind_ok:
+		return false
+	if def.target_type != &"" and not card_types.has(def.target_type):
+		return false
+	if not def.target_types_any.is_empty():
+		for card_type: StringName in def.target_types_any:
+			if card_types.has(card_type):
+				return true
+		return false
+	return true
+
+
+## Bonus già attivi che una carta riceverebbe per i suoi tipi, es. "Via del Commercio (+1 Oro...)".
+func type_bonuses_for(card_types: Array[StringName], is_building: bool) -> PackedStringArray:
+	var lines: PackedStringArray = PackedStringArray()
+	for modifier: ActiveModifier in modifiers.active:
+		if modifier.target_piece == null and type_bonus_applies(modifier.def, card_types, is_building):
+			var text: String = "%s (%s)" % [modifier.origin_name, modifier.def.description if modifier.def.description != "" else modifier.def.display_name]
+			if not lines.has(text):
+				lines.append(text)
+	return lines
+
+
+## Carte della plancia che riceverebbero questi modificatori legati a un tipo (es. il tratto di
+## una via, un perk, una tecnologia, l'opzione di un evento).
+func pieces_boosted_by(defs: Array[ModifierDef]) -> Array[BoardPiece]:
+	var found: Array[BoardPiece] = []
+	for def: ModifierDef in defs:
+		if def == null or not is_type_bonus(def):
+			continue
+		for piece: BoardPiece in board.buildings + board.troops:
+			if not found.has(piece) and type_bonus_applies(def, piece_types(piece), piece.building != null):
+				found.append(piece)
+	return found
+
+
 ## Produzione per fase di un singolo edificio, in unità interne, con il suo livello
 ## e i modificatori che lo riguardano (GDD §6.5).
 func building_production(piece: BoardPiece) -> Array[int]:
@@ -815,10 +872,16 @@ func offer_choices(offer: Offer) -> Array[String]:
 				for modifier: ActiveModifier in malus:
 					labels.append(modifier.describe())
 		OpportunityDef.Kind.INCANTO:
+			# Ogni voce dice come cambia il mana della truppa (GDD §4.3): +2 dello stesso colore,
+			# oppure 2 del colore dell'incanto se prima non ne chiedeva.
 			var troops: Array[BoardPiece] = _enchantable_troops()
 			if troops.size() > 1:
+				var spell: OpportunityDef = offer.opportunity
 				for piece: BoardPiece in troops:
-					labels.append(piece.display_name())
+					var now: TroopDef = effective_troop(piece)
+					var before: String = "nessun mana" if now.mana_cost <= 0 else "%d %s" % [now.mana_cost, now.mana_type]
+					var after: String = "%d %s" % [maxi(0, now.mana_cost) + spell.enchant_mana, now.mana_type if now.mana_cost > 0 else spell.enchant_color]
+					labels.append("%s · mana: %s → %s" % [piece.display_name(), before, after])
 	return labels
 
 
@@ -1548,8 +1611,9 @@ func _tech_pool() -> Array[TechDef]:
 	return found
 
 
-## Pesca la mano (GDD §10.5.3): 3 tecnologie dall'altezza più bassa ancora aperta e da quella
-## subito sopra, pesate dalle radici; una carta scartata ha il peso dimezzato a ogni scarto.
+## Pesca la mano (GDD §10.5.3): 3 tecnologie pesate dalle radici. In ogni ramo si pesca dalla sua
+## altezza più bassa ancora aperta e da quella subito sopra: un ramo finito prima degli altri
+## può andare avanti (Davide, 6 novembre). Una carta scartata ha il peso dimezzato a ogni scarto.
 func _draw_tech_hand() -> void:
 	for def: TechDef in tech_hand:
 		if not techs_done.has(def) and not tech_progress.has(def.id):
@@ -1558,13 +1622,13 @@ func _draw_tech_hand() -> void:
 	var pool: Array[TechDef] = _tech_pool()
 	if pool.is_empty():
 		return
-	var lowest: int = pool[0].height()
+	var lowest: Dictionary[StringName, int] = {}
 	for def: TechDef in pool:
-		lowest = mini(lowest, def.height())
+		lowest[def.branch()] = mini(lowest.get(def.branch(), def.height()), def.height())
 	var candidates: Array[TechDef] = []
 	var weights: Array[int] = []
 	for def: TechDef in pool:
-		if def.height() > lowest + 1:
+		if def.height() > lowest[def.branch()] + 1:
 			continue
 		candidates.append(def)
 		weights.append(_tech_weight(def))

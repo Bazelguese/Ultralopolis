@@ -511,9 +511,18 @@ func _testo_carta(run: RunState, tecnologia: TechDef) -> String:
 		stato = "In studio · "
 	elif run.tech_status(tecnologia) == RunState.TechStatus.INIZIATA:
 		stato = "Iniziata · "
-	return "%s\n%s%s · %s · altezza %d\n%d/%d Ricerca\n%s" % [tecnologia.display_name, stato,
+	var testo: String = "%s\n%s%s · %s · altezza %d\n%d/%d Ricerca\n%s" % [tecnologia.display_name, stato,
 			TechDef.BRANCH_NAMES.get(tecnologia.branch(), "?"), tecnologia.sphere, tecnologia.tier,
 			run.tech_progress_of(tecnologia), tecnologia.cost, tecnologia.description]
+	return testo + _riga_beneficiari(run, tecnologia.permanent_modifiers)
+
+
+## "Ne beneficiano: Milizia, Lancieri" per un bonus legato a un tipo (GDD §6.6), vuoto se nessuna.
+static func _riga_beneficiari(run: RunState, modificatori: Array[ModifierDef]) -> String:
+	var nomi: PackedStringArray = PackedStringArray()
+	for pezzo: BoardPiece in run.pieces_boosted_by(modificatori):
+		nomi.append(pezzo.display_name())
+	return "\n▲ Ne beneficiano: %s" % ", ".join(nomi) if not nomi.is_empty() else ""
 
 
 ## Una tecnologia dell'albero: colore e parola dicono lo stato, il suggerimento il perché (P4).
@@ -536,7 +545,8 @@ func _voce_albero(run: RunState, tecnologia: TechDef) -> Label:
 			nota = " · bloccata"
 	var voce: Label = StileVisivo.etichetta("%s%s (%d)%s" % ["  " if tecnologia.tier == 2 else "", tecnologia.display_name, tecnologia.cost, nota], StileVisivo.FONT_TESTO, 16, colore)
 	voce.mouse_filter = Control.MOUSE_FILTER_PASS
-	var aiuto: String = "%s (%s, altezza %d)\n%s" % [tecnologia.display_name, tecnologia.sphere, tecnologia.tier, tecnologia.description]
+	var aiuto: String = "%s (%s, altezza %d)\n%s%s" % [tecnologia.display_name, tecnologia.sphere, tecnologia.tier, tecnologia.description,
+			_riga_beneficiari(run, tecnologia.permanent_modifiers)]
 	if stato == RunState.TechStatus.BLOCCATA:
 		aiuto += "\nBloccata: %s" % run.tech_block_reason(tecnologia)
 	voce.tooltip_text = aiuto

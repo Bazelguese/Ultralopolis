@@ -361,3 +361,28 @@ func test_le_stagioni_cambiano_il_peso_dei_consiglieri() -> void:
 	while run.season == RunState.Season.INVERNO:
 		run.pass_round()
 	assert_eq(run.call("_advisor_weight", chancellor), 1, "Primavera: peso normale.")
+
+
+func test_si_vede_chi_riceve_un_bonus_legato_a_un_tipo() -> void:
+	# Richiesta di Davide (6 novembre): segnalare le interazioni fra tipi.
+	var faster: ModifierDef = ModifierDef.new()
+	faster.id = &"fanti_veloci"
+	faster.display_name = "Fanti veloci"
+	faster.description = "Le truppe Fante ricaricano il 10% più in fretta."
+	faster.is_malus = false
+	faster.effect = ModifierDef.Effect.RICARICA_TRUPPA
+	faster.target_type = &"Fante"
+	faster.amount = -10
+	faster.duration_kind = ModifierDef.Duration.PERMANENTE
+	var run: RunState = _run()
+	# Prima di averlo: quali carte ne beneficerebbero (la truppa Fante, non la fattoria).
+	var pieces: Array[BoardPiece] = run.pieces_boosted_by([faster] as Array[ModifierDef])
+	assert_eq(pieces.size(), 1)
+	assert_eq(pieces[0].troop, soldier_troop)
+	# Dopo averlo: una carta Fante in offerta mostra il bonus che riceverebbe.
+	run.modifiers.apply(faster, ActiveModifier.OriginKind.IDENTITA, "Via della Guerra", run.year, run.board, RandomNumberGenerator.new())
+	var lines: PackedStringArray = run.type_bonuses_for([&"Fante"] as Array[StringName], false)
+	assert_eq(lines.size(), 1)
+	assert_string_contains(lines[0], "Via della Guerra")
+	assert_true(run.type_bonuses_for([&"Fante"] as Array[StringName], true).is_empty(), "Un bonus delle truppe non tocca gli edifici.")
+	assert_true(run.type_bonuses_for([&"Spirituale"] as Array[StringName], false).is_empty())

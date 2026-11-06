@@ -987,7 +987,7 @@ Le ascensioni del livello 1 (es. +1 spazio truppa e +1 spazio edificio; +20 Resi
 | Regola | Stato |
 |---|---|
 | Il gioco mostra una **mano di 3 tecnologie**; il giocatore ne sceglie una da studiare | Confermato |
-| Si pesca fra le tecnologie **disponibili** (prerequisiti completati, era non futura, non ancora completate) dell’**altezza più bassa** ancora aperta e di quella **subito sopra** | Confermato |
+| Si pesca fra le tecnologie **disponibili** (prerequisiti completati, era non futura, non ancora completate) **in ogni ramo**, dell’**altezza più bassa** ancora aperta in quel ramo e di quella **subito sopra**. Così un ramo finito prima degli altri può andare avanti | Confermato (per ramo dal 6 novembre 2026, decisione di Davide) |
 | **Peso**: base 1, +1 per ogni radice “favorita da” che la nazione possiede; una radice “richiede” la fa comparire solo se la nazione ce l’ha. Le radici sono quelle degli eventi (§4.2.5) | Confermato |
 | **Sconto sulla carta scartata**: una tecnologia mostrata e non scelta ha il peso dimezzato nella mano successiva; lo sconto si accumula a ogni scarto fino a un minimo e si azzera quando la tecnologia viene scelta | Confermato; minimo placeholder |
 | Una nuova mano si pesca **ogni volta che si completa una tecnologia** ed entrando in una nuova era | Confermato |
@@ -1361,7 +1361,7 @@ Criteri di accettazione proposti per il prototipo:
 | Ricerca guadagnata | Va tutta nella tecnologia in corso, oppure resta in attesa se non ce n’è una; non entra nel Magazzino. |
 | Tecnologia completata | Si completa appena raggiunge il costo; la Ricerca in più passa alla successiva; si pesca una nuova mano. |
 | Cambio di tecnologia | I progressi su quella lasciata restano salvati; la tecnologia iniziata ricompare sempre nella mano. |
-| Mano | 3 tecnologie disponibili, dall’altezza più bassa aperta e da quella sopra, mai di un’era futura; con lo stesso seme è sempre la stessa. |
+| Mano | 3 tecnologie disponibili, in ogni ramo dalla sua altezza più bassa aperta e da quella sopra, mai di un’era futura; con lo stesso seme è sempre la stessa. |
 | Carta scartata | Peso dimezzato nella mano successiva; torna normale quando viene scelta. |
 | Seconda altezza | Si apre in un ramo dopo 1 tecnologia della prima altezza dello stesso ramo. |
 | Passaggio di era | Possibile solo con N tecnologie dell’era corrente; non automatico; nessuna Ricerca spesa; offerte coerenti con l’era. |
