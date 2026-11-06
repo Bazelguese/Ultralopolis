@@ -295,6 +295,11 @@ func phase_name() -> String:
 	return PHASE_NAMES[phase]
 
 
+## Temi dei round della stagione in corso, nell'ordine pescato a inizio stagione.
+func season_round_themes() -> Array[int]:
+	return _season_themes.duplicate()
+
+
 func season_name(which: Season = season) -> String:
 	return SEASON_NAMES[which]
 
@@ -481,6 +486,52 @@ func next_season_production() -> Array[int]:
 	return totals
 
 
+## Da dove arriva la produzione di una risorsa nella prossima stagione (principio P4): una riga per
+## ogni edificio che la produce, con i bonus fissi e il loro nome, poi le percentuali e il totale.
+func production_origin_lines(type: Res.Type) -> PackedStringArray:
+	var lines: PackedStringArray = PackedStringArray()
+	for piece: BoardPiece in board.buildings:
+		var base: int = piece.building.production(type)
+		if base > 0:
+			base += run_rules.building_production_per_level * (piece.level - 1)
+		var parts: PackedStringArray = PackedStringArray()
+		for modifier: ActiveModifier in modifiers.active:
+			var def: ModifierDef = modifier.def
+			if def.effect != ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO or def.resource != type:
+				continue
+			if modifier.target_piece != null and modifier.target_piece != piece:
+				continue
+			if not Modifiers._type_matches(def, piece):
+				continue
+			parts.append("%+d da %s" % [def.amount, modifier.origin_name])
+		var total: int = maxi(0, base + modifiers.flat_production(type, piece))
+		if total <= 0 and parts.is_empty():
+			continue
+		var line: String = "• %s +%s" % [piece.display_name(), Res.format(type, total * Res.scale(type))]
+		if not parts.is_empty():
+			var level_text: String = ", livello %d" % piece.level if piece.level > 1 and piece.building.production(type) > 0 else ""
+			line += " (di base %d%s; %s)" % [maxi(0, base), level_text, ", ".join(parts)]
+		elif piece.level > 1:
+			line += " (livello %d)" % piece.level
+		lines.append(line)
+	var percent_effect: int = -1
+	if type == Res.Type.ORO:
+		percent_effect = ModifierDef.Effect.PRODUZIONE_ORO
+	elif type == Res.Type.RICERCA:
+		percent_effect = ModifierDef.Effect.PRODUZIONE_RICERCA
+	for modifier: ActiveModifier in modifiers.active:
+		var def: ModifierDef = modifier.def
+		var applies: bool = (def.effect == ModifierDef.Effect.PRODUZIONE_PERCENTUALE and def.resource == type) \
+				or (percent_effect >= 0 and def.effect == percent_effect and modifier.target_piece == null)
+		if applies and def.amount != 0:
+			lines.append("• %s %+d%% (%s)" % [def.display_name, def.amount, modifier.origin_name])
+	if type == Res.Type.CIBO and season == Season.AUTUNNO:
+		lines.append("• La prossima stagione è l'inverno: niente Cibo.")
+	if lines.is_empty():
+		lines.append("• Nessun edificio la produce.")
+	return lines
+
+
 ## Produzione per fase di un singolo edificio, in unità interne, con il suo livello
 ## e i modificatori che lo riguardano (GDD §6.5).
 func building_production(piece: BoardPiece) -> Array[int]:
@@ -523,7 +574,13 @@ static func is_neutral_building(def: BuildingDef) -> bool:
 ## Costo di Potenzia con il consigliere scelto: la quantità dipende dal livello e dall'era della
 ## carta, la risorsa dal consigliere (GDD §4.2.4). null se il consigliere non potenzia.
 func upgrade_cost_of(piece: BoardPiece) -> ResourceAmounts:
-	if chosen_advisor == null or chosen_advisor.special in [AdvisorDef.Special.CLOWN, AdvisorDef.Special.VISITATORE]:
+	return upgrade_cost_for(chosen_advisor, piece)
+
+
+## Costo di Potenzia di una carta con un consigliere qualsiasi, anche non ancora scelto (per
+## mostrare in anticipo che cosa si potrebbe potenziare). null se quel consigliere non potenzia.
+func upgrade_cost_for(advisor: AdvisorDef, piece: BoardPiece) -> ResourceAmounts:
+	if advisor == null or advisor.special in [AdvisorDef.Special.CLOWN, AdvisorDef.Special.VISITATORE]:
 		return null
 	if piece.level >= max_level():
 		return null
@@ -536,13 +593,30 @@ func upgrade_cost_of(piece: BoardPiece) -> ResourceAmounts:
 	var quantity: int = multiplier * maxi(1, card_era)
 	quantity = maxi(1, quantity - _identity_int(&"upgrade_discount"))
 	var amounts: ResourceAmounts = ResourceAmounts.new()
-	if chosen_advisor.special == AdvisorDef.Special.ANZIANO:
+	if advisor.special == AdvisorDef.Special.ANZIANO:
 		amounts.add(Res.Type.ORO, quantity)
 	else:
-		amounts.add(chosen_advisor.upgrade_resource, quantity)
-		if chosen_advisor.random_resource:
+		amounts.add(advisor.upgrade_resource, quantity)
+		if advisor.random_resource:
 			amounts.add(shadow_resource, quantity)
 	return amounts
+
+
+## Carte della plancia che questo consigliere potrebbe potenziare adesso, con le risorse che ci
+## sono nel Magazzino (principio P4): servono al segnale su consiglieri e carte.
+func affordable_upgrades(advisor: AdvisorDef) -> Array[BoardPiece]:
+	var found: Array[BoardPiece] = []
+	if advisor == null or not is_shopping_phase() or not way_choices.is_empty():
+		return found
+	if advisor == chosen_advisor and upgrade_used:
+		return found
+	for piece: BoardPiece in board.buildings + board.troops:
+		if _advisor_upgrade_reason(advisor, piece) != "":
+			continue
+		var cost: ResourceAmounts = upgrade_cost_for(advisor, piece)
+		if cost != null and can_pay(cost):
+			found.append(piece)
+	return found
 
 
 ## Perché l'elemento non si può potenziare adesso; stringa vuota se si può (principio P4).
@@ -556,9 +630,19 @@ func upgrade_block_reason(piece: BoardPiece) -> String:
 		if chosen_event != null:
 			return "In questo round hai scelto un evento: Potenzia è un'opzione dei consiglieri."
 		return "Scegli prima un consigliere: Potenzia è una delle sue opzioni."
+	var reason: String = _advisor_upgrade_reason(chosen_advisor, piece)
+	if reason != "":
+		return reason
+	if upgrade_used:
+		return "Potenzia è già stato usato in questo round."
+	return ""
+
+
+## La parte del motivo che dipende solo dal consigliere e dalla carta.
+func _advisor_upgrade_reason(advisor: AdvisorDef, piece: BoardPiece) -> String:
 	if piece.level >= max_level():
 		return "Già al livello massimo."
-	match chosen_advisor.special:
+	match advisor.special:
 		AdvisorDef.Special.CLOWN:
 			return "Il Clown non potenzia."
 		AdvisorDef.Special.VISITATORE:
@@ -569,10 +653,8 @@ func upgrade_block_reason(piece: BoardPiece) -> String:
 			if elder_upgrades_used >= run_rules.elder_upgrades_per_year:
 				return "L'Anziano ha già potenziato quest'anno."
 		_:
-			if not chosen_advisor.covers(piece_types(piece)):
-				return "%s potenzia solo carte con tipo %s." % [chosen_advisor.display_name, ", ".join(chosen_advisor.types)]
-	if upgrade_used:
-		return "Potenzia è già stato usato in questo round."
+			if not advisor.covers(piece_types(piece)):
+				return "%s potenzia solo carte con tipo %s." % [advisor.display_name, ", ".join(advisor.types)]
 	return ""
 
 

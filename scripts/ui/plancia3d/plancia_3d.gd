@@ -683,6 +683,8 @@ func _aggiorna_tutto() -> void:
 	_annulla()
 	_costruisci_plancia_giocatore()
 	_costruisci_scelte()
+	_aggiorna_stato_consiglieri()
+	_mostra_potenziabili(run.chosen_advisor)
 	_nomi_lato[Lato.GIOCATORE].text = run.nation_name.to_upper()
 	_aggiorna_medaglione(Lato.GIOCATORE, run.player_resistance(), run.player_resistance())
 	_hud.aggiorna_partita(run)
@@ -695,6 +697,52 @@ func _esegui(riuscita: bool, messaggio: String = "") -> void:
 	elif messaggio != "":
 		_hud.mostra_messaggio(messaggio)
 	_aggiorna_tutto()
+
+
+## Il consigliere della carta sotto il mouse, se è una carta consigliere del round.
+func _consigliere_sotto(tessera: Tessera3D) -> AdvisorDef:
+	if tessera == null or _tipo_scelta != TipoScelta.CONSIGLIERE or not (tessera in _scelte):
+		return null
+	if tessera.indice < 0 or tessera.indice >= run.advisor_choices.size():
+		return null
+	return run.advisor_choices[tessera.indice]
+
+
+## Segna sulla plancia le carte che il consigliere potrebbe potenziare con le risorse che ci sono:
+## alone dorato e scritta "Potenzia" sopra la carta. Senza consigliere toglie i segnali.
+func _mostra_potenziabili(consigliere: AdvisorDef) -> void:
+	if run == null:
+		return
+	var potenziabili: Array[BoardPiece] = run.affordable_upgrades(consigliere)
+	for coppia: Array in [[_truppe[Lato.GIOCATORE], run.board.troops], [_edifici[Lato.GIOCATORE], run.board.buildings]]:
+		var tessere: Array = coppia[0]
+		var pezzi: Array = coppia[1]
+		for i: int in range(mini(tessere.size(), pezzi.size())):
+			var tessera: Tessera3D = tessere[i]
+			if not is_instance_valid(tessera):
+				continue
+			if potenziabili.has(pezzi[i]):
+				var costo: ResourceAmounts = run.upgrade_cost_for(consigliere, pezzi[i])
+				tessera.imposta_segnale("▲ POTENZIA\n%s" % costo.describe())
+				tessera.imposta_alone(Color(StileVisivo.ORO_LUCE, 0.35))
+			elif tessera.ha_segnale():
+				# Si spegne solo l'alone messo dal segnale: la carta selezionata resta evidenziata.
+				tessera.imposta_segnale("")
+				tessera.imposta_alone(Color(0.0, 0.0, 0.0, 0.0))
+
+
+## Sulle carte dei consiglieri del round: quante tue carte potrebbero potenziare adesso.
+func _aggiorna_stato_consiglieri() -> void:
+	if _tipo_scelta != TipoScelta.CONSIGLIERE:
+		return
+	for tessera: Tessera3D in _scelte:
+		if not is_instance_valid(tessera) or tessera.indice < 0 or tessera.indice >= run.advisor_choices.size():
+			continue
+		var quante: int = run.affordable_upgrades(run.advisor_choices[tessera.indice]).size()
+		if quante > 0:
+			tessera.imposta_stato("▲ Potenzia pronto · %d %s" % [quante, "carta" if quante == 1 else "carte"], StileVisivo.ORO_LUCE)
+		else:
+			tessera.imposta_stato("", StileVisivo.NOTTE)
 
 
 func _annulla() -> void:
@@ -876,6 +924,7 @@ func _seleziona(truppa: bool, i: int) -> void:
 	tessera.imposta_alone(Color(StileVisivo.ORO_LUCE, 0.55))
 	var pezzo: BoardPiece = run.board.troops[i] if truppa else run.board.buildings[i]
 	var azioni: Array[Dictionary] = []
+	var dettagli: String = tessera.scheda.dettagli
 	if truppa:
 		azioni.append({"testo": "◀ Sposta", "attiva": i > 0, "clic": func() -> void: _sposta(i, i - 1)})
 		azioni.append({"testo": "Sposta ▶", "attiva": i < run.board.troops.size() - 1, "clic": func() -> void: _sposta(i, i + 1)})
@@ -886,11 +935,13 @@ func _seleziona(truppa: bool, i: int) -> void:
 		if motivo == "" and costo != null:
 			azioni.append({"testo": "Potenzia · %s" % costo.describe(), "attiva": run.can_pay(costo), "clic": func() -> void: _potenzia(truppa, i)})
 		else:
-			azioni.append({"testo": "Potenzia: %s" % motivo, "attiva": false, "clic": func() -> void: pass})
+			# Il motivo va nel testo, non sul pulsante: una frase lunga allargava il pannello.
+			azioni.append({"testo": "Potenzia", "attiva": false, "clic": func() -> void: pass})
+			dettagli += "\nPotenzia non disponibile: %s" % motivo
 	if pezzo.building == null or not pezzo.building.is_capital:
 		var vendibile: bool = truppa or run.board.can_sell_building(i)
 		azioni.append({"testo": "Vendi · +%d Oro" % RunState.half_down(pezzo.paid), "attiva": vendibile, "clic": func() -> void: _vendi(truppa, i)})
-	_hud.mostra_pezzo(tessera.scheda.titolo, tessera.scheda.dettagli, azioni)
+	_hud.mostra_pezzo(tessera.scheda.titolo, dettagli, azioni)
 
 
 func _sposta(da: int, a: int) -> void:
@@ -1281,6 +1332,8 @@ func _physics_process(_delta: float) -> void:
 		_evidenziata = tessera
 		if tessera != null:
 			tessera.evidenzia(true)
+		# Mouse su un consigliere: si accendono le carte che potrebbe potenziare (P4).
+		_mostra_potenziabili(_consigliere_sotto(tessera) if _consigliere_sotto(tessera) != null else run.chosen_advisor)
 	if tessera != null and not _hud.esito_visibile():
 		var scheda: SchedaCarta = tessera.scheda
 		var titolo: String = scheda.titolo

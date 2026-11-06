@@ -218,6 +218,12 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 			scheda.riga = "Potenzia: %s" % run.advisor_resource_text(consigliere)
 			righe.append("Tipi: %s." % ", ".join(consigliere.types))
 			righe.append("Potenzia e rinnovo con: %s." % run.advisor_resource_text(consigliere))
+			var pronte: PackedStringArray = PackedStringArray()
+			for pezzo: BoardPiece in run.affordable_upgrades(consigliere):
+				pronte.append(pezzo.display_name())
+			if not pronte.is_empty():
+				righe.append("Puoi già potenziare: %s." % ", ".join(pronte))
+				scheda.costo = "Ascolta · ▲ Potenzia %d" % pronte.size()
 	scheda.costo = "Ascolta"
 	scheda.dettagli = "\n".join(righe)
 	return scheda

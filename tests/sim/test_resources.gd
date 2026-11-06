@@ -323,3 +323,24 @@ func test_produzione_extra_per_gli_edifici_con_un_tipo() -> void:
 	bonus.duration_kind = ModifierDef.Duration.PERMANENTE
 	run.modifiers.apply(bonus, ActiveModifier.OriginKind.ALTRO, "Prova", run.year, run.board, RandomNumberGenerator.new())
 	assert_eq(run.production_per_phase()[Res.Type.FEDE], 3, "1 di base + 2 sulla Capitale.")
+
+
+func test_si_vede_da_dove_arriva_la_produzione() -> void:
+	# Richiesta di Davide (6 novembre): passando il mouse su una risorsa se ne vede l'origine.
+	var bonus: ModifierDef = ModifierDef.new()
+	bonus.id = &"capitale_prova"
+	bonus.display_name = "Capitale: +1 Ferro"
+	bonus.is_malus = false
+	bonus.effect = ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO
+	bonus.target_type = &"Capitale"
+	bonus.resource = Res.Type.FERRO
+	bonus.amount = 1
+	bonus.duration_kind = ModifierDef.Duration.PERMANENTE
+	capital.documents_per_phase = 0
+	var run: RunState = _new_run()
+	run.modifiers.apply(bonus, ActiveModifier.OriginKind.IDENTITA, "Cinerali", run.year, run.board, RandomNumberGenerator.new())
+	var lines: PackedStringArray = run.production_origin_lines(Res.Type.FERRO)
+	var text: String = "\n".join(lines)
+	assert_string_contains(text, "Capitale", "L'edificio che la produce.")
+	assert_string_contains(text, "da Cinerali", "Il bonus con il suo nome.")
+	assert_string_contains("\n".join(run.production_origin_lines(Res.Type.DOCUMENTI)), "Nessun edificio")

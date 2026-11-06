@@ -44,12 +44,18 @@ var _malcontento: Label
 var _malcontento_cella: Control
 var _ultima_possibilita: Label
 var _valori_risorse: Dictionary[int, Label] = {}
+## Le celle della barra delle risorse: il tooltip dice da dove arriva la produzione.
+var _celle_risorse: Dictionary[int, Control] = {}
+var _flusso: FlussoAnno
 var _produzioni_risorse: Dictionary[int, Label] = {}
 var _pulsante_era: Button
 var _magazzino: PanelContainer
 var _righe_magazzino: Dictionary[int, Label] = {}
 var _vendite: Dictionary[int, Button] = {}
 var _pulsante_ricerca: Button
+## Avviso sopra la barra quando nessuna tecnologia è in studio (la Ricerca resta ferma).
+var _avviso_ricerca: Label
+var _pulsazione_ricerca: Tween
 var _ricerca: PanelContainer
 var _stato_ricerca: Label
 var _mano_ricerca: HBoxContainer
@@ -77,7 +83,7 @@ var _pulsanti_velocita: Array[Button] = []
 var _pezzo: PanelContainer
 var _titolo_pezzo: Label
 var _testo_pezzo: Label
-var _azioni_pezzo: HBoxContainer
+var _azioni_pezzo: HFlowContainer
 var _scelte: PanelContainer
 var _titolo_scelte: Label
 var _testo_scelte: Label
@@ -201,9 +207,16 @@ func _crea_fase() -> void:
 	colonna.add_theme_constant_override("separation", 4)
 	var riquadro: PanelContainer = PanelContainer.new()
 	colonna.add_child(riquadro)
-	_fase = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30)
+	var dentro: VBoxContainer = VBoxContainer.new()
+	dentro.add_theme_constant_override("separation", 2)
+	riquadro.add_child(dentro)
+	# Il flusso dell'anno, visivo (GDD §3.2, v0.25): stagioni, mesi, scontri e mese in corso.
+	_flusso = FlussoAnno.new()
+	_flusso.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	dentro.add_child(_flusso)
+	_fase = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 22)
 	_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	riquadro.add_child(_fase)
+	dentro.add_child(_fase)
 	_sotto_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 17, StileVisivo.TESTO_TENUE)
 	_sotto_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	colonna.add_child(_sotto_fase)
@@ -246,7 +259,7 @@ func _crea_risorse() -> void:
 	for tipo: int in Res.NAMES:
 		var cella: VBoxContainer = VBoxContainer.new()
 		cella.add_theme_constant_override("separation", -6)
-		cella.custom_minimum_size = Vector2(124, 0)
+		cella.custom_minimum_size = Vector2(100, 0)
 		cella.tooltip_text = "%s: quantità nel Magazzino e produzione della prossima stagione (d'inverno niente Cibo)." % Res.NAMES[tipo]
 		if tipo == Res.Type.RICERCA:
 			cella.tooltip_text = "Ricerca: va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende."
@@ -263,6 +276,7 @@ func _crea_risorse() -> void:
 		cella.add_child(valori)
 		riga.add_child(cella)
 		_valori_risorse[tipo] = valore
+		_celle_risorse[tipo] = cella
 		_produzioni_risorse[tipo] = produzione
 	var spinta: Control = Control.new()
 	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -270,6 +284,11 @@ func _crea_risorse() -> void:
 	_pulsante_ricerca = _pulsante("Ricerca", func() -> void: _ricerca.visible = not _ricerca.visible)
 	_pulsante_ricerca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_ricerca)
+	_avviso_ricerca = StileVisivo.etichetta("Nessuna tecnologia in studio: la Ricerca resta ferma. Clicca qui sotto, su Ricerca.",
+			StileVisivo.FONT_TESTO_FORTE, 18, StileVisivo.PERICOLO)
+	_avviso_ricerca.add_theme_constant_override("outline_size", 8)
+	_avviso_ricerca.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
+	_avviso_ricerca.visible = false
 	_pulsante_tradizioni = _pulsante("Tradizioni", func() -> void: _tradizioni.visible = not _tradizioni.visible)
 	_pulsante_tradizioni.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_tradizioni)
@@ -280,6 +299,7 @@ func _crea_risorse() -> void:
 	_pulsante_era.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_era)
 	add_child(barra)
+	_ancora(_avviso_ricerca, Control.PRESET_BOTTOM_RIGHT, Vector2(-30, SOPRA_BARRA + 16.0))
 	barra.anchor_left = 0.0
 	barra.anchor_right = 1.0
 	barra.anchor_top = 1.0
@@ -631,10 +651,12 @@ func _crea_pezzo() -> void:
 	colonna.add_child(_titolo_pezzo)
 	_testo_pezzo = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 18)
 	_testo_pezzo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_testo_pezzo.custom_minimum_size = Vector2(400, 0)
+	# Larghezza fissa: testo e pulsanti vanno a capo invece di allargare il pannello oltre lo schermo.
+	_testo_pezzo.custom_minimum_size = Vector2(560, 0)
 	colonna.add_child(_testo_pezzo)
-	_azioni_pezzo = HBoxContainer.new()
-	_azioni_pezzo.add_theme_constant_override("separation", 8)
+	_azioni_pezzo = HFlowContainer.new()
+	_azioni_pezzo.add_theme_constant_override("h_separation", 8)
+	_azioni_pezzo.add_theme_constant_override("v_separation", 8)
 	colonna.add_child(_azioni_pezzo)
 	_ancora(_pezzo, Control.PRESET_BOTTOM_RIGHT, Vector2(-24, SOPRA_BARRA - 166.0))
 	_pezzo.visible = false
@@ -730,6 +752,8 @@ func aggiorna_partita(run: RunState) -> void:
 	_identita.text = run.identity_summary()
 	var comprando: bool = run.is_shopping_phase()
 	# GDD §3.2 (v0.25): anno, stagione e mese, es. "Anno 2 · Estate · Agosto".
+	_flusso.visible = true
+	_flusso.aggiorna(run)
 	_fase.text = "Anno %d · %s" % [run.year, run.phase_name()]
 	if comprando:
 		_fase.text += " · %s · tema: %s" % [run.month_name(), run.theme_name()]
@@ -745,6 +769,12 @@ func aggiorna_partita(run: RunState) -> void:
 			run.run_rules.malcontent_threshold, "\nLa rivoluzione si avvicina!" if vicina else ""]
 
 	var produzione: Array[int] = run.next_season_production()
+	for tipo: int in _celle_risorse:
+		var testa: String = "%s: %s nel Magazzino." % [Res.NAMES[tipo], run.stock_text(tipo)]
+		if tipo == Res.Type.RICERCA:
+			testa = "Ricerca: va nella tecnologia che stai studiando. Senza una tecnologia in studio resta in attesa. Non si vende."
+		_celle_risorse[tipo].tooltip_text = "%s\nProssima stagione +%s:\n%s" % [testa, Res.format(tipo, produzione[tipo]),
+				"\n".join(run.production_origin_lines(tipo))]
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
@@ -752,6 +782,7 @@ func aggiorna_partita(run: RunState) -> void:
 	if run.current_tech != null:
 		_valori_risorse[Res.Type.RICERCA].text = "%d/%d" % [run.tech_progress_of(run.current_tech), run.current_tech.cost]
 	_pulsante_ricerca.text = "Ricerca · %s" % (run.current_tech.display_name if run.current_tech != null else "scegli")
+	_aggiorna_avviso_ricerca(run)
 	var tecnologie_era: int = run.next_era_techs_needed()
 	if tecnologie_era >= 0:
 		var fatte: int = mini(run.techs_done_in_era(run.era), tecnologie_era)
@@ -862,6 +893,30 @@ func _testo_fine(run: RunState) -> String:
 	return ""
 
 
+## Senza una tecnologia in studio (e con tecnologie da scegliere) il pulsante Ricerca diventa
+## rosso e pulsa, la casella della Ricerca dice quanta ne aspetta e sopra la barra compare un avviso.
+func _aggiorna_avviso_ricerca(run: RunState) -> void:
+	var ferma: bool = run.current_tech == null and not run.tech_hand_cards().is_empty() and run.phase != RunState.Phase.FINE_RUN
+	_avviso_ricerca.visible = ferma
+	StileVisivo.rendi_allarme(_pulsante_ricerca, ferma)
+	if ferma:
+		_pulsante_ricerca.text = "Ricerca · scegli!"
+		_valori_risorse[Res.Type.RICERCA].text = str(run.research_waiting())
+		_valori_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", StileVisivo.PERICOLO)
+		_produzioni_risorse[Res.Type.RICERCA].text = "ferma"
+		_produzioni_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", StileVisivo.PERICOLO)
+		if _pulsazione_ricerca == null or not _pulsazione_ricerca.is_valid():
+			_pulsazione_ricerca = create_tween().set_loops()
+			_pulsazione_ricerca.tween_property(_pulsante_ricerca, "modulate", Color(1.0, 1.0, 1.0, 0.55), 0.6)
+			_pulsazione_ricerca.tween_property(_pulsante_ricerca, "modulate", Color.WHITE, 0.6)
+	else:
+		_valori_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", COLORI_RISORSE[Res.Type.RICERCA])
+		_produzioni_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", StileVisivo.TESTO_TENUE)
+		if _pulsazione_ricerca != null and _pulsazione_ricerca.is_valid():
+			_pulsazione_ricerca.kill()
+		_pulsante_ricerca.modulate = Color.WHITE
+
+
 ## In battaglia restano solo i comandi dello scontro.
 func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	_comandi.visible = not attiva
@@ -872,6 +927,8 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	_cronaca.visible = false
 	nascondi_pezzo()
 	if attiva:
+		_flusso.visible = false
+		_avviso_ricerca.visible = false
 		_fase.text = titolo
 		_sotto_fase.text = "Le truppe agiscono da destra verso sinistra"
 		imposta_pausa(false)
