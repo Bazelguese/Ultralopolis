@@ -26,3 +26,4 @@ favored_advisors = Array[ExtResource("x3")]([ExtResource("x4"), ExtResource("x5"
 permanent_modifiers = Array[ExtResource("x6")]([ExtResource("x7")])
 revolution_causes = Array[int]([3])
 exclusive_buildings = Array[ExtResource("p1")]([ExtResource("p2")])
+inclinations = PackedInt32Array(0, 1, 0, 0)

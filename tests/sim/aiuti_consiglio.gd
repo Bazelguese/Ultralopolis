@@ -56,3 +56,15 @@ static func consiglio_semplice(catalogo: CatalogDef, regole: RunRules, azioni: A
 static func ascolta(run: RunState) -> void:
 	if run.is_shopping_phase() and run.chosen_advisor == null and not run.advisor_choices.is_empty():
 		run.choose_advisor(0)
+
+
+## Nella cronaca della stagione (GDD §9.6) sceglie la prima reazione possibile.
+static func reagisci(run: RunState) -> bool:
+	var opzioni: Array[EventOptionDef] = run.chronicle_options()
+	for i: int in range(opzioni.size()):
+		if run.option_block_reason(opzioni[i]) == "" and run.option_choices(opzioni[i]).is_empty():
+			return run.choose_chronicle_option(i)
+	for i: int in range(opzioni.size()):
+		if run.option_block_reason(opzioni[i]) == "":
+			return run.choose_chronicle_option(i, 0)
+	return false

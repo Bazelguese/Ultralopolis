@@ -27,3 +27,4 @@ proposal_gold_change = 1
 evolves_to = Array[Resource]([ExtResource("p1"), ExtResource("p2")])
 exclusive_buildings = Array[ExtResource("1_lyxgt")]([ExtResource("p3")])
 revolution_causes = Array[int]([1, 3])
+inclinations = PackedInt32Array(0, 0, 0, -1)

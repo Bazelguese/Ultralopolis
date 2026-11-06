@@ -27,3 +27,4 @@ favored_advisors = Array[ExtResource("x3")]([ExtResource("x4")])
 permanent_modifiers = Array[ExtResource("x5")]([ExtResource("x6")])
 upgrade_discount = 1
 exclusive_buildings = Array[ExtResource("p2")]([ExtResource("p1")])
+inclinations = PackedInt32Array(0, 0, 0, 1)

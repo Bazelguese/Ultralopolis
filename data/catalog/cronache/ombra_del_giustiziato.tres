@@ -1,0 +1,64 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+ferro = 1
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x2")
+stabilita = 1
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x3")
+label = "Schiacciali"
+description = "Paghi 1 Ferro, ricevi 1 Stabilità."
+cost = SubResource("S1")
+gain = SubResource("S2")
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+clear_flags = Array[StringName]([&"prigioniero_giustiziato"])
+story = "Le bande furono sterminate nei boschi."
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x2")
+oro = 4
+
+[sub_resource type="Resource" id="S5"]
+script = ExtResource("x3")
+label = "Paga per la pace"
+description = "Paghi 4 Oro."
+cost = SubResource("S4")
+inclination_shift = PackedInt32Array(-1, 0, 0, 0)
+clear_flags = Array[StringName]([&"prigioniero_giustiziato"])
+story = "Il sangue fu pagato con l'oro."
+
+[sub_resource type="Resource" id="S6"]
+script = ExtResource("x4")
+display_name = "Bande ai confini"
+description = "−5 Resistenza nel prossimo scontro con il fantasma."
+is_malus = true
+effect = 6
+amount = -5
+duration_kind = 1
+
+[sub_resource type="Resource" id="S7"]
+script = ExtResource("x3")
+label = "Lasciali venire"
+description = "−5 Resistenza nel prossimo scontro con il fantasma."
+modifiers = Array[ExtResource("x4")]([SubResource("S6")])
+clear_flags = Array[StringName]([&"prigioniero_giustiziato"])
+story = "Le bande bruciarono i villaggi di confine."
+
+[resource]
+script = ExtResource("x1")
+id = &"ombra_del_giustiziato"
+display_name = "L'ombra del giustiziato"
+description = "Il popolo del prigioniero giustiziato non ha dimenticato. Ai confini compaiono bande che portano il suo nome."
+sphere = "Guerra"
+color = &"rosso"
+options = Array[ExtResource("x3")]([SubResource("S3"), SubResource("S5"), SubResource("S7")])
+requires_flags = Array[StringName]([&"prigioniero_giustiziato"])

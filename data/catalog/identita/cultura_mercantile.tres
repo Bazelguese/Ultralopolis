@@ -21,3 +21,4 @@ permanent_modifiers = Array[ExtResource("5_osjtt")]([ExtResource("6_7crgb")])
 favored_advisors = Array[ExtResource("adv_s")]([ExtResource("adv_tes")])
 market_rate_change = 1
 exclusive_buildings = Array[ExtResource("1_any5m")]([ExtResource("p1")])
+inclinations = PackedInt32Array(0, 1, 0, 0)

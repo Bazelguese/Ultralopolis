@@ -20,6 +20,11 @@ extends Resource
 @export var ascensions: Array[IdentityDef] = []
 ## Popoli, governi, credi, culture e perk fra cui scegliere (GDD §9).
 @export var identities: Array[IdentityDef] = []
+## Cronache della nazione, usanze, vocazioni e personaggi (GDD §9.6, v0.29).
+@export var chronicles: Array[ChronicleDef] = []
+@export var customs: Array[IdentityDef] = []
+@export var vocations: Array[IdentityDef] = []
+@export var characters: Array[CharacterDef] = []
 ## Regole per generare fantasmi e incontri negli anni senza dati scritti a mano.
 ## Se manca, si usa il fantasma più recente e nessun incontro in più.
 @export var generator: GeneratorRules

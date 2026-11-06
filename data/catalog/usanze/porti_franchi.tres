@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+
+[resource]
+script = ExtResource("x1")
+id = &"porti_franchi"
+display_name = "Porti franchi"
+description = "I Visitatori compaiono più spesso fra le carte del Consiglio."
+dimension = 7
+inclination_axis = 1
+inclination_pole = 1
+story = "Dall'anno {anno} chiunque può attraccare e vendere senza pagare dazio."
+visitor_weight_change = 2

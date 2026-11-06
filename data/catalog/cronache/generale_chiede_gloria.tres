@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/generale.tres" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Concedigli il comando"
+description = "Una truppa sale di un livello; il generale si fida di più."
+upgrade = true
+upgrade_kind = 2
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+character_affinity = 1
+story = "{personaggio} ebbe il comando e lo usò bene."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x2")
+label = "Il comando resta a corte"
+description = "Il generale si fida di meno."
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+character_affinity = -1
+story = "{personaggio} restò a corte, e si offese."
+
+[resource]
+script = ExtResource("x1")
+id = &"generale_chiede_gloria"
+display_name = "Il generale chiede gloria"
+description = "{personaggio}, il tuo generale, chiede di guidare la prossima campagna."
+sphere = "Guerra"
+color = &"rosso"
+options = Array[ExtResource("x2")]([SubResource("S1"), SubResource("S2")])
+min_affinity = 0
+requires_character = ExtResource("x3")

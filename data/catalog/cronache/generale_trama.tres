@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/generale.tres" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Arrestalo"
+description = "Il generale esce dalla storia; il Malcontento sale di 1."
+malcontent_change = 1
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+set_flags = Array[StringName]([&"generale_arrestato"])
+character_leaves = true
+story = "{personaggio} fu arrestato all'alba, in camicia da notte."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+oro = 5
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x2")
+label = "Compralo"
+description = "Paghi 5 Oro; il generale si fida di più."
+cost = SubResource("S2")
+character_affinity = 2
+story = "{personaggio} ebbe una villa e smise di tramare."
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x2")
+label = "Fingi di non sapere"
+description = "Il generale si fida ancora di meno."
+character_affinity = -1
+story = "Si finse di non sapere nulla."
+
+[resource]
+script = ExtResource("x1")
+id = &"generale_trama"
+display_name = "Il generale trama"
+description = "Le spie riferiscono che {personaggio} incontra di notte i capi dell'esercito."
+sphere = "Ombra"
+color = &"viola"
+options = Array[ExtResource("x2")]([SubResource("S1"), SubResource("S3"), SubResource("S4")])
+max_affinity = -1
+requires_character = ExtResource("x4")

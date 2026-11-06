@@ -216,6 +216,8 @@ func test_una_run_completa_con_i_dati_veri_arriva_alla_fine() -> void:
 				run.take_reward(0)
 			RunState.Phase.SCONTRO_FANTASMA:
 				run.fight_ghost()
+			RunState.Phase.CRONACA:
+				assert_true(preload("res://tests/sim/aiuti_consiglio.gd").reagisci(run), run.last_error)
 	assert_true(run.is_over(), "La run termina.")
 	assert_lt(guard, 1000, "Nessun ciclo infinito.")
 	assert_ne(run.run_end, RunState.RunEnd.FINE_PROVA, "La run è completa: finisce con vittoria o sconfitta.")

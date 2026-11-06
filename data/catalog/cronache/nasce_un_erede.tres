@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/erede.tres" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x3")
+label = "Fra i soldati"
+description = "Entra nella storia l'erede."
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+set_flags = Array[StringName]([&"erede_soldato"])
+introduce_character = ExtResource("x2")
+story = "{personaggio} nacque e fu dato ai soldati."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Fra i sacerdoti"
+description = "Entra nella storia l'erede."
+inclination_shift = PackedInt32Array(0, 0, 1, 0)
+set_flags = Array[StringName]([&"erede_devoto"])
+introduce_character = ExtResource("x2")
+story = "{personaggio} nacque e fu dato ai sacerdoti."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x4")
+ricerca = 1
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x3")
+label = "Fra gli studiosi"
+description = "Entra nella storia l'erede; ricevi 1 Ricerca."
+gain = SubResource("S3")
+inclination_shift = PackedInt32Array(0, 0, -1, 0)
+set_flags = Array[StringName]([&"erede_studioso"])
+introduce_character = ExtResource("x2")
+story = "{personaggio} nacque e fu dato agli studiosi."
+
+[resource]
+script = ExtResource("x1")
+id = &"nasce_un_erede"
+display_name = "Nasce un erede"
+description = "Nella notte del solstizio nasce l'erede di {nazione}. Bisogna decidere chi lo crescerà."
+sphere = "Stato"
+color = &"blu"
+seasons = PackedInt32Array(0)
+options = Array[ExtResource("x3")]([SubResource("S1"), SubResource("S2"), SubResource("S4")])
+min_year = 2

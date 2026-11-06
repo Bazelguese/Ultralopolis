@@ -91,7 +91,10 @@ func test_ricompensa_di_una_risorsa() -> void:
 	encounter.rewards = [reward]
 	var catalog: CatalogDef = _catalog().duplicate() as CatalogDef
 	catalog.encounters = [encounter, encounter, encounter]
-	var run: RunState = RunState.new(catalog, _rules(), BattleRules.new(), ResistanceRules.new(), 3)
+	var rules: RunRules = _rules().duplicate() as RunRules
+	# Qui conta solo la ricompensa: niente cronache fra le stagioni.
+	rules.chronicles_enabled = false
+	var run: RunState = RunState.new(catalog, rules, BattleRules.new(), ResistanceRules.new(), 3)
 	run.found_nation("Prova", _choices(run))
 	while run.phase == RunState.Phase.CONSIGLIO:
 		run.pass_round()
@@ -114,6 +117,8 @@ func test_riepilogo_anno_per_anno() -> void:
 				run.choose_encounter(0)
 			elif run.phase == RunState.Phase.RICOMPENSA_INCONTRO:
 				run.skip_reward()
+			elif run.phase == RunState.Phase.CRONACA:
+				preload("res://tests/sim/aiuti_consiglio.gd").reagisci(run)
 		run.fight_ghost()
 	assert_eq(run.history.size(), 3, "Anni 1, 2 e l'anno 3 appena iniziato.")
 	assert_ne(run.history[0].encounter_result, "")

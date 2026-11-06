@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+fede = 2
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Unisciti alla processione"
+description = "Ricevi 2 Fede."
+gain = SubResource("S1")
+inclination_shift = PackedInt32Array(0, 0, 1, 0)
+story = "Anche il governo camminò scalzo dietro le statue."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x3")
+label = "Disperdi la folla"
+description = "Il Malcontento sale di 1."
+malcontent_change = 1
+inclination_shift = PackedInt32Array(0, 0, -1, 1)
+story = "I soldati dispersero i fedeli con i bastoni."
+
+[resource]
+script = ExtResource("x1")
+id = &"processione_infinita"
+display_name = "La processione infinita"
+description = "{nazione} è sempre più devota. Una processione blocca la capitale da giorni."
+sphere = "Fede"
+color = &"energetico"
+options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S3")])
+inclination_axis = 2
+inclination_pole = 1
+inclination_steps = 3

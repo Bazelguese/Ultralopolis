@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/porti_franchi.tres" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/ambasciate_permanenti.tres" id="x3"]
+
+[resource]
+script = ExtResource("x1")
+id = &"popolo_errante"
+display_name = "Popolo errante"
+description = "Nel primo round di ogni stagione c'è sempre un Visitatore fra le carte del Consiglio."
+dimension = 8
+rule = 11
+story = "Da allora la nazione è una strada: tutti passano, tutti lasciano qualcosa."
+requires_customs = Array[Resource]([ExtResource("x2"), ExtResource("x3")])

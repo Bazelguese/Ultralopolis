@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Restiamo come siamo"
+description = "Rifiuti la vocazione: non tornerà."
+story = "La nazione rifiutò di cambiare."
+
+[resource]
+script = ExtResource("x1")
+id = &"una_nazione_diversa"
+display_name = "Una nazione diversa"
+description = "Le usanze di {nazione} si sono intrecciate. Gli anziani dicono che il popolo è pronto a diventare qualcosa di nuovo: {vocazione}."
+sphere = "Stato"
+color = &"blu"
+special = 3
+options = Array[ExtResource("x2")]([SubResource("S1")])

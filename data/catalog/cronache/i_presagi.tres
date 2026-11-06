@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/opportunities/spia_inefficienza_caso.tres" id="x3"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x4"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x5"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+fede = 1
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x4")
+label = "Consulta gli indovini"
+description = "Paghi 1 Fede: un elemento del fantasma partirà rallentato."
+cost = SubResource("S1")
+spy = ExtResource("x3")
+inclination_shift = PackedInt32Array(0, 0, 1, 0)
+story = "Gli indovini lessero le viscere e videro il nemico."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x2")
+pietra = 2
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x5")
+display_name = "Mura rinforzate"
+description = "+5 Resistenza nel prossimo scontro con il fantasma."
+is_malus = false
+effect = 6
+amount = 5
+duration_kind = 1
+
+[sub_resource type="Resource" id="S5"]
+script = ExtResource("x4")
+label = "Rafforza le mura"
+description = "Paghi 2 Pietra: +5 Resistenza nel prossimo scontro con il fantasma."
+cost = SubResource("S3")
+modifiers = Array[ExtResource("x5")]([SubResource("S4")])
+inclination_shift = PackedInt32Array(0, -1, 0, 0)
+story = "Si alzarono le mura prima dell'arrivo del fantasma."
+
+[sub_resource type="Resource" id="S6"]
+script = ExtResource("x4")
+label = "Sono solo uccelli"
+description = ""
+inclination_shift = PackedInt32Array(0, 0, -1, 0)
+story = "Si disse che i corvi erano solo corvi."
+
+[resource]
+script = ExtResource("x1")
+id = &"i_presagi"
+display_name = "I presagi d'autunno"
+description = "Corvi sulla capitale. Si dice che il fantasma dell'anno sia già in cammino."
+sphere = "Fede"
+color = &"energetico"
+seasons = PackedInt32Array(3)
+repeatable = true
+options = Array[ExtResource("x4")]([SubResource("S2"), SubResource("S5"), SubResource("S6")])

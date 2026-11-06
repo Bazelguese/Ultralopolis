@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Onora i caduti"
+description = "Il loro sangue chiede altre vittorie."
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+story = "Si giurò sui caduti che la loro morte non sarebbe stata vana."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x2")
+label = "Prega per un anno di pace"
+description = ""
+inclination_shift = PackedInt32Array(-1, 0, 1, 0)
+story = "Le preghiere chiesero un anno senza guerra."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x3")
+oro = 2
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x2")
+label = "Fai festa fino all'alba"
+description = "Paghi 2 Oro; il Malcontento scende di 1."
+cost = SubResource("S3")
+malcontent_change = -1
+inclination_shift = PackedInt32Array(0, 0, 0, -1)
+story = "Si ballò fino all'alba, e nessuno contò i morti."
+
+[resource]
+script = ExtResource("x1")
+id = &"notte_piu_lunga"
+display_name = "La notte più lunga"
+description = "Nel solstizio d'inverno {nazione} accende i fuochi sulle colline e conta chi non è tornato dall'anno passato."
+sphere = "Stato"
+color = &"blu"
+seasons = PackedInt32Array(0)
+repeatable = true
+options = Array[ExtResource("x2")]([SubResource("S1"), SubResource("S2"), SubResource("S4")])

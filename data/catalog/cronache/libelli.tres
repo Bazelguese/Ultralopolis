@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+documenti = 1
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Lasciali scrivere"
+description = "Ricevi 1 Documenti; il Malcontento scende di 1."
+gain = SubResource("S1")
+malcontent_change = -1
+inclination_shift = PackedInt32Array(0, 0, 0, -1)
+story = "Si rise del governo nelle piazze, e il governo rise con loro."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x2")
+stabilita = 1
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x3")
+label = "Censura"
+description = "Ricevi 1 Stabilità."
+gain = SubResource("S3")
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+story = "Le stamperie furono chiuse."
+
+[resource]
+script = ExtResource("x1")
+id = &"libelli"
+display_name = "I libelli"
+description = "In {nazione} circolano libelli e canzoni che deridono il governo."
+sphere = "Stato"
+color = &"blu"
+options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S4")])
+inclination_axis = 3
+inclination_pole = -1
+inclination_steps = 3

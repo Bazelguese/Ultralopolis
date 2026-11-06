@@ -61,3 +61,21 @@ enum PieceKind {
 @export var change_government: Resource
 ## Malcontento in più (o, se negativo, in meno) (GDD §5.5, v0.24).
 @export var malcontent_change: int = 0
+
+@export_group("Cronache (GDD §9.6, v0.29)")
+## Passi sulle quattro inclinazioni, nell'ordine Spada, Porta, Altare, Legge (Inclination.Axis):
+## positivo verso Conquistatrice, Aperta, Devota, Ordinata; negativo verso l'altro polo.
+@export var inclination_shift: PackedInt32Array = PackedInt32Array()
+## Ricordi che la scelta lascia nella nazione (per le catene) e ricordi che cancella.
+@export var set_flags: Array[StringName] = []
+@export var clear_flags: Array[StringName] = []
+## Personaggio che entra nella storia della nazione, con la fiducia iniziale.
+@export var introduce_character: CharacterDef
+## Fiducia in più o in meno del personaggio della cronaca (introdotto o richiesto).
+@export var character_affinity: int = 0
+## Il personaggio della cronaca esce dalla storia.
+@export var character_leaves: bool = false
+## Vocazione accettata (IdentityDef), per le opzioni costruite dalle regole.
+@export var vocation: Resource
+## Riga che resta nella storia della nazione, es. "Il popolo festeggiò per tre giorni."
+@export var story: String = ""

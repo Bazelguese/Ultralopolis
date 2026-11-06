@@ -105,6 +105,21 @@ extends Resource
 @export var event_weight: int = 5
 @export var visitor_weight: int = 3
 @export var fortune_weight: int = 2
+## Cronache della nazione (GDD §9.6, v0.29). Valori placeholder.
+## Le cronache arrivano all'inizio di ogni stagione; d'inverno solo dall'anno 2.
+@export var chronicles_enabled: bool = true
+## Ogni inclinazione va da -limite a +limite; all'estremo nasce un'usanza.
+@export var inclination_limit: int = 5
+## I personaggi ricorrenti entrano nella storia solo da quest'anno (dopo il primo fantasma).
+@export var characters_from_year: int = 2
+## Vocazioni al massimo in una run.
+@export var max_vocations: int = 2
+## Una cronaca ripetibile non torna prima di tanti anni (se ce n'è un'altra possibile).
+@export var chronicle_repeat_gap_years: int = 2
+## Peso di una cronaca: 1, più questo per ogni condizione personale che soddisfa.
+@export var chronicle_specific_weight: int = 3
+## Malcontento per ogni truppa assimilata (vocazione Assimilatori).
+@export var malcontent_per_assimilation: int = 1
 ## Costo del primo rinnovo delle proposte.
 @export var reroll_base_cost: int = 1
 ## Il rinnovo non costa mai meno di così, nemmeno con i bonus che lo riducono.

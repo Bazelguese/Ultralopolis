@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/identity_def.gd" id="x1"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/processioni.tres" id="x2"]
+[ext_resource type="Resource" path="res://data/catalog/usanze/catasto.tres" id="x3"]
+
+[resource]
+script = ExtResource("x1")
+id = &"teocrazia_profetica"
+display_name = "Teocrazia profetica"
+description = "All'inizio di ogni anno una profezia rivela una truppa del fantasma."
+dimension = 8
+rule = 10
+story = "Da allora i profeti leggono nei registri del tempio il futuro della nazione."
+requires_customs = Array[Resource]([ExtResource("x2"), ExtResource("x3")])

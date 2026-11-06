@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x3"]
+[ext_resource type="Resource" path="res://data/catalog/personaggi/erede.tres" id="x4"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+influenza = 2
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+label = "Ascoltalo"
+description = "Ricevi 2 Influenza; l'erede si fida di più."
+gain = SubResource("S1")
+character_affinity = 1
+story = "{personaggio} parlò, e il consiglio ascoltò."
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x3")
+label = "Mettilo a tacere"
+description = "L'erede si fida di meno."
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+character_affinity = -1
+story = "{personaggio} fu zittito davanti a tutti."
+
+[resource]
+script = ExtResource("x1")
+id = &"erede_parla"
+display_name = "L'erede parla al consiglio"
+description = "{personaggio} è cresciuto. Oggi parla per la prima volta davanti al consiglio di {nazione}."
+sphere = "Stato"
+color = &"blu"
+options = Array[ExtResource("x3")]([SubResource("S2"), SubResource("S3")])
+min_year = 4
+requires_character = ExtResource("x4")

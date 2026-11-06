@@ -27,3 +27,4 @@ court_advisor_weight = 2
 evolves_to = Array[Resource]([ExtResource("p1"), ExtResource("p2")])
 exclusive_buildings = Array[ExtResource("1_uilto")]([ExtResource("p3")])
 revolution_causes = Array[int]([2])
+inclinations = PackedInt32Array(0, 0, 0, 1)

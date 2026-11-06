@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="ChronicleDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/chronicle_def.gd" id="x1"]
+[ext_resource type="Script" path="res://scripts/sim/data/event_option_def.gd" id="x2"]
+[ext_resource type="Script" path="res://scripts/sim/data/modifier_def.gd" id="x3"]
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("x2")
+label = "Trova un colpevole"
+description = "Il Malcontento scende di 1."
+malcontent_change = -1
+inclination_shift = PackedInt32Array(0, 0, 0, 1)
+story = "Un capitano fu impiccato in piazza, colpevole o no."
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("x3")
+display_name = "Giuramento di vendetta"
+description = "+5 Resistenza nel prossimo scontro con il fantasma."
+is_malus = false
+effect = 6
+amount = 5
+duration_kind = 1
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("x2")
+label = "Giura vendetta"
+description = "+5 Resistenza nel prossimo scontro con il fantasma."
+modifiers = Array[ExtResource("x3")]([SubResource("S2")])
+inclination_shift = PackedInt32Array(1, 0, 0, 0)
+story = "Si giurò vendetta su {nemico}."
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("x2")
+label = "Accetta il verdetto degli dei"
+description = ""
+inclination_shift = PackedInt32Array(-1, 0, 1, 0)
+story = "Si disse che gli dei avevano deciso così."
+
+[resource]
+script = ExtResource("x1")
+id = &"sconfitta_brucia"
+display_name = "La sconfitta brucia"
+description = "La sconfitta contro {nemico} brucia ancora. Il popolo cerca qualcuno da incolpare."
+sphere = "Guerra"
+color = &"rosso"
+seasons = PackedInt32Array(0, 2, 3)
+repeatable = true
+options = Array[ExtResource("x2")]([SubResource("S1"), SubResource("S3"), SubResource("S4")])
+last_battle = 2
