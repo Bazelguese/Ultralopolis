@@ -371,3 +371,25 @@ func test_le_azioni_di_livello_alto_arrivano_con_l_era() -> void:
 		if offer.opportunity == big:
 			seen = true
 	assert_true(seen, "Le proposte vengono ripescate e compare l'azione di livello 2.")
+
+
+func test_si_vede_in_anticipo_che_cosa_un_consigliere_puo_potenziare() -> void:
+	# Richiesta di Davide (6 novembre): segnale quando le risorse bastano per Potenzia.
+	catalog.advisors = [soldier, builder]
+	rules.advisors_per_round = 2
+	rules.starting_buildings = [red_building, neutral_building]
+	rules.upgrade_cost_per_era = PackedInt32Array([2, 3])
+	var run: RunState = _run()
+	run.stock[Res.Type.FERRO] = 0
+	assert_true(run.affordable_upgrades(soldier).is_empty(), "Senza Ferro il Generale non può potenziare nulla.")
+	run.stock[Res.Type.FERRO] = 2
+	var ready: Array[BoardPiece] = run.affordable_upgrades(soldier)
+	assert_eq(ready.size(), 2, "Con 2 Ferro: la caserma (Bellico) e i fanti (Bellico).")
+	assert_false(ready.has(run.board.buildings[1]), "Le mura (Guardiano) non sono del Generale.")
+	assert_true(run.affordable_upgrades(builder).is_empty(), "L'Architetto chiede Pietra.")
+	run.stock[Res.Type.PIETRA] = 2
+	assert_eq(run.affordable_upgrades(builder), [run.board.buildings[1]] as Array[BoardPiece])
+	var index: int = run.advisor_choices.find(soldier)
+	assert_true(run.choose_advisor(index))
+	assert_true(run.upgrade_building(0))
+	assert_true(run.affordable_upgrades(soldier).is_empty(), "Potenzia una volta per round: niente più segnali.")

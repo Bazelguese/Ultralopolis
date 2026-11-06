@@ -24,6 +24,7 @@ var _velo: MeshInstance3D
 var _evidenziata: bool = false
 var _colore_alone: Color = Color(0.0, 0.0, 0.0, 0.0)
 var _animazione_sollevamento: Tween
+var _segnale: Label3D
 
 
 func costruisci(p_scheda: SchedaCarta, p_larghezza: float, p_profondita: float, nitidezza: float = 1.0) -> void:
@@ -137,6 +138,27 @@ func evidenzia(attiva: bool) -> void:
 	_animazione_sollevamento.tween_property(_corpo, "position:y", ALTEZZA_SOLLEVATA if attiva else 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_animazione_sollevamento.tween_property(_corpo, "scale", Vector3.ONE * (1.06 if attiva else 1.0), 0.14)
 	_aggiorna_alone()
+
+
+## Scritta sopra il bordo alto della carta, es. "POTENZIA" quando la si può potenziare (P4).
+## Testo vuoto per toglierla.
+func imposta_segnale(testo: String, colore: Color = StileVisivo.ORO_LUCE) -> void:
+	if testo == "":
+		if _segnale != null:
+			_segnale.visible = false
+		return
+	if _segnale == null:
+		_segnale = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, 44, colore, 0.0, 14)
+		# Sotto la carta: sopra ci sono già i prezzi delle offerte.
+		_segnale.position = Vector3(0.0, SPESSORE + 0.03, profondita * 0.5 + 0.3)
+		_corpo.add_child(_segnale)
+	_segnale.text = testo
+	_segnale.modulate = colore
+	_segnale.visible = true
+
+
+func ha_segnale() -> bool:
+	return _segnale != null and _segnale.visible
 
 
 ## Colore dell'alone fisso (selezione, bersaglio). Trasparente per toglierlo.
