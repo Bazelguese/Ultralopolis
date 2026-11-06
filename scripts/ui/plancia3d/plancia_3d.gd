@@ -75,6 +75,8 @@ var _scritte_riserva: Array[Dictionary] = [{}, {}]
 var _gemme_riserva: Array[Dictionary] = [{}, {}]
 
 var _scelte: Array[Tessera3D] = []
+## Che cosa rappresenta ogni carta sul tavolo (offerta, via, opzione, ricompensa…), stesso ordine di _scelte.
+var _origini_scelte: Array[Object] = []
 var _costi_scelte: Array[Label3D] = []
 ## Riconosce le stesse scelte di prima: in quel caso non si rifanno né la carta né l'entrata.
 var _firma_scelte: String = ""
@@ -628,6 +630,7 @@ func _costruisci_scelte() -> void:
 		return
 	_firma_scelte = firma
 	_tipo_scelta = tipo
+	_origini_scelte = origini
 	for figlio: Node in _contenitore_scelte.get_children():
 		figlio.queue_free()
 	_scelte = []
@@ -706,6 +709,54 @@ func _consigliere_sotto(tessera: Tessera3D) -> AdvisorDef:
 	if tessera.indice < 0 or tessera.indice >= run.advisor_choices.size():
 		return null
 	return run.advisor_choices[tessera.indice]
+
+
+## Le tue carte che riceverebbero il bonus della carta sotto il mouse (perk, via, opzione…).
+func _beneficiari_sotto(tessera: Tessera3D) -> Array[BoardPiece]:
+	var vuoto: Array[BoardPiece] = []
+	if tessera == null or not (tessera in _scelte) or run == null:
+		return vuoto
+	var indice: int = _scelte.find(tessera)
+	if indice < 0 or indice >= _origini_scelte.size():
+		return vuoto
+	return run.pieces_boosted_by(_modificatori_di(_origini_scelte[indice]))
+
+
+## I modificatori che una carta sul tavolo darebbe alla nazione.
+static func _modificatori_di(origine: Object) -> Array[ModifierDef]:
+	var vuoto: Array[ModifierDef] = []
+	if origine is Offer:
+		var offerta: Offer = origine
+		if offerta.perk != null:
+			return offerta.perk.permanent_modifiers
+		if offerta.opportunity != null:
+			return offerta.opportunity.modifiers
+	elif origine is IdentityDef:
+		return (origine as IdentityDef).permanent_modifiers
+	elif origine is EventOptionDef:
+		return (origine as EventOptionDef).modifiers
+	elif origine is RewardDef:
+		var ricompensa: RewardDef = origine
+		if ricompensa.perk != null:
+			return ricompensa.perk.permanent_modifiers
+	return vuoto
+
+
+## Segna le carte che ne beneficerebbero: alone azzurro e "◆ NE BENEFICIA" sotto la carta.
+func _mostra_beneficiari(pezzi: Array[BoardPiece]) -> void:
+	for coppia: Array in [[_truppe[Lato.GIOCATORE], run.board.troops], [_edifici[Lato.GIOCATORE], run.board.buildings]]:
+		var tessere: Array = coppia[0]
+		var lista: Array = coppia[1]
+		for i: int in range(mini(tessere.size(), lista.size())):
+			var tessera: Tessera3D = tessere[i]
+			if not is_instance_valid(tessera):
+				continue
+			if pezzi.has(lista[i]):
+				tessera.imposta_segnale("◆ NE BENEFICIA", StileVisivo.COLORE_GIOCATORE)
+				tessera.imposta_alone(Color(StileVisivo.COLORE_GIOCATORE, 0.35))
+			elif tessera.ha_segnale():
+				tessera.imposta_segnale("")
+				tessera.imposta_alone(Color(0.0, 0.0, 0.0, 0.0))
 
 
 ## Segna sulla plancia le carte che il consigliere potrebbe potenziare con le risorse che ci sono:
@@ -1332,14 +1383,25 @@ func _physics_process(_delta: float) -> void:
 		_evidenziata = tessera
 		if tessera != null:
 			tessera.evidenzia(true)
+		# Mouse su una carta che dà un bonus a un tipo: si accendono le tue carte che ne beneficiano.
 		# Mouse su un consigliere: si accendono le carte che potrebbe potenziare (P4).
-		_mostra_potenziabili(_consigliere_sotto(tessera) if _consigliere_sotto(tessera) != null else run.chosen_advisor)
+		var beneficiari: Array[BoardPiece] = _beneficiari_sotto(tessera)
+		if not beneficiari.is_empty():
+			_mostra_beneficiari(beneficiari)
+		else:
+			_mostra_potenziabili(_consigliere_sotto(tessera) if _consigliere_sotto(tessera) != null else run.chosen_advisor)
 	if tessera != null and not _hud.esito_visibile():
 		var scheda: SchedaCarta = tessera.scheda
 		var titolo: String = scheda.titolo
 		if scheda.sopratitolo != "" and scheda.sopratitolo != scheda.titolo:
 			titolo = "%s · %s" % [scheda.sopratitolo, scheda.titolo]
 		var testo: String = scheda.dettagli
+		var beneficiari_testo: Array[BoardPiece] = _beneficiari_sotto(tessera)
+		if not beneficiari_testo.is_empty():
+			var nomi: PackedStringArray = PackedStringArray()
+			for pezzo: BoardPiece in beneficiari_testo:
+				nomi.append(pezzo.display_name())
+			testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
 		if scheda.costo != "":
 			testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]
 		_hud.mostra_suggerimento(titolo, testo, mouse)
