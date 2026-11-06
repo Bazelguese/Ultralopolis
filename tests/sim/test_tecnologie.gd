@@ -416,3 +416,19 @@ func test_il_catalogo_delle_tecnologie_rispetta_le_regole() -> void:
 	for advisor: AdvisorDef in real.advisors:
 		for action: OpportunityDef in advisor.actions:
 			assert_eq(action.cost_research, 0, "La Ricerca non paga azioni: %s." % action.display_name)
+
+
+func test_un_ramo_finito_prima_degli_altri_va_avanti() -> void:
+	# Davide (6 novembre): finito il ramo rosso dell'era 1, in era 2 il rosso continua anche se
+	# gli altri rami hanno ancora la prima altezza aperta.
+	var red2: TechDef = _tech(&"rosso2", "Militare", 2, 1, 5)
+	catalog.technologies = [walls, drill, fields, red2]
+	era2.techs_required = 2
+	rules.tech_hand_size = 3
+	var run: RunState = _run()
+	_complete(run, walls)
+	_complete(run, drill)
+	assert_true(run.advance_era(), run.last_error)
+	var hand: Array[TechDef] = run.tech_hand_cards()
+	assert_true(hand.has(fields), "Il verde resta all'altezza 1.")
+	assert_true(hand.has(red2), "Il rosso passa all'altezza 3 senza aspettare il verde.")

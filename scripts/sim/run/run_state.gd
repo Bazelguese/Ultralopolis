@@ -1554,8 +1554,9 @@ func _tech_pool() -> Array[TechDef]:
 	return found
 
 
-## Pesca la mano (GDD §10.5.3): 3 tecnologie dall'altezza più bassa ancora aperta e da quella
-## subito sopra, pesate dalle radici; una carta scartata ha il peso dimezzato a ogni scarto.
+## Pesca la mano (GDD §10.5.3): 3 tecnologie pesate dalle radici. In ogni ramo si pesca dalla sua
+## altezza più bassa ancora aperta e da quella subito sopra: un ramo finito prima degli altri
+## può andare avanti (Davide, 6 novembre). Una carta scartata ha il peso dimezzato a ogni scarto.
 func _draw_tech_hand() -> void:
 	for def: TechDef in tech_hand:
 		if not techs_done.has(def) and not tech_progress.has(def.id):
@@ -1564,13 +1565,13 @@ func _draw_tech_hand() -> void:
 	var pool: Array[TechDef] = _tech_pool()
 	if pool.is_empty():
 		return
-	var lowest: int = pool[0].height()
+	var lowest: Dictionary[StringName, int] = {}
 	for def: TechDef in pool:
-		lowest = mini(lowest, def.height())
+		lowest[def.branch()] = mini(lowest.get(def.branch(), def.height()), def.height())
 	var candidates: Array[TechDef] = []
 	var weights: Array[int] = []
 	for def: TechDef in pool:
-		if def.height() > lowest + 1:
+		if def.height() > lowest[def.branch()] + 1:
 			continue
 		candidates.append(def)
 		weights.append(_tech_weight(def))
