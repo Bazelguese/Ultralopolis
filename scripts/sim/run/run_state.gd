@@ -532,6 +532,116 @@ func production_origin_lines(type: Res.Type) -> PackedStringArray:
 	return lines
 
 
+# --- Mantenimento delle carte (GDD §5.6, v0.28) ----------------------------------------------
+
+var _special_cards: Dictionary = {}
+var _special_cards_ready: bool = false
+
+
+## Carta speciale: esclusiva di un elemento dell'identità o di una via, oppure di una linea.
+func is_special_card(def: Resource) -> bool:
+	if not _special_cards_ready:
+		_special_cards_ready = true
+		var owners: Array[IdentityDef] = catalog.identities.duplicate()
+		for era_def: EraDef in catalog.eras:
+			owners.append_array(era_def.ways)
+		for owner: IdentityDef in owners:
+			for card: BuildingDef in owner.exclusive_buildings:
+				_special_cards[card] = true
+			for card: TroopDef in owner.exclusive_troops:
+				_special_cards[card] = true
+		for tech: TechDef in catalog.technologies:
+			if tech.line != null:
+				for card: BuildingDef in tech.line.buildings:
+					_special_cards[card] = true
+				for card: TroopDef in tech.line.troops:
+					_special_cards[card] = true
+	return _special_cards.has(def)
+
+
+## Risorsa del mantenimento: quella della categoria del primo tipo della carta che sta in una
+## categoria; per l'Ombra Oro (GDD §5.6).
+func upkeep_resource(card_types: Array[StringName]) -> int:
+	for card_type: StringName in card_types:
+		for advisor: AdvisorDef in catalog.advisors:
+			if advisor.special == AdvisorDef.Special.NESSUNO and advisor.types.has(card_type):
+				return Res.Type.ORO if advisor.random_resource else advisor.upgrade_resource
+	return -1
+
+
+## Che cosa costa una carta prima di ogni scontro; null se non paga nulla.
+func upkeep_of(piece: BoardPiece) -> ResourceAmounts:
+	var def: Resource = piece.building if piece.building != null else piece.troop
+	if piece.building != null and piece.building.is_capital:
+		return null
+	var quantity: int = run_rules.upkeep_per_level * maxi(0, piece.level - 1)
+	if is_special_card(def):
+		quantity += run_rules.special_upkeep
+	if quantity <= 0:
+		return null
+	var resource: int = upkeep_resource(piece_types(piece))
+	if resource < 0:
+		return null
+	var amounts: ResourceAmounts = ResourceAmounts.new()
+	amounts.add(resource as Res.Type, quantity)
+	return amounts
+
+
+## Carte nell'ordine in cui pagano: da destra, prima le truppe e poi gli edifici.
+func _upkeep_order() -> Array[BoardPiece]:
+	var order: Array[BoardPiece] = []
+	for i: int in range(board.troops.size() - 1, -1, -1):
+		order.append(board.troops[i])
+	for i: int in range(board.buildings.size() - 1, -1, -1):
+		order.append(board.buildings[i])
+	return order
+
+
+## Totale del mantenimento al prossimo scontro (per la barra delle risorse).
+func upkeep_total() -> ResourceAmounts:
+	var total: ResourceAmounts = ResourceAmounts.new()
+	for piece: BoardPiece in _upkeep_order():
+		var cost: ResourceAmounts = upkeep_of(piece)
+		if cost != null:
+			for type: Res.Type in Res.NAMES:
+				total.add(type, cost.whole(type))
+	return total
+
+
+## Righe "Colossi di pietra: 1 Pietra" per il tooltip della risorsa indicata.
+func upkeep_lines(type: Res.Type) -> PackedStringArray:
+	var lines: PackedStringArray = PackedStringArray()
+	for piece: BoardPiece in _upkeep_order():
+		var cost: ResourceAmounts = upkeep_of(piece)
+		if cost != null and cost.whole(type) > 0:
+			lines.append("• %s −%d" % [piece.display_name(), cost.whole(type)])
+	return lines
+
+
+## Prima di ogni scontro: si paga da destra; chi non si può pagare è trascurato (×1,5) e porta
+## +1 Malcontento (GDD §5.6).
+func _pay_upkeep() -> void:
+	var neglected_names: PackedStringArray = PackedStringArray()
+	var paid: ResourceAmounts = ResourceAmounts.new()
+	for piece: BoardPiece in _upkeep_order():
+		piece.neglected = false
+		var cost: ResourceAmounts = upkeep_of(piece)
+		if cost == null:
+			continue
+		if can_pay(cost):
+			for type: Res.Type in Res.NAMES:
+				stock[type] -= cost.internal(type)
+				paid.add(type, cost.whole(type))
+		else:
+			piece.neglected = true
+			neglected_names.append(piece.display_name())
+	if not paid.is_empty():
+		_log("Mantenimento pagato: %s." % paid.describe())
+	if not neglected_names.is_empty():
+		_log("Mantenimento non pagato, carte trascurate in questo scontro: %s." % ", ".join(neglected_names))
+		_change_malcontent(neglected_names.size() * run_rules.malcontent_per_neglected, IdentityDef.Grievance.CARESTIE, "Mantenimento non pagato")
+
+
 # --- Interazioni fra tipi (GDD §6.6): che cosa potenzia che cosa ---------------------------
 
 const _EFFETTI_EDIFICI: Array[ModifierDef.Effect] = [ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO,
@@ -928,14 +1038,16 @@ func reward_choices() -> Array[RewardDef]:
 
 ## Edificio come entrerà in battaglia: livello e modificatori (GDD §6.5, §8).
 func effective_building(piece: BoardPiece) -> BuildingDef:
-	return ElementStats.building(piece.building, piece, modifiers, piece.level, run_rules)
+	var neglect: int = run_rules.neglect_slowdown_percent if piece.neglected else 0
+	return ElementStats.building(piece.building, piece, modifiers, piece.level, run_rules, neglect)
 
 
 ## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5, §8).
 func effective_troop(piece: BoardPiece) -> TroopDef:
 	# Con l'ascensione Esercito frugale le truppe senza Cibo non rallentano (GDD §10.4.2).
 	var hunger: int = run_rules.hunger_cooldown_percent if piece.hungry and not has_rule(IdentityDef.Rule.ESERCITO_FRUGALE) else 0
-	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger)
+	var neglect: int = run_rules.neglect_slowdown_percent if piece.neglected else 0
+	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger + neglect)
 
 
 ## Cibo consumato da una truppa a inizio anno, in decimi (GDD §5.4).
@@ -1979,6 +2091,7 @@ func choose_encounter(index: int) -> bool:
 		return _fail("Incontro non valido.")
 	var encounter: EncounterDef = encounter_choices[index]
 	var enemy: BattleSideSetup = BattleSideSetup.new(encounter.buildings, encounter.troops, encounter.resistance)
+	_pay_upkeep()
 	var outcome: BattleSim.Outcome = _fight(BattleKind.INCONTRO, encounter.display_name, enemy)
 	if not history.is_empty():
 		# Due incontri all'anno (v0.25): il riepilogo li elenca in ordine.
@@ -2066,6 +2179,7 @@ func fight_ghost() -> bool:
 		# Lo spionaggio dell'anno colpisce gli elementi scelti (GDD §12).
 		enemy.start_timer_effects = spy_effects.duplicate()
 	spy_effects = []
+	_pay_upkeep()
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
 	for message: String in modifiers.on_ghost_fight_done():
 		_log(message)

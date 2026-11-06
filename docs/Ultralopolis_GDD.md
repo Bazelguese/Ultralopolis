@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.27
+## Game Design Document — v0.28
 
 **Data:** 5 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -407,6 +407,24 @@ Il **Malcontento** è un contatore della nazione, distinto dal Magazzino. Insiem
 | Non si vende al mercato; si conserva da un anno all'altro | Proposta |
 | Gli eventi possono avere come radice “Malcontento sopra una soglia” | Proposta |
 | Valori: quanto sale per ogni causa, quanto vale 1 Stabilità, la soglia | Da definire |
+
+### 5.6 Mantenimento delle carte — Confermato (modifica del nucleo, v0.28)
+
+Oltre al Cibo delle truppe (§5.4), le carte forti costano qualcosa nel tempo. Le risorse accumulate trovano così uno sbocco, e potenziare o prendere una carta speciale diventa una scelta. Bozza della discussione: `docs/Bozza_mantenimento.md`.
+
+| Regola | Stato |
+|---|---|
+| Pagano le **carte potenziate** (per ogni livello sopra il primo) e le **carte speciali** | Confermato |
+| Carte speciali: le **esclusive** (di razza, governo, credo, cultura e vie) e le carte delle **linee di elementi** (§10.5.5). Le carte normali, anche dell'era 3, no | Confermato |
+| La risorsa è quella della **categoria del primo tipo** della carta (§4.2.4): una truppa Fante paga Ferro, una Spirituale Fede. I tipi fuori dalle categorie (identità, Capitale) si saltano; per l'Ombra si paga Oro | Confermato |
+| Si paga **prima di ogni scontro**: i due incontri del mondo e il fantasma | Confermato |
+| Tutte le carte sulla plancia pagano, anche gli edifici che non combattono | Confermato |
+| **Ordine da destra**, come il Cibo: prima le truppe da destra a sinistra, poi gli edifici da destra a sinistra | Confermato (ordine fra truppe ed edifici: Proposta) |
+| Una carta che non si può pagare è **trascurata** in quello scontro: ricarica (truppe) o intervallo (edifici) ×1,5, come una truppa affamata | Confermato |
+| Ogni carta non pagata dà **+1 Malcontento** (§5.5) | Confermato |
+| Valori: 1 unità per ogni livello sopra il primo, 1 unità in più per le carte speciali | Placeholder |
+| Ogni carta mostra il suo mantenimento; le carte trascurate si vedono in battaglia; la barra delle risorse dice quanto si paga al prossimo scontro (P4) | Confermato |
+| I fantasmi non pagano: sono registrazioni con le statistiche già salvate (§11) | Confermato |
 
 ## 6. Plancia della nazione
 
@@ -1505,6 +1523,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.28 — 6 novembre 2026** (modifica del nucleo)
+- **Mantenimento delle carte** (§5.6): le carte potenziate e quelle speciali pagano la risorsa della categoria del loro primo tipo prima di ogni scontro; se non si paga la carta è trascurata e sale il Malcontento. Bozza: `docs/Bozza_mantenimento.md`.
+- La mano delle tecnologie pesca **per ramo** (§10.5.3, decisione di Davide).
 
 **v0.27 — 5 novembre 2026** (modifica del nucleo)
 - Approvata la bozza `docs/Bozza_v0.27_tradizioni.md`: ogni **via** diventa un albero di **tradizioni**, come in Stellaris ma senza una risorsa nuova (§10.4.1).

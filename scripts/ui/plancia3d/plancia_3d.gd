@@ -1185,6 +1185,8 @@ func _aggiorna_visuale_scontro() -> void:
 				edificio.imposta_stato("Sabotato", Color("8b3fc9"))
 			elif _sim.get_building_slow_ms(lato, i) > 0:
 				edificio.imposta_stato("Rallentato", Color("e08a2e"))
+			elif _trascurata(lato, false, i):
+				edificio.imposta_stato("Trascurato: mantenimento non pagato", Color("e08a2e"))
 			else:
 				edificio.imposta_stato("", StileVisivo.NOTTE)
 		for mana: StringName in COLORI_RISERVA:
@@ -1211,8 +1213,18 @@ func _aggiorna_visuale_scontro() -> void:
 					tessera.imposta_stato("Si attiva!", StileVisivo.ORO_LUCE)
 				elif _sim.get_troop_slow_ms(lato, i) > 0:
 					tessera.imposta_stato("Rallentata", Color("e08a2e"))
+				elif _trascurata(lato, true, i):
+					tessera.imposta_stato("Trascurata: mantenimento non pagato", Color("e08a2e"))
 				else:
 					tessera.imposta_stato("", StileVisivo.NOTTE)
+
+
+## Carta del giocatore che in questo scontro lavora più piano perché non è stata pagata (GDD §5.6).
+func _trascurata(lato: int, truppa: bool, i: int) -> bool:
+	if lato != Lato.GIOCATORE or run == null:
+		return false
+	var fila: Array[BoardPiece] = run.board.troops if truppa else run.board.buildings
+	return i >= 0 and i < fila.size() and fila[i].neglected
 
 
 ## Una gemma vola dall'edificio alla riserva di mana del suo lato, lasciando una scia.

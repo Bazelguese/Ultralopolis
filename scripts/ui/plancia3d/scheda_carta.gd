@@ -145,9 +145,14 @@ static func da_pezzo(run: RunState, pezzo: BoardPiece) -> SchedaCarta:
 		if modificatore.def.is_malus:
 			nomi_malus.append(modificatore.def.display_name)
 	var malus_testo: String = ", ".join(nomi_malus)
+	var scheda: SchedaCarta
 	if pezzo.building != null:
-		return da_edificio(run.effective_building(pezzo), pezzo.level, malus_testo)
-	var scheda: SchedaCarta = da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
+		scheda = da_edificio(run.effective_building(pezzo), pezzo.level, malus_testo)
+	else:
+		scheda = da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
+	scheda.dettagli += _riga_mantenimento(run, pezzo)
+	if pezzo.building != null:
+		return scheda
 	if pezzo.enchant != null:
 		scheda.dettagli += "\n%s (già compreso nei valori)." % pezzo.enchant.display_name
 	if pezzo.second_enchant != null:
@@ -182,6 +187,12 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda.dettagli = offerta.opportunity.description
 			scheda.illustrazione = _carica("azioni/%s.png" % offerta.opportunity.id)
 			scheda.sopratitolo = "Azione"
+	# Mantenimento delle carte speciali (GDD §5.6), da sapere prima di comprarle.
+	if offerta.is_element():
+		var prova: BoardPiece = BoardPiece.of_building(offerta.building, 0) if offerta.building != null else BoardPiece.of_troop(offerta.troop, 0)
+		var costo_mantenimento: ResourceAmounts = run.upkeep_of(prova)
+		if costo_mantenimento != null:
+			scheda.dettagli += "\nCarta speciale: mantenimento %s prima di ogni scontro (di più se la potenzi)." % costo_mantenimento.describe()
 	# Bonus già attivi che la carta riceverebbe per i suoi tipi (GDD §6.6): si vedono prima di comprarla.
 	if offerta.is_element():
 		var tipi: Array[StringName] = offerta.building.types if offerta.building != null else offerta.troop.types
@@ -196,6 +207,18 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	elif not run.offer_choices(offerta).is_empty():
 		scheda.dettagli += "\nDopo averla presa scegli una voce."
 	return scheda
+
+
+## Mantenimento di una carta (GDD §5.6): che cosa paga prima di ogni scontro e se l'ultima volta
+## è rimasta trascurata.
+static func _riga_mantenimento(run: RunState, pezzo: BoardPiece) -> String:
+	var costo: ResourceAmounts = run.upkeep_of(pezzo)
+	var testo: String = ""
+	if costo != null:
+		testo = "\nMantenimento: %s prima di ogni scontro%s." % [costo.describe(), " (carta speciale)" if run.is_special_card(pezzo.building if pezzo.building != null else pezzo.troop) else ""]
+	if pezzo.neglected:
+		testo += "\nTrascurata all'ultimo scontro: non pagata, ha lavorato più piano."
+	return testo
 
 
 ## Un consigliere del round (GDD §4.2): categoria, tipi, risorsa di Potenzia e che cosa propone.

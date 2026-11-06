@@ -785,6 +785,9 @@ func aggiorna_partita(run: RunState) -> void:
 			testa = "Ricerca: va nella tecnologia che stai studiando. Senza una tecnologia in studio resta in attesa. Non si vende."
 		_celle_risorse[tipo].tooltip_text = "%s\nProssima stagione +%s:\n%s" % [testa, Res.format(tipo, produzione[tipo]),
 				"\n".join(run.production_origin_lines(tipo))]
+		var mantenimento: PackedStringArray = run.upkeep_lines(tipo)
+		if not mantenimento.is_empty():
+			_celle_risorse[tipo].tooltip_text += "\nMantenimento prima di ogni scontro:\n%s" % "\n".join(mantenimento)
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
@@ -842,11 +845,11 @@ func aggiorna_partita(run: RunState) -> void:
 		RunState.Phase.CONSIGLIO:
 			_suggerimento_fase.text = _testo_consiglio(run)
 		RunState.Phase.SCELTA_INCONTRO:
-			_suggerimento_fase.text = "Incontro del mondo: scegli quale minaccia affrontare. Se perdi, l'Oro si dimezza."
+			_suggerimento_fase.text = "Incontro del mondo: scegli quale minaccia affrontare. Se perdi, l'Oro si dimezza." + _testo_mantenimento(run)
 		RunState.Phase.RICOMPENSA_INCONTRO:
 			_suggerimento_fase.text = "Hai vinto l'incontro: scegli una ricompensa."
 		RunState.Phase.SCONTRO_FANTASMA:
-			_suggerimento_fase.text = "Il fantasma ti aspetta. Puoi ancora riordinare o vendere le truppe."
+			_suggerimento_fase.text = "Il fantasma ti aspetta. Puoi ancora riordinare o vendere le truppe." + _testo_mantenimento(run)
 			_principale.text = "Affronta il fantasma"
 		RunState.Phase.FINE_RUN:
 			_suggerimento_fase.text = _testo_fine(run)
@@ -925,6 +928,17 @@ func _aggiorna_avviso_ricerca(run: RunState) -> void:
 		if _pulsazione_ricerca != null and _pulsazione_ricerca.is_valid():
 			_pulsazione_ricerca.kill()
 		_pulsante_ricerca.modulate = Color.WHITE
+
+
+## Prima di uno scontro: quanto si paga di mantenimento e chi resterebbe trascurato (GDD §5.6).
+static func _testo_mantenimento(run: RunState) -> String:
+	var totale: ResourceAmounts = run.upkeep_total()
+	if totale.is_empty():
+		return ""
+	var testo: String = "\nMantenimento prima dello scontro: %s." % totale.describe()
+	if not run.can_pay(totale):
+		testo += " Non basta: alcune carte saranno trascurate (+1 Malcontento ciascuna)."
+	return testo
 
 
 ## In battaglia restano solo i comandi dello scontro.

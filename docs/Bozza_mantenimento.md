@@ -1,7 +1,7 @@
 # ULTRALOPOLIS — Bozza: mantenimento in risorse
 
 **Data:** 6 novembre 2026
-**Stato:** **bozza 2: prime decisioni di Davide (6 novembre), restano alcuni dettagli.** Non cambia ancora né il GDD né il gioco.
+**Stato:** **approvata da Davide il 6 novembre 2026 e riportata nel GDD v0.28** (§5.6). Questo file resta come memoria della discussione.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.27, §5 Economia
 
 **Modifica del nucleo.** Il mantenimento oggi esiste solo per il Cibo delle truppe (§5.4). Estenderlo ad altre risorse cambia l'economia della Parte I. Non serve una risorsa nuova; serve una **famiglia di effetti nuova** ("costo che si paga nel tempo") e una regola su che cosa succede se non si paga (principio P5).
