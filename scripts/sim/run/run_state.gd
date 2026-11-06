@@ -295,6 +295,11 @@ func phase_name() -> String:
 	return PHASE_NAMES[phase]
 
 
+## Temi dei round della stagione in corso, nell'ordine pescato a inizio stagione.
+func season_round_themes() -> Array[int]:
+	return _season_themes.duplicate()
+
+
 func season_name(which: Season = season) -> String:
 	return SEASON_NAMES[which]
 

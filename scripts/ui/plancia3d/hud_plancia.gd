@@ -46,6 +46,7 @@ var _ultima_possibilita: Label
 var _valori_risorse: Dictionary[int, Label] = {}
 ## Le celle della barra delle risorse: il tooltip dice da dove arriva la produzione.
 var _celle_risorse: Dictionary[int, Control] = {}
+var _flusso: FlussoAnno
 var _produzioni_risorse: Dictionary[int, Label] = {}
 var _pulsante_era: Button
 var _magazzino: PanelContainer
@@ -203,9 +204,16 @@ func _crea_fase() -> void:
 	colonna.add_theme_constant_override("separation", 4)
 	var riquadro: PanelContainer = PanelContainer.new()
 	colonna.add_child(riquadro)
-	_fase = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30)
+	var dentro: VBoxContainer = VBoxContainer.new()
+	dentro.add_theme_constant_override("separation", 2)
+	riquadro.add_child(dentro)
+	# Il flusso dell'anno, visivo (GDD §3.2, v0.25): stagioni, mesi, scontri e mese in corso.
+	_flusso = FlussoAnno.new()
+	_flusso.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	dentro.add_child(_flusso)
+	_fase = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 22)
 	_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	riquadro.add_child(_fase)
+	dentro.add_child(_fase)
 	_sotto_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 17, StileVisivo.TESTO_TENUE)
 	_sotto_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	colonna.add_child(_sotto_fase)
@@ -735,6 +743,8 @@ func aggiorna_partita(run: RunState) -> void:
 	_identita.text = run.identity_summary()
 	var comprando: bool = run.is_shopping_phase()
 	# GDD §3.2 (v0.25): anno, stagione e mese, es. "Anno 2 · Estate · Agosto".
+	_flusso.visible = true
+	_flusso.aggiorna(run)
 	_fase.text = "Anno %d · %s" % [run.year, run.phase_name()]
 	if comprando:
 		_fase.text += " · %s · tema: %s" % [run.month_name(), run.theme_name()]
@@ -883,6 +893,7 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	_cronaca.visible = false
 	nascondi_pezzo()
 	if attiva:
+		_flusso.visible = false
 		_fase.text = titolo
 		_sotto_fase.text = "Le truppe agiscono da destra verso sinistra"
 		imposta_pausa(false)

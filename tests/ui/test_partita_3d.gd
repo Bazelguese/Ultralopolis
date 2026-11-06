@@ -332,3 +332,20 @@ func test_ascensione_scelta_con_le_carte_e_pannello_tradizioni() -> void:
 	_scena.call("_clic_scelta", scelte[0])
 	assert_true(run.identity.has(scelta), "Cliccando la carta l'ascensione è presa.")
 	assert_true(run.ascension_choices.is_empty())
+
+
+func test_il_flusso_dell_anno_mostra_mesi_e_scontri() -> void:
+	# Richiesta di Davide (6 novembre): il flusso dell'anno si vede, non solo come scritta.
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var flusso: FlussoAnno = hud.get("_flusso")
+	assert_not_null(flusso)
+	assert_true(flusso.visible)
+	var zone: Array = flusso.get("_zone")
+	assert_eq(zone.size(), 15, "12 mesi e 3 scontri.")
+	var primo: String = flusso.call("_get_tooltip", (zone[0][0] as Rect2).get_center())
+	assert_string_contains(primo, "Gennaio")
+	assert_string_contains(primo, "adesso", "Il mese in corso è segnato.")
+	assert_string_contains(primo, run.theme_name(), "Con il tema del round.")
+	var fantasma: String = flusso.call("_get_tooltip", (zone[14][0] as Rect2).get_center())
+	assert_string_contains(fantasma, "fantasma")
