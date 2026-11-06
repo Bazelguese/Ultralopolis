@@ -1,7 +1,7 @@
 # ULTRALOPOLIS — Bozza: le cronache della nazione
 
 **Data:** 6 novembre 2026
-**Stato:** **bozza di discussione.** Non cambia né il GDD né il gioco. Le idee qui sono **Proposte**.
+**Stato:** **approvata da Davide il 6 novembre 2026 e riportata nel GDD v0.29** (§9.6). Questo file resta come memoria della discussione.
 **Riferimento:** `docs/Ultralopolis_GDD.md` v0.27: §3.2 stagioni, §4.2.5 eventi, Parte III (catene di eventi, personaggi ricorrenti, tratti acquisiti, identità emergente)
 
 **Modifica del nucleo.** Aggiunge un momento nuovo nell'anno, fra una stagione e l'altra, che arriva da solo: oggi "nessun evento arriva da solo, salvo la Rivoluzione" (§4.2.5, Confermato). Può introdurre anche regole che cambiano il gioco per una sola nazione, come le ascensioni del livello 2.

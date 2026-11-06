@@ -1,7 +1,7 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.28
+## Game Design Document — v0.29
 
-**Data:** 5 novembre 2026
+**Data:** 6 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
@@ -117,6 +117,7 @@ In ogni round il giocatore ascolta uno dei consiglieri della nazione (§4.2). Ed
 | Ogni round mostra il **nome del mese** (es. "Anno 2 · Estate · Agosto") | Confermato (v0.25) |
 | Edifici e truppe disponibili in tutte le stagioni | Confermato (v0.21) |
 | Le stagioni sostituiscono le due metà Produzione e Preparazione (5 round, incontro, 5 round, fantasma) della v0.21 | Confermato (v0.25) |
+| All'inizio di ogni stagione la nazione vive una **cronaca** (§9.6): Solstizio d'inverno, Equinozio di primavera, Solstizio d'estate, Equinozio d'autunno. Non consuma un round e non si salta; la produzione della stagione arriva dopo la reazione. Nel primo anno niente Solstizio d'inverno | Confermato (modifica del nucleo, v0.29) |
 
 La durata in minuti della run non è ancora fissata. Con 12 round e 3 scontri un anno dura circa un quarto in più della v0.24.
 
@@ -290,7 +291,7 @@ Nei round, oltre ai consiglieri, possono comparire carte di altre famiglie, lega
 | Ogni carta ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo); dalla v0.25 anche le **stagioni** in cui la carta può comparire | Confermato |
 | Eventi legati alle stagioni: *Un inverno lungo* e *Il passo innevato* d'inverno, *La piena del fiume* e *Le terre di confine* in primavera, *Il torneo* d'estate, *Raccolto abbondante* d'estate o d'autunno, *La grande fiera* d'autunno; nuovi eventi invernali; d'inverno la Riforma e i Tumulti in piazza sono più frequenti (+1 di peso) | Proposta (v0.25) |
 | Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una carta con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione **gratuita e senza requisiti**, così si può sempre scegliere qualcosa (v0.24) | Confermato |
-| Nessun evento arriva da solo senza essere scelto, con una sola eccezione: la **Rivoluzione** (§9.4.2) | Confermato (eccezione dalla v0.24) |
+| Nessun evento arriva da solo senza essere scelto, con due eccezioni: la **Rivoluzione** (§9.4.2) e le **cronache** della nazione all'inizio di ogni stagione (§9.6, v0.29) | Confermato (Rivoluzione dalla v0.24, cronache dalla v0.29) |
 | Le opzioni possono anche **cambiare il governo** (Riforma, Rivoluzione) e far salire o scendere il **Malcontento** (§5.5) | Confermato (v0.24) |
 
 Il catalogo del prototipo (18 eventi, 6 fortune, 6 visitatori) è in `docs/Catalogo.md`.
@@ -866,6 +867,66 @@ Ogni dimensione agisce su una parte diversa del gioco. Dettagli, catalogo e moti
 
 **Da definire:** tratti delle razze, evoluzione proposta prima o dopo la via, costo della Riforma, governo e evoluzione dei fantasmi generati.
 
+### 9.6 Cronache della nazione — Confermato nella struttura (modifica del nucleo, v0.29), contenuti placeholder
+
+Davide vuole che la nazione sembri **viva**, non una serie di tasselli, e che ogni partita racconti una nazione **peculiare**, come in un sandbox (l'esempio è Stellaris: i robot che rapivano gli altri popoli e li trasformavano in cyborg). Bozza della discussione: `docs/Bozza_cronache.md`.
+
+**Modifica del nucleo.** Aggiunge un momento nuovo all'inizio di ogni stagione (§3.2), un contatore nuovo (le inclinazioni) e regole che valgono per una sola nazione (le vocazioni).
+
+#### 9.6.1 Momenti di cronaca
+
+| Regola | Stato |
+|---|---|
+| All'inizio di ogni stagione arriva una **cronaca**: una scena che racconta qualcosa che è successo a questa nazione. Non è un'offerta: il giocatore sceglie **come reagisce la nazione**, fra 2–3 atteggiamenti | Confermato (v0.29) |
+| Momenti: **Solstizio d'inverno** (bilancio, riti, eredità), **Equinozio di primavera** (rinascita, partenze), **Solstizio d'estate** (feste, guerra; dopo il primo incontro), **Equinozio d'autunno** (raccolto, presagi del fantasma; dopo il secondo incontro). Nel primo anno niente Solstizio d'inverno | Confermato (v0.29) |
+| Non consuma un round e non si salta; la produzione della stagione arriva **dopo** la reazione | Confermato (v0.29) |
+| Le cronache sono costruite sulla partita: vittorie di fila, esito dell'ultimo scontro, carte di un tipo sulla plancia, Malcontento, inclinazioni, ricordi e personaggi. Più condizioni personali ha una cronaca, più è probabile | Confermato (v0.29); pesi placeholder (§16.3) |
+| Nei testi compaiono il nome della nazione, l'anno, la razza, il governo, il credo, l'ultimo nemico e i personaggi | Confermato (v0.29) |
+| Ogni cronaca ha almeno una reazione **gratuita e senza requisiti**, come gli eventi (§4.2.5). Le reazioni usano il linguaggio del nucleo (risorse, modificatori, spionaggio, livelli, Malcontento; P5) | Confermato (v0.29) |
+| Il tono può essere **duro o moralmente ambiguo**: rapire, assimilare, reprimere, giustiziare | Confermato (Davide: "certo!") |
+| Ogni reazione lascia una riga nella **storia della nazione**, visibile nel pannello Cronaca | Confermato (v0.29) |
+
+#### 9.6.2 Inclinazioni
+
+| Regola | Stato |
+|---|---|
+| Quattro coppie di tendenze opposte, **sempre visibili** sulla scheda della nazione come barre fra due poli: **Spada** (Conquistatrice / Pacifica), **Porta** (Aperta / Chiusa), **Altare** (Devota / Profana), **Legge** (Ordinata / Libera) | Confermato (Davide, v0.29); nomi placeholder |
+| Ogni reazione sposta una o due inclinazioni; la reazione mostra in anticipo dove spinge la nazione (P4) | Confermato (v0.29) |
+| Le inclinazioni partono dall'identità: razze, governi, credi e culture danno una spinta iniziale (es. Pietrosangue verso Chiusa, Teocrazia verso Devota) | Confermato (v0.29); valori placeholder |
+| Le inclinazioni sono una **radice** delle cronache: alcune arrivano solo a una nazione molto devota, guerriera, chiusa o libera | Confermato (v0.29) |
+| Le inclinazioni come radice di eventi e visitatori dei round | Proposta (non ancora nel gioco) |
+
+#### 9.6.3 Usanze
+
+| Regola | Stato |
+|---|---|
+| Quando un'inclinazione arriva a un **estremo**, la nazione prende l'**usanza** di quel polo: un tratto permanente piccolo, con un nome e una storia ("Dall'anno 3 il popolo espone nelle piazze i trofei dei vinti"). Una sola volta per polo | Confermato (v0.29; è il "tratto acquisito" della Parte III) |
+| Otto usanze, una per polo: Trofei di guerra (Conquistatrice), Ambasciate permanenti (Pacifica), Porti franchi (Aperta), Mura dei padri (Chiusa), Processioni (Devota), Accademie laiche (Profana), Il grande catasto (Ordinata), Mercato nero tollerato (Libera). Effetti in `docs/Catalogo.md` §6 sexies | Placeholder (v0.29) |
+| Le usanze sono elementi dell'identità: usano gli effetti dell'identità (§9.2) e, se valgono in battaglia, restano nell'identità del fantasma (§11.4) | Confermato (v0.29) |
+
+#### 9.6.4 Personaggi e catene
+
+| Regola | Stato |
+|---|---|
+| **Personaggi ricorrenti**: generale, erede, profeta, mercante straniero. Hanno un nome pescato con il seme della run, una **fiducia** che cambia con le scelte e cronache loro | Confermato (v0.29; Parte III) |
+| I personaggi entrano nella storia **solo dopo il primo fantasma** (dall'anno 2), una volta ciascuno; possono uscirne (arrestati, scacciati, morti) | Confermato (Davide: "non prima del primo fantasma") |
+| **Catene**: una reazione lascia un **ricordo** nella nazione; più avanti arrivano cronache che lo richiedono ("Hai liberato il prigioniero: ora suo padre manda doni") | Confermato (v0.29; Parte III) |
+
+#### 9.6.5 Vocazioni
+
+| Regola | Stato |
+|---|---|
+| Due usanze compatibili aprono una **vocazione**, che arriva come una cronaca speciale e si accetta o si rifiuta. Una vocazione rifiutata non torna; al massimo 2 vocazioni per run | Confermato (v0.29); massimo placeholder |
+| Le vocazioni sono **"una via di mezzo"** (Davide): effetti forti e possibilità nuove in momenti che esistono già (dopo un incontro vinto, nel primo round della stagione, a inizio anno), ma **senza cambiare le regole di base** della battaglia e dell'economia | Confermato (Davide); questa lettura di "via di mezzo" è di Claude, da confermare |
+| **Assimilatori** (Trofei di guerra + Mura dei padri): dopo un incontro vinto, al posto della ricompensa, si può prendere una truppa del nemico. Diventa della nazione con il tipo **Assimilato** e il tipo della razza; ogni assimilazione dà +1 Malcontento e apre le cronache sugli assimilati | Proposta (v0.29) |
+| **Repubblica mercantile** (Porti franchi + Mercato nero tollerato): proposte −1 Oro, Visitatori molto più frequenti, mercato più conveniente. La bozza diceva "il mercato compra anche": è stata cambiata perché toccherebbe una regola del nucleo (§5.3) | Proposta (v0.29) |
+| **Teocrazia profetica** (Processioni + Il grande catasto): a inizio anno una profezia rivela una truppa del fantasma, scritta sulla sua carta | Proposta (v0.29) |
+| **Popolo errante** (Porti franchi + Ambasciate permanenti): nel primo round di ogni stagione c'è sempre un Visitatore | Proposta (v0.29) |
+| **Stato di polizia** (Il grande catasto + Mura dei padri): il Malcontento non supera mai la soglia di avviso, ma la Stabilità chiesta dalle azioni costa il doppio | Proposta (v0.29) |
+| Le vocazioni compaiono sulla scheda della nazione e nella storia; usanze, vocazioni e personaggi formano l'**identità emergente** (Parte III) | Confermato (v0.29) |
+
+**Da definire:** illustrazioni delle cronache; la schermata finale con la storia della run; quante cronache scrivere per ogni momento; equilibrio delle usanze e delle vocazioni.
+
 ## 10. Ricerca, tecnologie ed ere
 
 Dalla v0.26 la Ricerca serve a un **albero delle tecnologie**, e le ere si raggiungono completando tecnologie. Le regole di dettaglio sono state discusse in `docs/Bozza_v0.26_ricerca_tecnologie.md`, approvata da Davide il 5 novembre 2026. Valori placeholder (§16.3).
@@ -1081,7 +1142,7 @@ Per il prototipo si usano avversari locali (§16.3); non costituiscono multiplay
 
 ### 11.4 Dati di una copia — Proposta tecnica
 
-Anno, era, identità rilevante, Resistenza massima, edifici, truppe e loro ordine, modificatori attivi (comprese le tecnologie che agiscono in battaglia, v0.26), passi e ascensioni (v0.27) e versione delle regole. Le ascensioni che cambiano le regole della battaglia valgono anche per il fantasma. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
+Anno, era, identità rilevante (dalla v0.29 anche usanze e vocazioni), Resistenza massima, edifici, truppe e loro ordine, modificatori attivi (comprese le tecnologie che agiscono in battaglia, v0.26), passi e ascensioni (v0.27) e versione delle regole. Le ascensioni che cambiano le regole della battaglia valgono anche per il fantasma. Poiché la battaglia ammette casualità (§7.5), va gestito anche il seme casuale.
 
 È proposto di salvare le **statistiche complete** degli elementi e non solo il loro identificativo: se in seguito un elemento viene ribilanciato, la copia continua a combattere com’era stata registrata.
 
@@ -1161,6 +1222,8 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
 | Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.26). |
 | Tradizioni | Per ogni via adottata: i 4 passi, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.27). |
+| Nazione | Le quattro inclinazioni come barre fra due poli, le usanze, la vocazione e i personaggi con la loro fiducia (v0.29). |
+| Cronaca | Momento e anno, la scena, il personaggio coinvolto; per ogni reazione che cosa fa, dove spinge la nazione e, se è spenta, perché (v0.29). |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
 | Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, cooldown, unità in attesa e motivo dell’attesa, elementi rallentati o sabotati con durata residua e origine. |
 | Esito | Risultato, perdita di Prestigio, vittorie, conseguenze. |
@@ -1187,14 +1250,14 @@ Idee annotate per il futuro. Non vanno implementate nella base; la base non deve
 | Spunto | Origine | Nota per l’introduzione |
 |---|---|---|
 | Truppa che elimina una truppa avversaria (Uccidi) | Creatore | Troppo forte all’inizio. Richiede regole su elementi eliminati, oggi assenti: è una modifica del nucleo. Candidata per ere avanzate (P2). |
-| Eventi forzati: arrivano da soli e chiedono solo come reagire | Creatore (v0.23) | Per ora solo la Rivoluzione (§9.4.2); gli altri dovranno rispettare P1 e P4 (§4.2.5). |
-| Catene di eventi: una scelta sblocca un evento negli anni successivi | Proposta di Claude (v0.23) | Richiede che la nazione ricordi le scelte fatte. |
-| Personaggi ricorrenti: un visitatore che torna e ricorda i rapporti avuti | Proposta di Claude (v0.23) | Come le catene, con un nome proprio. |
-| Tratti acquisiti: un evento lascia un tratto permanente che diventa parte dell'identità | Proposta di Claude (v0.23) | Primo passo verso riforme e conversioni (§9.1). |
+| Eventi forzati: arrivano da soli e chiedono solo come reagire | Creatore (v0.23) | Dalla v0.29 lo sono la Rivoluzione (§9.4.2) e le cronache (§9.6); altri dovranno rispettare P1 e P4 (§4.2.5). |
+| Catene di eventi: una scelta sblocca un evento negli anni successivi | Proposta di Claude (v0.23) | Introdotte con le cronache (§9.6.4, v0.29); restano uno spunto per gli eventi dei round. |
+| Personaggi ricorrenti: un visitatore che torna e ricorda i rapporti avuti | Proposta di Claude (v0.23) | Introdotti con le cronache (§9.6.4, v0.29); un visitatore che ricorda resta uno spunto. |
+| Tratti acquisiti: un evento lascia un tratto permanente che diventa parte dell'identità | Proposta di Claude (v0.23) | Introdotti come usanze (§9.6.3, v0.29). |
 | Malus che porta il nome della nazione che lo ha inflitto | Creatore | Non sempre presente: effetto speciale di certi perk o abilità legati a razza e identità. Usa il campo Origine (§8.2). |
 | Eventi a scelta con testo e opzioni | Creatore | Seconda forma degli incontri del mondo, dopo gli scontri automatici. |
 | Diplomazia come accordi o diserzioni | Creatore | Vedi §13.3. |
-| Identità emergente (cultura e credo dagli eventi) | Proposta precedente | Non confermata; vedi §9. |
+| Identità emergente (cultura e credo dagli eventi) | Proposta precedente | Dalla v0.29 esiste con inclinazioni, usanze e vocazioni (§9.6); cambiare cultura o credo dagli eventi resta uno spunto. |
 | Nemesi: ritrovare più avanti una copia dello stesso giocatore che ci ha sconfitto | Proposta di Claude | Non discussa. Dà continuità narrativa agli avversari in un contesto asincrono. |
 | Riduzione del danno a ogni colpo | Proposta precedente | Scudo e cura sono confermati dalla v0.13 (§7.6); la riduzione per colpo resta uno spunto. Punirebbe gli eserciti di truppe veloci e deboli. |
 | Recupero del Prestigio | — | Nessuna regola prevista. |
@@ -1364,6 +1427,10 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | I fantasmi generati ricevono a caso, con il seme della run, il numero di tecnologie richiesto per ogni era raggiunta; in battaglia valgono solo quelle che agiscono in battaglia | Provvisoria (v0.26). |
 | Incontro d'estate: forza a metà strada fra quella dell'anno e quella dell'anno successivo | Placeholder (v0.25). |
 | Stagioni nel prototipo: pesi d'inverno dei consiglieri, eventi stagionali e tre eventi invernali come nelle Proposte del §4.2 e del §4.2.5; valori in `docs/Catalogo.md` §6 quinquies | Placeholder (v0.25). |
+| Mantenimento: si pagano prima le truppe da destra a sinistra, poi gli edifici da destra a sinistra; una carta si paga tutta o niente | Provvisoria (v0.28). |
+| Cronache: inclinazioni da −5 a +5, usanza a ±5; peso di una cronaca 1 + 3 per ogni condizione personale; una cronaca ripetibile non torna per 2 anni se ce n'è un'altra possibile; pescata con un seme a parte, che non sposta quella dei consiglieri | Placeholder (v0.29). |
+| Cronache: catalogo del prototipo (35 cronache, 8 usanze, 5 vocazioni, 4 personaggi) e spinte iniziali delle identità in `docs/Catalogo.md` §6 sexies | Placeholder (v0.29). |
+| Vocazioni: al massimo 2 per run; la prima pronta ha la precedenza sulle altre cronache; una truppa assimilata conserva i suoi valori e i suoi tipi, più Assimilato e il tipo della razza | Provvisoria (v0.29). |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
@@ -1456,6 +1523,11 @@ Criteri di accettazione proposti per il prototipo:
 | Tema del round | Un round Edifici propone solo edifici, Truppe solo truppe, Azioni solo azioni; Clown e Anziano fanno eccezione. |
 | Incanto | Una sola volta per truppa; aggiunge l’effetto e il costo di mana, anche a una truppa che non usava mana. |
 | Spionaggio | Lo scontro con il fantasma parte con l’elemento scelto dal criterio della proposta già sabotato o rallentato; con lo stesso seme è sempre lo stesso. |
+| Cronaca | Arriva all'inizio di ogni stagione, tranne il primo inverno; non si salta; la produzione arriva dopo la reazione; con lo stesso seme è sempre la stessa. |
+| Inclinazioni | Partono dall'identità; una reazione le sposta; non superano il limite; all'estremo nasce l'usanza di quel polo, una volta sola. |
+| Vocazione | Con le due usanze richieste arriva la cronaca della vocazione; accettata cambia ciò che dice, rifiutata non torna. |
+| Personaggio | Non entra prima dell'anno 2; le sue cronache arrivano solo se c'è, con la fiducia richiesta; uscito dalla storia, la sua catena continua con i ricordi. |
+| Assimilazione | Dopo un incontro vinto, con gli Assimilatori, si può prendere una truppa del nemico al posto della ricompensa: tipi Assimilato e razza, +1 Malcontento. |
 
 Domande di playtest: l’ordine delle truppe cambia davvero la strategia? Il motivo di una mancata attivazione è leggibile? Investire in Ricerca è un’alternativa credibile? Le due fasi offrono decisioni diverse? L’economia può riprendersi dopo una sconfitta? Un malus fa cambiare piano o si limita a pesare?
 
@@ -1519,10 +1591,22 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 | Modificatore | Effetto con bersaglio, durata, origine e regole di cumulo. |
 | Origine | Fonte di un modificatore; permette in futuro i malus con nome. |
 | Conseguenza | Modifica dello stato della run che persiste dopo un evento o uno scontro. |
+| Cronaca | Scena che arriva da sola all'inizio di una stagione; il giocatore sceglie come reagisce la nazione (§9.6). |
+| Inclinazione | Una delle quattro tendenze della nazione fra due poli opposti (Spada, Porta, Altare, Legge). |
+| Usanza | Tratto permanente preso quando un'inclinazione arriva a un estremo. |
+| Vocazione | Modo di giocare aperto da due usanze, accettato in una cronaca. |
+| Personaggio | Persona con un nome e una fiducia che torna nelle cronache. |
+| Ricordo | Traccia di una scelta che la nazione conserva e che apre altre cronache (catene). |
 
 ---
 
 ## Registro delle versioni
+
+**v0.29 — 6 novembre 2026** (modifica del nucleo)
+- Approvata la bozza `docs/Bozza_cronache.md` (Davide: struttura sì, inclinazioni sì, vocazioni "una via di mezzo", personaggi non prima del primo fantasma, tono duro sì, "fai tutto").
+- **Cronache della nazione** (§9.6): all'inizio di ogni stagione una scena costruita sulla partita, a cui la nazione reagisce; seconda eccezione a "nessun evento arriva da solo" (§3.2, §4.2.5).
+- **Inclinazioni** visibili (Spada, Porta, Altare, Legge), **usanze** agli estremi, **personaggi** e **catene** con i ricordi, **vocazioni** da due usanze.
+- Aggiornati fantasmi, informazioni da mostrare, spunti, convenzioni, verifica e glossario (§11.4, §14.3, Parte III, §16.3, §17, §19); in §16.3 anche l'ordine del mantenimento (v0.28).
 
 **v0.28 — 6 novembre 2026** (modifica del nucleo)
 - **Mantenimento delle carte** (§5.6): le carte potenziate e quelle speciali pagano la risorsa della categoria del loro primo tipo prima di ogni scontro; se non si paga la carta è trascurata e sale il Malcontento. Bozza: `docs/Bozza_mantenimento.md`.
