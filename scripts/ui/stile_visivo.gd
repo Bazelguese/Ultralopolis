@@ -238,6 +238,26 @@ static func tema_interfaccia() -> Theme:
 	return tema
 
 
+## Pulsante che chiede attenzione (es. nessuna tecnologia in studio): rosso, bordo chiaro.
+## Con attiva = false torna allo stile normale.
+static func rendi_allarme(pulsante: Button, attiva: bool) -> void:
+	var nomi: Array[String] = ["normal", "hover", "pressed", "focus"]
+	if not attiva:
+		for nome: String in nomi:
+			pulsante.remove_theme_stylebox_override(nome)
+		pulsante.remove_theme_color_override("font_color")
+		return
+	var normale: StyleBoxFlat = riquadro(PERICOLO.darkened(0.25), ORO_LUCE)
+	normale.set_content_margin_all(10)
+	var sopra: StyleBoxFlat = riquadro(PERICOLO, Color.WHITE)
+	sopra.set_content_margin_all(10)
+	pulsante.add_theme_stylebox_override("normal", normale)
+	pulsante.add_theme_stylebox_override("hover", sopra)
+	pulsante.add_theme_stylebox_override("pressed", normale)
+	pulsante.add_theme_stylebox_override("focus", normale)
+	pulsante.add_theme_color_override("font_color", Color.WHITE)
+
+
 ## Pulsante principale dorato (azione più importante dello schermo).
 static func rendi_principale(pulsante: Button) -> void:
 	var normale: StyleBoxFlat = riquadro(ORO, ORO_LUCE)

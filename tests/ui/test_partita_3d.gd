@@ -349,3 +349,19 @@ func test_il_flusso_dell_anno_mostra_mesi_e_scontri() -> void:
 	assert_string_contains(primo, run.theme_name(), "Con il tema del round.")
 	var fantasma: String = flusso.call("_get_tooltip", (zone[14][0] as Rect2).get_center())
 	assert_string_contains(fantasma, "fantasma")
+
+
+func test_senza_tecnologia_in_studio_c_e_un_avviso() -> void:
+	# Richiesta di Davide (6 novembre): segnalare chiaramente quando la Ricerca è ferma.
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var avviso: Label = hud.get("_avviso_ricerca")
+	_scena.call("_aggiorna_tutto")
+	assert_null(run.current_tech, "All'inizio nessuna tecnologia è in studio.")
+	assert_true(avviso.visible, "Si vede l'avviso.")
+	assert_string_contains((hud.get("_pulsante_ricerca") as Button).text, "scegli")
+	var carte: Array[TechDef] = run.tech_hand_cards()
+	assert_false(carte.is_empty())
+	assert_true(run.choose_tech(carte[0]), run.last_error)
+	_scena.call("_aggiorna_tutto")
+	assert_false(avviso.visible, "Con una tecnologia in studio l'avviso sparisce.")

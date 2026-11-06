@@ -53,6 +53,9 @@ var _magazzino: PanelContainer
 var _righe_magazzino: Dictionary[int, Label] = {}
 var _vendite: Dictionary[int, Button] = {}
 var _pulsante_ricerca: Button
+## Avviso sopra la barra quando nessuna tecnologia è in studio (la Ricerca resta ferma).
+var _avviso_ricerca: Label
+var _pulsazione_ricerca: Tween
 var _ricerca: PanelContainer
 var _stato_ricerca: Label
 var _mano_ricerca: HBoxContainer
@@ -281,6 +284,11 @@ func _crea_risorse() -> void:
 	_pulsante_ricerca = _pulsante("Ricerca", func() -> void: _ricerca.visible = not _ricerca.visible)
 	_pulsante_ricerca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_ricerca)
+	_avviso_ricerca = StileVisivo.etichetta("Nessuna tecnologia in studio: la Ricerca resta ferma. Clicca qui sotto, su Ricerca.",
+			StileVisivo.FONT_TESTO_FORTE, 18, StileVisivo.PERICOLO)
+	_avviso_ricerca.add_theme_constant_override("outline_size", 8)
+	_avviso_ricerca.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
+	_avviso_ricerca.visible = false
 	_pulsante_tradizioni = _pulsante("Tradizioni", func() -> void: _tradizioni.visible = not _tradizioni.visible)
 	_pulsante_tradizioni.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_tradizioni)
@@ -291,6 +299,7 @@ func _crea_risorse() -> void:
 	_pulsante_era.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_era)
 	add_child(barra)
+	_ancora(_avviso_ricerca, Control.PRESET_BOTTOM_RIGHT, Vector2(-30, SOPRA_BARRA + 16.0))
 	barra.anchor_left = 0.0
 	barra.anchor_right = 1.0
 	barra.anchor_top = 1.0
@@ -773,6 +782,7 @@ func aggiorna_partita(run: RunState) -> void:
 	if run.current_tech != null:
 		_valori_risorse[Res.Type.RICERCA].text = "%d/%d" % [run.tech_progress_of(run.current_tech), run.current_tech.cost]
 	_pulsante_ricerca.text = "Ricerca · %s" % (run.current_tech.display_name if run.current_tech != null else "scegli")
+	_aggiorna_avviso_ricerca(run)
 	var tecnologie_era: int = run.next_era_techs_needed()
 	if tecnologie_era >= 0:
 		var fatte: int = mini(run.techs_done_in_era(run.era), tecnologie_era)
@@ -883,6 +893,30 @@ func _testo_fine(run: RunState) -> String:
 	return ""
 
 
+## Senza una tecnologia in studio (e con tecnologie da scegliere) il pulsante Ricerca diventa
+## rosso e pulsa, la casella della Ricerca dice quanta ne aspetta e sopra la barra compare un avviso.
+func _aggiorna_avviso_ricerca(run: RunState) -> void:
+	var ferma: bool = run.current_tech == null and not run.tech_hand_cards().is_empty() and run.phase != RunState.Phase.FINE_RUN
+	_avviso_ricerca.visible = ferma
+	StileVisivo.rendi_allarme(_pulsante_ricerca, ferma)
+	if ferma:
+		_pulsante_ricerca.text = "Ricerca · scegli!"
+		_valori_risorse[Res.Type.RICERCA].text = str(run.research_waiting())
+		_valori_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", StileVisivo.PERICOLO)
+		_produzioni_risorse[Res.Type.RICERCA].text = "ferma"
+		_produzioni_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", StileVisivo.PERICOLO)
+		if _pulsazione_ricerca == null or not _pulsazione_ricerca.is_valid():
+			_pulsazione_ricerca = create_tween().set_loops()
+			_pulsazione_ricerca.tween_property(_pulsante_ricerca, "modulate", Color(1.0, 1.0, 1.0, 0.55), 0.6)
+			_pulsazione_ricerca.tween_property(_pulsante_ricerca, "modulate", Color.WHITE, 0.6)
+	else:
+		_valori_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", COLORI_RISORSE[Res.Type.RICERCA])
+		_produzioni_risorse[Res.Type.RICERCA].add_theme_color_override("font_color", StileVisivo.TESTO_TENUE)
+		if _pulsazione_ricerca != null and _pulsazione_ricerca.is_valid():
+			_pulsazione_ricerca.kill()
+		_pulsante_ricerca.modulate = Color.WHITE
+
+
 ## In battaglia restano solo i comandi dello scontro.
 func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	_comandi.visible = not attiva
@@ -894,6 +928,7 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	nascondi_pezzo()
 	if attiva:
 		_flusso.visible = false
+		_avviso_ricerca.visible = false
 		_fase.text = titolo
 		_sotto_fase.text = "Le truppe agiscono da destra verso sinistra"
 		imposta_pausa(false)
