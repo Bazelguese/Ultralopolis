@@ -44,6 +44,8 @@ var _malcontento: Label
 var _malcontento_cella: Control
 var _ultima_possibilita: Label
 var _valori_risorse: Dictionary[int, Label] = {}
+## Le celle della barra delle risorse: il tooltip dice da dove arriva la produzione.
+var _celle_risorse: Dictionary[int, Control] = {}
 var _produzioni_risorse: Dictionary[int, Label] = {}
 var _pulsante_era: Button
 var _magazzino: PanelContainer
@@ -263,6 +265,7 @@ func _crea_risorse() -> void:
 		cella.add_child(valori)
 		riga.add_child(cella)
 		_valori_risorse[tipo] = valore
+		_celle_risorse[tipo] = cella
 		_produzioni_risorse[tipo] = produzione
 	var spinta: Control = Control.new()
 	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -747,6 +750,12 @@ func aggiorna_partita(run: RunState) -> void:
 			run.run_rules.malcontent_threshold, "\nLa rivoluzione si avvicina!" if vicina else ""]
 
 	var produzione: Array[int] = run.next_season_production()
+	for tipo: int in _celle_risorse:
+		var testa: String = "%s: %s nel Magazzino." % [Res.NAMES[tipo], run.stock_text(tipo)]
+		if tipo == Res.Type.RICERCA:
+			testa = "Ricerca: va nella tecnologia che stai studiando. Senza una tecnologia in studio resta in attesa. Non si vende."
+		_celle_risorse[tipo].tooltip_text = "%s\nProssima stagione +%s:\n%s" % [testa, Res.format(tipo, produzione[tipo]),
+				"\n".join(run.production_origin_lines(tipo))]
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""

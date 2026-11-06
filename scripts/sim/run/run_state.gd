@@ -481,6 +481,52 @@ func next_season_production() -> Array[int]:
 	return totals
 
 
+## Da dove arriva la produzione di una risorsa nella prossima stagione (principio P4): una riga per
+## ogni edificio che la produce, con i bonus fissi e il loro nome, poi le percentuali e il totale.
+func production_origin_lines(type: Res.Type) -> PackedStringArray:
+	var lines: PackedStringArray = PackedStringArray()
+	for piece: BoardPiece in board.buildings:
+		var base: int = piece.building.production(type)
+		if base > 0:
+			base += run_rules.building_production_per_level * (piece.level - 1)
+		var parts: PackedStringArray = PackedStringArray()
+		for modifier: ActiveModifier in modifiers.active:
+			var def: ModifierDef = modifier.def
+			if def.effect != ModifierDef.Effect.PRODUZIONE_PER_EDIFICIO or def.resource != type:
+				continue
+			if modifier.target_piece != null and modifier.target_piece != piece:
+				continue
+			if not Modifiers._type_matches(def, piece):
+				continue
+			parts.append("%+d da %s" % [def.amount, modifier.origin_name])
+		var total: int = maxi(0, base + modifiers.flat_production(type, piece))
+		if total <= 0 and parts.is_empty():
+			continue
+		var line: String = "• %s +%s" % [piece.display_name(), Res.format(type, total * Res.scale(type))]
+		if not parts.is_empty():
+			var level_text: String = ", livello %d" % piece.level if piece.level > 1 and piece.building.production(type) > 0 else ""
+			line += " (di base %d%s; %s)" % [maxi(0, base), level_text, ", ".join(parts)]
+		elif piece.level > 1:
+			line += " (livello %d)" % piece.level
+		lines.append(line)
+	var percent_effect: int = -1
+	if type == Res.Type.ORO:
+		percent_effect = ModifierDef.Effect.PRODUZIONE_ORO
+	elif type == Res.Type.RICERCA:
+		percent_effect = ModifierDef.Effect.PRODUZIONE_RICERCA
+	for modifier: ActiveModifier in modifiers.active:
+		var def: ModifierDef = modifier.def
+		var applies: bool = (def.effect == ModifierDef.Effect.PRODUZIONE_PERCENTUALE and def.resource == type) \
+				or (percent_effect >= 0 and def.effect == percent_effect and modifier.target_piece == null)
+		if applies and def.amount != 0:
+			lines.append("• %s %+d%% (%s)" % [def.display_name, def.amount, modifier.origin_name])
+	if type == Res.Type.CIBO and season == Season.AUTUNNO:
+		lines.append("• La prossima stagione è l'inverno: niente Cibo.")
+	if lines.is_empty():
+		lines.append("• Nessun edificio la produce.")
+	return lines
+
+
 ## Produzione per fase di un singolo edificio, in unità interne, con il suo livello
 ## e i modificatori che lo riguardano (GDD §6.5).
 func building_production(piece: BoardPiece) -> Array[int]:
