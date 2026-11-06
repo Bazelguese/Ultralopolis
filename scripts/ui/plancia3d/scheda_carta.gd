@@ -327,6 +327,8 @@ static func da_ricompensa(ricompensa: RewardDef) -> SchedaCarta:
 			scheda = da_edificio(ricompensa.building)
 		RewardDef.Kind.TRUPPA:
 			scheda = da_truppa(ricompensa.troop)
+			if ricompensa.assimilation:
+				scheda.dettagli += "\nAssimilati (vocazione): una truppa del nemico vinto diventa tua, al posto della ricompensa. +1 Malcontento."
 		_:
 			scheda = SchedaCarta.new()
 			scheda.genere = Genere.AZIONE
@@ -409,6 +411,8 @@ static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 	if not identita.is_empty():
 		righe.append(" · ".join(identita))
 	righe.append("Se perdi: −%d Prestigio." % run.year)
+	if run.prophecy != "":
+		righe.append("Profezia: schiera %s." % run.prophecy)
 	for malus_def: ModifierDef in fantasma.malus:
 		righe.append("Se perdi o pareggi subisci %s: %s" % [malus_def.display_name, malus_def.description])
 	righe.append("Puoi ancora riordinare o vendere le truppe prima di combattere.")

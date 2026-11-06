@@ -135,6 +135,7 @@ func _collega_hud() -> void:
 	_hud.pausa.connect(_on_pausa)
 	_hud.velocita.connect(func(fattore: float) -> void: _velocita = fattore)
 	_hud.annulla.connect(_annulla)
+	_hud.scegli_cronaca.connect(_on_scegli_cronaca)
 
 
 ## Nuova run con la nazione scelta nel menu, o con una nazione di prova
@@ -152,6 +153,20 @@ func _nuova_run() -> void:
 	_disponi_subito = true
 	_firma_scelte = ""
 	_aggiorna_tutto()
+
+
+## Reazione della nazione alla cronaca (GDD §9.6): se agisce su una carta, prima si sceglie quale.
+func _on_scegli_cronaca(indice: int) -> void:
+	var opzioni: Array[EventOptionDef] = run.chronicle_options()
+	if indice < 0 or indice >= opzioni.size():
+		return
+	var opzione: EventOptionDef = opzioni[indice]
+	var voci: Array[String] = run.option_choices(opzione)
+	var nome: String = run.chronicle_text(opzione.label)
+	if not voci.is_empty():
+		_hud.mostra_scelte(nome, run.chronicle_text(opzione.description), voci, func(voce: int) -> void: _esegui(run.choose_chronicle_option(indice, voce), nome))
+	else:
+		_esegui(run.choose_chronicle_option(indice), nome)
 
 
 func _nazione_di_prova(catalogo: CatalogDef, regole_run: RunRules) -> NationTemplate:
@@ -840,7 +855,7 @@ func _on_azione_principale() -> void:
 
 func _unhandled_input(evento: InputEvent) -> void:
 	var clic: InputEventMouseButton = evento as InputEventMouseButton
-	if clic == null or not clic.pressed or _modo == Modo.SCONTRO or _hud.esito_visibile():
+	if clic == null or not clic.pressed or _modo == Modo.SCONTRO or _hud.esito_visibile() or _hud.cronaca_visibile():
 		return
 	if clic.button_index == MOUSE_BUTTON_RIGHT:
 		_annulla()
@@ -1402,7 +1417,7 @@ func _physics_process(_delta: float) -> void:
 			_mostra_beneficiari(beneficiari)
 		else:
 			_mostra_potenziabili(_consigliere_sotto(tessera) if _consigliere_sotto(tessera) != null else run.chosen_advisor)
-	if tessera != null and not _hud.esito_visibile():
+	if tessera != null and not _hud.esito_visibile() and not _hud.cronaca_visibile():
 		var scheda: SchedaCarta = tessera.scheda
 		var titolo: String = scheda.titolo
 		if scheda.sopratitolo != "" and scheda.sopratitolo != scheda.titolo:
