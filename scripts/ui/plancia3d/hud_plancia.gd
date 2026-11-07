@@ -36,7 +36,8 @@ const COLORI_RISORSE: Dictionary[int, Color] = {
 }
 
 var _nazione: Label
-var _identita: Label
+var _identita: HFlowContainer
+var _firma_identita: String = ""
 var _fase: Label
 var _sotto_fase: Label
 var _prestigio: Label
@@ -101,6 +102,12 @@ var _suggerimento: PanelContainer
 var _titolo_suggerimento: Label
 var _testo_suggerimento: Label
 var _messaggio: Label
+## Riquadro in alto al centro: annunci (nuovo round, round passato…) e titolo dello scontro.
+var _annuncio: VBoxContainer
+var _sotto_messaggio: Label
+## Colonna a sinistra: scheda della nazione e, sotto, il calendario dell'anno.
+var _colonna_sinistra: VBoxContainer
+var _riquadro_fase: PanelContainer
 var _inclinazioni: BarreInclinazioni
 var _usanze: Label
 var _pannello_cronaca: PanelContainer
@@ -204,11 +211,23 @@ func _crea_nazione() -> void:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 0)
 	riquadro.add_child(colonna)
+	# Nome della nazione e, accanto, Ricomincia (con la stessa nazione).
+	var testa: HBoxContainer = HBoxContainer.new()
+	testa.add_theme_constant_override("separation", 12)
+	colonna.add_child(testa)
 	_nazione = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 34)
-	colonna.add_child(_nazione)
-	_identita = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 16, StileVisivo.TESTO_TENUE)
-	_identita.custom_minimum_size = Vector2(320, 0)
-	_identita.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_nazione.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	testa.add_child(_nazione)
+	var ricomincia_pulsante: Button = _pulsante("Ricomincia", func() -> void: ricomincia.emit())
+	ricomincia_pulsante.add_theme_font_size_override("font_size", 16)
+	ricomincia_pulsante.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ricomincia_pulsante.tooltip_text = "Nuova partita con la stessa nazione."
+	testa.add_child(ricomincia_pulsante)
+	# Ogni elemento dell'identità ha il suo riquadro con che cosa fa (P4).
+	_identita = HFlowContainer.new()
+	_identita.custom_minimum_size = Vector2(330, 0)
+	_identita.add_theme_constant_override("h_separation", 4)
+	_identita.add_theme_constant_override("v_separation", 0)
 	colonna.add_child(_identita)
 	# Inclinazioni, usanze e vocazioni (GDD §9.6, v0.29).
 	_inclinazioni = BarreInclinazioni.new()
@@ -218,29 +237,55 @@ func _crea_nazione() -> void:
 	_usanze.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_usanze.mouse_filter = Control.MOUSE_FILTER_STOP
 	colonna.add_child(_usanze)
-	_ancora(riquadro, Control.PRESET_TOP_LEFT, Vector2(24, 20))
+	_colonna_sinistra = VBoxContainer.new()
+	_colonna_sinistra.add_theme_constant_override("separation", 10)
+	_colonna_sinistra.add_child(riquadro)
+	_ancora(_colonna_sinistra, Control.PRESET_TOP_LEFT, Vector2(24, 20))
 
 
+## Calendario dell'anno in verticale, sotto la scheda della nazione, con la fase e la Resistenza
+## del prossimo scontro (richiesta di Davide, 6 novembre).
 func _crea_fase() -> void:
-	var colonna: VBoxContainer = VBoxContainer.new()
-	colonna.alignment = BoxContainer.ALIGNMENT_CENTER
-	colonna.add_theme_constant_override("separation", 4)
 	var riquadro: PanelContainer = PanelContainer.new()
-	colonna.add_child(riquadro)
 	var dentro: VBoxContainer = VBoxContainer.new()
-	dentro.add_theme_constant_override("separation", 2)
+	dentro.add_theme_constant_override("separation", 6)
 	riquadro.add_child(dentro)
+	_fase = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 20)
+	_fase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_fase.custom_minimum_size = Vector2(266, 0)
+	dentro.add_child(_fase)
 	# Il flusso dell'anno, visivo (GDD §3.2, v0.25): stagioni, mesi, scontri e mese in corso.
 	_flusso = FlussoAnno.new()
-	_flusso.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_flusso.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	dentro.add_child(_flusso)
-	_fase = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 22)
-	_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	dentro.add_child(_fase)
-	_sotto_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 17, StileVisivo.TESTO_TENUE)
-	_sotto_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	colonna.add_child(_sotto_fase)
-	_ancora(colonna, Control.PRESET_CENTER_TOP, Vector2(0, 18))
+	_sotto_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 16, StileVisivo.TESTO_TENUE)
+	_sotto_fase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_sotto_fase.custom_minimum_size = Vector2(266, 0)
+	dentro.add_child(_sotto_fase)
+	# Stretto: sta a sinistra del ritratto della nazione.
+	riquadro.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_colonna_sinistra.add_child(riquadro)
+	_riquadro_fase = riquadro
+
+	# In alto al centro: gli annunci della partita.
+	_annuncio = VBoxContainer.new()
+	_annuncio.alignment = BoxContainer.ALIGNMENT_CENTER
+	_annuncio.add_theme_constant_override("separation", 0)
+	_annuncio.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_messaggio = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 46, StileVisivo.ORO_LUCE)
+	_messaggio.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
+	_messaggio.add_theme_constant_override("outline_size", 12)
+	_messaggio.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_messaggio.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_annuncio.add_child(_messaggio)
+	_sotto_messaggio = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 22, StileVisivo.TESTO)
+	_sotto_messaggio.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
+	_sotto_messaggio.add_theme_constant_override("outline_size", 8)
+	_sotto_messaggio.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_sotto_messaggio.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_annuncio.add_child(_sotto_messaggio)
+	_ancora(_annuncio, Control.PRESET_CENTER_TOP, Vector2(0, 26))
+	_annuncio.modulate.a = 0.0
 
 
 func _crea_run() -> void:
@@ -641,7 +686,6 @@ func _crea_comandi() -> void:
 func _crea_principale() -> void:
 	_colonna_principale = VBoxContainer.new()
 	_colonna_principale.add_theme_constant_override("separation", 10)
-	_colonna_principale.add_child(_pulsante("Ricomincia", func() -> void: ricomincia.emit()))
 	_principale = _pulsante("", func() -> void: azione_principale.emit())
 	_principale.custom_minimum_size = Vector2(320, 68)
 	StileVisivo.rendi_principale(_principale)
@@ -856,6 +900,31 @@ func cronaca_visibile() -> bool:
 	return _pannello_cronaca.visible
 
 
+## Elementi dell'identità come voci separate: passando il mouse si legge che cosa fanno.
+func _aggiorna_identita(run: RunState) -> void:
+	var elementi: Array[IdentityDef] = []
+	for elemento: IdentityDef in run.identity:
+		if elemento.dimension not in [IdentityDef.Dimension.USANZA, IdentityDef.Dimension.VOCAZIONE]:
+			elementi.append(elemento)
+	var firma: String = ""
+	for elemento: IdentityDef in elementi:
+		firma += "|%s" % elemento.id
+	if firma == _firma_identita:
+		return
+	_firma_identita = firma
+	for figlio: Node in _identita.get_children():
+		figlio.queue_free()
+	for i: int in range(elementi.size()):
+		var elemento: IdentityDef = elementi[i]
+		var perk: bool = elemento.dimension in [IdentityDef.Dimension.PERK, IdentityDef.Dimension.ASCENSIONE]
+		var voce: Label = StileVisivo.etichetta(elemento.display_name + (" ·" if i < elementi.size() - 1 else ""),
+				StileVisivo.FONT_TESTO, 16, Color("c7b8ff") if perk else StileVisivo.TESTO_TENUE)
+		voce.mouse_filter = Control.MOUSE_FILTER_STOP
+		voce.mouse_default_cursor_shape = Control.CURSOR_HELP
+		voce.tooltip_text = "%s — %s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], elemento.display_name, elemento.description]
+		_identita.add_child(voce)
+
+
 ## Inclinazioni, usanze, vocazioni e personaggi sulla scheda della nazione.
 func _aggiorna_nazione(run: RunState) -> void:
 	var usanze: PackedStringArray = PackedStringArray()
@@ -899,20 +968,15 @@ func _crea_suggerimento() -> void:
 
 
 func _crea_messaggio() -> void:
-	_messaggio = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 52, StileVisivo.ORO_LUCE)
-	_messaggio.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
-	_messaggio.add_theme_constant_override("outline_size", 12)
-	_messaggio.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_messaggio.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_messaggio)
-	_messaggio.modulate.a = 0.0
+	# Il messaggio sta nel riquadro degli annunci, in alto al centro (_crea_fase).
+	pass
 
 
 # --- Aggiornamento della partita ---------------------------------------------------
 
 func aggiorna_partita(run: RunState) -> void:
 	_nazione.text = run.nation_name.to_upper()
-	_identita.text = run.identity_summary()
+	_aggiorna_identita(run)
 	_aggiorna_nazione(run)
 	var comprando: bool = run.is_shopping_phase()
 	# GDD §3.2 (v0.25): anno, stagione e mese, es. "Anno 2 · Estate · Agosto".
@@ -942,6 +1006,9 @@ func aggiorna_partita(run: RunState) -> void:
 		var mantenimento: PackedStringArray = run.upkeep_lines(tipo)
 		if not mantenimento.is_empty():
 			_celle_risorse[tipo].tooltip_text += "\nMantenimento prima di ogni scontro:\n%s" % "\n".join(mantenimento)
+		var richieste: PackedStringArray = run.resource_demand_lines(tipo)
+		if not richieste.is_empty():
+			_celle_risorse[tipo].tooltip_text += "\nChi la chiede:\n%s" % "\n".join(richieste)
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
@@ -1115,6 +1182,14 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 		_fase.text = titolo
 		_sotto_fase.text = "Le truppe agiscono da destra verso sinistra"
 		imposta_pausa(false)
+	# Durante lo scontro il titolo resta in alto al centro; il calendario si nasconde.
+	_riquadro_fase.visible = not attiva
+	if _animazione_messaggio != null and _animazione_messaggio.is_valid():
+		_animazione_messaggio.kill()
+	_messaggio.text = titolo if attiva else ""
+	_messaggio.add_theme_color_override("font_color", StileVisivo.ORO_LUCE)
+	_sotto_messaggio.text = "Le truppe agiscono da destra verso sinistra" if attiva else ""
+	_annuncio.modulate.a = 1.0 if attiva else 0.0
 
 
 func imposta_tempo(millisecondi: int) -> void:
@@ -1234,18 +1309,22 @@ func nascondi_suggerimento() -> void:
 	_suggerimento.visible = false
 
 
-func mostra_messaggio(testo: String, errore: bool = false) -> void:
+## Annuncio in alto al centro (richiesta di Davide, 6 novembre): "Round passato", "Nuovo round"…
+## sotto è una seconda riga facoltativa. Gli errori sono in rosso e restano un po' di più.
+func mostra_messaggio(testo: String, errore: bool = false, sotto: String = "") -> void:
+	if _barra_scontro.visible and not errore:
+		return
 	_messaggio.text = testo
 	_messaggio.add_theme_color_override("font_color", StileVisivo.PERICOLO.lightened(0.2) if errore else StileVisivo.ORO_LUCE)
-	_messaggio.add_theme_font_size_override("font_size", 30 if errore else 52)
-	_messaggio.reset_size()
-	_messaggio.position = (get_viewport_rect().size - _messaggio.size) * Vector2(0.5, 0.4)
+	_messaggio.add_theme_font_size_override("font_size", 28 if errore else 46)
+	_sotto_messaggio.text = sotto
+	_sotto_messaggio.visible = sotto != ""
 	if _animazione_messaggio != null and _animazione_messaggio.is_valid():
 		_animazione_messaggio.kill()
 	_animazione_messaggio = create_tween()
-	_animazione_messaggio.tween_property(_messaggio, "modulate:a", 1.0, 0.15)
-	_animazione_messaggio.tween_interval(1.8 if errore else 1.2)
-	_animazione_messaggio.tween_property(_messaggio, "modulate:a", 0.0, 0.4)
+	_animazione_messaggio.tween_property(_annuncio, "modulate:a", 1.0, 0.15)
+	_animazione_messaggio.tween_interval(2.6 if errore else 2.0)
+	_animazione_messaggio.tween_property(_annuncio, "modulate:a", 0.0, 0.5)
 
 
 func _on_velocita(fattore: float, scelto: Button) -> void:

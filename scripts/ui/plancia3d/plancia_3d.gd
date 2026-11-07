@@ -37,6 +37,8 @@ const MASSIMO_GEMME_IN_VOLO: int = 24
 
 const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 27.0, 14.6)
 const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, 0.9)
+## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
+const SPOSTAMENTO_PLANCIA: float = 1.2
 const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 28.4, 15.6)
 const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.1)
 
@@ -62,7 +64,19 @@ var _spazio_libero_edificio: Node3D
 var _spazio_libero_truppa: Node3D
 var _materiali_bordo: Array[StandardMaterial3D] = []
 var _medaglioni: Array[Node3D] = [null, null]
+## Ultima azione riuscita da annunciare e momento dell'anno già annunciato.
+var _messaggio_azione: String = ""
+var _firma_momento: String = ""
 var _scritte_resistenza: Array[Label3D] = [null, null]
+## Ritratto alla Dota (richiesta di Davide): iniziali della nazione al centro e anello del tempo
+## di battaglia attorno; si riempie fino al logoramento, poi diventa rosso.
+var _iniziali: Array[Label3D] = [null, null]
+var _anelli: Array[Array] = [[], []]
+var _stato_anelli: Array[int] = [-1, -1]
+var _materiale_anello_spento: StandardMaterial3D
+var _materiale_anello_acceso: StandardMaterial3D
+var _materiale_anello_logoramento: StandardMaterial3D
+const SEGMENTI_ANELLO: int = 48
 var _barre_resistenza: Array[MeshInstance3D] = [null, null]
 ## Scudo e Corruzione accanto allo stemma (GDD §7.6), visibili solo se non sono zero.
 var _segnalini_scudo: Array[Node3D] = [null, null]
@@ -348,7 +362,8 @@ func _scala_per(larghezza: float, massima: float) -> float:
 func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: float) -> void:
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
 	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 1.1
-	var posizione: Vector3 = Vector3(MIRA_PARTITA.x - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
+	# Un po' a destra: a sinistra c'è la colonna con la nazione e il calendario.
+	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
 	if _animazione_plancia != null and _animazione_plancia.is_valid():
 		_animazione_plancia.kill()
 	if durata <= 0.0:
@@ -364,7 +379,7 @@ func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: flo
 func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	var colore: Color = _colore_lato(lato)
 	var medaglione: Node3D = Node3D.new()
-	medaglione.position = Vector3(X_MEDAGLIONE, 0.0, z_centro - 1.15)
+	medaglione.position = Vector3(X_MEDAGLIONE, 0.0, z_centro - 1.35)
 	radice.add_child(medaglione)
 	_medaglioni[lato] = medaglione
 	var bordo: MeshInstance3D = MeshInstance3D.new()
@@ -385,33 +400,40 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	disco.material_override = StileVisivo.materiale(colore.darkened(0.55), 0.5)
 	disco.position.y = 0.09
 	medaglione.add_child(disco)
-	var numero: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 140, Color.WHITE, 0.0, 18)
-	numero.position.y = 0.2
-	medaglione.add_child(numero)
-	_scritte_resistenza[lato] = numero
-	var nome: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 44, StileVisivo.TESTO, 0.0, 8)
-	nome.position = Vector3(X_MEDAGLIONE, 0.04, z_centro)
+	# Al centro del ritratto le iniziali della nazione, come lo stemma di un eroe.
+	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 120, Color.WHITE, 0.0, 18)
+	iniziali.position.y = 0.2
+	medaglione.add_child(iniziali)
+	_iniziali[lato] = iniziali
+	_crea_anello(medaglione, lato)
+	var nome: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 40, StileVisivo.TESTO, 0.0, 8)
+	nome.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.12)
 	radice.add_child(nome)
 	_nomi_lato[lato] = nome
+	# Sotto il nome la barra della Resistenza con i numeri sopra, come la vita di un eroe.
 	var fondo_barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_fondo: BoxMesh = BoxMesh.new()
-	forma_fondo.size = Vector3(1.9, 0.04, 0.2)
+	forma_fondo.size = Vector3(2.3, 0.04, 0.4)
 	fondo_barra.mesh = forma_fondo
 	fondo_barra.material_override = StileVisivo.materiale(StileVisivo.NOTTE, 0.9)
-	fondo_barra.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.36)
+	fondo_barra.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.58)
 	radice.add_child(fondo_barra)
 	var barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_barra: BoxMesh = BoxMesh.new()
-	forma_barra.size = Vector3(1.9, 0.05, 0.14)
+	forma_barra.size = Vector3(2.2, 0.05, 0.32)
 	barra.mesh = forma_barra
-	barra.material_override = StileVisivo.materiale_luminoso(colore, 0.9)
+	barra.material_override = StileVisivo.materiale_luminoso(Color("3fae6a"), 0.7)
 	barra.position = fondo_barra.position + Vector3(0.0, 0.01, 0.0)
 	radice.add_child(barra)
 	_barre_resistenza[lato] = barra
-	var scudo: Array = _crea_segnalino(medaglione, Vector3(1.0, 0.0, -0.55), Color("2f6fd0"))
+	var numero: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 60, Color.WHITE, 0.0, 12)
+	numero.position = fondo_barra.position + Vector3(0.0, 0.06, 0.0)
+	radice.add_child(numero)
+	_scritte_resistenza[lato] = numero
+	var scudo: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, -0.55), Color("2f6fd0"))
 	_segnalini_scudo[lato] = scudo[0]
 	_scritte_scudo[lato] = scudo[1]
-	var corruzione: Array = _crea_segnalino(medaglione, Vector3(1.0, 0.0, 0.55), Color("8b3fc9"))
+	var corruzione: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, 0.55), Color("8b3fc9"))
 	_segnalini_corruzione[lato] = corruzione[0]
 	_scritte_corruzione[lato] = corruzione[1]
 
@@ -465,11 +487,65 @@ func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
 
 
 func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
-	_scritte_resistenza[lato].text = str(maxi(resistenza, 0))
+	_scritte_resistenza[lato].text = "%d / %d" % [maxi(resistenza, 0), maxi(massimo, 0)]
+	_iniziali[lato].text = _iniziali_di(_nomi_lato[lato].text)
 	var frazione: float = clampf(float(resistenza) / float(maxi(massimo, 1)), 0.0, 1.0)
 	var barra: MeshInstance3D = _barre_resistenza[lato]
 	barra.scale.x = maxf(frazione, 0.001)
-	barra.position.x = X_MEDAGLIONE - 0.95 * (1.0 - frazione)
+	barra.position.x = X_MEDAGLIONE - 1.1 * (1.0 - frazione)
+	# Verde, poi giallo e rosso quando la Resistenza scende.
+	var colore: Color = Color("3fae6a") if frazione > 0.5 else (Color("e0b23a") if frazione > 0.25 else StileVisivo.PERICOLO)
+	(barra.material_override as StandardMaterial3D).albedo_color = colore
+	(barra.material_override as StandardMaterial3D).emission = colore
+
+
+## Iniziali delle prime due parole del nome, saltando le parole brevi ("di", "del"…).
+static func _iniziali_di(nome: String) -> String:
+	var lettere: String = ""
+	for parola: String in nome.split(" ", false):
+		if parola.length() > 3 and lettere.length() < 2:
+			lettere += parola.left(1).to_upper()
+	if lettere == "" and nome.strip_edges() != "":
+		lettere = nome.strip_edges().left(1).to_upper()
+	return lettere
+
+
+## Anello di segmenti attorno al ritratto: il tempo della battaglia.
+func _crea_anello(medaglione: Node3D, lato: int) -> void:
+	if _materiale_anello_spento == null:
+		_materiale_anello_spento = StileVisivo.materiale(Color("26304a"), 0.9)
+		_materiale_anello_acceso = StileVisivo.materiale_luminoso(StileVisivo.ORO, 0.7)
+		_materiale_anello_logoramento = StileVisivo.materiale_luminoso(StileVisivo.PERICOLO, 1.4)
+	var raggio: float = 1.13
+	var forma: BoxMesh = BoxMesh.new()
+	forma.size = Vector3(0.11, 0.06, 0.13)
+	_anelli[lato] = []
+	for i: int in range(SEGMENTI_ANELLO):
+		# Dall'alto, in senso orario come una lancetta.
+		var angolo: float = -PI / 2.0 + TAU * float(i) / float(SEGMENTI_ANELLO)
+		var segmento: MeshInstance3D = MeshInstance3D.new()
+		segmento.mesh = forma
+		segmento.material_override = _materiale_anello_spento
+		segmento.position = Vector3(cos(angolo) * raggio, 0.05, sin(angolo) * raggio)
+		segmento.rotation.y = -angolo + PI / 2.0
+		medaglione.add_child(segmento)
+		_anelli[lato].append(segmento)
+	_stato_anelli[lato] = 0
+
+
+## Riempie l'anello fino all'inizio del logoramento; da lì in poi è tutto rosso.
+func _aggiorna_anello(lato: int, millisecondi: int) -> void:
+	var inizio: int = maxi(1, run.battle_rules.attrition_start_ms)
+	var stato: int = -2 if millisecondi >= inizio else int(float(millisecondi) / float(inizio) * SEGMENTI_ANELLO)
+	if stato == _stato_anelli[lato]:
+		return
+	_stato_anelli[lato] = stato
+	for i: int in range(_anelli[lato].size()):
+		var segmento: MeshInstance3D = _anelli[lato][i]
+		if stato == -2:
+			segmento.material_override = _materiale_anello_logoramento
+		else:
+			segmento.material_override = _materiale_anello_acceso if i < stato else _materiale_anello_spento
 
 
 # --- Carte sulla plancia ---------------------------------------------------------
@@ -706,15 +782,44 @@ func _aggiorna_tutto() -> void:
 	_nomi_lato[Lato.GIOCATORE].text = run.nation_name.to_upper()
 	_aggiorna_medaglione(Lato.GIOCATORE, run.player_resistance(), run.player_resistance())
 	_hud.aggiorna_partita(run)
+	# Annuncio in alto al centro: l'azione appena fatta e, sotto, che cosa è cambiato.
+	var novita: String = _novita_momento()
+	if _messaggio_azione != "":
+		_hud.mostra_messaggio(_messaggio_azione, false, novita)
+	elif novita != "":
+		_hud.mostra_messaggio(novita)
+	_messaggio_azione = ""
 
 
 ## Dopo un'azione di RunState: messaggio di errore se non è riuscita, poi si ridisegna tutto.
 func _esegui(riuscita: bool, messaggio: String = "") -> void:
 	if not riuscita:
 		_hud.mostra_messaggio(run.last_error, true)
-	elif messaggio != "":
-		_hud.mostra_messaggio(messaggio)
+	_messaggio_azione = messaggio if riuscita else ""
 	_aggiorna_tutto()
+
+
+## Che cosa è cambiato nell'anno dall'ultima volta: nuovo round, nuova stagione, cronaca, scontro.
+## Vuoto se si è ancora nello stesso momento.
+func _novita_momento() -> String:
+	var firma: String = "%d|%d|%d|%d" % [run.year, run.season, run.phase, run.round_number]
+	if firma == _firma_momento:
+		return ""
+	var prima: String = _firma_momento
+	_firma_momento = firma
+	match run.phase:
+		RunState.Phase.CONSIGLIO:
+			var stagione_nuova: bool = prima == "" or not prima.begins_with("%d|%d|" % [run.year, run.season])
+			if stagione_nuova and run.round_number == 1:
+				return "Inizia %s · anno %d · %s" % [("l'" if run.season == RunState.Season.INVERNO or run.season == RunState.Season.ESTATE or run.season == RunState.Season.AUTUNNO else "la ") + run.season_name().to_lower(), run.year, run.month_name()]
+			return "Nuovo round · %s · tema %s" % [run.month_name(), run.theme_name()]
+		RunState.Phase.CRONACA:
+			return "%s · anno %d" % [run.chronicle_moment(), run.year]
+		RunState.Phase.SCELTA_INCONTRO:
+			return "Incontro del mondo"
+		RunState.Phase.SCONTRO_FANTASMA:
+			return "Il fantasma è arrivato"
+	return ""
 
 
 ## Il consigliere della carta sotto il mouse, se è una carta consigliere del round.
@@ -1187,6 +1292,7 @@ func _elemento_da_indice(lato: int, indice: int) -> Tessera3D:
 func _aggiorna_visuale_scontro() -> void:
 	_hud.imposta_tempo(_sim.elapsed_ms)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
+		_aggiorna_anello(lato, _sim.elapsed_ms)
 		_aggiorna_medaglione(lato, _sim.get_resistance(lato), _sim.get_max_resistance(lato))
 		var scudo: int = _sim.get_shield(lato)
 		_segnalini_scudo[lato].visible = scudo > 0
@@ -1375,6 +1481,7 @@ func _chiudi_scontro() -> void:
 	_hud.modalita_scontro(false)
 	# La plancia torna com'è fuori dagli scontri: niente riserva di mana, Scudo o Corruzione.
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
+		_aggiorna_anello(lato, 0)
 		_riserve[lato].visible = false
 		_segnalini_scudo[lato].visible = false
 		_segnalini_corruzione[lato].visible = false

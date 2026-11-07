@@ -391,3 +391,44 @@ func test_senza_tecnologia_in_studio_c_e_un_avviso() -> void:
 	assert_true(run.choose_tech(carte[0]), run.last_error)
 	_scena.call("_aggiorna_tutto")
 	assert_false(avviso.visible, "Con una tecnologia in studio l'avviso sparisce.")
+
+
+func test_annunci_in_alto_e_calendario_a_sinistra() -> void:
+	# Richiesta di Davide (6 novembre): calendario verticale a sinistra, annunci in alto al centro.
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var flusso: FlussoAnno = hud.get("_flusso")
+	assert_gt(flusso.custom_minimum_size.y, flusso.custom_minimum_size.x * 0.5, "Il calendario è in verticale.")
+	var zone: Array = flusso.get("_zone")
+	assert_gt((zone[14][0] as Rect2).position.y, (zone[0][0] as Rect2).position.y, "Il fantasma è in fondo, sotto l'inverno.")
+	hud.passa.emit()
+	assert_eq((hud.get("_messaggio") as Label).text, "Round passato")
+	assert_string_contains((hud.get("_sotto_messaggio") as Label).text, "Nuovo round")
+	assert_string_contains((hud.get("_sotto_messaggio") as Label).text, run.month_name())
+
+
+func test_scheda_della_nazione_con_ricomincia_e_spiegazioni() -> void:
+	# Richiesta di Davide (6 novembre): Ricomincia accanto al nome; ogni caratteristica si spiega.
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var voci: HFlowContainer = hud.get("_identita")
+	var testi: Array[String] = []
+	for voce: Node in voci.get_children():
+		testi.append((voce as Label).tooltip_text)
+	var popolo: IdentityDef = run.identity[0]
+	assert_true(testi.any(func(t: String) -> bool: return t.contains(popolo.display_name) and t.contains(popolo.description)),
+			"Il riquadro di una caratteristica dice che cosa fa.")
+	var colonna: Control = hud.get("_colonna_principale")
+	for figlio: Node in colonna.get_children():
+		assert_ne((figlio as Button).text if figlio is Button else "", "Ricomincia", "Ricomincia non è più in basso a destra.")
+
+
+func test_il_riquadro_delle_risorse_dice_chi_le_chiede() -> void:
+	# Richiesta di Davide (6 novembre): passando su una risorsa, quali consiglieri la chiederanno.
+	_run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var celle: Dictionary = hud.get("_celle_risorse")
+	var pietra: String = (celle[Res.Type.PIETRA] as Control).tooltip_text
+	assert_string_contains(pietra, "Chi la chiede")
+	assert_string_contains(pietra, "Architetto")
+	assert_string_contains(pietra, "Potenzia")
