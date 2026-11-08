@@ -27,6 +27,8 @@ var _area_arte: Rect2
 var _area_nome: Rect2
 var _area_basso: Rect2
 var _pastiglie: Array[Rect2] = []
+## Zona delle righe di simboli (consiglieri, azioni, eventi): vuota se la carta non ne ha.
+var _area_simboli: Rect2
 
 
 func imposta(p_scheda: SchedaCarta, misura: Vector2) -> void:
@@ -68,14 +70,22 @@ func _calcola_misure() -> void:
 	_bordo = maxf(5.0, lato * 0.03)
 	_raggio = lato * 0.08
 	var margine: float = _bordo + lato * 0.03
+	var con_simboli: bool = not scheda.simboli.is_empty()
 	var altezza_arte: float = size.y * (0.5 if size.x < size.y else 0.46)
+	# Con i simboli l'illustrazione si abbassa: lo spazio serve alle righe di simboli.
+	if con_simboli:
+		altezza_arte = size.y * 0.27
 	_area_arte = Rect2(margine, margine, size.x - margine * 2.0, altezza_arte)
-	var altezza_nome: float = size.y * 0.14
+	var altezza_nome: float = size.y * (0.12 if con_simboli else 0.14)
 	_area_nome = Rect2(_bordo, _area_arte.end.y + lato * 0.02, size.x - _bordo * 2.0, altezza_nome)
 	# Le pastiglie restano ben dentro la cornice anche viste piccole e in prospettiva.
 	var inizio_basso: float = _area_nome.end.y + lato * 0.04
 	var rientro: float = margine + lato * 0.025
 	_area_basso = Rect2(rientro, inizio_basso, size.x - rientro * 2.0, size.y - _bordo - lato * 0.075 - inizio_basso)
+	_area_simboli = Rect2()
+	if con_simboli:
+		var inizio_simboli: float = _area_nome.end.y + lato * 0.03
+		_area_simboli = Rect2(margine, inizio_simboli, size.x - margine * 2.0, size.y - _bordo - lato * 0.04 - inizio_simboli)
 	_pastiglie.clear()
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var meta: float = (_area_basso.size.x - lato * 0.04) * 0.5
@@ -180,6 +190,8 @@ func _disegna_sopra() -> void:
 		_rombo(centro_rombo, passo * 0.42 + 2.0, Color("0b1220"))
 		_rombo(centro_rombo, passo * 0.42, StileVisivo.ORO_LUCE if pieno else Color("3a4560"))
 
+	_disegna_simboli()
+
 	if scheda.malus != "":
 		_pillola(_malus, StileVisivo.PERICOLO)
 	if scheda.affamata:
@@ -248,6 +260,142 @@ func _pillola(etichetta: Label, colore: Color) -> void:
 	fondo.bg_color = colore
 	fondo.set_corner_radius_all(int(etichetta.size.y * 0.5))
 	_sopra.draw_style_box(fondo, Rect2(etichetta.position, etichetta.size).grow_individual(8.0, 0.0, 8.0, 0.0))
+
+
+# --- Simboli -------------------------------------------------------------------
+# Righe di simboli come nei giochi da tavolo (RigaSimboli): numeri e simboli, centrati,
+# una riga per ogni cosa che la carta può fare. Le righe troppo lunghe si rimpiccioliscono.
+
+## Cambia le righe di simboli senza ricostruire la carta (es. un'opzione che diventa pagabile).
+func imposta_simboli(righe: Array[RigaSimboli]) -> void:
+	scheda.simboli = righe
+	_sopra.queue_redraw()
+
+
+func _disegna_simboli() -> void:
+	var righe: Array[RigaSimboli] = scheda.simboli
+	if righe.is_empty() or _area_simboli.size.y <= 0.0:
+		return
+	var lato: float = minf(size.x, size.y)
+	var stacco: float = lato * 0.018
+	var quante: int = righe.size()
+	var altezza: float = minf((_area_simboli.size.y - stacco * (quante - 1)) / quante, _area_simboli.size.y * 0.36)
+	var totale: float = altezza * quante + stacco * (quante - 1)
+	var y: float = _area_simboli.position.y + (_area_simboli.size.y - totale) * 0.5
+	for riga: RigaSimboli in righe:
+		var area: Rect2 = Rect2(_area_simboli.position.x, y, _area_simboli.size.x, altezza)
+		var fondo: StyleBoxFlat = StyleBoxFlat.new()
+		fondo.bg_color = Color(0.0, 0.0, 0.0, 0.18 if riga.spenta else 0.32)
+		fondo.set_corner_radius_all(int(altezza * 0.3))
+		fondo.anti_aliasing = true
+		_sopra.draw_style_box(fondo, area)
+		_disegna_riga(riga, area)
+		y += altezza + stacco
+
+
+func _disegna_riga(riga: RigaSimboli, area: Rect2) -> void:
+	var font: Font = StileVisivo.FONT_TITOLI
+	var lato_icona: float = area.size.y * 0.74
+	var carattere: int = int(area.size.y * 0.56)
+	var stacco: float = area.size.y * 0.1
+	var disponibile: float = area.size.x - area.size.y * 0.4
+	var larghezza: float = _larghezza_riga(riga, font, carattere, lato_icona, stacco)
+	if larghezza > disponibile and larghezza > 0.0:
+		var fattore: float = disponibile / larghezza
+		lato_icona *= fattore
+		stacco *= fattore
+		carattere = maxi(8, int(carattere * fattore))
+		larghezza = _larghezza_riga(riga, font, carattere, lato_icona, stacco)
+	var opacita: float = 0.38 if riga.spenta else 1.0
+	var centro_y: float = area.get_center().y
+	var x: float = area.get_center().x - larghezza * 0.5
+	for i: int in range(riga.simboli.size()):
+		var voce: RigaSimboli.Simbolo = riga.simboli[i]
+		if i > 0:
+			x += stacco
+		if voce.testo != "":
+			var colore: Color = _colore_tono(voce.tono)
+			colore.a = opacita
+			var linea_base: float = centro_y + (font.get_ascent(carattere) - font.get_descent(carattere)) * 0.5
+			var ombra: Color = StileVisivo.OMBRA_TESTO
+			ombra.a = opacita
+			_sopra.draw_string_outline(font, Vector2(x, linea_base), voce.testo, HORIZONTAL_ALIGNMENT_LEFT, -1.0, carattere, maxi(2, int(carattere * 0.16)), ombra)
+			_sopra.draw_string(font, Vector2(x, linea_base), voce.testo, HORIZONTAL_ALIGNMENT_LEFT, -1.0, carattere, colore)
+			x += font.get_string_size(voce.testo, HORIZONTAL_ALIGNMENT_LEFT, -1.0, carattere).x
+			if voce.icona != &"" or voce.gemma != &"":
+				x += stacco * 0.3
+		if voce.icona != &"":
+			_disegna_icona(voce, Rect2(x, centro_y - lato_icona * 0.5, lato_icona, lato_icona), opacita)
+			x += lato_icona
+		elif voce.gemma != &"":
+			var colore_gemma: Color = StileVisivo.colore_mana_nome(voce.gemma)
+			colore_gemma.a = opacita
+			var centro: Vector2 = Vector2(x + lato_icona * 0.5, centro_y)
+			_esagono(centro, lato_icona * 0.42, Color(StileVisivo.NOTTE, opacita))
+			_esagono(centro, lato_icona * 0.36, colore_gemma)
+			x += lato_icona
+
+
+## Larghezza di una riga con queste misure: serve a centrarla e a rimpicciolirla se non entra.
+func _larghezza_riga(riga: RigaSimboli, font: Font, carattere: int, lato_icona: float, stacco: float) -> float:
+	var larghezza: float = 0.0
+	for i: int in range(riga.simboli.size()):
+		var voce: RigaSimboli.Simbolo = riga.simboli[i]
+		if i > 0:
+			larghezza += stacco
+		if voce.testo != "":
+			larghezza += font.get_string_size(voce.testo, HORIZONTAL_ALIGNMENT_LEFT, -1.0, carattere).x
+			if voce.icona != &"" or voce.gemma != &"":
+				larghezza += stacco * 0.3
+		if voce.icona != &"" or voce.gemma != &"":
+			larghezza += lato_icona
+	return larghezza
+
+
+## Un simbolo: l'immagine di assets/icone; se manca, un cerchio con l'iniziale del concetto.
+## Gli spazi della plancia hanno una cornice tratteggiata, i potenziamenti una freccia in su.
+func _disegna_icona(voce: RigaSimboli.Simbolo, quadro: Rect2, opacita: float) -> void:
+	var bianco: Color = Color(1.0, 1.0, 1.0, opacita)
+	var dentro: Rect2 = quadro
+	if voce.spazio:
+		var tratto: Color = Color(StileVisivo.TESTO_TENUE, opacita)
+		var spessore: float = maxf(1.5, quadro.size.x * 0.06)
+		var trattino: float = maxf(2.0, quadro.size.x * 0.14)
+		var angoli: PackedVector2Array = PackedVector2Array([quadro.position, Vector2(quadro.end.x, quadro.position.y), quadro.end, Vector2(quadro.position.x, quadro.end.y)])
+		for i: int in range(4):
+			_sopra.draw_dashed_line(angoli[i], angoli[(i + 1) % 4], tratto, spessore, trattino)
+		dentro = quadro.grow(-quadro.size.x * 0.2)
+	var trama: Texture2D = Simboli.trama(voce.icona, dentro.size.x)
+	if trama != null:
+		_sopra.draw_texture_rect(trama, dentro, false, bianco)
+	else:
+		var raggio: float = dentro.size.x * 0.45
+		_sopra.draw_circle(dentro.get_center(), raggio, Color(StileVisivo.PIETRA_CHIARA, opacita))
+		var iniziale: String = String(voce.icona).substr(0, 1).to_upper()
+		var misura: int = maxi(8, int(dentro.size.y * 0.6))
+		var font: Font = StileVisivo.FONT_TITOLI
+		var larghezza: float = font.get_string_size(iniziale, HORIZONTAL_ALIGNMENT_LEFT, -1.0, misura).x
+		var linea_base: float = dentro.get_center().y + (font.get_ascent(misura) - font.get_descent(misura)) * 0.5
+		_sopra.draw_string(font, Vector2(dentro.get_center().x - larghezza * 0.5, linea_base), iniziale, HORIZONTAL_ALIGNMENT_LEFT, -1.0, misura, bianco)
+	if voce.su:
+		# Freccia del potenziamento, in alto a destra del simbolo.
+		var punta: float = quadro.size.x * 0.34
+		var base: Vector2 = Vector2(quadro.end.x - punta * 0.5, quadro.position.y + punta * 0.55)
+		var freccia: PackedVector2Array = PackedVector2Array([base + Vector2(0.0, -punta * 0.55), base + Vector2(punta * 0.5, punta * 0.3), base + Vector2(-punta * 0.5, punta * 0.3)])
+		_sopra.draw_colored_polygon(freccia, Color(StileVisivo.ORO_LUCE, opacita))
+
+
+## Colore dei numeri secondo il loro ruolo: oro per i costi, rosso per i malus (colori riservati
+## della direzione artistica), bianco per il resto, tenue per frecce e separatori.
+func _colore_tono(tono: RigaSimboli.Tono) -> Color:
+	match tono:
+		RigaSimboli.Tono.COSTO:
+			return StileVisivo.ORO_LUCE
+		RigaSimboli.Tono.MALUS:
+			return StileVisivo.PERICOLO.lightened(0.15)
+		RigaSimboli.Tono.SEPARATORE:
+			return StileVisivo.TESTO_TENUE
+	return StileVisivo.TESTO
 
 
 # --- Elementi ------------------------------------------------------------------
@@ -332,7 +480,7 @@ func _crea_scritte() -> void:
 		testo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		add_child(testo)
 		_testi_pastiglie.append(testo)
-	if testi.is_empty():
+	if testi.is_empty() and scheda.simboli.is_empty():
 		_riga = _etichetta(scheda.riga, StileVisivo.FONT_NUMERI, int(_area_basso.size.y * 0.42), StileVisivo.ORO_LUCE, 6)
 		_riga.position = _area_basso.position
 		_riga.size = _area_basso.size

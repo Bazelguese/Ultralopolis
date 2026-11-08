@@ -179,10 +179,23 @@ func _aggiorna_alone() -> void:
 ## si ridisegna la faccia solo se cambia la disponibilità.
 func aggiorna_scheda(nuova: SchedaCarta) -> void:
 	var cambiata: bool = nuova.disponibile != _faccia.scheda.disponibile
+	# Le righe di simboli possono cambiare anche senza cambiare carta (es. un'opzione che
+	# diventa pagabile dopo una vendita al mercato): si ridisegnano senza ricostruire la carta.
+	var simboli_cambiati: bool = _testo_simboli(nuova) != _testo_simboli(_faccia.scheda)
 	scheda = nuova
+	if simboli_cambiati:
+		_faccia.imposta_simboli(nuova.simboli)
 	if cambiata:
 		_faccia.imposta_disponibile(nuova.disponibile)
+	if cambiata or simboli_cambiati:
 		_ridisegna()
+
+
+static func _testo_simboli(p_scheda: SchedaCarta) -> String:
+	var testo: String = ""
+	for riga: RigaSimboli in p_scheda.simboli:
+		testo += "%s%s\n" % ["(spenta) " if riga.spenta else "", riga.come_testo()]
+	return testo
 
 
 ## frazione: 0 = appena attivata, 1 = pronta.

@@ -177,13 +177,34 @@ func _pulsante(testo: String, al_clic: Callable) -> Button:
 
 
 ## Coppia nome piccolo + numero grande. Restituisce [contenitore, etichetta del numero].
-func _valore(nome: String, colore: Color = StileVisivo.TESTO) -> Array:
+func _valore(nome: String, colore: Color = StileVisivo.TESTO, simbolo: StringName = &"") -> Array:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", -6)
-	colonna.add_child(StileVisivo.etichetta(nome.to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+	colonna.add_child(_intestazione(nome, simbolo))
 	var valore: Label = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 34, colore)
 	colonna.add_child(valore)
 	return [colonna, valore]
+
+
+## Nome di un valore della barra, con accanto il suo simbolo (se ne ha uno): è lo stesso
+## simbolo stampato sulle carte, così il giocatore impara a riconoscerlo.
+func _intestazione(nome: String, simbolo: StringName) -> HBoxContainer:
+	var testa: HBoxContainer = HBoxContainer.new()
+	testa.add_theme_constant_override("separation", 4)
+	testa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var trama: Texture2D = Simboli.trama(simbolo, 18.0)
+	if trama != null:
+		var immagine: TextureRect = TextureRect.new()
+		immagine.texture = trama
+		immagine.custom_minimum_size = Vector2(16, 16)
+		immagine.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		immagine.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		immagine.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		immagine.modulate = StileVisivo.TESTO_TENUE
+		immagine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		testa.add_child(immagine)
+	testa.add_child(StileVisivo.etichetta(nome.to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+	return testa
 
 
 ## Bordi dello schermo più scuri, per dare profondità alla scena.
@@ -303,7 +324,7 @@ func _crea_run() -> void:
 	riga.add_child(era[0])
 	_era = era[1]
 	# Malcontento (GDD §5.5, v0.24): sempre visibile, con la soglia della Rivoluzione.
-	var malcontento: Array = _valore("Malcontento")
+	var malcontento: Array = _valore("Malcontento", StileVisivo.TESTO, &"malcontento")
 	riga.add_child(malcontento[0])
 	_malcontento = malcontento[1]
 	_malcontento_cella = malcontento[0]
@@ -330,7 +351,7 @@ func _crea_risorse() -> void:
 			cella.tooltip_text = "Ricerca: va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende."
 
 		cella.mouse_filter = Control.MOUSE_FILTER_PASS
-		cella.add_child(StileVisivo.etichetta(Res.NAMES[tipo].to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+		cella.add_child(_intestazione(Res.NAMES[tipo], Simboli.di_risorsa(tipo as Res.Type)))
 		var valori: HBoxContainer = HBoxContainer.new()
 		valori.add_theme_constant_override("separation", 6)
 		var valore: Label = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30, COLORI_RISORSE[tipo])
