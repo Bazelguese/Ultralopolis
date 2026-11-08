@@ -14,3 +14,4 @@ prototype_years = 0
 starting_gold = 7
 starting_buildings = Array[ExtResource("2_nlgyk")]([ExtResource("3_usmqx")])
 starting_troops = Array[ExtResource("4_dc03y")]([ExtResource("5_hw03f")])
+min_value_gain_per_level = 1
