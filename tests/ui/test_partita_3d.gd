@@ -369,11 +369,11 @@ func test_il_flusso_dell_anno_mostra_mesi_e_scontri() -> void:
 	assert_true(flusso.visible)
 	var zone: Array = flusso.get("_zone")
 	assert_eq(zone.size(), 15, "12 mesi e 3 scontri.")
-	var primo: String = flusso.call("_get_tooltip", (zone[0][0] as Rect2).get_center())
+	var primo: String = Suggerimenti.testo_di(flusso, (zone[0][0] as Rect2).get_center())
 	assert_string_contains(primo, "Gennaio")
 	assert_string_contains(primo, "adesso", "Il mese in corso è segnato.")
 	assert_string_contains(primo, run.theme_name(), "Con il tema del round.")
-	var fantasma: String = flusso.call("_get_tooltip", (zone[14][0] as Rect2).get_center())
+	var fantasma: String = Suggerimenti.testo_di(flusso, (zone[14][0] as Rect2).get_center())
 	assert_string_contains(fantasma, "fantasma")
 
 
@@ -414,7 +414,7 @@ func test_scheda_della_nazione_con_ricomincia_e_spiegazioni() -> void:
 	var voci: HFlowContainer = hud.get("_identita")
 	var testi: Array[String] = []
 	for voce: Node in voci.get_children():
-		testi.append((voce as Label).tooltip_text)
+		testi.append(Suggerimenti.titolo_di(voce as Control) + "\n" + Suggerimenti.testo_di(voce as Control))
 	var popolo: IdentityDef = run.identity[0]
 	assert_true(testi.any(func(t: String) -> bool: return t.contains(popolo.display_name) and t.contains(popolo.description)),
 			"Il riquadro di una caratteristica dice che cosa fa.")
@@ -428,7 +428,27 @@ func test_il_riquadro_delle_risorse_dice_chi_le_chiede() -> void:
 	_run()
 	var hud: HudPlancia = _scena.get("_hud")
 	var celle: Dictionary = hud.get("_celle_risorse")
-	var pietra: String = (celle[Res.Type.PIETRA] as Control).tooltip_text
+	var pietra: String = Suggerimenti.testo_di(celle[Res.Type.PIETRA] as Control)
 	assert_string_contains(pietra, "Chi la chiede")
 	assert_string_contains(pietra, "Architetto")
 	assert_string_contains(pietra, "Potenzia")
+
+
+func test_suggerimenti_colorati_e_nessun_tooltip_di_sistema() -> void:
+	# Richiesta di Davide (8 novembre): tutti i suggerimenti con il riquadro nuovo, come in The Bazaar.
+	_run()
+	_scena.call("_aggiorna_tutto")
+	var hud: HudPlancia = _scena.get("_hud")
+	var da_visitare: Array[Node] = [hud]
+	while not da_visitare.is_empty():
+		var nodo: Node = da_visitare.pop_back()
+		if nodo is Control:
+			assert_eq((nodo as Control).tooltip_text, "", "%s usa ancora il tooltip grigio di Godot." % nodo.name)
+		da_visitare.append_array(nodo.get_children())
+	# Il riquadro delle carte della plancia spiega le parole chiave che contiene.
+	hud.mostra_suggerimento("Prova", "12 danni allo scudo.", Vector2(500, 500))
+	var pannello: PannelloSuggerimento = hud.get("_suggerimento")
+	assert_true(pannello.visible)
+	assert_true(pannello.spiegazioni_mostrate().has("Scudo"))
+	hud.nascondi_suggerimento()
+	assert_false(pannello.visible)

@@ -26,6 +26,7 @@ var _zone: Array[Array] = []
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	custom_minimum_size = Vector2(_larghezza_totale(), 4.0 * ALTEZZA_MESE + 3.0 * SPAZIO_STAGIONE + 2.0)
+	Suggerimenti.imposta_dinamico(self, testo_suggerimento)
 
 
 func aggiorna(run: RunState) -> void:
@@ -38,7 +39,8 @@ static func _larghezza_totale() -> float:
 	return LARGHEZZA_NOME + 3.0 * LATO_MESE + 2.0 * SPAZIO + SPAZIO_STAGIONE + LATO_SCONTRO + 2.0
 
 
-func _get_tooltip(at_position: Vector2) -> String:
+## Il testo del suggerimento della casella sotto il mouse (vuoto fuori dalle caselle).
+func testo_suggerimento(at_position: Vector2) -> String:
 	for zona: Array in _zone:
 		if (zona[0] as Rect2).has_point(at_position):
 			return zona[1]

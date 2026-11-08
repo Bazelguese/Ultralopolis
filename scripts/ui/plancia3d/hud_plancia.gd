@@ -85,11 +85,11 @@ var _pulsante_pausa: Button
 var _pulsanti_velocita: Array[Button] = []
 var _pezzo: PanelContainer
 var _titolo_pezzo: Label
-var _testo_pezzo: Label
+var _testo_pezzo: RichTextLabel
 var _azioni_pezzo: HFlowContainer
 var _scelte: PanelContainer
 var _titolo_scelte: Label
-var _testo_scelte: Label
+var _testo_scelte: RichTextLabel
 var _voci_scelte: VBoxContainer
 var _sostituzione: PanelContainer
 var _testo_sostituzione: Label
@@ -98,9 +98,10 @@ var _titolo_esito: Label
 var _sotto_esito: Label
 var _righe_esito: VBoxContainer
 var _al_continua: Callable
-var _suggerimento: PanelContainer
-var _titolo_suggerimento: Label
-var _testo_suggerimento: Label
+## Riquadro delle carte della plancia (passando il mouse su una carta 3D).
+var _suggerimento: PannelloSuggerimento
+## Suggerimenti dei controlli dell'interfaccia (risorse, tecnologie, nazione…).
+var _suggerimenti: Suggerimenti
 var _messaggio: Label
 ## Riquadro in alto al centro: annunci (nuovo round, round passato…) e titolo dello scontro.
 var _annuncio: VBoxContainer
@@ -143,6 +144,9 @@ func _ready() -> void:
 	_crea_pannello_cronaca()
 	_crea_suggerimento()
 	_crea_messaggio()
+	# Per ultimo, così i suggerimenti stanno sopra a tutto.
+	_suggerimenti = Suggerimenti.new()
+	add_child(_suggerimenti)
 
 
 # --- Costruzione -------------------------------------------------------------
@@ -221,7 +225,7 @@ func _crea_nazione() -> void:
 	var ricomincia_pulsante: Button = _pulsante("Ricomincia", func() -> void: ricomincia.emit())
 	ricomincia_pulsante.add_theme_font_size_override("font_size", 16)
 	ricomincia_pulsante.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	ricomincia_pulsante.tooltip_text = "Nuova partita con la stessa nazione."
+	Suggerimenti.imposta(ricomincia_pulsante, "Nuova partita con la stessa nazione.")
 	testa.add_child(ricomincia_pulsante)
 	# Ogni elemento dell'identità ha il suo riquadro con che cosa fa (P4).
 	_identita = HFlowContainer.new()
@@ -325,10 +329,9 @@ func _crea_risorse() -> void:
 		var cella: VBoxContainer = VBoxContainer.new()
 		cella.add_theme_constant_override("separation", -6)
 		cella.custom_minimum_size = Vector2(100, 0)
-		cella.tooltip_text = "%s: quantità nel Magazzino e produzione della prossima stagione (d'inverno niente Cibo)." % Res.NAMES[tipo]
+		Suggerimenti.imposta(cella, "Quantità nel Magazzino e produzione della prossima stagione (d'inverno niente Cibo).", Res.NAMES[tipo])
 		if tipo == Res.Type.RICERCA:
-			cella.tooltip_text = "Ricerca: va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende."
-
+			Suggerimenti.imposta(cella, "Va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende.", Res.NAMES[tipo])
 		cella.mouse_filter = Control.MOUSE_FILTER_PASS
 		cella.add_child(StileVisivo.etichetta(Res.NAMES[tipo].to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
 		var valori: HBoxContainer = HBoxContainer.new()
@@ -547,7 +550,7 @@ func _aggiorna_ricerca(run: RunState) -> void:
 		var motivo: String = run.tech_block_reason(tecnologia, run.is_golden(tecnologia))
 		if motivo != "":
 			carta.disabled = true
-			carta.tooltip_text = motivo
+			Suggerimenti.imposta(carta, motivo, "Non disponibile")
 		carta.pressed.connect(_on_scegli_tecnologia.bind(i))
 		_mano_ricerca.add_child(carta)
 	if carte.is_empty():
@@ -610,11 +613,11 @@ func _voce_albero(run: RunState, tecnologia: TechDef) -> Label:
 			nota = " · bloccata"
 	var voce: Label = StileVisivo.etichetta("%s%s (%d)%s" % ["  " if tecnologia.tier == 2 else "", tecnologia.display_name, tecnologia.cost, nota], StileVisivo.FONT_TESTO, 16, colore)
 	voce.mouse_filter = Control.MOUSE_FILTER_PASS
-	var aiuto: String = "%s (%s, altezza %d)\n%s%s" % [tecnologia.display_name, tecnologia.sphere, tecnologia.tier, tecnologia.description,
+	var aiuto: String = "%s, altezza %d\n%s%s" % [tecnologia.sphere, tecnologia.tier, tecnologia.description,
 			_riga_beneficiari(run, tecnologia.permanent_modifiers)]
 	if stato == RunState.TechStatus.BLOCCATA:
 		aiuto += "\nBloccata: %s" % run.tech_block_reason(tecnologia)
-	voce.tooltip_text = aiuto
+	Suggerimenti.imposta(voce, aiuto, tecnologia.display_name)
 	return voce
 
 
@@ -723,8 +726,8 @@ func _crea_pezzo() -> void:
 	_pezzo.add_child(colonna)
 	_titolo_pezzo = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30)
 	colonna.add_child(_titolo_pezzo)
-	_testo_pezzo = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 18)
-	_testo_pezzo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# Testo con le parole chiave colorate (risorse, effetti, numeri).
+	_testo_pezzo = PannelloSuggerimento.testo_colorato(18)
 	# Larghezza fissa: testo e pulsanti vanno a capo invece di allargare il pannello oltre lo schermo.
 	_testo_pezzo.custom_minimum_size = Vector2(560, 0)
 	colonna.add_child(_testo_pezzo)
@@ -756,8 +759,7 @@ func _crea_scelte() -> void:
 	_scelte.add_child(colonna)
 	_titolo_scelte = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 34, StileVisivo.ORO_LUCE)
 	colonna.add_child(_titolo_scelte)
-	_testo_scelte = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 18)
-	_testo_scelte.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_testo_scelte = PannelloSuggerimento.testo_colorato(18)
 	_testo_scelte.custom_minimum_size = Vector2(520, 0)
 	colonna.add_child(_testo_scelte)
 	_voci_scelte = VBoxContainer.new()
@@ -878,7 +880,7 @@ func _reazione(run: RunState, opzione: EventOptionDef, indice: int) -> Control:
 	pulsante.custom_minimum_size = Vector2(0, 48)
 	var motivo: String = run.option_block_reason(opzione)
 	pulsante.disabled = motivo != ""
-	pulsante.tooltip_text = motivo
+	Suggerimenti.imposta(pulsante, motivo, "Non disponibile" if motivo != "" else "")
 	riga.add_child(pulsante)
 	var parti: PackedStringArray = PackedStringArray()
 	if opzione.description != "":
@@ -921,7 +923,7 @@ func _aggiorna_identita(run: RunState) -> void:
 				StileVisivo.FONT_TESTO, 16, Color("c7b8ff") if perk else StileVisivo.TESTO_TENUE)
 		voce.mouse_filter = Control.MOUSE_FILTER_STOP
 		voce.mouse_default_cursor_shape = Control.CURSOR_HELP
-		voce.tooltip_text = "%s — %s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], elemento.display_name, elemento.description]
+		Suggerimenti.imposta(voce, "%s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], elemento.description], elemento.display_name)
 		_identita.add_child(voce)
 
 
@@ -946,25 +948,14 @@ func _aggiorna_nazione(run: RunState) -> void:
 		testo.append("Personaggi: %s" % " · ".join(persone))
 	_usanze.text = "\n".join(testo)
 	_usanze.visible = not testo.is_empty()
-	_usanze.tooltip_text = "\n".join(aiuto)
+	Suggerimenti.imposta(_usanze, "\n".join(aiuto), "Usanze, vocazioni e personaggi" if not aiuto.is_empty() else "")
 	var spiegazione: String = "Inclinazioni della nazione: le cronache le spostano con le tue scelte. A %d passi da un lato nasce un'usanza; due usanze adatte aprono una vocazione." % run.run_rules.inclination_limit
 	_inclinazioni.aggiorna(run.inclinations, run.run_rules.inclination_limit, spiegazione)
 
 
 func _crea_suggerimento() -> void:
-	_suggerimento = PanelContainer.new()
-	_suggerimento.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var colonna: VBoxContainer = VBoxContainer.new()
-	colonna.add_theme_constant_override("separation", 4)
-	_suggerimento.add_child(colonna)
-	_titolo_suggerimento = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 28)
-	colonna.add_child(_titolo_suggerimento)
-	_testo_suggerimento = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 18)
-	_testo_suggerimento.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_testo_suggerimento.custom_minimum_size = Vector2(400, 0)
-	colonna.add_child(_testo_suggerimento)
+	_suggerimento = PannelloSuggerimento.new()
 	add_child(_suggerimento)
-	_suggerimento.visible = false
 
 
 func _crea_messaggio() -> void:
@@ -993,22 +984,23 @@ func aggiorna_partita(run: RunState) -> void:
 	_malcontento.text = "%d/%d" % [run.malcontent, run.run_rules.malcontent_threshold]
 	var vicina: bool = run.malcontent >= run.run_rules.malcontent_warning
 	_malcontento.add_theme_color_override("font_color", StileVisivo.PERICOLO if vicina else StileVisivo.TESTO)
-	_malcontento_cella.tooltip_text = "Malcontento: sale con sconfitte, carestie, malus ed eventi; scende spendendo Stabilità (Cancelliere), Fede o Cibo. A %d scoppia la Rivoluzione.%s" % [
-			run.run_rules.malcontent_threshold, "\nLa rivoluzione si avvicina!" if vicina else ""]
+	Suggerimenti.imposta(_malcontento_cella, "Sale con sconfitte, carestie, malus ed eventi; scende spendendo Stabilità (Cancelliere), Fede o Cibo. A %d scoppia la Rivoluzione.%s" % [
+			run.run_rules.malcontent_threshold, "\nLa Rivoluzione si avvicina!" if vicina else ""], "Malcontento")
 
 	var produzione: Array[int] = run.next_season_production()
 	for tipo: int in _celle_risorse:
-		var testa: String = "%s: %s nel Magazzino." % [Res.NAMES[tipo], run.stock_text(tipo)]
+		var testa: String = "%s nel Magazzino." % run.stock_text(tipo)
 		if tipo == Res.Type.RICERCA:
-			testa = "Ricerca: va nella tecnologia che stai studiando. Senza una tecnologia in studio resta in attesa. Non si vende."
-		_celle_risorse[tipo].tooltip_text = "%s\nProssima stagione +%s:\n%s" % [testa, Res.format(tipo, produzione[tipo]),
+			testa = "Va nella tecnologia che stai studiando. Senza una tecnologia in studio resta in attesa. Non si vende."
+		var aiuto: String = "%s\nProssima stagione +%s:\n%s" % [testa, Res.format(tipo, produzione[tipo]),
 				"\n".join(run.production_origin_lines(tipo))]
 		var mantenimento: PackedStringArray = run.upkeep_lines(tipo)
 		if not mantenimento.is_empty():
-			_celle_risorse[tipo].tooltip_text += "\nMantenimento prima di ogni scontro:\n%s" % "\n".join(mantenimento)
+			aiuto += "\nMantenimento prima di ogni scontro:\n%s" % "\n".join(mantenimento)
 		var richieste: PackedStringArray = run.resource_demand_lines(tipo)
 		if not richieste.is_empty():
-			_celle_risorse[tipo].tooltip_text += "\nChi la chiede:\n%s" % "\n".join(richieste)
+			aiuto += "\nChi la chiede:\n%s" % "\n".join(richieste)
+		Suggerimenti.imposta(_celle_risorse[tipo], aiuto, Res.NAMES[tipo])
 	for tipo: int in _valori_risorse:
 		_valori_risorse[tipo].text = run.stock_text(tipo)
 		_produzioni_risorse[tipo].text = "+%s" % Res.format(tipo, produzione[tipo]) if produzione[tipo] > 0 else ""
@@ -1023,7 +1015,7 @@ func aggiorna_partita(run: RunState) -> void:
 		_pulsante_era.text = "Entra in %s · %d/%d tecnologie" % [run.era_name(run.era + 1), fatte, tecnologie_era]
 		_pulsante_era.visible = true
 		_pulsante_era.disabled = not comprando or run.era_block_reason() != ""
-		_pulsante_era.tooltip_text = run.era_block_reason() if run.era_block_reason() != "" else "Entri quando vuoi: le offerte dell'era attuale spariscono."
+		Suggerimenti.imposta(_pulsante_era, run.era_block_reason() if run.era_block_reason() != "" else "Entri quando vuoi: le offerte dell'era attuale spariscono.")
 	else:
 		_pulsante_era.visible = false
 	_aggiorna_ricerca(run)
@@ -1205,7 +1197,7 @@ func imposta_pausa(in_pausa: bool) -> void:
 ## azioni: elenco di { "testo": String, "attiva": bool, "clic": Callable }.
 func mostra_pezzo(titolo: String, testo: String, azioni: Array[Dictionary]) -> void:
 	_titolo_pezzo.text = titolo
-	_testo_pezzo.text = testo
+	_testo_pezzo.text = TestoRicco.colora(testo)
 	for figlio: Node in _azioni_pezzo.get_children():
 		figlio.queue_free()
 	for azione: Dictionary in azioni:
@@ -1215,6 +1207,7 @@ func mostra_pezzo(titolo: String, testo: String, azioni: Array[Dictionary]) -> v
 	_azioni_pezzo.add_child(_pulsante("Chiudi", func() -> void: annulla.emit()))
 	_pezzo.visible = true
 	_pezzo.reset_size()
+	_ridimensiona_dopo_impaginazione(_pezzo)
 
 
 func nascondi_pezzo() -> void:
@@ -1224,13 +1217,15 @@ func nascondi_pezzo() -> void:
 ## scelto riceve la posizione della voce scelta.
 func mostra_scelte(titolo: String, testo: String, voci: Array[String], scelto: Callable) -> void:
 	_titolo_scelte.text = titolo
-	_testo_scelte.text = testo
+	_testo_scelte.text = TestoRicco.colora(testo)
+	_testo_scelte.visible = testo != ""
 	for figlio: Node in _voci_scelte.get_children():
 		figlio.queue_free()
 	for i: int in range(voci.size()):
 		_voci_scelte.add_child(_pulsante(voci[i], _on_voce.bind(scelto, i)))
 	_scelte.visible = true
 	_centra(_scelte)
+	_ricentra_dopo_impaginazione(_scelte)
 
 
 func _on_voce(scelto: Callable, posizione: int) -> void:
@@ -1279,6 +1274,13 @@ func _centra(pannello: Control) -> void:
 	pannello.position = (get_viewport_rect().size - pannello.size) * 0.5
 
 
+## Il testo colorato si impagina al fotogramma dopo: solo allora il pannello ha la misura giusta.
+func _ridimensiona_dopo_impaginazione(pannello: Control) -> void:
+	await get_tree().process_frame
+	if is_instance_valid(pannello) and pannello.visible:
+		pannello.reset_size()
+
+
 func _ricentra_dopo_impaginazione(pannello: Control) -> void:
 	await get_tree().process_frame
 	if is_instance_valid(pannello) and pannello.visible:
@@ -1296,17 +1298,14 @@ func _on_continua_esito() -> void:
 		_al_continua.call()
 
 
+## Riquadro di una carta della plancia, sopra il mouse, con le parole chiave colorate
+## e le loro spiegazioni accanto.
 func mostra_suggerimento(titolo: String, testo: String, posizione: Vector2) -> void:
-	_titolo_suggerimento.text = titolo
-	_testo_suggerimento.text = testo
-	_suggerimento.visible = true
-	_suggerimento.reset_size()
-	var limite: Vector2 = get_viewport_rect().size - _suggerimento.size - Vector2(16, 16)
-	_suggerimento.position = (posizione + Vector2(24, -_suggerimento.size.y - 16)).clamp(Vector2(16, 16), limite)
+	_suggerimento.mostra(titolo, testo, posizione, true)
 
 
 func nascondi_suggerimento() -> void:
-	_suggerimento.visible = false
+	_suggerimento.nascondi()
 
 
 ## Annuncio in alto al centro (richiesta di Davide, 6 novembre): "Round passato", "Nuovo round"…
