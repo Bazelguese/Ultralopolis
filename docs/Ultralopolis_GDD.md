@@ -1431,6 +1431,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Cronache: inclinazioni da −5 a +5, usanza a ±5; peso di una cronaca 1 + 3 per ogni condizione personale; una cronaca ripetibile non torna per 2 anni se ce n'è un'altra possibile; pescata con un seme a parte, che non sposta quella dei consiglieri | Placeholder (v0.29). |
 | Cronache: catalogo del prototipo (35 cronache, 8 usanze, 5 vocazioni, 4 personaggi) e spinte iniziali delle identità in `docs/Catalogo.md` §6 sexies | Placeholder (v0.29). |
 | Vocazioni: al massimo 2 per run; la prima pronta ha la precedenza sulle altre cronache; una truppa assimilata conserva i suoi valori e i suoi tipi, più Assimilato e il tipo della razza | Provvisoria (v0.29). |
+| Testi colorati, sul modello di The Bazaar: nei suggerimenti, nei pannelli delle carte e delle scelte, nelle cronache e nell'esito le parole chiave si riconoscono da sole e prendono un colore per famiglia (risorse come nella barra, effetti di battaglia, colori del mana, tipi, bonus in verde, malus in rosso). I numeri vanno in grassetto e prendono il colore della parola che segue (+3 scudo). Accanto a un suggerimento compaiono al massimo 4 spiegazioni delle parole di battaglia e della nazione, prese da questo documento (§5, §7, §19); la parola del titolo non si rispiega. Parole, colori e spiegazioni stanno in `data/ui/lessico.tres` | Provvisoria (8 novembre 2026): palette e spiegazioni da approvare. |
 
 Tutti gli esempi di carte e statistiche restano modificabili.
 
