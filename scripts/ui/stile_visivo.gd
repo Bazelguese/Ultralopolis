@@ -22,6 +22,10 @@ const LEGNO_TAVOLO: Color = Color("0c0806")
 const CARTA_PLANCIA: Color = Color("3d2f22")
 const CARTA_PLANCIA_NEMICO: Color = Color("30221c")
 const BRACE: Color = Color("ff7a1a")
+## Interfaccia di cartoncino scuro con il bordo color crema delle figurine (Davide, 8 novembre 2026).
+const CARTONCINO: Color = Color("1c1612")
+const CARTONCINO_CHIARO: Color = Color("2c231b")
+const CARTA_CREMA: Color = Color("ece2cc")
 
 # Testi e accenti.
 const TESTO: Color = Color("f4f1ea")
@@ -206,13 +210,13 @@ static func scritta(testo: String, font: Font, dimensione: int, colore: Color, l
 
 # --- Interfaccia 2D -------------------------------------------------------------
 
-## Pannello scuro e semitrasparente con bordo sottile e angoli arrotondati.
-static func riquadro(sfondo: Color = Color(0.05, 0.08, 0.14, 0.88), bordo: Color = Color(1.0, 1.0, 1.0, 0.14)) -> StyleBoxFlat:
+## Pannello di cartoncino scuro con il bordo di carta color crema (teatro di carta).
+static func riquadro(sfondo: Color = Color(CARTONCINO, 0.95), bordo: Color = Color(CARTA_CREMA, 0.5)) -> StyleBoxFlat:
 	var stile: StyleBoxFlat = StyleBoxFlat.new()
 	stile.bg_color = sfondo
 	stile.border_color = bordo
 	stile.set_border_width_all(2)
-	stile.set_corner_radius_all(12)
+	stile.set_corner_radius_all(5)
 	stile.set_content_margin_all(14)
 	stile.shadow_color = Color(0.0, 0.0, 0.0, 0.5)
 	stile.shadow_size = 10
@@ -228,20 +232,20 @@ static func tema_interfaccia() -> Theme:
 	tema.set_stylebox("panel", "PanelContainer", riquadro())
 	tema.set_color("font_color", "Label", TESTO)
 	var stati: Dictionary[String, Color] = {
-		"normal": Color("1d2840"),
-		"hover": Color("2a3a5c"),
-		"pressed": Color("141c2e"),
-		"focus": Color("1d2840"),
-		"disabled": Color("151b28"),
+		"normal": CARTONCINO_CHIARO,
+		"hover": Color("3b2f24"),
+		"pressed": Color("15100c"),
+		"focus": CARTONCINO_CHIARO,
+		"disabled": Color("1a1511"),
 	}
 	for stato: String in stati:
-		var stile: StyleBoxFlat = riquadro(stati[stato], Color(1.0, 1.0, 1.0, 0.18))
+		var stile: StyleBoxFlat = riquadro(stati[stato], Color(CARTA_CREMA, 0.35))
 		stile.set_content_margin_all(10)
 		stile.content_margin_left = 20
 		stile.content_margin_right = 20
 		stile.shadow_size = 4
 		if stato == "hover":
-			stile.border_color = COLORE_GIOCATORE
+			stile.border_color = ORO_LUCE
 		if stato == "focus":
 			stile.draw_center = false
 		tema.set_stylebox(stato, "Button", stile)

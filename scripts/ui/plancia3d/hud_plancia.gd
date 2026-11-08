@@ -237,7 +237,7 @@ func _simbolo_risorsa(tipo: Res.Type) -> Control:
 func _crea_vignetta() -> void:
 	var sfumatura: Gradient = Gradient.new()
 	sfumatura.set_color(0, Color(0.0, 0.0, 0.0, 0.0))
-	sfumatura.set_color(1, Color(0.0, 0.02, 0.06, 0.7))
+	sfumatura.set_color(1, Color(0.0, 0.0, 0.0, 0.3))
 	sfumatura.set_offset(0, 0.55)
 	var trama: GradientTexture2D = GradientTexture2D.new()
 	trama.gradient = sfumatura
@@ -457,7 +457,7 @@ func _crea_magazzino() -> void:
 ## Pannello della Ricerca (GDD §10.5, §14.3): tecnologia in studio, mano di carte e albero.
 func _crea_ricerca() -> void:
 	_ricerca = PanelContainer.new()
-	_ricerca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.96), StileVisivo.ORO))
+	_ricerca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	_ricerca.add_child(colonna)
@@ -499,7 +499,7 @@ func _crea_ricerca() -> void:
 ## l'impresa con quanto manca e l'effetto; poi le ascensioni prese.
 func _crea_tradizioni() -> void:
 	_tradizioni = PanelContainer.new()
-	_tradizioni.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.96), StileVisivo.ORO))
+	_tradizioni.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	_tradizioni.add_child(colonna)
@@ -704,7 +704,7 @@ func _crea_pannelli_destra() -> void:
 	_ancora(colonna, Control.PRESET_CENTER_RIGHT, Vector2(-24, -60))
 
 	_legenda = LegendaSimboli.new()
-	_legenda.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.97), StileVisivo.ORO))
+	_legenda.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	_legenda.costruisci(GameSession.catalog())
 	_ancora(_legenda, Control.PRESET_CENTER_RIGHT, Vector2(-180, 0))
 	_legenda.visible = false
@@ -862,7 +862,7 @@ func _crea_scelte() -> void:
 
 func _crea_esito() -> void:
 	_esito = PanelContainer.new()
-	_esito.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.95), StileVisivo.ORO))
+	_esito.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	colonna.custom_minimum_size = Vector2(640, 0)
@@ -887,7 +887,7 @@ func _crea_esito() -> void:
 ## Pannello della cronaca: il momento, la scena e le reazioni possibili della nazione.
 func _crea_pannello_cronaca() -> void:
 	_pannello_cronaca = PanelContainer.new()
-	_pannello_cronaca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.09, 0.07, 0.05, 0.96), StileVisivo.ORO))
+	_pannello_cronaca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	colonna.custom_minimum_size = Vector2(700, 0)

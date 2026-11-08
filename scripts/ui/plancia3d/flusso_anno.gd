@@ -117,15 +117,15 @@ static func _indice_primo_mese(stagione: int) -> int:
 func _casella_mese(rettangolo: Rect2, mese: int, mese_corrente: int, stagione: int, tema: int, font: Font) -> void:
 	var passato: bool = stagione < int(_run.season) or (stagione == int(_run.season) and (mese_corrente < 0 or mese < mese_corrente))
 	var corrente: bool = mese == mese_corrente
-	var fondo: Color = StileVisivo.PIETRA_SCURA
+	var fondo: Color = StileVisivo.CARTONCINO_CHIARO
 	if stagione == int(RunState.Season.INVERNO):
-		fondo = Color("1b2a40")
+		fondo = Color("263040")
 	if corrente:
 		fondo = Color(StileVisivo.ORO, 0.28)
 	elif passato:
-		fondo = Color(StileVisivo.PIETRA_SCURA, 0.5)
+		fondo = Color(StileVisivo.CARTONCINO_CHIARO, 0.5)
 	draw_rect(rettangolo, fondo, true)
-	draw_rect(rettangolo, StileVisivo.ORO_LUCE if corrente else Color(StileVisivo.PIETRA_CHIARA, 0.5 if passato else 1.0), false, 2.0 if corrente else 1.0)
+	draw_rect(rettangolo, StileVisivo.ORO_LUCE if corrente else Color(StileVisivo.CARTA_CREMA, 0.25 if passato else 0.45), false, 2.0 if corrente else 1.0)
 	var centro: Vector2 = rettangolo.get_center()
 	if tema >= 0:
 		_icona_tema(tema, centro, 11.0, 1.0 if not passato or corrente else 0.4)
