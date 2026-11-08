@@ -103,6 +103,9 @@ static func larghezza_riga(riga: RigaSimboli, font: Font, carattere: int, lato_i
 ## Gli spazi della plancia hanno una cornice tratteggiata, i potenziamenti una freccia in su.
 static func _disegna_icona(tela: CanvasItem, voce: RigaSimboli.Simbolo, quadro: Rect2, opacita: float) -> void:
 	var bianco: Color = Color(1.0, 1.0, 1.0, opacita)
+	if voce.tipo:
+		medaglione(tela, voce.icona, quadro.get_center(), quadro.size.x, opacita)
+		return
 	var dentro: Rect2 = quadro
 	if voce.spazio:
 		var tratto: Color = Color(StileVisivo.TESTO_TENUE, opacita)
@@ -151,3 +154,15 @@ static func _esagono(tela: CanvasItem, centro: Vector2, raggio: float, colore: C
 		var angolo: float = deg_to_rad(60.0 * i - 90.0)
 		punti.append(centro + Vector2(cos(angolo), sin(angolo)) * raggio)
 	tela.draw_colored_polygon(punti, colore)
+
+
+## Il medaglione di un tipo di tessera: tondo scuro con un bordo sottile e il simbolo bianco.
+## La forma tonda distingue i tipi dalle risorse; i tipi non hanno colore (GDD §6.6).
+static func medaglione(tela: CanvasItem, concetto: StringName, centro: Vector2, diametro: float, opacita: float = 1.0) -> void:
+	var raggio: float = diametro * 0.5
+	tela.draw_circle(centro, raggio, Color(StileVisivo.TESTO_TENUE, 0.75 * opacita))
+	tela.draw_circle(centro, raggio - maxf(1.5, diametro * 0.05), Color(StileVisivo.NOTTE, 0.92 * opacita))
+	var lato: float = diametro * 0.6
+	var trama: Texture2D = Simboli.trama(concetto, lato)
+	if trama != null:
+		tela.draw_texture_rect(trama, Rect2(centro - Vector2(lato, lato) * 0.5, Vector2(lato, lato)), false, Color(1.0, 1.0, 1.0, opacita))

@@ -29,6 +29,8 @@ class Simbolo:
 	var spazio: bool = false
 	## Il simbolo ha una piccola freccia in su: si potenzia (sale di livello).
 	var su: bool = false
+	## Il simbolo è un tipo di tessera: si disegna in un medaglione tondo, come sulle tessere.
+	var tipo: bool = false
 
 
 ## Le voci, da sinistra a destra.
@@ -89,6 +91,13 @@ func spazio(concetto: StringName, testo: String = "", tono: Tono = Tono.BONUS) -
 	return self
 
 
+## Aggiunge il medaglione di un tipo di tessera (es. &"Fante").
+func tipo(nome_tipo: StringName) -> RigaSimboli:
+	icona(Simboli.di_tipo(nome_tipo))
+	simboli[simboli.size() - 1].tipo = true
+	return self
+
+
 ## Aggiunge un simbolo con la freccia del potenziamento (la carta sale di un livello).
 func potenziata(concetto: StringName, testo: String = "") -> RigaSimboli:
 	icona(concetto, testo, Tono.BONUS)
@@ -109,7 +118,7 @@ func come_testo() -> String:
 	for voce: Simbolo in simboli:
 		var parte: String = voce.testo
 		if voce.icona != &"":
-			parte += "[%s%s%s]" % ["spazio " if voce.spazio else "", String(voce.icona), "↑" if voce.su else ""]
+			parte += "[%s%s%s]" % ["spazio " if voce.spazio else ("tipo " if voce.tipo else ""), String(voce.icona), "↑" if voce.su else ""]
 		elif voce.gemma != &"":
 			parte += "[gemma %s]" % voce.gemma
 		parti.append(parte)

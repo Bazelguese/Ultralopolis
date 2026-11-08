@@ -49,6 +49,8 @@ var colore_consigliere: StringName = &""
 ## Righe di simboli stampate sulla carta, come nei giochi da tavolo (consiglieri, azioni, eventi).
 ## Se ci sono, prendono il posto della riga di testo.
 var simboli: Array[RigaSimboli] = []
+## Tipi della tessera, o del consigliere (i tipi della sua categoria): medaglioni a sinistra.
+var tipi: Array[StringName] = []
 
 
 func colore_cornice() -> Color:
@@ -80,6 +82,7 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 	scheda.scudo = def.shield
 	scheda.cura = def.heal
 	scheda.corruzione = def.corruption
+	scheda.tipi = def.types.duplicate()
 	scheda.illustrazione = _carica("edifici/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
 	var produzione: PackedStringArray = PackedStringArray()
@@ -124,6 +127,7 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 	scheda.livello = p_livello
 	scheda.malus = p_malus
 	scheda.affamata = p_affamata
+	scheda.tipi = def.types.duplicate()
 	scheda.illustrazione = _carica("truppe/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
 	if def.mana_cost > 0:
@@ -241,6 +245,7 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	scheda.sopratitolo = consigliere.category_name if consigliere.category_name != "" else "Consigliere speciale"
 	scheda.sopratitolo += " · %s" % run.council_level_name()
 	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
+	scheda.tipi = consigliere.types.duplicate()
 	# Sotto la carta: "Ascolta" (scegli questo consigliere); se con lui puoi già potenziare
 	# qualche tua carta, anche quante.
 	scheda.costo = "Ascolta"

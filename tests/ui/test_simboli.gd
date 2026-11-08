@@ -281,3 +281,22 @@ func test_la_legenda_spiega_ogni_tipo_di_azione() -> void:
 		assert_ne(voce[1] as String, "Altre azioni", "%s ha un nome." % (voce[0] as RigaSimboli).come_testo())
 	assert_eq((tipi[0][0] as RigaSimboli).come_testo(), "[scambio]")
 	assert_eq(tipi[0][1], "Scambi di risorse")
+
+
+# --- Tipi ----------------------------------------------------------------------
+
+func test_ogni_tipo_ha_il_suo_simbolo_o_lo_stendardo() -> void:
+	assert_eq(Simboli.di_tipo(&"Infrastruttura Bellica"), &"tipo_infrastruttura_bellica")
+	assert_eq(Simboli.di_tipo(&"Materie prime"), &"tipo_materie_prime")
+	assert_eq(Simboli.di_tipo(&"Capitale"), &"tipo_capitale")
+	assert_eq(Simboli.di_tipo(&"Pietrosangue"), Simboli.TIPO_IDENTITA, "I tipi d'identità hanno lo stendardo.")
+	for consigliere: AdvisorDef in (load("res://data/catalog/catalog.tres") as CatalogDef).advisors:
+		for tipo: StringName in consigliere.types:
+			assert_ne(Simboli.di_tipo(tipo), Simboli.TIPO_IDENTITA, "Il tipo %s del %s deve avere un simbolo suo." % [tipo, consigliere.display_name])
+
+
+func test_tessere_e_consiglieri_mostrano_i_loro_tipi() -> void:
+	assert_eq(SchedaCarta.da_truppa(soldier).tipi, [&"Fante"] as Array[StringName])
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Legge", &"Nobile"], [], Res.Type.STABILITA)
+	catalog.advisors = [cancelliere]
+	assert_eq(SchedaCarta.da_consigliere(_run(), cancelliere).tipi, [&"Legge", &"Nobile"] as Array[StringName])
