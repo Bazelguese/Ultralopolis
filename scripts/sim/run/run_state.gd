@@ -259,7 +259,7 @@ var completed_ways: Array[IdentityDef] = []
 var ascension_choices: Array[IdentityDef] = []
 ## Alberi completati di cui non si è ancora scelta l'ascensione.
 var pending_ascensions: int = 0
-## Doppio ascolto già usato in questa metà dell'anno.
+## Doppio ascolto già usato in questa stagione.
 var double_pick_used: bool = false
 var _tradition_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 

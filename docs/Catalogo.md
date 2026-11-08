@@ -366,7 +366,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | **Disciplina ferrea** | La truppa più a destra **prenota** il mana: le altre non lo usano finché lei non si attiva | §7.3: "il mana non viene prenotato per la truppa saltata" | Cambia l'ordine delle truppe: la regola di priorità va spiegata bene a schermo |
 | **Mana unito** | Una truppa può pagare con il mana di **qualsiasi colore**, dopo il proprio e l'energetico | §5.3: "una truppa paga prima con il proprio colore e poi con l'energetico" | Molto forte per le nazioni a più colori |
 | **Maestria** | Le tessere possono arrivare al **livello 4** | §6.5: "3 livelli" | Serve un costo di Potenzia per il livello 4 |
-| **Doppio ascolto** | Una volta per metà anno si prendono **due opportunità** dallo stesso consigliere | §4.2: "se ne prende una sola" | Da limitare (una volta per metà) per non svuotare la scelta |
+| **Doppio ascolto** | Una volta per stagione si prendono **due opportunità** dallo stesso consigliere | §4.2: "se ne prende una sola" | Da limitare (una volta per stagione) per non svuotare la scelta |
 | **Esercito frugale** | Le truppe senza Cibo **non rallentano** | §5.4: "ricarica ×1,5 senza cibo" | Toglie peso al Cibo: da accoppiare a nazioni che ne hanno poco |
 
 ---
