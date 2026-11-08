@@ -125,8 +125,7 @@ var _scritte_scudo: Array[Label3D] = [null, null]
 var _segnalini_corruzione: Array[Node3D] = [null, null]
 var _scritte_corruzione: Array[Label3D] = [null, null]
 var _nomi_lato: Array[Label3D] = [null, null]
-var _riserve: Array[Node3D] = [null, null]
-var _scritte_riserva: Array[Dictionary] = [{}, {}]
+var _riserve: Array[Node3D] = [null, null]  # RiservaMana
 var _gemme_riserva: Array[Dictionary] = [{}, {}]
 
 var _scelte: Array[Tessera3D] = []
@@ -529,30 +528,16 @@ func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color) -> Arr
 	return [nodo, scritta]
 
 
+## La riserva di mana sotto lo stendardo (stile scelto in RiservaMana).
 func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
-	var nodo: Node3D = Node3D.new()
-	nodo.position = Vector3(X_MEDAGLIONE, 0.0, z_centro + 1.05)
-	radice.add_child(nodo)
-	_riserve[lato] = nodo
-	for i: int in range(COLORI_RISERVA.size()):
-		var mana: StringName = COLORI_RISERVA[i]
-		var x: float = (i - (COLORI_RISERVA.size() - 1) * 0.5) * 0.43
-		var gemma: MeshInstance3D = MeshInstance3D.new()
-		var forma: CylinderMesh = CylinderMesh.new()
-		forma.top_radius = 0.15
-		forma.bottom_radius = 0.18
-		forma.height = 0.12
-		forma.radial_segments = 6
-		gemma.mesh = forma
-		gemma.material_override = StileVisivo.materiale_gemma(StileVisivo.mana_da_nome(mana))
-		gemma.position = Vector3(x, 0.08, 0.0)
-		nodo.add_child(gemma)
-		var conteggio: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 64, Color.WHITE, 0.0, 10)
-		conteggio.position = Vector3(x, 0.04, 0.5)
-		nodo.add_child(conteggio)
-		_scritte_riserva[lato][mana] = conteggio
-		_gemme_riserva[lato][mana] = gemma
-	nodo.visible = false
+	var riserva: RiservaMana = RiservaMana.new()
+	riserva.position = Vector3(X_MEDAGLIONE, 0.0, z_centro + 1.05)
+	radice.add_child(riserva)
+	riserva.costruisci(RiservaMana.stile_predefinito)
+	_riserve[lato] = riserva
+	for mana: StringName in COLORI_RISERVA:
+		_gemme_riserva[lato][mana] = riserva.arrivo(mana)
+	riserva.visible = false
 
 
 func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
@@ -1515,8 +1500,7 @@ func _aggiorna_visuale_scontro() -> void:
 			else:
 				edificio.imposta_stato("", StileVisivo.NOTTE)
 		for mana: StringName in COLORI_RISERVA:
-			var scritta: Label3D = _scritte_riserva[lato][mana]
-			scritta.text = str(_sim.get_mana(lato, mana))
+			(_riserve[lato] as RiservaMana).imposta(mana, _sim.get_mana(lato, mana))
 		for i: int in range(_truppe[lato].size()):
 			var tessera: Tessera3D = _truppe[lato][i]
 			var def: TroopDef = _setups[lato].troops[i]
