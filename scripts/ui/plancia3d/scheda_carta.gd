@@ -247,8 +247,32 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	if run.offer_needs_replacement(offerta):
 		scheda.dettagli += "\nPlancia piena: sceglierai quale tessera sostituire (ti torna metà del prezzo)."
 	elif not run.offer_choices(offerta).is_empty():
-		scheda.dettagli += "\nDopo averla presa scegli una voce."
+		scheda.dettagli += "\n" + _frase_scelta(offerta)
 	return scheda
+
+
+## Che cosa si sceglie dopo aver preso un'opportunità con più voci (RunState.offer_choices).
+static func _frase_scelta(offerta: Offer) -> String:
+	match offerta.kind:
+		OpportunityDef.Kind.INCANTO:
+			return "Dopo averla presa scegli la truppa da incantare."
+		OpportunityDef.Kind.ACCORCIA_MALUS:
+			return "Dopo averla presa scegli il malus da accorciare."
+		OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
+			var su_truppa: bool = false
+			var su_edificio: bool = false
+			for modificatore: ModifierDef in offerta.opportunity.modifiers:
+				su_truppa = su_truppa or modificatore.target == ModifierDef.Target.TRUPPA_SCELTA
+				su_edificio = su_edificio or modificatore.target == ModifierDef.Target.EDIFICIO_SCELTO
+			var piu_bonus: bool = offerta.opportunity.modifiers.size() > 1
+			if piu_bonus and (su_truppa or su_edificio):
+				return "Dopo averla presa scegli il bonus e la tessera che lo riceve."
+			if su_truppa:
+				return "Dopo averla presa scegli la truppa che riceve il bonus."
+			if su_edificio:
+				return "Dopo averla presa scegli l'edificio che riceve il bonus."
+			return "Dopo averla presa scegli il bonus."
+	return "Dopo averla presa scegli fra le sue voci."
 
 
 ## Mantenimento di una carta (GDD §5.6): che cosa paga prima di ogni scontro e se l'ultima volta
@@ -276,8 +300,11 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	# Sotto la carta: "Ascolta" (scegli questo consigliere); se con lui puoi già potenziare
 	# qualche tua carta, anche quante.
 	scheda.costo = "Ascolta"
-	if consigliere.special == AdvisorDef.Special.VISITATORE:
+	var visitatore: bool = consigliere.special == AdvisorDef.Special.VISITATORE
+	if visitatore:
 		scheda.sopratitolo = "Visitatore · %s" % consigliere.category_name
+		# Nel gioco il Visitatore si presenta come "Di passaggio", la Fortuna come "Un dono" (Glossario).
+		scheda.riga = "Di passaggio"
 	var pronte: int = run.affordable_upgrades(consigliere).size() if consigliere.special == AdvisorDef.Special.NESSUNO else 0
 	if pronte > 0:
 		scheda.costo = "Ascolta · ▲ Potenzia %d" % pronte
@@ -285,6 +312,9 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	# una frase per ogni riga di simboli, nello stesso ordine.
 	scheda.simboli = SimboliEffetti.consigliere(run, consigliere)
 	var righe: PackedStringArray = PackedStringArray()
+	# Il Visitatore dice anche chi è, che tessere porta e a che prezzi: è scritto nei suoi dati.
+	if visitatore:
+		righe.append("Di passaggio. %s" % consigliere.description if consigliere.description != "" else "Di passaggio.")
 	for riga: RigaSimboli in scheda.simboli:
 		if riga.etichetta != "":
 			righe.append(riga.etichetta)
@@ -317,7 +347,11 @@ static func da_evento(run: RunState, evento: EventDef) -> SchedaCarta:
 	for opzione: EventOptionDef in evento.options:
 		var requisito: String = run.option_requirement(opzione)
 		righe.append("• %s%s" % ["[%s] " % requisito if requisito != "" else "", opzione.label])
-	righe.append("Ignora il tema del round. Sceglierlo è la scelta del round.")
+	if evento.special == EventDef.Special.RIVOLUZIONE:
+		# Arriva da sola e non si può lasciar passare il round (RunState.pass_round).
+		righe.append("Non si può evitare: scegli il nuovo governo. Poi il Malcontento si azzera.")
+	else:
+		righe.append("Ignora il tema del round. Sceglierlo è la scelta del round.")
 	scheda.simboli = SimboliEffetti.evento(run, evento)
 	scheda.costo = "Scegli"
 	scheda.dettagli = "\n".join(righe)
@@ -379,13 +413,18 @@ static func da_incontro(incontro: EncounterDef, run: RunState = null) -> SchedaC
 	return scheda
 
 
-static func da_ricompensa(ricompensa: RewardDef) -> SchedaCarta:
+## run: la partita, per sapere se la plancia è piena e il livello massimo. Facoltativa solo perché
+## chi chiama può non averla: senza, il riquadro lo dice in generale.
+static func da_ricompensa(ricompensa: RewardDef, run: RunState = null) -> SchedaCarta:
 	var scheda: SchedaCarta
+	var livello_massimo: int = run.max_level() if run != null else 0
 	match ricompensa.kind:
 		RewardDef.Kind.EDIFICIO:
-			scheda = da_edificio(ricompensa.building)
+			scheda = da_edificio(ricompensa.building, 1, "", livello_massimo)
+			scheda.dettagli += _righe_tessera_in_regalo(ricompensa, run)
 		RewardDef.Kind.TRUPPA:
-			scheda = da_truppa(ricompensa.troop)
+			scheda = da_truppa(ricompensa.troop, 1, "", false, livello_massimo)
+			scheda.dettagli += _righe_tessera_in_regalo(ricompensa, run)
 			if ricompensa.assimilation:
 				scheda.dettagli += "\nAssimilati (vocazione): una truppa del nemico vinto diventa tua, al posto della ricompensa. +1 Malcontento."
 		_:
@@ -400,6 +439,20 @@ static func da_ricompensa(ricompensa: RewardDef) -> SchedaCarta:
 	return scheda
 
 
+## Una tessera presa come ricompensa (RunState.take_reward): è gratis, entra al livello 1 e, se la
+## plancia è piena, ne sostituisce una (con il rimborso di metà del suo prezzo, GDD §6.4).
+static func _righe_tessera_in_regalo(ricompensa: RewardDef, run: RunState) -> String:
+	var testo: String = "\nGratis: entra sulla plancia al livello 1. Se poi la vendi, ti torna metà del suo prezzo."
+	var sostituzione: String = "sceglierai quale %s sostituire (ti torna metà di quanto l'avevi pagata%s)" % [
+		"edificio" if ricompensa.kind == RewardDef.Kind.EDIFICIO else "truppa",
+		"; la Capitale no" if ricompensa.kind == RewardDef.Kind.EDIFICIO else ""]
+	if run == null:
+		testo += "\nSe la plancia è piena, %s." % sostituzione
+	elif run.reward_needs_replacement(ricompensa):
+		testo += "\nPlancia piena: %s." % sostituzione
+	return testo
+
+
 static func da_via(via: IdentityDef) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.VIA
@@ -407,10 +460,11 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	scheda.titolo = via.display_name
 	scheda.sopratitolo = "Via"
 	scheda.riga = "Scegli questa via"
-	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: opportunità, tessere esclusive, un tratto permanente e un bonus immediato."
+	# Adozione della via (GDD §10.4, §10.4.1).
+	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: le sue opportunità diventano più frequenti, apre tessere e tecnologie esclusive, dà un tratto permanente e un bonus immediato."
 	if not via.traditions.is_empty():
 		# Le imprese si vedono prima di scegliere la via (GDD §10.4.1, v0.27).
-		scheda.dettagli += "\nTradizioni (completale tutte per un'ascensione):"
+		scheda.dettagli += "\nTradizioni (completale tutte per un'ascensione). Le imprese contano da quando scegli la via:"
 		for passo: TraditionDef in via.traditions:
 			scheda.dettagli += "\n• %s: %s → %s" % [passo.display_name, passo.deed.describe() if passo.deed != null else "", passo.description]
 	scheda.illustrazione = _carica("vie/%s.png" % via.id)
@@ -446,14 +500,18 @@ static func da_governo(governo: IdentityDef) -> SchedaCarta:
 
 
 ## La carta per rifiutare l'evoluzione del governo.
-static func da_resta(governo: IdentityDef) -> SchedaCarta:
+## run: la partita, per sapere se questa è l'ultima era. Facoltativa solo perché chi chiama può non
+## averla: senza, si scrive il testo delle ere che non sono l'ultima.
+static func da_resta(governo: IdentityDef, run: RunState = null) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.VIA
 	scheda.titolo = "Resta com'è"
 	scheda.sopratitolo = "Governo"
 	scheda.riga = "Rifiuta l'evoluzione"
 	scheda.costo = "Resta"
-	scheda.dettagli = "Il governo resta %s. Potrai evolvere entrando nella prossima era, o con una Riforma." % (governo.display_name if governo != null else "com'è")
+	var ultima_era: bool = run != null and run.era >= run.catalog.eras.size()
+	scheda.dettagli = "Il governo resta %s. %s" % [governo.display_name if governo != null else "com'è",
+			"Potrai evolvere solo con una Riforma." if ultima_era else "Potrai evolvere entrando nella prossima era, o con una Riforma."]
 	return scheda
 
 
