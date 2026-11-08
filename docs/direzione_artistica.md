@@ -118,10 +118,11 @@ Regole della grafica:
 - `/` separa le alternative, `·` separa due effetti diversi della stessa scelta.
 - Uno **spazio** della plancia è il simbolo dentro una cornice tratteggiata; una tessera che **sale di livello** ha una freccia dorata.
 - Le stesse icone delle risorse compaiono nella barra delle risorse in basso e accanto al Malcontento, così il giocatore le impara.
-- Le righe corte stanno **affiancate** sulla stessa linea, ognuna nella sua pastiglia, per non sprecare spazio (richiesta di Davide); gli incanti e gli spionaggi di un consigliere si riuniscono in una riga sola.
-- Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli **si ingrandisce** (×1,7) e il testo dei dettagli va sotto o di fianco, senza coprirla.
-- La **legenda** (pulsante «Legenda» a destra, accanto a Effetti e Annali) mostra come si leggono i simboli con esempi presi dal gioco, tutti i simboli, le gemme di mana e i colori dei numeri. Gli esempi si costruiscono dai dati, come le righe dei consiglieri.
-- **Gerarchia del consigliere**, dall'alto: la riga di ciò che propone nel round, con il fondo del colore del consigliere; le azioni, su fondo scuro; in fondo il Potenzia, con il solo bordo, più bassa e mai affiancata, perché è un servizio in più e non un'opportunità.
+- Le righe corte stanno **affiancate** sulla stessa linea, ognuna nella sua pastiglia, per non sprecare spazio (richiesta di Davide).
+- Sul consigliere il riquadro dei dettagli dice **solo ciò che si vede**: una frase per ogni riga di simboli, nello stesso ordine.
+- Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli **si ingrandisce** (×1,7) e il testo dei dettagli va sotto o di fianco, senza coprirlo.
+- La **legenda** (pulsante «Legenda» a destra, accanto a Effetti e Annali) mostra come si leggono i simboli con esempi presi dal gioco, tutti i simboli, i tipi di azione della riga del timbro (con le stesse parole del riquadro dei dettagli), le gemme di mana e i colori dei numeri. Gli esempi si costruiscono dai dati, come le righe dei consiglieri.
+- **Gerarchia del consigliere**, dall'alto: la riga di ciò che propone nel round, con il fondo del colore del consigliere; una sola riga «azioni» su fondo scuro, con il timbro e i *tipi* di azione possibili (scambio, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza numeri; in fondo il Potenzia, con il solo bordo, più bassa e mai affiancata, perché è un servizio in più e non un'opportunità.
 - Se con un consigliere puoi già potenziare qualche tessera, la riga del Potenzia ha il **bordo dorato** e sotto il consigliere compare "Ascolta · ▲ Potenzia N" (quante tessere).
 
 ### 4.2 Dove sono

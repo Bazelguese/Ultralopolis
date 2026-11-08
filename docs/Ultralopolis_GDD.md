@@ -1254,14 +1254,14 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 | Le righe si costruiscono **dai dati** del catalogo (costi, guadagni, modificatori di §8): cambiando un valore nei dati, la riga si aggiorna da sola | Confermato |
 | Le righe corte si **affiancano** sulla stessa linea, per non sprecare spazio | Confermato (richiesta di Davide) |
 | Gli stessi simboli delle risorse compaiono nella barra delle risorse e accanto al Malcontento, così il giocatore li impara | Confermato |
-| Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli si ingrandisce e il riquadro dei dettagli non la copre | Confermato |
-| Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si leggono i simboli, con esempi presi dal gioco, e che cosa vuol dire ogni simbolo, gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
+| Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli si ingrandisce e il riquadro dei dettagli non lo copre | Confermato |
+| Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si leggono i simboli, con esempi presi dal gioco, che cosa vuol dire ogni simbolo, ogni tipo di azione della riga del timbro, ogni gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
 
 **Che cosa mostrano consiglieri, azioni e avvenimenti — Confermato (prima fase):**
 
 | Che cosa | Righe |
 |---|---|
-| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore del consigliere: `[proposte]: [edificio] / [truppa]`); **le azioni** che può proporre (righe scure; incanti e spionaggi riuniti in una riga); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N") |
+| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore del consigliere: `[proposte]: [edificio] / [truppa]`); una sola riga **azioni** (scura): il timbro e un simbolo per ogni *tipo* di azione che può proporre (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza costi né numeri, che si vedono sulle opportunità dopo averlo scelto (variante A, scelta di Davide); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
 | Azione o peculiarità proposte | Costo → effetto |
 | Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
 | Opzione dell’evento scelto | Costo → effetti, su una o più righe |
@@ -1601,6 +1601,7 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 - Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
 - **Legenda dei simboli** nel gioco (§14.4), con esempi presi dalle carte vere.
 - **Gerarchia sulla carta del consigliere** (§14.4): prima ciò che propone (riga colorata), poi le azioni, il Potenzia in fondo e in disparte (Davide: la carta del Tesoriere sembrava offrire solo Potenzia).
+- Le azioni del consigliere sono riassunte in **una riga di macrocategorie** (tipi di azione, senza numeri) invece di una riga per azione; le righe mostrano solo ciò che può davvero uscire nel round, e il riquadro dei dettagli dice solo ciò che si vede (decisioni di Davide).
 
 **Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
 - Le azioni del Tesoriere (Esattori, Grandi esattori, Assemblea) sono **gratuite**, come già nel gioco: il GDD diceva che si pagavano in Influenza (§4.2.3, §16.3). Decisione di Davide: vale la versione del gioco.

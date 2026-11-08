@@ -52,6 +52,8 @@ Se un simbolo manca, la carta mostra un cerchio con l'iniziale del concetto.
 | `proposta.svg` | Proposte del Consiglio | card-draw |
 | `caso.svg` | A caso | perspective-dice-six-faces-random |
 | `bloccato.svg` | Opzione bloccata | padlock |
+| `azione.svg` | Azioni del Consiglio (la riga «azioni» del consigliere) | stamper |
+| `scambio.svg` | Scambio di risorse | trade |
 
 Il mana non ha un file: le gemme colorate le disegna il gioco, perché il colore è il loro significato.
 
