@@ -38,12 +38,14 @@ const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola",
 ## Oltre questo numero di gemme in volo non se ne lanciano altre (solo effetto visivo).
 const MASSIMO_GEMME_IN_VOLO: int = 24
 
-## Teatro di carta: lanterna sopra il tavolo, un po' verso il giocatore.
-const POSIZIONE_LANTERNA: Vector3 = Vector3(0.0, 12.0, 5.0)
-const ENERGIA_LANTERNA: float = 3.4
+## Altezza del telo dello stendardo della nazione.
+const ALTEZZA_STENDARDO: float = 2.6
+## Teatro di carta: dove stanno il calendario pop-up e il sole/luna, sul fondo del palco.
+const POSIZIONE_CALENDARIO: Vector3 = Vector3(10.0, 0.0, -5.0)
+const POSIZIONE_ASTRO: Vector3 = Vector3(5.5, 0.0, -9.0)
 
-const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 27.0, 14.6)
-const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, 0.9)
+const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 21.5, 20.0)
+const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -0.2)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 1.2
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
@@ -53,7 +55,10 @@ const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.6)
 var run: RunState
 
 var _camera: Camera3D
-var _luce_atmosfera: OmniLight3D
+## Teatro di carta: luci, tempo atmosferico e calendario (solo scenografia).
+var _scena: ScenaTeatro
+## La prima volta di una partita la scena si imposta senza animazioni.
+var _scena_subito: bool = true
 var _hud: HudPlancia
 ## Contiene i due lati: si ingrandisce e si centra in base a quanti spazi si vedono.
 var _plancia: Node3D
@@ -86,6 +91,9 @@ var _materiale_anello_acceso: StandardMaterial3D
 var _materiale_anello_logoramento: StandardMaterial3D
 const SEGMENTI_ANELLO: int = 48
 var _barre_resistenza: Array[MeshInstance3D] = [null, null]
+## Teatro di carta: lo stendardo di ogni lato (materiale del telo e numero della Resistenza).
+var _teli_stendardo: Array[ShaderMaterial] = [null, null]
+var _numeri_stendardo: Array[Label3D] = [null, null]
 ## Scudo e Corruzione accanto allo stemma (GDD §7.6), visibili solo se non sono zero.
 var _segnalini_scudo: Array[Node3D] = [null, null]
 var _scritte_scudo: Array[Label3D] = [null, null]
@@ -128,7 +136,6 @@ var _gia_viste: Array[Dictionary] = [{}, {}]
 
 func _ready() -> void:
 	_crea_ambiente()
-	_crea_tavolo()
 	_plancia = Node3D.new()
 	add_child(_plancia)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
@@ -177,6 +184,7 @@ func _nuova_run() -> void:
 		run.found_nation(nazione.nation_name, nazione.resolve(catalogo))
 	_modo = Modo.NORMALE
 	_disponi_subito = true
+	_scena_subito = true
 	_firma_scelte = ""
 	_aggiorna_tutto()
 
@@ -208,59 +216,14 @@ func _nazione_di_prova(catalogo: CatalogDef, regole_run: RunRules) -> NationTemp
 # --- Ambiente ------------------------------------------------------------------
 
 func _crea_ambiente() -> void:
-	# Teatro di carta: buio quasi totale, una lanterna calda che oscilla e fa ombre lunghe.
-	var mondo: WorldEnvironment = WorldEnvironment.new()
-	var ambiente: Environment = Environment.new()
-	ambiente.background_mode = Environment.BG_COLOR
-	ambiente.background_color = StileVisivo.BUIO
-	ambiente.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	ambiente.ambient_light_color = Color("3a2c3c")
-	ambiente.ambient_light_energy = 0.3
-	ambiente.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	ambiente.glow_enabled = true
-	ambiente.glow_intensity = 0.7
-	ambiente.glow_bloom = 0.06
-	ambiente.glow_hdr_threshold = 1.0
-	ambiente.fog_enabled = true
-	ambiente.fog_light_color = Color("0b0806")
-	ambiente.fog_density = 0.008
-	mondo.environment = ambiente
-	add_child(mondo)
-
-	var riempi: DirectionalLight3D = DirectionalLight3D.new()
-	riempi.light_color = Color("ffd9a8")
-	riempi.light_energy = 0.12
-	riempi.rotation_degrees = Vector3(-60.0, -25.0, 0.0)
-	add_child(riempi)
-
-	var controluce: DirectionalLight3D = DirectionalLight3D.new()
-	controluce.light_color = Color("5a78c8")
-	controluce.light_energy = 0.35
-	controluce.rotation_degrees = Vector3(-30.0, 155.0, 0.0)
-	add_child(controluce)
-
-	_luce_atmosfera = OmniLight3D.new()
-	_luce_atmosfera.light_color = StileVisivo.LUCE_LANTERNA
-	_luce_atmosfera.light_energy = ENERGIA_LANTERNA
-	_luce_atmosfera.omni_range = 48.0
-	_luce_atmosfera.omni_attenuation = 1.1
-	_luce_atmosfera.shadow_enabled = true
-	_luce_atmosfera.position = POSIZIONE_LANTERNA
-	add_child(_luce_atmosfera)
-
+	# Teatro di carta: luci del momento del giorno, tempo atmosferico, pagina del tavolo,
+	# sole/luna e calendario pop-up (solo scenografia).
+	_scena = ScenaTeatro.new()
+	add_child(_scena)
+	_scena.costruisci(POSIZIONE_CALENDARIO, POSIZIONE_ASTRO)
 	_camera = Camera3D.new()
 	_camera.fov = 30.0
 	add_child(_camera)
-
-
-func _crea_tavolo() -> void:
-	var terreno: MeshInstance3D = MeshInstance3D.new()
-	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(70.0, 0.5, 50.0)
-	terreno.mesh = forma
-	terreno.material_override = _materiale_carta(StileVisivo.LEGNO_TAVOLO, 4.0)
-	terreno.position.y = -0.45
-	add_child(terreno)
 
 
 ## Grana da stampa e vignetta sopra la scena 3D, sotto l'interfaccia (che resta nitida).
@@ -286,27 +249,6 @@ void fragment() {
 	materiale.shader = shader
 	velo.material = materiale
 	strato.add_child(velo)
-
-
-## Carta spessa con la grana: tavolo e plance del teatro di carta.
-func _materiale_carta(colore: Color, scala: float) -> StandardMaterial3D:
-	var materiale: StandardMaterial3D = StileVisivo.materiale(colore, 0.95)
-	var grana: NoiseTexture2D = NoiseTexture2D.new()
-	grana.width = 256
-	grana.height = 256
-	grana.seamless = true
-	var rumore: FastNoiseLite = FastNoiseLite.new()
-	rumore.frequency = 0.03
-	rumore.fractal_octaves = 4
-	grana.noise = rumore
-	var rampa: Gradient = Gradient.new()
-	rampa.set_color(0, Color(0.72, 0.68, 0.64))
-	rampa.set_color(1, Color(1.0, 1.0, 1.0))
-	grana.color_ramp = rampa
-	materiale.albedo_texture = grana
-	materiale.uv1_scale = Vector3(scala, scala, scala)
-	materiale.uv1_triplanar = true
-	return materiale
 
 
 ## Pulviscolo luminoso che fluttua sopra il tavolo (solo atmosfera).
@@ -372,7 +314,7 @@ func _crea_lastra(radice: Node3D, lato: int, z_centro: float, colore: Color) -> 
 	var forma: BoxMesh = BoxMesh.new()
 	forma.size = Vector3(LARGHEZZA_LASTRA_PIENA, 0.4, PROFONDITA_LASTRA)
 	lastra.mesh = forma
-	lastra.material_override = _materiale_carta(StileVisivo.CARTA_PLANCIA if lato == Lato.GIOCATORE else StileVisivo.CARTA_PLANCIA_NEMICO, 2.0)
+	lastra.material_override = ScenaTeatro.materiale_carta(StileVisivo.CARTA_PLANCIA if lato == Lato.GIOCATORE else StileVisivo.CARTA_PLANCIA_NEMICO, 2.0)
 	lastra.position = Vector3(0.0, -0.18, z_centro)
 	radice.add_child(lastra)
 	_lastre[lato] = lastra
@@ -446,29 +388,45 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	medaglione.position = Vector3(X_MEDAGLIONE, 0.0, z_centro - 1.35)
 	radice.add_child(medaglione)
 	_medaglioni[lato] = medaglione
-	var bordo: MeshInstance3D = MeshInstance3D.new()
-	var forma_bordo: CylinderMesh = CylinderMesh.new()
-	forma_bordo.top_radius = 0.95
-	forma_bordo.bottom_radius = 1.0
-	forma_bordo.height = 0.16
-	bordo.mesh = forma_bordo
-	bordo.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
-	bordo.position.y = 0.08
-	medaglione.add_child(bordo)
-	var disco: MeshInstance3D = MeshInstance3D.new()
-	var forma_disco: CylinderMesh = CylinderMesh.new()
-	forma_disco.top_radius = 0.8
-	forma_disco.bottom_radius = 0.8
-	forma_disco.height = 0.18
-	disco.mesh = forma_disco
-	disco.material_override = StileVisivo.materiale(colore.darkened(0.55), 0.5)
-	disco.position.y = 0.09
-	medaglione.add_child(disco)
-	# Al centro del ritratto le iniziali della nazione, come lo stemma di un eroe.
-	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 120, Color.WHITE, 0.0, 18)
-	iniziali.position.y = 0.2
+	# Teatro di carta (Davide, 8 novembre 2026): lo stendardo di carta della nazione.
+	# Porta le iniziali e la Resistenza, e brucia dal basso man mano che la Resistenza scende.
+	var asta: MeshInstance3D = MeshInstance3D.new()
+	var forma_asta: CylinderMesh = CylinderMesh.new()
+	forma_asta.top_radius = 0.05
+	forma_asta.bottom_radius = 0.07
+	forma_asta.height = ALTEZZA_STENDARDO + 0.9
+	asta.mesh = forma_asta
+	asta.material_override = StileVisivo.materiale(Color("1a1410"), 0.8)
+	asta.position = Vector3(-1.05, forma_asta.height * 0.5, 0.0)
+	medaglione.add_child(asta)
+	var punta: MeshInstance3D = MeshInstance3D.new()
+	var forma_punta: SphereMesh = SphereMesh.new()
+	forma_punta.radius = 0.11
+	forma_punta.height = 0.22
+	punta.mesh = forma_punta
+	punta.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
+	punta.position = Vector3(-1.05, forma_asta.height + 0.05, 0.0)
+	medaglione.add_child(punta)
+	var telo: MeshInstance3D = MeshInstance3D.new()
+	var forma_telo: QuadMesh = QuadMesh.new()
+	forma_telo.size = Vector2(2.0, ALTEZZA_STENDARDO)
+	telo.mesh = forma_telo
+	var materiale_telo: ShaderMaterial = Figurina.materiale_carta(_trama_stendardo(colore))
+	telo.material_override = materiale_telo
+	telo.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.5, 0.0)
+	medaglione.add_child(telo)
+	_teli_stendardo[lato] = materiale_telo
+	# Al centro dello stendardo le iniziali della nazione, come lo stemma di un eroe.
+	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 150, Color("1a1410"), 0.0, 0)
+	iniziali.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.68, 0.02)
+	iniziali.rotation = Vector3.ZERO
 	medaglione.add_child(iniziali)
 	_iniziali[lato] = iniziali
+	var numero_telo: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 190, Color("1a1410"), 0.0, 0)
+	numero_telo.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.36, 0.02)
+	numero_telo.rotation = Vector3.ZERO
+	medaglione.add_child(numero_telo)
+	_numeri_stendardo[lato] = numero_telo
 	_crea_anello(medaglione, lato)
 	var nome: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 40, StileVisivo.TESTO, 0.0, 8)
 	nome.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.12)
@@ -554,6 +512,9 @@ func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
 	_scritte_resistenza[lato].text = "%d / %d" % [maxi(resistenza, 0), maxi(massimo, 0)]
 	_iniziali[lato].text = _iniziali_di(_nomi_lato[lato].text)
 	var frazione: float = clampf(float(resistenza) / float(maxi(massimo, 1)), 0.0, 1.0)
+	_numeri_stendardo[lato].text = str(maxi(resistenza, 0))
+	# Lo stendardo brucia fino a metà; a zero brucia del tutto (a fine scontro).
+	_teli_stendardo[lato].set_shader_parameter("bruciatura", 0.0 if frazione >= 1.0 else 0.08 + 0.4 * (1.0 - frazione))
 	var barra: MeshInstance3D = _barre_resistenza[lato]
 	barra.scale.x = maxf(frazione, 0.001)
 	barra.position.x = X_MEDAGLIONE - 1.1 * (1.0 - frazione)
@@ -561,6 +522,20 @@ func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
 	var colore: Color = Color("3fae6a") if frazione > 0.5 else (Color("e0b23a") if frazione > 0.25 else StileVisivo.PERICOLO)
 	(barra.material_override as StandardMaterial3D).albedo_color = colore
 	(barra.material_override as StandardMaterial3D).emission = colore
+
+
+## Telo dello stendardo: carta color crema, fascia del colore del lato in alto, coda a punte in basso.
+func _trama_stendardo(colore: Color) -> ImageTexture:
+	var img: Image = Image.create(256, 336, false, Image.FORMAT_RGBA8)
+	img.fill(Figurina.COLORE_CARTA)
+	img.fill_rect(Rect2i(0, 0, 256, 44), colore.darkened(0.35))
+	img.fill_rect(Rect2i(0, 44, 256, 6), Color("1a1410"))
+	for x: int in range(256):
+		var taglio: int = 296 + int(absf(float(x % 64) - 32.0) * 1.2)
+		for y: int in range(taglio, 336):
+			img.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
+	img.generate_mipmaps()
+	return ImageTexture.create_from_image(img)
 
 
 ## Iniziali delle prime due parole del nome, saltando le parole brevi ("di", "del"…).
@@ -614,7 +589,9 @@ func _aggiorna_anello(lato: int, millisecondi: int) -> void:
 
 # --- Carte sulla plancia ---------------------------------------------------------
 
-func _crea_tessera(genitore: Node3D, scheda: SchedaCarta, misura: Vector2, posizione: Vector3, indice: int, nitidezza: float = 1.0) -> Tessera3D:
+func _crea_tessera(genitore: Node3D, scheda: SchedaCarta, misura: Vector2, posizione: Vector3, indice: int, nitidezza: float = 1.0, base: bool = false) -> Tessera3D:
+	# Teatro di carta: sulla plancia la carta fa da base alla figurina e non ripete il disegno.
+	scheda.come_base = base and scheda.illustrazione != null
 	var tessera: Tessera3D = Tessera3D.new()
 	genitore.add_child(tessera)
 	tessera.costruisci(scheda, misura.x, misura.y, nitidezza)
@@ -673,7 +650,7 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici))
 	for i: int in range(spazi_truppe):
 		if i < truppe.size():
-			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i, nitidezza))
+			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i, nitidezza, true))
 			_lampi[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
 			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_truppa(lato, i), MISURA_TRUPPA, i < capacita_truppe, colore)
@@ -681,7 +658,7 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 				_spazio_libero_truppa = spazio
 	for i: int in range(spazi_edifici):
 		if i < edifici.size():
-			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i, nitidezza))
+			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i, nitidezza, true))
 		elif lato == Lato.GIOCATORE:
 			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_edificio(lato, i), MISURA_EDIFICIO, i < capacita_edifici, colore)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
@@ -817,7 +794,7 @@ func _costruisci_scelte() -> void:
 			misura = MISURA_TRUPPA
 		var arrivo: Vector3 = Vector3(-0.4 + (i - (schede.size() - 1) * 0.5) * 4.4, 1.8, -2.4)
 		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6)
-		tessera.rotation_degrees = Vector3(28.0, 0.0, 0.0)
+		tessera.rotation_degrees = Vector3(38.0, 0.0, 0.0)
 		tessera.scale = Vector3.ONE * SCALA_SCELTA
 		if not scheda.simboli.is_empty():
 			tessera.imposta_ingrandimento(INGRANDIMENTO_SIMBOLI)
@@ -870,6 +847,11 @@ func _aggiorna_tutto() -> void:
 	_mostra_potenziabili(run.chosen_advisor)
 	_nomi_lato[Lato.GIOCATORE].text = run.nation_name.to_upper()
 	_aggiorna_medaglione(Lato.GIOCATORE, run.player_resistance(), run.player_resistance())
+	# Il mese mostrato resta dentro la stagione in corso (durante un incontro il round va oltre il terzo).
+	var primo_mese: int = int(run.season) * run.run_rules.rounds_per_season + 1
+	var mese: int = clampi(run.month(), primo_mese, primo_mese + run.run_rules.rounds_per_season - 1)
+	_scena.imposta_mese(run.year, int(run.season), mese, RunState.MONTH_NAMES[mese - 1], run.season_name(), hash(run.nation_name), _scena_subito)
+	_scena_subito = false
 	_hud.aggiorna_partita(run)
 	# Annuncio in alto al centro: l'azione appena fatta e, sotto, che cosa è cambiato.
 	var novita: String = _novita_momento()
@@ -1320,9 +1302,7 @@ func _salta_scontro() -> void:
 
 func _process(delta: float) -> void:
 	_tempo += delta
-	# La lanterna oscilla piano e la fiamma tremola.
-	_luce_atmosfera.position = POSIZIONE_LANTERNA + Vector3(sin(_tempo * 0.6) * 4.0, 0.0, cos(_tempo * 0.45) * 1.2)
-	_luce_atmosfera.light_energy = ENERGIA_LANTERNA + sin(_tempo * 13.0) * 0.12 + sin(_tempo * 7.3) * 0.1
+	_scena.aggiorna(delta)
 	if _modo != Modo.SCONTRO or _sim == null:
 		return
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
@@ -1517,7 +1497,7 @@ func _colpo(lato: int, danno: int, nota: String) -> void:
 	salto.tween_property(numero, "global_position", base + Vector3(0.0, 1.2, 0.0), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	salto.tween_property(numero, "modulate:a", 0.0, 0.5).set_delay(0.35)
 	salto.chain().tween_callback(numero.queue_free)
-	_brace(medaglione.global_position + Vector3(0.0, 0.4, 0.0), mini(60, 14 + danno * 4))
+	_brace(medaglione.global_position + Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.4, 0.2), mini(60, 14 + danno * 4))
 	var centro: Vector3 = Vector3(X_MEDAGLIONE, 0.0, medaglione.position.z)
 	var scossa: Tween = create_tween()
 	for passo: int in range(4):
@@ -1541,7 +1521,10 @@ func _richiudi_sconfitto(esito: BattleSim.Outcome) -> void:
 			if tessera.figurina != null:
 				tessera.figurina.richiudi(ritardo)
 				ritardo += 0.06
-	_brace(_medaglioni[sconfitto].global_position + Vector3(0.0, 0.5, 0.0), 90)
+	_brace(_medaglioni[sconfitto].global_position + Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.5, 0.2), 90)
+	var telo: ShaderMaterial = _teli_stendardo[sconfitto]
+	var brucia: Tween = create_tween()
+	brucia.tween_method(func(v: float) -> void: telo.set_shader_parameter("bruciatura", v), 0.5, 1.05, 1.6)
 
 
 ## Scintille di brace che salgono (colpi sullo stemma, sconfitta).
@@ -1583,7 +1566,7 @@ func _brace(dove: Vector3, quante: int) -> void:
 func _punto_scritta(lato: int) -> Vector3:
 	_scritte_uscite[lato] += 1
 	var turno: int = _scritte_uscite[lato] % 3
-	return _medaglioni[lato].global_position + Vector3(-0.7 + turno * 0.7, 1.6 + turno * 0.25, 0.1)
+	return _medaglioni[lato].global_position + Vector3(0.9 + turno * 0.6, 1.4 + ALTEZZA_STENDARDO * 0.6 + turno * 0.3, 0.3)
 
 
 ## Scritta che sale dallo stemma di un lato (scudo, cura, Corruzione, assedio).
