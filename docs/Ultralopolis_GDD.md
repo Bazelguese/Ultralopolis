@@ -1255,6 +1255,7 @@ Come nei giochi da tavolo, le carte dicono **che cosa fanno con dei simboli**: o
 | Le righe corte si **affiancano** sulla stessa linea, per non sprecare spazio | Confermato (richiesta di Davide) |
 | Gli stessi simboli delle risorse compaiono nella barra delle risorse e accanto al Malcontento, così il giocatore li impara | Confermato |
 | Con il mouse sopra, una carta con i simboli si ingrandisce e il riquadro dei dettagli non la copre | Confermato |
+| Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si legge una carta, con esempi presi dalle carte vere, e che cosa vuol dire ogni simbolo, gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
 
 **Che cosa mostrano le carte — Confermato (prima fase):**
 
@@ -1639,6 +1640,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 **v0.30 — 8 novembre 2026**
 - **Simboli sulle carte** (§14.4): consiglieri, azioni, eventi, fortune e visitatori mostrano costi ed effetti con simboli, come nei giochi da tavolo ("paghi → ottieni"); simboli monocromatici, colore solo nei numeri; righe corte affiancate. Prima fase approvata da Davide; edifici, truppe, ricompense e cronache restano da definire.
 - Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
+- **Legenda dei simboli** nel gioco (§14.4), con esempi presi dalle carte vere.
 
 **Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
 - Le azioni del Tesoriere (Esattori, Grandi esattori, Assemblea) sono **gratuite**, come già nel gioco: il GDD diceva che si pagavano in Influenza (§4.2.3, §16.3). Decisione di Davide: vale la versione del gioco.
