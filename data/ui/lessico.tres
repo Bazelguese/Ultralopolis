@@ -221,6 +221,7 @@ nome = "Fante"
 famiglia = 3
 forme = PackedStringArray("Fante", "Fanti")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_fante"
 
 [sub_resource type="Resource" id="voce_27"]
 script = ExtResource("1_voce")
@@ -228,6 +229,7 @@ nome = "Spirituale"
 famiglia = 3
 forme = PackedStringArray("Spirituale", "Spirituali")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_spirituale"
 
 [sub_resource type="Resource" id="voce_28"]
 script = ExtResource("1_voce")
@@ -235,6 +237,7 @@ nome = "Criminale"
 famiglia = 3
 forme = PackedStringArray("Criminale", "Criminali")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_criminale"
 
 [sub_resource type="Resource" id="voce_29"]
 script = ExtResource("1_voce")
@@ -242,6 +245,7 @@ nome = "Materie prime"
 famiglia = 3
 forme = PackedStringArray("Materie prime")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_materie_prime"
 
 [sub_resource type="Resource" id="voce_30"]
 script = ExtResource("1_voce")
@@ -249,6 +253,7 @@ nome = "Economico"
 famiglia = 3
 forme = PackedStringArray("Economico", "Economici")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_economico"
 
 [sub_resource type="Resource" id="voce_31"]
 script = ExtResource("1_voce")
@@ -256,6 +261,7 @@ nome = "Guardiano"
 famiglia = 3
 forme = PackedStringArray("Guardiano", "Guardiani")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_guardiano"
 
 [sub_resource type="Resource" id="voce_32"]
 script = ExtResource("1_voce")
@@ -263,6 +269,7 @@ nome = "Legge"
 famiglia = 3
 forme = PackedStringArray("Legge")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_legge"
 
 [sub_resource type="Resource" id="voce_33"]
 script = ExtResource("1_voce")
@@ -270,6 +277,7 @@ nome = "Nobile"
 famiglia = 3
 forme = PackedStringArray("Nobile", "Nobili")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_nobile"
 
 [sub_resource type="Resource" id="voce_34"]
 script = ExtResource("1_voce")
@@ -277,6 +285,7 @@ nome = "Infrastruttura Strategica"
 famiglia = 3
 forme = PackedStringArray("Infrastruttura Strategica", "Infrastrutture Strategiche")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_infrastruttura_strategica"
 
 [sub_resource type="Resource" id="voce_35"]
 script = ExtResource("1_voce")
@@ -284,6 +293,7 @@ nome = "Infrastruttura Bellica"
 famiglia = 3
 forme = PackedStringArray("Infrastruttura Bellica", "Infrastrutture Belliche")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_infrastruttura_bellica"
 
 [sub_resource type="Resource" id="voce_36"]
 script = ExtResource("1_voce")
@@ -291,6 +301,7 @@ nome = "Infrastruttura Segreta"
 famiglia = 3
 forme = PackedStringArray("Infrastruttura Segreta", "Infrastrutture Segrete")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_infrastruttura_segreta"
 
 [sub_resource type="Resource" id="voce_37"]
 script = ExtResource("1_voce")
@@ -298,6 +309,7 @@ nome = "Accademico"
 famiglia = 3
 forme = PackedStringArray("Accademico", "Accademici")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_accademico"
 
 [sub_resource type="Resource" id="voce_38"]
 script = ExtResource("1_voce")
@@ -305,6 +317,7 @@ nome = "Patriota"
 famiglia = 3
 forme = PackedStringArray("Patriota", "Patrioti")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_patriota"
 
 [sub_resource type="Resource" id="voce_39"]
 script = ExtResource("1_voce")
@@ -312,6 +325,7 @@ nome = "Fauna"
 famiglia = 3
 forme = PackedStringArray("Fauna")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_fauna"
 
 [sub_resource type="Resource" id="voce_40"]
 script = ExtResource("1_voce")
@@ -634,6 +648,7 @@ nome = "Capitale"
 famiglia = 8
 forme = PackedStringArray("Capitale")
 colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"tipo_capitale"
 definizione = "Il cuore della nazione. Produce Oro, Cibo, Ricerca e una risorsa per ogni elemento dell'identità; nello scontro dà mana energetico. Non si vende e non si sostituisce."
 
 [sub_resource type="Resource" id="voce_n27"]

@@ -300,3 +300,10 @@ func test_tessere_e_consiglieri_mostrano_i_loro_tipi() -> void:
 	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Legge", &"Nobile"], [], Res.Type.STABILITA)
 	catalog.advisors = [cancelliere]
 	assert_eq(SchedaCarta.da_consigliere(_run(), cancelliere).tipi, [&"Legge", &"Nobile"] as Array[StringName])
+
+
+func test_la_legenda_spiega_ogni_tipo() -> void:
+	var catalogo: CatalogDef = load("res://data/catalog/catalog.tres") as CatalogDef
+	var tipi: Array = LegendaSimboli.tipi_delle_tessere(catalogo)
+	assert_eq(tipi.size(), 17, "15 tipi delle categorie, la Capitale e lo stendardo dei tipi d'identità.")
+	assert_eq((tipi[tipi.size() - 1][0] as RigaSimboli).come_testo(), "[tipo tipo_identita]")

@@ -73,6 +73,13 @@ func costruisci(catalogo: CatalogDef) -> void:
 			griglia.add_child(_voce(RigaSimboli.new().potenziata(&"truppa"), "Tessera che sale di livello"))
 		colonna.add_child(griglia)
 
+	# I tipi delle tessere: medaglioni sulla linguetta sopra tessere e consiglieri.
+	colonna.add_child(_titolo("Tipi (linguetta sopra tessere e consiglieri)"))
+	var medaglioni: GridContainer = _griglia()
+	for voce: Array in tipi_delle_tessere(catalogo):
+		medaglioni.add_child(_voce(voce[0] as RigaSimboli, voce[1] as String))
+	colonna.add_child(medaglioni)
+
 	# Sulla riga del timbro del consigliere i simboli dicono il tipo di azione: stesse parole
 	# del riquadro dei dettagli, prese da SimboliEffetti.
 	colonna.add_child(_titolo("Tipi di azione (riga del timbro sul consigliere)"))
@@ -93,6 +100,24 @@ func costruisci(catalogo: CatalogDef) -> void:
 	numeri.add_child(_voce(RigaSimboli.new().icona(&"oro", "+3"), "Bianco: quello che ottieni"))
 	numeri.add_child(_voce(RigaSimboli.new().icona(&"oro", "−50%", RigaSimboli.Tono.MALUS), "Rosso: un peggioramento"))
 	colonna.add_child(numeri)
+
+
+## I tipi da spiegare: quelli delle categorie dei consiglieri (dai dati), la Capitale e lo
+## stendardo dei tipi d'identità. [medaglione, nome].
+static func tipi_delle_tessere(catalogo: CatalogDef) -> Array:
+	var tipi: Array = []
+	var visti: Array[StringName] = []
+	for consigliere: AdvisorDef in catalogo.advisors:
+		for tipo: StringName in consigliere.types:
+			if not visti.has(tipo):
+				visti.append(tipo)
+				tipi.append([RigaSimboli.new().tipo(tipo), String(tipo)])
+	tipi.append([RigaSimboli.new().tipo(&"Capitale"), "Capitale"])
+	var stendardo: RigaSimboli = RigaSimboli.new()
+	stendardo.icona(Simboli.TIPO_IDENTITA)
+	stendardo.simboli[0].tipo = true
+	tipi.append([stendardo, "Tipo d'identità (es. Pietrosangue, Monarchico)"])
+	return tipi
 
 
 ## Un esempio per ogni tipo di azione: [simbolo, nome], come sulla riga del timbro del consigliere.
