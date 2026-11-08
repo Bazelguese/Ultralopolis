@@ -342,7 +342,9 @@ static func da_opzione(run: RunState, opzione: EventOptionDef) -> SchedaCarta:
 	return scheda
 
 
-static func da_incontro(incontro: EncounterDef) -> SchedaCarta:
+## run: la partita, per dire che cosa succede davvero se perdi (Malcontento, ultima possibilità).
+## Facoltativa solo perché chi chiama può non averla: senza, il riquadro resta generico.
+static func da_incontro(incontro: EncounterDef, run: RunState = null) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.INCONTRO
 	scheda.titolo = incontro.display_name
@@ -352,8 +354,28 @@ static func da_incontro(incontro: EncounterDef) -> SchedaCarta:
 	var ricompense: PackedStringArray = PackedStringArray()
 	for ricompensa: RewardDef in incontro.rewards:
 		ricompense.append(ricompensa.describe())
-	scheda.dettagli = "%s\nEdifici: %s.\nTruppe: %s.\nSe vinci scegli fra: %s.\nSe perdi, l'Oro del Magazzino si dimezza." % [
-		incontro.description, _nomi_edifici(incontro.buildings), _nomi_truppe(incontro.troops), ", ".join(ricompense)]
+	var righe: PackedStringArray = PackedStringArray()
+	righe.append(incontro.description)
+	righe.append("Edifici: %s." % _nomi_edifici(incontro.buildings))
+	righe.append("Truppe: %s." % _nomi_truppe(incontro.troops))
+	# Vittoria o pareggio (GDD §3.3, §3.4): il bottino arriva sempre, poi si sceglie la ricompensa.
+	var vinci: PackedStringArray = PackedStringArray()
+	var bottino: String = _testo_bottino(incontro.loot_gold, incontro.loot_research)
+	if bottino != "":
+		vinci.append("bottino di %s" % bottino)
+	if not ricompense.is_empty():
+		vinci.append("scegli una ricompensa fra: %s" % ", ".join(ricompense))
+	if not vinci.is_empty():
+		righe.append("Se vinci o pareggi: %s." % ", poi ".join(vinci))
+	righe.append("Il pareggio conta come vittoria.")
+	if run != null and run.last_chance:
+		# Ultima possibilità (GDD §3.3, §3.4): perdere un incontro chiude la partita.
+		righe.append("Se perdi, la partita finisce.")
+	elif run != null:
+		righe.append("Se perdi: l'Oro del Magazzino si dimezza e %+d Malcontento." % run.run_rules.malcontent_per_encounter_defeat)
+	else:
+		righe.append("Se perdi: l'Oro del Magazzino si dimezza e cresce il Malcontento.")
+	scheda.dettagli = "\n".join(righe)
 	return scheda
 
 
@@ -447,11 +469,30 @@ static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 	var righe: PackedStringArray = PackedStringArray()
 	if not identita.is_empty():
 		righe.append(" · ".join(identita))
-	righe.append("Se perdi: −%d Prestigio." % run.year)
+	# Vittoria o pareggio (GDD §3.4): una vittoria in più e il bottino.
+	var vinci: String = "Se vinci o pareggi: vittoria %d di %d" % [run.wins + 1, run.run_rules.wins_needed]
+	var bottino: String = _testo_bottino(run.run_rules.ghost_loot_gold, run.run_rules.ghost_loot_research)
+	if bottino != "":
+		vinci += " e bottino di %s" % bottino
+	righe.append(vinci + ".")
+	righe.append("Il pareggio conta come vittoria, ma subisci i malus." if not fantasma.malus.is_empty() else "Il pareggio conta come vittoria.")
+	if run.last_chance:
+		# Ultima possibilità (GDD §3.4): la prossima sconfitta chiude la partita.
+		righe.append("Se perdi, la partita finisce.")
+	else:
+		var perdi: String = "Se perdi: −%d Prestigio e %+d Malcontento" % [run.year, run.run_rules.malcontent_per_ghost_defeat]
+		if not fantasma.malus.is_empty():
+			perdi += ", più i malus"
+		perdi += "."
+		if run.prestige - run.year <= 0:
+			perdi += " Il Prestigio finirebbe: comincerebbe l'ultima possibilità."
+		righe.append(perdi)
 	if run.prophecy != "":
 		righe.append("Profezia: schiera %s." % run.prophecy)
+	# I malus del fantasma arrivano a fine anno (GDD §11.1), ognuno con il suo Malcontento.
+	var quando: String = "Se pareggi" if run.last_chance else "Se perdi o pareggi"
 	for malus_def: ModifierDef in fantasma.malus:
-		righe.append("Se perdi o pareggi subisci %s: %s" % [malus_def.display_name, malus_def.description])
+		righe.append("%s subisci %s %s (%+d Malcontento): %s" % [quando, malus_def.display_name, _durata_malus(malus_def), run.run_rules.malcontent_per_malus, malus_def.description])
 	righe.append("Puoi ancora riordinare o vendere le truppe prima di combattere.")
 	scheda.dettagli = "\n".join(righe)
 	return scheda
@@ -462,6 +503,29 @@ static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 static func secondi(millisecondi: int) -> String:
 	var testo: String = ("%.1f" % (millisecondi / 1000.0)).replace(".", ",")
 	return testo.trim_suffix(",0") + " s"
+
+
+## "3 Oro e 2 Ricerca"; vuoto se il bottino non c'è.
+static func _testo_bottino(oro: int, ricerca: int) -> String:
+	var parti: PackedStringArray = PackedStringArray()
+	if oro > 0:
+		parti.append("%d Oro" % oro)
+	if ricerca > 0:
+		parti.append("%d Ricerca" % ricerca)
+	return " e ".join(parti)
+
+
+## Quanto dura un malus del fantasma, che arriva a fine anno: un malus a durata vale per gli anni
+## interi successivi (scripts/sim/run/modifiers.gd, GDD §8.2.1).
+static func _durata_malus(def: ModifierDef) -> String:
+	match def.duration_kind:
+		ModifierDef.Duration.PERMANENTE:
+			return "per tutta la partita"
+		ModifierDef.Duration.PROSSIMO_SCONTRO_FANTASMA:
+			return "fino al prossimo scontro con un fantasma"
+	if def.duration_years <= 1:
+		return "per tutto l'anno prossimo"
+	return "per i prossimi %d anni" % def.duration_years
 
 
 static func _carica(percorso: String) -> Texture2D:
