@@ -1255,7 +1255,7 @@ Come nei giochi da tavolo, le carte dicono **che cosa fanno con dei simboli**: o
 | Le righe corte si **affiancano** sulla stessa linea, per non sprecare spazio | Confermato (richiesta di Davide) |
 | Gli stessi simboli delle risorse compaiono nella barra delle risorse e accanto al Malcontento, così il giocatore li impara | Confermato |
 | Con il mouse sopra, una carta con i simboli si ingrandisce e il riquadro dei dettagli non la copre | Confermato |
-| Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si legge una carta, con esempi presi dalle carte vere, e che cosa vuol dire ogni simbolo, gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
+| Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si legge una carta, con esempi presi dalle carte vere, che cosa vuol dire ogni simbolo, ogni tipo di azione della riga del timbro, ogni gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
 
 **Che cosa mostrano le carte — Confermato (prima fase):**
 
