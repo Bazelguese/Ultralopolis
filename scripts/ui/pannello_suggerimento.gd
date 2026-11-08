@@ -4,7 +4,9 @@ extends Control
 ## The Bazaar): titolo, testo con le parole chiave colorate e, accanto, un riquadro più piccolo
 ## che spiega le parole chiave contenute (Scudo, Corruzione, Sabotaggio…).
 ## Usato dalle carte della plancia e da tutti i suggerimenti dell'interfaccia.
-## Solo presentazione.
+## Il riquadro si attacca all'elemento (scelta di Davide, 8 novembre, come in The Bazaar):
+## sopra se c'è spazio, altrimenti sotto, altrimenti di lato; le spiegazioni lo affiancano
+## dal lato dello schermo con più spazio. Solo presentazione.
 
 const LARGHEZZA_MINIMA: float = 140.0
 const LARGHEZZA_MASSIMA: float = 440.0
@@ -13,17 +15,18 @@ const DIMENSIONE_TITOLO: int = 26
 const DIMENSIONE_TESTO: int = 18
 const DIMENSIONE_SPIEGAZIONE: int = 15
 const MARGINE_SCHERMO: float = 16.0
+## Distanza fra l'elemento e il riquadro, e fra il riquadro e le spiegazioni.
+const DISTANZA: float = 10.0
 ## Fotogrammi in cui il riquadro resta invisibile dopo un cambio di testo:
 ## il tempo di impaginare il testo, così non si vede un riquadro della misura sbagliata.
 const FOTOGRAMMI_IMPAGINAZIONE: int = 2
 
-var _fila: HBoxContainer
 var _principale: PanelContainer
 var _titolo: Label
 var _testo: RichTextLabel
 var _spiegazioni: VBoxContainer
-var _punto: Vector2 = Vector2.ZERO
-var _sopra: bool = false
+## Rettangolo dell'elemento sullo schermo: il riquadro gli si attacca.
+var _area: Rect2 = Rect2()
 var _titolo_attuale: String = ""
 var _testo_attuale: String = ""
 var _attesa_impaginazione: int = 0
@@ -32,18 +35,12 @@ var _attesa_impaginazione: int = 0
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = false
-	_fila = HBoxContainer.new()
-	_fila.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fila.add_theme_constant_override("separation", 8)
-	_fila.alignment = BoxContainer.ALIGNMENT_BEGIN
-	add_child(_fila)
 	_principale = PanelContainer.new()
 	_principale.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_principale.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	var stile: StyleBoxFlat = StileVisivo.riquadro(Color(0.035, 0.055, 0.1, 0.97), StileVisivo.ORO.darkened(0.25))
 	stile.set_corner_radius_all(10)
 	_principale.add_theme_stylebox_override("panel", stile)
-	_fila.add_child(_principale)
+	add_child(_principale)
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	colonna.add_theme_constant_override("separation", 6)
@@ -55,9 +52,8 @@ func _init() -> void:
 	colonna.add_child(_testo)
 	_spiegazioni = VBoxContainer.new()
 	_spiegazioni.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_spiegazioni.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_spiegazioni.add_theme_constant_override("separation", 6)
-	_fila.add_child(_spiegazioni)
+	add_child(_spiegazioni)
 	set_process(false)
 
 
@@ -79,12 +75,10 @@ static func testo_colorato(dimensione: int, colore: Color = StileVisivo.TESTO) -
 	return risultato
 
 
-## Mostra il riquadro vicino al punto (coordinate dello schermo). Con sopra = true compare
-## sopra il punto (le carte della plancia), altrimenti sotto (i controlli dell'interfaccia).
+## Mostra il riquadro attaccato all'elemento che occupa l'area indicata (coordinate dello schermo).
 ## Richiamarlo con lo stesso testo sposta soltanto il riquadro.
-func mostra(titolo: String, testo: String, punto: Vector2, sopra: bool = false) -> void:
-	_punto = punto
-	_sopra = sopra
+func mostra(titolo: String, testo: String, area: Rect2) -> void:
+	_area = area
 	if visible and titolo == _titolo_attuale and testo == _testo_attuale:
 		return
 	_titolo_attuale = titolo
@@ -99,7 +93,7 @@ func mostra(titolo: String, testo: String, punto: Vector2, sopra: bool = false) 
 	_aggiorna_spiegazioni(titolo, testo)
 	visible = true
 	_attesa_impaginazione = FOTOGRAMMI_IMPAGINAZIONE
-	_fila.modulate.a = 0.0
+	modulate.a = 0.0
 	set_process(true)
 	_sistema()
 
@@ -133,25 +127,59 @@ func _process(_delta: float) -> void:
 	if _attesa_impaginazione > 0:
 		_attesa_impaginazione -= 1
 		if _attesa_impaginazione == 0:
-			_fila.modulate.a = 1.0
+			modulate.a = 1.0
 
 
-## Misura il riquadro sul testo e lo tiene dentro lo schermo.
+## Riquadro principale e spiegazioni sullo schermo (serve ai test).
+func rettangolo_principale() -> Rect2:
+	return _principale.get_global_rect()
+
+
+func rettangolo_spiegazioni() -> Rect2:
+	return _spiegazioni.get_global_rect()
+
+
+## Misura il riquadro sul testo, lo attacca all'elemento e lo tiene dentro lo schermo.
 func _sistema() -> void:
-	_fila.reset_size()
+	_principale.reset_size()
+	_spiegazioni.reset_size()
 	var schermo: Vector2 = get_viewport_rect().size
-	var misura: Vector2 = _fila.size
-	var posizione: Vector2
-	if _sopra:
-		posizione = _punto + Vector2(24.0, -misura.y - 16.0)
+	var principale: Rect2 = posizione_attaccata(_area, _principale.size, schermo)
+	_principale.position = principale.position
+	if not _spiegazioni.visible:
+		return
+	# Le spiegazioni stanno dal lato dello schermo con più spazio, allineate al riquadro:
+	# in alto se il riquadro è sotto l'elemento, in basso se è sopra.
+	var misura: Vector2 = _spiegazioni.size
+	var a_destra: bool = principale.get_center().x <= schermo.x * 0.5
+	if a_destra and principale.end.x + DISTANZA + misura.x > schermo.x - MARGINE_SCHERMO:
+		a_destra = false
+	elif not a_destra and principale.position.x - DISTANZA - misura.x < MARGINE_SCHERMO:
+		a_destra = true
+	var x: float = principale.end.x + DISTANZA if a_destra else principale.position.x - DISTANZA - misura.x
+	var y: float = principale.position.y
+	if principale.end.y <= _area.position.y:
+		y = principale.end.y - misura.y
+	_spiegazioni.position = Vector2(x, clampf(y, MARGINE_SCHERMO, maxf(MARGINE_SCHERMO, schermo.y - misura.y - MARGINE_SCHERMO)))
+
+
+## Dove va un riquadro di quella misura per restare attaccato all'area: sopra, centrato, se c'è
+## spazio; altrimenti sotto; altrimenti di lato (a destra, poi a sinistra). Sempre dentro lo schermo.
+static func posizione_attaccata(area: Rect2, misura: Vector2, schermo: Vector2) -> Rect2:
+	var x: float = area.get_center().x - misura.x * 0.5
+	var y: float
+	if area.position.y - DISTANZA - misura.y >= MARGINE_SCHERMO:
+		y = area.position.y - DISTANZA - misura.y
+	elif area.end.y + DISTANZA + misura.y <= schermo.y - MARGINE_SCHERMO:
+		y = area.end.y + DISTANZA
 	else:
-		posizione = _punto + Vector2(18.0, 24.0)
-		if posizione.y + misura.y > schermo.y - MARGINE_SCHERMO:
-			posizione.y = _punto.y - misura.y - 12.0
-	if posizione.x + misura.x > schermo.x - MARGINE_SCHERMO:
-		posizione.x = _punto.x - misura.x - 18.0
-	var limite: Vector2 = Vector2(maxf(MARGINE_SCHERMO, schermo.x - misura.x - MARGINE_SCHERMO), maxf(MARGINE_SCHERMO, schermo.y - misura.y - MARGINE_SCHERMO))
-	_fila.position = posizione.clamp(Vector2(MARGINE_SCHERMO, MARGINE_SCHERMO), limite)
+		y = area.get_center().y - misura.y * 0.5
+		x = area.end.x + DISTANZA
+		if x + misura.x > schermo.x - MARGINE_SCHERMO:
+			x = area.position.x - DISTANZA - misura.x
+	x = clampf(x, MARGINE_SCHERMO, maxf(MARGINE_SCHERMO, schermo.x - misura.x - MARGINE_SCHERMO))
+	y = clampf(y, MARGINE_SCHERMO, maxf(MARGINE_SCHERMO, schermo.y - misura.y - MARGINE_SCHERMO))
+	return Rect2(Vector2(x, y), misura)
 
 
 ## Larghezza del testo: quanto la riga più lunga, entro un minimo e un massimo,

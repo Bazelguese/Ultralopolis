@@ -1498,6 +1498,22 @@ func _chiudi_scontro() -> void:
 
 # --- Mouse ---------------------------------------------------------------------
 
+## Il rettangolo che una carta occupa sullo schermo: il suo riquadro dei dettagli le si attacca.
+func _area_sullo_schermo(tessera: Tessera3D) -> Rect2:
+	var mezza_x: float = tessera.larghezza * 0.5
+	var mezza_z: float = tessera.profondita * 0.5
+	var area: Rect2 = Rect2()
+	var primo: bool = true
+	for angolo: Vector3 in [Vector3(-mezza_x, 0.0, -mezza_z), Vector3(mezza_x, 0.0, -mezza_z), Vector3(-mezza_x, 0.0, mezza_z), Vector3(mezza_x, 0.0, mezza_z)]:
+		var punto: Vector2 = _camera.unproject_position(tessera.to_global(angolo))
+		if primo:
+			area = Rect2(punto, Vector2.ZERO)
+			primo = false
+		else:
+			area = area.expand(punto)
+	return area
+
+
 func _physics_process(_delta: float) -> void:
 	var mouse: Vector2 = get_viewport().get_mouse_position()
 	var origine: Vector3 = _camera.project_ray_origin(mouse)
@@ -1538,6 +1554,6 @@ func _physics_process(_delta: float) -> void:
 			testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
 		if scheda.costo != "":
 			testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]
-		_hud.mostra_suggerimento(titolo, testo, mouse)
+		_hud.mostra_suggerimento(titolo, testo, _area_sullo_schermo(tessera))
 	else:
 		_hud.nascondi_suggerimento()

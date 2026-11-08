@@ -9,6 +9,7 @@ extends Control
 const GRUPPO: StringName = &"suggerimenti"
 const META_TESTO: StringName = &"suggerimento_testo"
 const META_TITOLO: StringName = &"suggerimento_titolo"
+const META_AREA: StringName = &"suggerimento_area"
 const META_COLLEGATO: StringName = &"suggerimento_collegato"
 ## Attesa prima che il riquadro compaia, come i tooltip di Godot (un po' più rapida).
 const ATTESA_S: float = 0.35
@@ -37,10 +38,13 @@ static func imposta(controllo: Control, testo: String, titolo: String = "") -> v
 
 
 ## Per i controlli con un suggerimento diverso in ogni punto (es. il calendario dell'anno):
-## fonte riceve il punto nelle coordinate del controllo e restituisce il testo.
-static func imposta_dinamico(controllo: Control, fonte: Callable, titolo: String = "") -> void:
+## fonte riceve il punto nelle coordinate del controllo e restituisce il testo; area, se c'è,
+## riceve lo stesso punto e restituisce il rettangolo (coordinate del controllo) a cui il
+## riquadro si attacca, per esempio la casella sotto il mouse.
+static func imposta_dinamico(controllo: Control, fonte: Callable, titolo: String = "", area: Callable = Callable()) -> void:
 	controllo.set_meta(META_TESTO, fonte)
 	controllo.set_meta(META_TITOLO, titolo)
+	controllo.set_meta(META_AREA, area)
 	_collega(controllo)
 
 
@@ -56,6 +60,18 @@ static func testo_di(controllo: Control, punto: Vector2 = Vector2.ZERO) -> Strin
 
 static func titolo_di(controllo: Control) -> String:
 	return str(controllo.get_meta(META_TITOLO, ""))
+
+
+## Il rettangolo sullo schermo a cui si attacca il riquadro: tutto il controllo, oppure la parte
+## indicata da chi l'ha impostato (punto nelle coordinate del controllo).
+static func area_di(controllo: Control, punto: Vector2 = Vector2.ZERO) -> Rect2:
+	var globale: Rect2 = controllo.get_global_rect()
+	var area: Variant = controllo.get_meta(META_AREA, Callable())
+	if area is Callable and (area as Callable).is_valid():
+		var locale: Rect2 = (area as Callable).call(punto)
+		if locale.has_area():
+			return Rect2(globale.position + locale.position, locale.size)
+	return globale
 
 
 static func _collega(controllo: Control) -> void:
@@ -117,11 +133,11 @@ func _process(delta: float) -> void:
 	_attesa += delta
 	if _attesa < ATTESA_S:
 		return
-	var testo: String = testo_di(_bersaglio, _bersaglio.get_local_mouse_position())
+	var punto: Vector2 = _bersaglio.get_local_mouse_position()
+	var testo: String = testo_di(_bersaglio, punto)
 	var titolo: String = titolo_di(_bersaglio)
 	if testo.strip_edges() == "" and titolo.strip_edges() == "":
 		_pannello.nascondi()
 		return
-	if _pannello.visible and testo == _pannello.testo_mostrato() and titolo == _pannello.titolo_mostrato():
-		return
-	_pannello.mostra(titolo, testo, get_global_mouse_position())
+	# Il riquadro si attacca al controllo (o alla sua parte sotto il mouse), non al puntatore.
+	_pannello.mostra(titolo, testo, area_di(_bersaglio, punto))

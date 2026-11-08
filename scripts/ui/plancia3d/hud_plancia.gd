@@ -1303,10 +1303,10 @@ func _on_continua_esito() -> void:
 		_al_continua.call()
 
 
-## Riquadro di una carta della plancia, sopra il mouse, con le parole chiave colorate
-## e le loro spiegazioni accanto.
-func mostra_suggerimento(titolo: String, testo: String, posizione: Vector2) -> void:
-	_suggerimento.mostra(titolo, testo, posizione, true)
+## Riquadro di una carta della plancia, attaccato alla carta (area: la carta sullo schermo),
+## con le parole chiave colorate e le loro spiegazioni accanto.
+func mostra_suggerimento(titolo: String, testo: String, area: Rect2) -> void:
+	_suggerimento.mostra(titolo, testo, area)
 
 
 func nascondi_suggerimento() -> void:

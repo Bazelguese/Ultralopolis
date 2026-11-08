@@ -115,16 +115,16 @@ func test_spiegazioni_al_massimo_quante_previste() -> void:
 func test_il_riquadro_mostra_testo_e_spiegazioni() -> void:
 	var pannello: PannelloSuggerimento = PannelloSuggerimento.new()
 	add_child_autofree(pannello)
-	pannello.mostra("Arieti", "10 danni allo scudo · attacco d'assedio.", Vector2(400, 400), true)
+	pannello.mostra("Arieti", "10 danni allo scudo · attacco d'assedio.", Rect2(400, 400, 100, 120))
 	assert_true(pannello.visible)
 	assert_eq(pannello.titolo_mostrato(), "Arieti")
 	var spiegazioni: PackedStringArray = pannello.spiegazioni_mostrate()
 	assert_true(spiegazioni.has("Danno"))
 	assert_true(spiegazioni.has("Scudo"))
 	assert_true(spiegazioni.has("Attacco d'assedio"))
-	pannello.mostra("Granaio", "Ricevi 2 Cibo.", Vector2(400, 400))
+	pannello.mostra("Granaio", "Ricevi 2 Cibo.", Rect2(400, 400, 100, 120))
 	assert_true(pannello.spiegazioni_mostrate().is_empty(), "Senza parole da spiegare, niente riquadro accanto.")
-	pannello.mostra("Malcontento", "Sale con le sconfitte e i malus.", Vector2(400, 400))
+	pannello.mostra("Malcontento", "Sale con le sconfitte e i malus.", Rect2(400, 400, 100, 120))
 	assert_eq(pannello.spiegazioni_mostrate(), PackedStringArray(["Malus"]), "La parola del titolo non si rispiega.")
 	pannello.nascondi()
 	assert_false(pannello.visible)
@@ -142,3 +142,42 @@ func test_un_controllo_con_suggerimento_non_usa_il_tooltip_di_sistema() -> void:
 	assert_eq(Suggerimenti.titolo_di(etichetta), "Mercato")
 	Suggerimenti.imposta_dinamico(etichetta, func(punto: Vector2) -> String: return "x=%d" % int(punto.x))
 	assert_eq(Suggerimenti.testo_di(etichetta, Vector2(7, 0)), "x=7", "Testo diverso in ogni punto.")
+
+
+func test_il_riquadro_si_attacca_all_elemento() -> void:
+	# Scelta di Davide (8 novembre): il riquadro compare attaccato alla carta, come in The Bazaar.
+	var schermo: Vector2 = Vector2(1920, 1080)
+	var misura: Vector2 = Vector2(400, 200)
+	# Con spazio sopra: sopra, centrato sulla carta.
+	var carta: Rect2 = Rect2(800, 500, 120, 150)
+	var sopra: Rect2 = PannelloSuggerimento.posizione_attaccata(carta, misura, schermo)
+	assert_almost_eq(sopra.end.y, carta.position.y - PannelloSuggerimento.DISTANZA, 0.01, "Appena sopra la carta.")
+	assert_almost_eq(sopra.get_center().x, carta.get_center().x, 0.01, "Centrato sulla carta.")
+	# Vicino al bordo in alto: sotto.
+	var in_alto: Rect2 = Rect2(800, 40, 120, 60)
+	var sotto: Rect2 = PannelloSuggerimento.posizione_attaccata(in_alto, misura, schermo)
+	assert_almost_eq(sotto.position.y, in_alto.end.y + PannelloSuggerimento.DISTANZA, 0.01, "Appena sotto.")
+	# Senza spazio né sopra né sotto: di lato.
+	var alta: Rect2 = Rect2(800, 100, 120, 900)
+	var lato: Rect2 = PannelloSuggerimento.posizione_attaccata(alta, misura, schermo)
+	assert_almost_eq(lato.position.x, alta.end.x + PannelloSuggerimento.DISTANZA, 0.01, "A destra.")
+	# Sul bordo destro dello schermo resta dentro.
+	var a_destra: Rect2 = PannelloSuggerimento.posizione_attaccata(Rect2(1850, 500, 60, 60), misura, schermo)
+	assert_lte(a_destra.end.x, schermo.x - PannelloSuggerimento.MARGINE_SCHERMO + 0.01)
+
+
+func test_la_stessa_carta_ha_il_riquadro_sempre_nello_stesso_punto() -> void:
+	# Da qualunque punto della carta entri il mouse, il riquadro non cambia posto.
+	var pannello: PannelloSuggerimento = PannelloSuggerimento.new()
+	add_child_autofree(pannello)
+	var carta: Rect2 = Rect2(800, 500, 120, 150)
+	pannello.mostra("Arieti", "10 danni allo scudo.", carta)
+	await wait_process_frames(3)
+	var prima: Rect2 = pannello.rettangolo_principale()
+	assert_lte(prima.end.y, carta.position.y, "Il riquadro sta sopra la carta.")
+	var spiegazioni: Rect2 = pannello.rettangolo_spiegazioni()
+	assert_false(spiegazioni.intersects(prima), "Le spiegazioni affiancano il riquadro senza coprirlo.")
+	pannello.nascondi()
+	pannello.mostra("Arieti", "10 danni allo scudo.", carta)
+	await wait_process_frames(3)
+	assert_eq(pannello.rettangolo_principale(), prima)

@@ -446,7 +446,7 @@ func test_suggerimenti_colorati_e_nessun_tooltip_di_sistema() -> void:
 			assert_eq((nodo as Control).tooltip_text, "", "%s usa ancora il tooltip grigio di Godot." % nodo.name)
 		da_visitare.append_array(nodo.get_children())
 	# Il riquadro delle carte della plancia spiega le parole chiave che contiene.
-	hud.mostra_suggerimento("Prova", "12 danni allo scudo.", Vector2(500, 500))
+	hud.mostra_suggerimento("Prova", "12 danni allo scudo.", Rect2(500, 500, 120, 150))
 	var pannello: PannelloSuggerimento = hud.get("_suggerimento")
 	assert_true(pannello.visible)
 	assert_true(pannello.spiegazioni_mostrate().has("Scudo"))
