@@ -56,9 +56,109 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		if def.special == AdvisorDef.Special.VISITATORE:
 			_prezzo_visitatore(elementi, def)
 		righe.append(elementi)
-	for offerta: Offer in run.advisor_action_preview(def):
-		righe.append(azione(offerta))
+	righe.append_array(azioni_riunite(run.advisor_action_preview(def)))
 	return righe
+
+
+## Una riga per azione; gli incanti e gli spionaggi, che spesso sono molti e si somigliano,
+## si riuniscono in una riga sola con le alternative separate da "/". Così la carta resta leggibile.
+static func azioni_riunite(azioni: Array[Offer]) -> Array[RigaSimboli]:
+	var righe: Array[RigaSimboli] = []
+	var gruppi: Dictionary[OpportunityDef.Kind, Array] = {}
+	for offerta: Offer in azioni:
+		if offerta.kind == OpportunityDef.Kind.INCANTO or offerta.kind == OpportunityDef.Kind.SPIONAGGIO:
+			if not gruppi.has(offerta.kind):
+				gruppi[offerta.kind] = []
+			gruppi[offerta.kind].append(offerta)
+	var fatti: Dictionary[OpportunityDef.Kind, bool] = {}
+	for offerta: Offer in azioni:
+		if not gruppi.has(offerta.kind) or gruppi[offerta.kind].size() < 2:
+			righe.append(azione(offerta))
+		elif not fatti.has(offerta.kind):
+			fatti[offerta.kind] = true
+			var gruppo: Array[Offer] = []
+			gruppo.assign(gruppi[offerta.kind])
+			righe.append_array(_righe_riunite(gruppo))
+	return righe
+
+
+## Più incanti o più spionaggi in una riga: costo (es. "2/3" se cambia), freccia, alternative.
+## Se le alternative degli incanti sono più di 3, vanno su una seconda riga.
+static func _righe_riunite(gruppo: Array[Offer]) -> Array[RigaSimboli]:
+	var righe: Array[RigaSimboli] = []
+	var riga: RigaSimboli = RigaSimboli.new()
+	var nomi: PackedStringArray = PackedStringArray()
+	for offerta: Offer in gruppo:
+		nomi.append(offerta.describe())
+	riga.etichetta = ", ".join(nomi)
+	if _costo_riunito(riga, gruppo):
+		riga.scritta("→")
+	var concetti: Array[StringName] = []
+	if gruppo[0].kind == OpportunityDef.Kind.INCANTO:
+		riga.icona(&"incanto").icona(&"truppa")
+		var mana: int = 0
+		for offerta: Offer in gruppo:
+			var valori: Array[ModifierDef.BattleValue] = [offerta.opportunity.enchant_value]
+			if not offerta.opportunity.enchant_amounts_2.is_empty():
+				valori.append(offerta.opportunity.enchant_value_2)
+			for valore: ModifierDef.BattleValue in valori:
+				if not concetti.has(Simboli.di_valore(valore)):
+					concetti.append(Simboli.di_valore(valore))
+			mana = maxi(mana, offerta.opportunity.enchant_mana)
+		riga.gemma(&"qualsiasi", "+%d" % mana, RigaSimboli.Tono.MALUS)
+		if concetti.size() > 3:
+			var seconda: RigaSimboli = RigaSimboli.new()
+			seconda.etichetta = riga.etichetta
+			_alternative(seconda, concetti, "+")
+			righe.append(riga)
+			righe.append(seconda)
+			return righe
+		riga.simboli.pop_back()
+		_alternative(riga, concetti, "+")
+		riga.gemma(&"qualsiasi", "+%d" % mana, RigaSimboli.Tono.MALUS)
+	else:
+		riga.icona(&"fantasma").scritta(":")
+		for offerta: Offer in gruppo:
+			var concetto: StringName = &"sabotaggio" if offerta.opportunity.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else &"inefficienza"
+			if not concetti.has(concetto):
+				concetti.append(concetto)
+		_alternative(riga, concetti, "")
+	righe.append(riga)
+	return righe
+
+
+## Simboli alternativi separati da "/"; il testo davanti va solo sul primo.
+static func _alternative(riga: RigaSimboli, concetti: Array[StringName], testo: String) -> void:
+	for i: int in range(concetti.size()):
+		if i > 0:
+			riga.scritta("/")
+		riga.icona(concetti[i], testo if i == 0 else "", RigaSimboli.Tono.BONUS)
+
+
+## Costo di più proposte insieme: per ogni risorsa il valore, oppure "minimo/massimo" se cambia.
+static func _costo_riunito(riga: RigaSimboli, gruppo: Array[Offer]) -> bool:
+	var pagato: bool = false
+	for tipo: Res.Type in Res.NAMES:
+		var minimo: int = -1
+		var massimo: int = 0
+		for offerta: Offer in gruppo:
+			var quanto: int = _costo_di(offerta, tipo)
+			minimo = quanto if minimo < 0 else mini(minimo, quanto)
+			massimo = maxi(massimo, quanto)
+		if massimo <= 0:
+			continue
+		riga.icona(Simboli.di_risorsa(tipo), str(massimo) if minimo == massimo else "%d/%d" % [minimo, massimo], RigaSimboli.Tono.COSTO)
+		pagato = true
+	return pagato
+
+
+static func _costo_di(offerta: Offer, tipo: Res.Type) -> int:
+	var quanto: int = offerta.other_cost.whole(tipo) if offerta.other_cost != null else 0
+	if tipo == Res.Type.ORO:
+		quanto += offerta.price
+	elif tipo == Res.Type.RICERCA:
+		quanto += offerta.research_price
+	return quanto
 
 
 ## Il visitatore cambia i prezzi (GDD §4.2.5): Oro in più o in meno e un costo aggiuntivo.

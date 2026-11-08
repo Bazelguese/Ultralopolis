@@ -199,3 +199,14 @@ func test_consigliere_in_un_round_di_edifici_non_mostra_azioni() -> void:
 	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
 	assert_eq(righe.size(), 2)
 	assert_eq(righe[1].come_testo(), "[edificio]")
+
+
+func test_incanti_e_spionaggi_si_riuniscono_in_una_riga() -> void:
+	var azioni: Array[Offer] = []
+	for nome: String in ["incanto_danno", "incanto_scudo", "spia_sabotaggio_veloce", "rete_di_sabotatori", "veleno_nei_pozzi", "decreto_fiscale"]:
+		azioni.append(_offerta("res://data/catalog/opportunities/%s.tres" % nome))
+	var righe: Array[RigaSimboli] = SimboliEffetti.azioni_riunite(azioni)
+	assert_eq(righe.size(), 3, "Incanti in una riga, spionaggi in una riga, decreto da solo.")
+	assert_eq(righe[0].come_testo(), "2[fede] → [incanto] [truppa] +[danno] / [scudo] +2[gemma qualsiasi]")
+	assert_eq(righe[1].come_testo(), "2/3[documenti] → [fantasma] : [sabotaggio] / [inefficienza]")
+	assert_eq(righe[2].come_testo(), "2[stabilita] → +4[oro]")

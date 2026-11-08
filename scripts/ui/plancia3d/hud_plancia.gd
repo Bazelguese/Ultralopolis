@@ -1317,13 +1317,16 @@ func _on_continua_esito() -> void:
 		_al_continua.call()
 
 
-func mostra_suggerimento(titolo: String, testo: String, posizione: Vector2) -> void:
+## Con "sotto" il riquadro sta centrato sotto il punto indicato (il bordo basso di una carta
+## ingrandita), così non copre i simboli della carta; altrimenti sta in alto a destra del mouse.
+func mostra_suggerimento(titolo: String, testo: String, posizione: Vector2, sotto: bool = false) -> void:
 	_titolo_suggerimento.text = titolo
 	_testo_suggerimento.text = testo
 	_suggerimento.visible = true
 	_suggerimento.reset_size()
 	var limite: Vector2 = get_viewport_rect().size - _suggerimento.size - Vector2(16, 16)
-	_suggerimento.position = (posizione + Vector2(24, -_suggerimento.size.y - 16)).clamp(Vector2(16, 16), limite)
+	var scarto: Vector2 = Vector2(-_suggerimento.size.x * 0.5, 12) if sotto else Vector2(24, -_suggerimento.size.y - 16)
+	_suggerimento.position = (posizione + scarto).clamp(Vector2(16, 16), limite)
 
 
 func nascondi_suggerimento() -> void:

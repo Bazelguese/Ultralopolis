@@ -295,7 +295,7 @@ func _disegna_simboli() -> void:
 
 func _disegna_riga(riga: RigaSimboli, area: Rect2) -> void:
 	var font: Font = StileVisivo.FONT_TITOLI
-	var lato_icona: float = area.size.y * 0.74
+	var lato_icona: float = area.size.y * 0.8
 	var carattere: int = int(area.size.y * 0.56)
 	var stacco: float = area.size.y * 0.1
 	var disponibile: float = area.size.x - area.size.y * 0.4

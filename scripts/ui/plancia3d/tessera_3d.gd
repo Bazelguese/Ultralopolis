@@ -24,6 +24,9 @@ var _velo: MeshInstance3D
 var _evidenziata: bool = false
 var _colore_alone: Color = Color(0.0, 0.0, 0.0, 0.0)
 var _animazione_sollevamento: Tween
+## Quanto si ingrandisce la carta con il mouse sopra. Le carte con le righe di simboli
+## (consiglieri, azioni, eventi) si ingrandiscono molto, perché i simboli si leggano bene.
+var ingrandimento: float = 1.06
 var _segnale: Label3D
 
 
@@ -135,8 +138,10 @@ func evidenzia(attiva: bool) -> void:
 		_animazione_sollevamento.kill()
 	_animazione_sollevamento = create_tween()
 	_animazione_sollevamento.set_parallel(true)
-	_animazione_sollevamento.tween_property(_corpo, "position:y", ALTEZZA_SOLLEVATA if attiva else 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_animazione_sollevamento.tween_property(_corpo, "scale", Vector3.ONE * (1.06 if attiva else 1.0), 0.14)
+	# Più la carta si ingrandisce, più si alza: così passa sopra alle vicine.
+	var altezza: float = ALTEZZA_SOLLEVATA * maxf(1.0, ingrandimento * 2.0 - 1.0)
+	_animazione_sollevamento.tween_property(_corpo, "position:y", altezza if attiva else 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_animazione_sollevamento.tween_property(_corpo, "scale", Vector3.ONE * (ingrandimento if attiva else 1.0), 0.14)
 	_aggiorna_alone()
 
 

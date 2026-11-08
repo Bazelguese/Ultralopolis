@@ -15,6 +15,8 @@ const MISURA_TRUPPA: Vector2 = Vector2(1.58, 1.95)
 const MISURA_EDIFICIO: Vector2 = Vector2(1.9, 1.6)
 const MISURA_AZIONE: Vector2 = Vector2(1.7, 1.95)
 const SCALA_SCELTA: float = 1.45
+## Le scelte con le righe di simboli si ingrandiscono così tanto al passaggio del mouse.
+const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
 const Z_EDIFICI: float = 4.4
 ## Bordo sinistro del primo spazio: gli spazi si allineano a destra dello stemma.
@@ -737,6 +739,8 @@ func _costruisci_scelte() -> void:
 		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6)
 		tessera.rotation_degrees = Vector3(28.0, 0.0, 0.0)
 		tessera.scale = Vector3.ONE * SCALA_SCELTA
+		if not scheda.simboli.is_empty():
+			tessera.ingrandimento = INGRANDIMENTO_SIMBOLI
 		if scheda.sopratitolo != "":
 			var sopra: Label3D = StileVisivo.scritta(scheda.sopratitolo.to_upper(), StileVisivo.FONT_TITOLI, 42, StileVisivo.TESTO, 0.0, 10)
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
@@ -1538,6 +1542,11 @@ func _physics_process(_delta: float) -> void:
 			testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
 		if scheda.costo != "":
 			testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]
-		_hud.mostra_suggerimento(titolo, testo, mouse)
+		# Le carte che si ingrandiscono molto (con i simboli) hanno il testo sotto, non sopra.
+		var sotto: bool = tessera.ingrandimento > 1.2
+		var ancora: Vector2 = mouse
+		if sotto:
+			ancora = _camera.unproject_position(tessera.to_global(Vector3(0.0, 0.0, tessera.profondita * 0.5 * tessera.ingrandimento)))
+		_hud.mostra_suggerimento(titolo, testo, ancora, sotto)
 	else:
 		_hud.nascondi_suggerimento()
