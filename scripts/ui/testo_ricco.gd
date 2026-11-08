@@ -69,14 +69,15 @@ static func _aggiungi_forma(forma: String, voce: VoceLessico) -> void:
 	_forme_per_iniziale[iniziale].append([forma, voce])
 
 
-## Il testo con i codici di colore del RichTextLabel (BBCode).
-static func colora(testo: String) -> String:
+## Il testo con i codici di colore del RichTextLabel (BBCode). dimensione: grandezza del
+## carattere del testo, per disegnare i simboli della stessa altezza.
+static func colora(testo: String, dimensione: int = 18) -> String:
 	var lessico_attuale: Lessico = lessico()
 	var parti: PackedStringArray = PackedStringArray()
 	for pezzo: Pezzo in scomponi(testo):
 		var sicuro: String = _proteggi(pezzo.testo)
 		if pezzo.voce != null:
-			parti.append(_stile(sicuro, pezzo.voce.colore, pezzo.voce.grassetto))
+			parti.append(_simbolo(pezzo.voce, dimensione) + _stile(sicuro, pezzo.voce.colore, pezzo.voce.grassetto))
 		elif pezzo.numero and lessico_attuale != null:
 			var colore: Color = lessico_attuale.colore_numeri
 			if pezzo.voce_vicina != null and lessico_attuale.numeri_col_colore_della_parola:
@@ -202,6 +203,14 @@ static func _cifra(carattere: String) -> bool:
 ## Lettere (anche accentate) e cifre: separano le parole chiave dal resto.
 static func _fa_parte_di_parola(carattere: String) -> bool:
 	return _cifra(carattere) or carattere.to_lower() != carattere.to_upper()
+
+
+## Il simbolo della carta davanti alla parola, nel colore della parola (vuoto se non ne ha).
+static func _simbolo(voce: VoceLessico, dimensione: int) -> String:
+	if voce.icona == null or _lessico == null or not _lessico.simboli_nel_testo or voce.icona.resource_path.is_empty():
+		return ""
+	var lato: int = maxi(8, roundi(dimensione * 0.9))
+	return "[img width=%d height=%d color=#%s]%s[/img] " % [lato, lato, voce.colore.to_html(false), voce.icona.resource_path]
 
 
 static func _stile(testo: String, colore: Color, grassetto: bool) -> String:

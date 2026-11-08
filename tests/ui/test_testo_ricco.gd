@@ -79,7 +79,7 @@ func test_solo_parole_intere() -> void:
 
 
 func test_la_forma_piu_lunga_vince() -> void:
-	assert_eq(_tratti("Tipi: Infrastruttura Bellica"), PackedStringArray(["Tipi: ", "{Infrastruttura Bellica}"]))
+	assert_eq(_tratti("Tipi: Infrastruttura Bellica"), PackedStringArray(["{Tipi}", ": ", "{Infrastruttura Bellica}"]))
 	assert_eq(_tratti("un attacco d'assedio"), PackedStringArray(["un ", "{attacco d'assedio}"]))
 
 
@@ -87,8 +87,8 @@ func test_numeri_secondi_e_percentuali() -> void:
 	assert_eq(_tratti("ricarica 2,5 s."), PackedStringArray(["{ricarica}", " ", "<2,5 s>", "."]))
 	assert_eq(_tratti("il 10% più in fretta"), PackedStringArray(["il ", "<10%>", " più in fretta"]))
 	assert_eq(_tratti("−1 anno, ×1,5"), PackedStringArray(["<−1>", " anno, ", "<×1,5>"]))
-	# "2 spazi" e "10 secondi" non sono secondi abbreviati.
-	assert_eq(_tratti("2 spazi"), PackedStringArray(["<2>", " spazi"]))
+	# "2 giorni" e "10 secondi" non sono secondi abbreviati.
+	assert_eq(_tratti("2 giorni"), PackedStringArray(["<2>", " giorni"]))
 	assert_eq(_tratti("10 secondi"), PackedStringArray(["<10>", " secondi"]))
 
 
@@ -181,3 +181,27 @@ func test_la_stessa_carta_ha_il_riquadro_sempre_nello_stesso_punto() -> void:
 	pannello.mostra("Arieti", "10 danni allo scudo.", carta)
 	await wait_process_frames(3)
 	assert_eq(pannello.rettangolo_principale(), prima)
+
+
+func test_simboli_delle_carte_davanti_alle_parole() -> void:
+	# Scelta di Davide (8 novembre): lo stesso simbolo della carta, nel colore della parola.
+	var testo: String = TestoRicco.colora("2 danni ogni 3 s, ricarica 1,8 s.", 18)
+	var danno: VoceLessico = _voce("Danno")
+	assert_not_null(danno.icona, "Il danno ha il simbolo della spada.")
+	assert_string_contains(testo, "[img width=16 height=16 color=#%s]%s[/img]" % [danno.colore.to_html(false), danno.icona.resource_path])
+	assert_string_contains(testo, _voce("Ricarica").icona.resource_path, "La ricarica ha la clessidra.")
+	assert_false(TestoRicco.colora("Ricevi 2 Oro.").contains("[img"), "Le risorse non hanno simboli.")
+	for nome: String in ["Danno", "Scudo", "Cura", "Corruzione", "Attacco d'assedio", "Ricarica", "Mana", "Livello", "Affamata"]:
+		assert_not_null(_voce(nome).icona, "%s ha il suo simbolo." % nome)
+
+
+func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
+	# Richiesta di Davide (8 novembre): anche Propone, Potenzia e le altre parole base.
+	assert_eq(_tratti("Propone edifici; Potenzia: Ferro."), PackedStringArray(["{Propone}", " edifici; ", "{Potenzia}", ": ", "{Ferro}", "."]))
+	assert_eq(_tratti("Carta esclusiva: Foro (era 2)."), PackedStringArray(["Carta ", "{esclusiva}", ": Foro (", "{era 2}", ")."]))
+	assert_eq(_tratti("c'era una volta"), PackedStringArray(["c'era una volta"]), "Il verbo \"era\" non è l'era.")
+	assert_eq(_tratti("la via del porto"), PackedStringArray(["la via del porto"]), "\"via\" minuscola non è la Via.")
+	assert_eq(_tratti("Ricevi 2 Oro, paghi 1 Fede."), PackedStringArray(["{Ricevi}", " ", "<2>", " ", "{Oro}", ", ", "{paghi}", " ", "<1>", " ", "{Fede}", "."]))
+	for nome: String in ["Proposta", "Potenzia", "Livello", "Era", "Capitale", "Spazio", "Fantasma"]:
+		assert_ne(_voce(nome).definizione, "", "%s ha una spiegazione." % nome)
+	assert_eq(_voce("Ricevi").definizione, "", "Ricevi e Paghi si colorano senza spiegazione.")

@@ -87,7 +87,7 @@ func mostra(titolo: String, testo: String, area: Rect2) -> void:
 	_titolo.text = titolo
 	_titolo.visible = titolo != ""
 	_titolo.custom_minimum_size = Vector2(larghezza, 0.0)
-	_testo.text = TestoRicco.colora(testo)
+	_testo.text = TestoRicco.colora(testo, DIMENSIONE_TESTO)
 	_testo.visible = testo != ""
 	_testo.custom_minimum_size = Vector2(larghezza, 0.0)
 	_aggiorna_spiegazioni(titolo, testo)
@@ -222,6 +222,6 @@ func _riquadro_spiegazione(voce: VoceLessico) -> PanelContainer:
 	testo.custom_minimum_size = Vector2(LARGHEZZA_SPIEGAZIONI, 0.0)
 	# Il nome nel suo colore, poi la spiegazione con le sue parole chiave colorate.
 	var nome: String = "[font_size=%d][b][color=#%s]%s[/color][/b][/font_size]" % [DIMENSIONE_SPIEGAZIONE + 3, voce.colore.to_html(false), voce.nome]
-	testo.text = "%s\n%s" % [nome, TestoRicco.colora(voce.definizione)]
+	testo.text = "%s\n%s" % [nome, TestoRicco.colora(voce.definizione, DIMENSIONE_SPIEGAZIONE)]
 	riquadro.add_child(testo)
 	return riquadro
