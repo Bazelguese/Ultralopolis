@@ -62,7 +62,8 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		AdvisorDef.Special.VISITATORE:
 			pass  # I visitatori non potenziano (GDD §4.2.5).
 		_:
-			potenzia.etichetta = "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando %s. Non consuma la scelta del round." % run.advisor_resource_text(def)
+			potenzia.etichetta = "Potenzia: fa salire di livello una tua tessera di tipo %s, pagando %s. Si usa una volta per round e non consuma la scelta del round." % [
+					elenco_con_o(def.types), run.advisor_resource_text(def)]
 			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
 			if def.random_resource:
 				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)
@@ -115,8 +116,8 @@ static func nome_tipo_di_azione(def: OpportunityDef) -> String:
 	return "altre azioni"
 
 
-## Il simbolo del tipo di un'azione: scambio di risorse, bonus per un tempo (calendario),
-## spazio, malus da accorciare, spionaggio, incanto, perk, ripescare le tecnologie.
+## Il simbolo del tipo di un'azione: scambio di risorse, bonus temporanei (calendario),
+## spazio, malus da accorciare, spionaggio, incanto, peculiarità, ripescare la mano delle tecnologie.
 ## Uno scambio che serve solo a calmare il Malcontento ha il simbolo del Malcontento.
 static func tipo_di_azione(def: OpportunityDef) -> RigaSimboli:
 	var riga: RigaSimboli = RigaSimboli.new()
@@ -487,6 +488,16 @@ static func _risorse(riga: RigaSimboli, quantita: ResourceAmounts, scala: int, t
 		riga.icona(Simboli.di_risorsa(tipo), _con_segno(unita) if segno else str(unita), tono)
 		aggiunte = true
 	return aggiunte
+
+
+## Nomi in elenco con "o" prima dell'ultimo, es. "Assedio, Fante o Guardiano".
+static func elenco_con_o(nomi: Array[StringName]) -> String:
+	var parole: PackedStringArray = PackedStringArray()
+	for nome: StringName in nomi:
+		parole.append(String(nome))
+	if parole.size() <= 1:
+		return "".join(parole)
+	return "%s o %s" % [", ".join(parole.slice(0, parole.size() - 1)), parole[parole.size() - 1]]
 
 
 ## Nomi dei tipi separati da "/", es. "Spirituale / Patriota".

@@ -423,7 +423,8 @@ func reroll_resource_cost() -> ResourceAmounts:
 	return amounts
 
 
-## Risorse che un consigliere chiede per Potenzia, es. "Ferro" oppure "Oro + Pietra" (per Ombra).
+## Risorse che un consigliere chiede per Potenzia, es. "Ferro" oppure, per il Maestro delle spie,
+## "Oro + Pietra (la risorsa di questo round)".
 func advisor_resource_text(advisor: AdvisorDef) -> String:
 	match advisor.special:
 		AdvisorDef.Special.CLOWN:
@@ -433,7 +434,7 @@ func advisor_resource_text(advisor: AdvisorDef) -> String:
 		AdvisorDef.Special.VISITATORE:
 			return "nessuna: i visitatori non potenziano"
 	if advisor.random_resource:
-		return "%s + %s" % [Res.NAMES[advisor.upgrade_resource], Res.NAMES[shadow_resource]]
+		return "%s + %s (la risorsa di questo round)" % [Res.NAMES[advisor.upgrade_resource], Res.NAMES[shadow_resource]]
 	return Res.NAMES[advisor.upgrade_resource]
 
 

@@ -270,8 +270,20 @@ func test_i_dettagli_del_consigliere_dicono_solo_cio_che_si_vede() -> void:
 	assert_eq(righe.size(), scheda.simboli.size(), "Una frase per ogni riga di simboli.")
 	assert_eq(righe[0], "Può proporre: edifici e truppe.")
 	assert_eq(righe[1], "Azioni possibili: scambi di risorse.")
-	assert_string_starts_with(righe[2], "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando Stabilità.")
+	assert_string_starts_with(righe[2], "Potenzia: fa salire di livello una tua tessera di tipo Materie prime o Fante, pagando Stabilità. Si usa una volta per round e non consuma la scelta del round.")
 	assert_false(scheda.dettagli.contains("Decreto fiscale"), "Niente elenco delle singole azioni: non si vedono sulla carta.")
+
+
+## Il Maestro delle spie paga Oro più la risorsa uscita in questo round: va detto (revisione n. 63).
+func test_il_potenzia_del_maestro_delle_spie_dice_la_risorsa_del_round() -> void:
+	var spie: AdvisorDef = Aiuti.consigliere(&"spie", [&"Materie prime"], [], Res.Type.ORO)
+	spie.random_resource = true
+	catalog.advisors = [spie, Aiuti.consigliere(&"base", [&"Fante"])]
+	var run: RunState = _run()
+	run.shadow_resource = Res.Type.FERRO
+	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, spie)
+	var potenzia: String = righe[righe.size() - 1].etichetta
+	assert_string_contains(potenzia, "pagando Oro + Ferro (la risorsa di questo round)")
 
 
 func test_la_legenda_spiega_ogni_tipo_di_azione() -> void:
