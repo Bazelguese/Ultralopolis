@@ -404,7 +404,7 @@ Il **Malcontento** è un contatore della nazione, distinto dal Magazzino. Insiem
 | Sale con sconfitte, carestie (Cibo insufficiente), malus subiti e alcune opzioni degli eventi | Confermato |
 | Scende soprattutto spendendo **Stabilità** con un'azione del Cancelliere; anche con Fede (Sacerdote), Cibo (Fattore) e alcune opzioni degli eventi | Confermato nella forma; azioni Proposta |
 | Raggiunta una **soglia**, scatta la **Rivoluzione** (§9.4.2); dopo la rivoluzione si azzera | Confermato |
-| È sempre visibile con la sua soglia, e il gioco avverte quando la rivoluzione si avvicina (come P4) | Proposta |
+| Si consulta con la sua soglia nella linguetta «Partita» in alto a destra (si apre passando il mouse o con un clic: Davide, 8 novembre 2026), e il gioco avverte quando la rivoluzione si avvicina (come P4) | Confermato (Davide, 8 novembre 2026); avviso Proposta |
 | Vive fuori dalla battaglia: non entra nella simulazione e non cambia la Resistenza | Proposta |
 | Non si vende al mercato; si conserva da un anno all'altro | Proposta |
 | Gli eventi possono avere come radice “Malcontento sopra una soglia” | Proposta |
@@ -893,7 +893,7 @@ Davide vuole che la nazione sembri **viva**, non una serie di tasselli, e che og
 
 | Regola | Stato |
 |---|---|
-| Quattro coppie di tendenze opposte, **sempre visibili** sulla scheda della nazione come barre fra due poli: **Spada** (Conquistatrice / Pacifica), **Porta** (Aperta / Chiusa), **Altare** (Devota / Profana), **Legge** (Ordinata / Libera) | Confermato (Davide, v0.29); nomi placeholder |
+| Quattro coppie di tendenze opposte, sulla scheda della nazione come barre fra due poli: **Spada** (Conquistatrice / Pacifica), **Porta** (Aperta / Chiusa), **Altare** (Devota / Profana), **Legge** (Ordinata / Libera). Stanno nei **dettagli a scomparsa** della scheda: si aprono passando il mouse o con un clic (Davide, 8 novembre 2026; prima erano sempre visibili) | Confermato (Davide, v0.29 e 8 novembre 2026); nomi placeholder |
 | Ogni reazione sposta una o due inclinazioni; la reazione mostra in anticipo dove spinge la nazione (P4) | Confermato (v0.29) |
 | Le inclinazioni partono dall'identità: popoli, governi, credi e culture danno una spinta iniziale (es. Pietrosangue verso Chiusa, Teocrazia verso Devota) | Confermato (v0.29); valori placeholder |
 | Le inclinazioni sono una **radice** delle cronache: alcune arrivano solo a una nazione molto devota, guerriera, chiusa o libera | Confermato (v0.29) |
@@ -1219,13 +1219,13 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 
 | Contesto | Informazioni essenziali |
 |---|---|
-| Run | Anno, stagione, era, vittorie, Prestigio, ultima possibilità. |
+| Run | Anno, stagione, era, vittorie, Prestigio, ultima possibilità. Sempre visibili: anno, stagione, mese e tema del round; Prestigio, vittorie, era e Malcontento sono nella linguetta «Partita», che si apre passando il mouse (Davide, 8 novembre 2026). |
 | Economia | Risorse nel Magazzino; produzione prevista per stagione. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
 | Opportunità | Costo, requisiti, effetto, disponibilità nell’era corrente; con i simboli di §14.4 (v0.30). |
 | Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.26). |
 | Tradizioni | Per ogni via adottata: le 4 tradizioni, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.27). |
-| Nazione | Le quattro inclinazioni come barre fra due poli, le usanze, la vocazione e i personaggi con la loro fiducia (v0.29). |
+| Nazione | Le quattro inclinazioni come barre fra due poli, le usanze, la vocazione e i personaggi con la loro fiducia (v0.29). Sempre visibile solo il nome; il resto si apre passando il mouse sulla scheda o con un clic (Davide, 8 novembre 2026). |
 | Cronaca | Momento e anno, la scena, il personaggio coinvolto; per ogni reazione che cosa fa, dove spinge la nazione e, se è spenta, perché (v0.29). |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
 | Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, ricarica, unità in attesa e motivo dell’attesa, elementi inefficienti o sabotati con durata residua e origine. |
