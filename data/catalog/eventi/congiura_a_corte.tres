@@ -25,7 +25,7 @@ documenti = 3
 [sub_resource type="Resource" id="OPT_3"]
 script = ExtResource("e2")
 label = "Infiltra i congiurati"
-description = "Paghi 3 Documenti: la truppa più veloce del fantasma parte sabotata per 5 s."
+description = "Paghi 3 Documenti: la truppa più veloce del fantasma parte sabotata per 5 s (6 s con il Totalitarismo)."
 cost = SubResource("RA_4")
 spy = ExtResource("e6")
 

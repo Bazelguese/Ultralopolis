@@ -13,7 +13,7 @@ fede = 1
 [sub_resource type="Resource" id="S2"]
 script = ExtResource("x4")
 label = "Consulta gli indovini"
-description = "Paghi 1 Fede: una tessera del fantasma partirà inefficiente."
+description = "Paghi 1 Fede: una tessera a caso del fantasma partirà inefficiente per 10 s (11 s con il Totalitarismo)."
 cost = SubResource("S1")
 spy = ExtResource("x3")
 inclination_shift = PackedInt32Array(0, 0, 1, 0)
