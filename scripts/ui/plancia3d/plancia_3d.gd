@@ -673,7 +673,7 @@ func _costruisci_scelte() -> void:
 		for governo: IdentityDef in run.government_choices:
 			schede.append(SchedaCarta.da_governo(governo))
 			origini.append(governo)
-		schede.append(SchedaCarta.da_resta(run.government()))
+		schede.append(SchedaCarta.da_resta(run.government(), run))
 		origini.append(run.government())
 		fase = -1
 	match fase:
@@ -699,12 +699,12 @@ func _costruisci_scelte() -> void:
 		RunState.Phase.SCELTA_INCONTRO:
 			tipo = TipoScelta.INCONTRO
 			for incontro: EncounterDef in run.encounter_choices:
-				schede.append(SchedaCarta.da_incontro(incontro))
+				schede.append(SchedaCarta.da_incontro(incontro, run))
 				origini.append(incontro)
 		RunState.Phase.RICOMPENSA_INCONTRO:
 			tipo = TipoScelta.RICOMPENSA
 			for ricompensa: RewardDef in run.reward_choices():
-				schede.append(SchedaCarta.da_ricompensa(ricompensa))
+				schede.append(SchedaCarta.da_ricompensa(ricompensa, run))
 				origini.append(ricompensa)
 		RunState.Phase.SCONTRO_FANTASMA:
 			if run.current_ghost != null:
@@ -1182,9 +1182,9 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	var stessi_edifici: bool = run.board.buildings.size() == _setups[0].buildings.size()
 	var stesse_truppe: bool = run.board.troops.size() == _setups[0].troops.size()
 	for i: int in range(_setups[0].buildings.size()):
-		edifici.append(SchedaCarta.da_edificio(_setups[0].buildings[i], run.board.buildings[i].level if stessi_edifici else 1))
+		edifici.append(SchedaCarta.da_edificio(_setups[0].buildings[i], run.board.buildings[i].level if stessi_edifici else 1, "", run.max_level()))
 	for i: int in range(_setups[0].troops.size()):
-		truppe.append(SchedaCarta.da_truppa(_setups[0].troops[i], run.board.troops[i].level if stesse_truppe else 1))
+		truppe.append(SchedaCarta.da_truppa(_setups[0].troops[i], run.board.troops[i].level if stesse_truppe else 1, "", false, run.max_level()))
 	var edifici_avversari: Array[SchedaCarta] = []
 	for def: BuildingDef in _setups[1].buildings:
 		edifici_avversari.append(SchedaCarta.da_edificio(def))

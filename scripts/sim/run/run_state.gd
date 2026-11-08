@@ -1530,7 +1530,7 @@ func option_block_reason(option: EventOptionDef) -> String:
 		if not found:
 			return "Richiede: %s." % option_requirement(option)
 	if not option.requires_types.is_empty() and _pieces_with(option.requires_types, option.requires_kind).is_empty():
-		return "Serve una tessera %s sulla plancia." % option_requirement(option)
+		return "Serve %s sulla plancia." % option_requirement_need(option)
 	if option.cost != null and not can_pay(option.cost):
 		return "Risorse insufficienti (servono %s)." % option.cost.describe()
 	if option.upgrade and _option_upgrade_candidates(option).is_empty():
