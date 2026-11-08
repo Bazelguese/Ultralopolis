@@ -1007,16 +1007,16 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | Le imprese sono scritte nei dati della via; accanto a ognuna si vede quanto manca (P4) | Confermato |
 | Imprese che guardano dentro la battaglia | Spunto (servono statistiche della battaglia che oggi non si registrano) |
 
-#### 10.4.2 Ascensioni — Confermato (v0.27; il livello 2 è una modifica del nucleo)
+#### 10.4.2 Ascensioni — Confermato (v0.27; le ascensioni maggiori sono una modifica del nucleo)
 
 | Regola | Stato |
 |---|---|
 | Completando le 4 tradizioni di una via si sceglie **1 ascensione fra 3**, pescate con più probabilità per quelle coerenti con l'identità e le vie | Confermato |
 | Le ascensioni sono **permanenti**; una già presa non si ripresenta; alcune possono essere esclusive di una via o di un elemento dell'identità | Confermato |
-| **Livello 1**: effetti forti con il linguaggio di oggi. **Livello 2**: cambiano una regola e compaiono solo a chi ha già un'ascensione. Nel prototipo la prima ascensione è di livello 1, la seconda di livello 2 | Confermato |
+| **Ascensioni minori** (prima “livello 1”): effetti forti con il linguaggio di oggi. **Ascensioni maggiori** (prima “livello 2”): cambiano una regola e compaiono solo a chi ha già un'ascensione. Nel prototipo la prima ascensione è minore, la seconda maggiore (nomi decisi da Davide, 8 novembre 2026: “Livello” resta solo alle tessere) | Confermato |
 | Un'ascensione che cambia una regola si vede in battaglia o sulla plancia (P4) | Confermato |
 
-**Ascensioni del livello 2 — Confermato (modifica del nucleo, v0.27), valori placeholder.** Ognuna è un'eccezione scritta anche nella sezione della regola che cambia.
+**Ascensioni maggiori — Confermato (modifica del nucleo, v0.27), valori placeholder.** Ognuna è un'eccezione scritta anche nella sezione della regola che cambia.
 
 | Ascensione | Effetto | Regola che cambia |
 |---|---|---|
@@ -1029,7 +1029,7 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | **Doppio ascolto** | Una volta per stagione si prendono due opportunità dallo stesso consigliere (Proposta con le stagioni) | §4.2 |
 | **Esercito frugale** | Le truppe senza Cibo non rallentano | §5.4 |
 
-Le ascensioni del livello 1 (es. +1 spazio truppa e +1 spazio edificio; +20 Resistenza; +25% delle risorse prodotte) sono nel Catalogo (§4.5).
+Le ascensioni minori (es. +1 spazio truppa e +1 spazio edificio; +20 Resistenza; +25% delle risorse prodotte) sono nel Catalogo (§4.5).
 
 ### 10.5 Tecnologie — Confermato (modifica del nucleo, v0.26)
 

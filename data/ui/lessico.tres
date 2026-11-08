@@ -602,7 +602,7 @@ nome = "Ascensione"
 famiglia = 7
 forme = PackedStringArray("ascensione", "ascensioni")
 colore = Color(1, 1, 1, 1)
-definizione = "Completate le 4 tradizioni di una via, scegli un'ascensione fra 3: un effetto permanente forte. Quelle di livello 2 cambiano una regola del gioco."
+definizione = "Completate le 4 tradizioni di una via, scegli un'ascensione fra 3: un effetto permanente forte. Le ascensioni maggiori cambiano una regola del gioco."
 
 [sub_resource type="Resource" id="voce_n19"]
 script = ExtResource("1_voce")
