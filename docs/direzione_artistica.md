@@ -113,6 +113,9 @@ Regole della grafica:
 - `/` separa le alternative, `·` separa due effetti diversi della stessa scelta.
 - Uno **spazio** della plancia è il simbolo dentro una cornice tratteggiata; una carta che **sale di livello** ha una freccia dorata.
 - Le stesse icone delle risorse compaiono nella barra delle risorse in basso e accanto al Malcontento, così il giocatore le impara.
+- Le righe corte stanno **affiancate** sulla stessa linea, ognuna nella sua pastiglia, per non sprecare spazio (richiesta di Davide); gli incanti e gli spionaggi di un consigliere si riuniscono in una riga sola.
+- Con il mouse sopra, una carta con i simboli **si ingrandisce** (×1,7) e il testo dei dettagli va sotto o di fianco, senza coprirla.
+- Se con un consigliere puoi già potenziare qualche carta, la sua riga del Potenzia è **dorata** e sotto la carta compare "Ascolta · ▲ Potenzia N" (quante carte).
 
 ### 4.2 Dove sono
 
