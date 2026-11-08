@@ -66,7 +66,18 @@ func colore_cornice() -> Color:
 
 # --- Costruzione dai dati del gioco --------------------------------------------
 
-static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = "") -> SchedaCarta:
+## p_livello_massimo: il livello più alto delle tessere nella partita (0 se non si conosce: allora
+## il riquadro dice solo il livello).
+static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = "", p_livello_massimo: int = 0) -> SchedaCarta:
+	return _edificio(def, p_livello, p_malus, _produzione_di_base(def), p_livello_massimo)
+
+
+static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p_affamata: bool = false, p_livello_massimo: int = 0) -> SchedaCarta:
+	return _truppa(def, p_livello, p_malus, p_affamata, def.food_tenths, p_livello_massimo)
+
+
+## produzione: quello che l'edificio deposita a ogni stagione, in unità interne (Res).
+static func _edificio(def: BuildingDef, p_livello: int, p_malus: String, produzione: Array[int], p_livello_massimo: int) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.EDIFICIO
 	scheda.id = def.id
@@ -82,32 +93,39 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 	scheda.corruzione = def.corruption
 	scheda.illustrazione = _carica("edifici/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
-	var produzione: PackedStringArray = PackedStringArray()
+	var sulla_carta: PackedStringArray = PackedStringArray()
+	var nel_riquadro: PackedStringArray = PackedStringArray()
 	for tipo: Res.Type in Res.NAMES:
-		var quanto: int = def.production(tipo)
-		if quanto != 0:
-			produzione.append("+%d %s" % [quanto, Res.NAMES[tipo]])
-	scheda.riga = " · ".join(produzione.slice(0, 2))
-	righe.append("A ogni stagione: %s." % (", ".join(produzione) if not produzione.is_empty() else "nessuna risorsa"))
+		var quanto: int = produzione[tipo]
+		if quanto == 0:
+			continue
+		var testo: String = "%s%s %s" % ["+" if quanto > 0 else "", Res.format(tipo, quanto), Res.NAMES[tipo]]
+		sulla_carta.append(testo)
+		# D'inverno gli edifici non producono Cibo (GDD §5.2).
+		nel_riquadro.append(testo + (" (non d'inverno)" if tipo == Res.Type.CIBO and quanto > 0 else ""))
+	scheda.riga = " · ".join(sulla_carta.slice(0, 2))
+	righe.append("A ogni stagione: %s." % (", ".join(nel_riquadro) if not nel_riquadro.is_empty() else "nessuna risorsa"))
+	var ciclo: String = "ogni ciclo di %s" % secondi(def.mana_interval_ms)
 	if def.mana_amount > 0:
-		righe.append("Nello scontro: %d %s ogni ciclo di %s." % [def.mana_amount, def.mana_type, secondi(def.mana_interval_ms)])
+		righe.append("Nello scontro: %d mana %s %s." % [def.mana_amount, def.mana_type, ciclo])
 	else:
 		righe.append("Edificio neutro: non produce mana.")
-	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, 0, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, "ogni %s" % secondi(def.mana_interval_ms)))
+	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, 0, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, ciclo))
 	if def.extra_building_slots > 0:
 		righe.append("+%d spazio edificio." % def.extra_building_slots)
 	if def.extra_troop_slots > 0:
 		righe.append("+%d spazio truppa." % def.extra_troop_slots)
 	if def.is_capital:
 		righe.append("Non si può vendere né sostituire.")
-	righe.append(_riga_tipi(def.types, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello, p_livello_massimo, def.is_capital))
 	if p_malus != "":
 		righe.append("Colpito da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
 	return scheda
 
 
-static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p_affamata: bool = false) -> SchedaCarta:
+## razione: il Cibo che la truppa mangia a inizio anno, in decimi (Res).
+static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: bool, razione: int, p_livello_massimo: int) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.TRUPPA
 	scheda.id = def.id
@@ -129,20 +147,32 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 	if def.mana_cost > 0:
 		righe.append("Costa %d mana %s (se manca, usa l'energetico)." % [def.mana_cost, def.mana_type])
 	else:
-		righe.append("Senza mana: agisce appena finisce la ricarica.")
+		righe.append("Non chiede mana: si attiva appena finisce la ricarica.")
 	if def.damage > 0:
-		righe.append("%d danni (prima allo scudo, poi alla Resistenza) · ricarica %s." % [def.damage, secondi(def.cooldown_ms)])
+		righe.append("%d %s (prima allo scudo, poi alla Resistenza) · ricarica %s." % [def.damage, "danno" if def.damage == 1 else "danni", secondi(def.cooldown_ms)])
 	else:
 		righe.append("Ricarica %s." % secondi(def.cooldown_ms))
 	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, def.siege_damage, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, "a ogni attivazione"))
-	righe.append("Mangia %s Cibo a inizio anno." % Res.format(Res.Type.CIBO, def.food_tenths))
+	# La razione si mangia dal secondo anno (GDD §5.4); quella vera passa per bonus e malus.
+	var riga_razione: String = "Razione: %s Cibo a inizio anno (dal secondo anno" % Res.format(Res.Type.CIBO, razione)
+	if razione != def.food_tenths:
+		riga_razione += "; di base %s" % Res.format(Res.Type.CIBO, def.food_tenths)
+	righe.append(riga_razione + ").")
 	if p_affamata:
 		righe.append("Affamata: ricarica più lenta fino al prossimo pasto.")
-	righe.append(_riga_tipi(def.types, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello, p_livello_massimo, false))
 	if p_malus != "":
 		righe.append("Colpita da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
 	return scheda
+
+
+## Produzione di catalogo di un edificio, al livello 1 e senza bonus, in unità interne (Res).
+static func _produzione_di_base(def: BuildingDef) -> Array[int]:
+	var produzione: Array[int] = Res.empty()
+	for tipo: Res.Type in Res.NAMES:
+		produzione[tipo] = def.production(tipo) * Res.scale(tipo)
+	return produzione
 
 
 ## Un elemento della plancia del giocatore, con livello e modificatori che lo colpiscono.
@@ -153,10 +183,12 @@ static func da_pezzo(run: RunState, pezzo: BoardPiece) -> SchedaCarta:
 			nomi_malus.append(modificatore.def.display_name)
 	var malus_testo: String = ", ".join(nomi_malus)
 	var scheda: SchedaCarta
+	# Sulla plancia i numeri sono quelli veri: livello, bonus e malus, e per la Capitale anche le
+	# risorse in più dell'identità (GDD §6.2); la razione passa per i suoi modificatori (§5.4).
 	if pezzo.building != null:
-		scheda = da_edificio(run.effective_building(pezzo), pezzo.level, malus_testo)
+		scheda = _edificio(run.effective_building(pezzo), pezzo.level, malus_testo, run.building_production(pezzo), run.max_level())
 	else:
-		scheda = da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
+		scheda = _truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry, run.troop_ration(pezzo), run.max_level())
 	scheda.dettagli += _riga_mantenimento(run, pezzo)
 	if pezzo.building != null:
 		return scheda
@@ -171,10 +203,10 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	var scheda: SchedaCarta
 	match offerta.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
-			scheda = da_edificio(offerta.building)
+			scheda = da_edificio(offerta.building, 1, "", run.max_level())
 			scheda.sopratitolo = "Edificio"
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
-			scheda = da_truppa(offerta.troop)
+			scheda = da_truppa(offerta.troop, 1, "", false, run.max_level())
 			scheda.sopratitolo = "Truppa"
 		OpportunityDef.Kind.PERK:
 			scheda = SchedaCarta.new()
@@ -215,8 +247,32 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	if run.offer_needs_replacement(offerta):
 		scheda.dettagli += "\nPlancia piena: sceglierai quale tessera sostituire (ti torna metà del prezzo)."
 	elif not run.offer_choices(offerta).is_empty():
-		scheda.dettagli += "\nDopo averla presa scegli una voce."
+		scheda.dettagli += "\n" + _frase_scelta(offerta)
 	return scheda
+
+
+## Che cosa si sceglie dopo aver preso un'opportunità con più voci (RunState.offer_choices).
+static func _frase_scelta(offerta: Offer) -> String:
+	match offerta.kind:
+		OpportunityDef.Kind.INCANTO:
+			return "Dopo averla presa scegli la truppa da incantare."
+		OpportunityDef.Kind.ACCORCIA_MALUS:
+			return "Dopo averla presa scegli il malus da accorciare."
+		OpportunityDef.Kind.MODIFICATORE_A_SCELTA:
+			var su_truppa: bool = false
+			var su_edificio: bool = false
+			for modificatore: ModifierDef in offerta.opportunity.modifiers:
+				su_truppa = su_truppa or modificatore.target == ModifierDef.Target.TRUPPA_SCELTA
+				su_edificio = su_edificio or modificatore.target == ModifierDef.Target.EDIFICIO_SCELTO
+			var piu_bonus: bool = offerta.opportunity.modifiers.size() > 1
+			if piu_bonus and (su_truppa or su_edificio):
+				return "Dopo averla presa scegli il bonus e la tessera che lo riceve."
+			if su_truppa:
+				return "Dopo averla presa scegli la truppa che riceve il bonus."
+			if su_edificio:
+				return "Dopo averla presa scegli l'edificio che riceve il bonus."
+			return "Dopo averla presa scegli il bonus."
+	return "Dopo averla presa scegli fra le sue voci."
 
 
 ## Mantenimento di una carta (GDD §5.6): che cosa paga prima di ogni scontro e se l'ultima volta
@@ -244,8 +300,11 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	# Sotto la carta: "Ascolta" (scegli questo consigliere); se con lui puoi già potenziare
 	# qualche tua carta, anche quante.
 	scheda.costo = "Ascolta"
-	if consigliere.special == AdvisorDef.Special.VISITATORE:
+	var visitatore: bool = consigliere.special == AdvisorDef.Special.VISITATORE
+	if visitatore:
 		scheda.sopratitolo = "Visitatore · %s" % consigliere.category_name
+		# Nel gioco il Visitatore si presenta come "Di passaggio", la Fortuna come "Un dono" (Glossario).
+		scheda.riga = "Di passaggio"
 	var pronte: int = run.affordable_upgrades(consigliere).size() if consigliere.special == AdvisorDef.Special.NESSUNO else 0
 	if pronte > 0:
 		scheda.costo = "Ascolta · ▲ Potenzia %d" % pronte
@@ -253,6 +312,9 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	# una frase per ogni riga di simboli, nello stesso ordine.
 	scheda.simboli = SimboliEffetti.consigliere(run, consigliere)
 	var righe: PackedStringArray = PackedStringArray()
+	# Il Visitatore dice anche chi è, che tessere porta e a che prezzi: è scritto nei suoi dati.
+	if visitatore:
+		righe.append("Di passaggio. %s" % consigliere.description if consigliere.description != "" else "Di passaggio.")
 	for riga: RigaSimboli in scheda.simboli:
 		if riga.etichetta != "":
 			righe.append(riga.etichetta)
@@ -285,7 +347,11 @@ static func da_evento(run: RunState, evento: EventDef) -> SchedaCarta:
 	for opzione: EventOptionDef in evento.options:
 		var requisito: String = run.option_requirement(opzione)
 		righe.append("• %s%s" % ["[%s] " % requisito if requisito != "" else "", opzione.label])
-	righe.append("Ignora il tema del round. Sceglierlo è la scelta del round.")
+	if evento.special == EventDef.Special.RIVOLUZIONE:
+		# Arriva da sola e non si può lasciar passare il round (RunState.pass_round).
+		righe.append("Non si può evitare: scegli il nuovo governo. Poi il Malcontento si azzera.")
+	else:
+		righe.append("Ignora il tema del round. Sceglierlo è la scelta del round.")
 	scheda.simboli = SimboliEffetti.evento(run, evento)
 	scheda.costo = "Scegli"
 	scheda.dettagli = "\n".join(righe)
@@ -310,7 +376,9 @@ static func da_opzione(run: RunState, opzione: EventOptionDef) -> SchedaCarta:
 	return scheda
 
 
-static func da_incontro(incontro: EncounterDef) -> SchedaCarta:
+## run: la partita, per dire che cosa succede davvero se perdi (Malcontento, ultima possibilità).
+## Facoltativa solo perché chi chiama può non averla: senza, il riquadro resta generico.
+static func da_incontro(incontro: EncounterDef, run: RunState = null) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.INCONTRO
 	scheda.titolo = incontro.display_name
@@ -320,18 +388,43 @@ static func da_incontro(incontro: EncounterDef) -> SchedaCarta:
 	var ricompense: PackedStringArray = PackedStringArray()
 	for ricompensa: RewardDef in incontro.rewards:
 		ricompense.append(ricompensa.describe())
-	scheda.dettagli = "%s\nEdifici: %s.\nTruppe: %s.\nSe vinci scegli fra: %s.\nSe perdi, l'Oro del Magazzino si dimezza." % [
-		incontro.description, _nomi_edifici(incontro.buildings), _nomi_truppe(incontro.troops), ", ".join(ricompense)]
+	var righe: PackedStringArray = PackedStringArray()
+	righe.append(incontro.description)
+	righe.append("Edifici: %s." % _nomi_edifici(incontro.buildings))
+	righe.append("Truppe: %s." % _nomi_truppe(incontro.troops))
+	# Vittoria o pareggio (GDD §3.3, §3.4): il bottino arriva sempre, poi si sceglie la ricompensa.
+	var vinci: PackedStringArray = PackedStringArray()
+	var bottino: String = _testo_bottino(incontro.loot_gold, incontro.loot_research)
+	if bottino != "":
+		vinci.append("bottino di %s" % bottino)
+	if not ricompense.is_empty():
+		vinci.append("scegli una ricompensa fra: %s" % ", ".join(ricompense))
+	if not vinci.is_empty():
+		righe.append("Se vinci o pareggi: %s." % ", poi ".join(vinci))
+	righe.append("Il pareggio conta come vittoria.")
+	if run != null and run.last_chance:
+		# Ultima possibilità (GDD §3.3, §3.4): perdere un incontro chiude la partita.
+		righe.append("Se perdi, la partita finisce.")
+	elif run != null:
+		righe.append("Se perdi: l'Oro del Magazzino si dimezza e %+d Malcontento." % run.run_rules.malcontent_per_encounter_defeat)
+	else:
+		righe.append("Se perdi: l'Oro del Magazzino si dimezza e cresce il Malcontento.")
+	scheda.dettagli = "\n".join(righe)
 	return scheda
 
 
-static func da_ricompensa(ricompensa: RewardDef) -> SchedaCarta:
+## run: la partita, per sapere se la plancia è piena e il livello massimo. Facoltativa solo perché
+## chi chiama può non averla: senza, il riquadro lo dice in generale.
+static func da_ricompensa(ricompensa: RewardDef, run: RunState = null) -> SchedaCarta:
 	var scheda: SchedaCarta
+	var livello_massimo: int = run.max_level() if run != null else 0
 	match ricompensa.kind:
 		RewardDef.Kind.EDIFICIO:
-			scheda = da_edificio(ricompensa.building)
+			scheda = da_edificio(ricompensa.building, 1, "", livello_massimo)
+			scheda.dettagli += _righe_tessera_in_regalo(ricompensa, run)
 		RewardDef.Kind.TRUPPA:
-			scheda = da_truppa(ricompensa.troop)
+			scheda = da_truppa(ricompensa.troop, 1, "", false, livello_massimo)
+			scheda.dettagli += _righe_tessera_in_regalo(ricompensa, run)
 			if ricompensa.assimilation:
 				scheda.dettagli += "\nAssimilati (vocazione): una truppa del nemico vinto diventa tua, al posto della ricompensa. +1 Malcontento."
 		_:
@@ -346,6 +439,20 @@ static func da_ricompensa(ricompensa: RewardDef) -> SchedaCarta:
 	return scheda
 
 
+## Una tessera presa come ricompensa (RunState.take_reward): è gratis, entra al livello 1 e, se la
+## plancia è piena, ne sostituisce una (con il rimborso di metà del suo prezzo, GDD §6.4).
+static func _righe_tessera_in_regalo(ricompensa: RewardDef, run: RunState) -> String:
+	var testo: String = "\nGratis: entra sulla plancia al livello 1. Se poi la vendi, ti torna metà del suo prezzo."
+	var sostituzione: String = "sceglierai quale %s sostituire (ti torna metà di quanto l'avevi pagata%s)" % [
+		"edificio" if ricompensa.kind == RewardDef.Kind.EDIFICIO else "truppa",
+		"; la Capitale no" if ricompensa.kind == RewardDef.Kind.EDIFICIO else ""]
+	if run == null:
+		testo += "\nSe la plancia è piena, %s." % sostituzione
+	elif run.reward_needs_replacement(ricompensa):
+		testo += "\nPlancia piena: %s." % sostituzione
+	return testo
+
+
 static func da_via(via: IdentityDef) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.VIA
@@ -353,10 +460,11 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	scheda.titolo = via.display_name
 	scheda.sopratitolo = "Via"
 	scheda.riga = "Scegli questa via"
-	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: opportunità, tessere esclusive, un tratto permanente e un bonus immediato."
+	# Adozione della via (GDD §10.4, §10.4.1).
+	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: le sue opportunità diventano più frequenti, apre tessere e tecnologie esclusive, dà un tratto permanente e un bonus immediato."
 	if not via.traditions.is_empty():
 		# Le imprese si vedono prima di scegliere la via (GDD §10.4.1, v0.27).
-		scheda.dettagli += "\nTradizioni (completale tutte per un'ascensione):"
+		scheda.dettagli += "\nTradizioni (completale tutte per un'ascensione). Le imprese contano da quando scegli la via:"
 		for passo: TraditionDef in via.traditions:
 			scheda.dettagli += "\n• %s: %s → %s" % [passo.display_name, passo.deed.describe() if passo.deed != null else "", passo.description]
 	scheda.illustrazione = _carica("vie/%s.png" % via.id)
@@ -392,14 +500,18 @@ static func da_governo(governo: IdentityDef) -> SchedaCarta:
 
 
 ## La carta per rifiutare l'evoluzione del governo.
-static func da_resta(governo: IdentityDef) -> SchedaCarta:
+## run: la partita, per sapere se questa è l'ultima era. Facoltativa solo perché chi chiama può non
+## averla: senza, si scrive il testo delle ere che non sono l'ultima.
+static func da_resta(governo: IdentityDef, run: RunState = null) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.VIA
 	scheda.titolo = "Resta com'è"
 	scheda.sopratitolo = "Governo"
 	scheda.riga = "Rifiuta l'evoluzione"
 	scheda.costo = "Resta"
-	scheda.dettagli = "Il governo resta %s. Potrai evolvere entrando nella prossima era, o con una Riforma." % (governo.display_name if governo != null else "com'è")
+	var ultima_era: bool = run != null and run.era >= run.catalog.eras.size()
+	scheda.dettagli = "Il governo resta %s. %s" % [governo.display_name if governo != null else "com'è",
+			"Potrai evolvere solo con una Riforma." if ultima_era else "Potrai evolvere entrando nella prossima era, o con una Riforma."]
 	return scheda
 
 
@@ -415,11 +527,30 @@ static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 	var righe: PackedStringArray = PackedStringArray()
 	if not identita.is_empty():
 		righe.append(" · ".join(identita))
-	righe.append("Se perdi: −%d Prestigio." % run.year)
+	# Vittoria o pareggio (GDD §3.4): una vittoria in più e il bottino.
+	var vinci: String = "Se vinci o pareggi: vittoria %d di %d" % [run.wins + 1, run.run_rules.wins_needed]
+	var bottino: String = _testo_bottino(run.run_rules.ghost_loot_gold, run.run_rules.ghost_loot_research)
+	if bottino != "":
+		vinci += " e bottino di %s" % bottino
+	righe.append(vinci + ".")
+	righe.append("Il pareggio conta come vittoria, ma subisci i malus." if not fantasma.malus.is_empty() else "Il pareggio conta come vittoria.")
+	if run.last_chance:
+		# Ultima possibilità (GDD §3.4): la prossima sconfitta chiude la partita.
+		righe.append("Se perdi, la partita finisce.")
+	else:
+		var perdi: String = "Se perdi: −%d Prestigio e %+d Malcontento" % [run.year, run.run_rules.malcontent_per_ghost_defeat]
+		if not fantasma.malus.is_empty():
+			perdi += ", più i malus"
+		perdi += "."
+		if run.prestige - run.year <= 0:
+			perdi += " Il Prestigio finirebbe: comincerebbe l'ultima possibilità."
+		righe.append(perdi)
 	if run.prophecy != "":
 		righe.append("Profezia: schiera %s." % run.prophecy)
+	# I malus del fantasma arrivano a fine anno (GDD §11.1), ognuno con il suo Malcontento.
+	var quando: String = "Se pareggi" if run.last_chance else "Se perdi o pareggi"
 	for malus_def: ModifierDef in fantasma.malus:
-		righe.append("Se perdi o pareggi subisci %s: %s" % [malus_def.display_name, malus_def.description])
+		righe.append("%s subisci %s %s (%+d Malcontento): %s" % [quando, malus_def.display_name, _durata_malus(malus_def), run.run_rules.malcontent_per_malus, malus_def.description])
 	righe.append("Puoi ancora riordinare o vendere le truppe prima di combattere.")
 	scheda.dettagli = "\n".join(righe)
 	return scheda
@@ -430,6 +561,29 @@ static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 static func secondi(millisecondi: int) -> String:
 	var testo: String = ("%.1f" % (millisecondi / 1000.0)).replace(".", ",")
 	return testo.trim_suffix(",0") + " s"
+
+
+## "3 Oro e 2 Ricerca"; vuoto se il bottino non c'è.
+static func _testo_bottino(oro: int, ricerca: int) -> String:
+	var parti: PackedStringArray = PackedStringArray()
+	if oro > 0:
+		parti.append("%d Oro" % oro)
+	if ricerca > 0:
+		parti.append("%d Ricerca" % ricerca)
+	return " e ".join(parti)
+
+
+## Quanto dura un malus del fantasma, che arriva a fine anno: un malus a durata vale per gli anni
+## interi successivi (scripts/sim/run/modifiers.gd, GDD §8.2.1).
+static func _durata_malus(def: ModifierDef) -> String:
+	match def.duration_kind:
+		ModifierDef.Duration.PERMANENTE:
+			return "per tutta la partita"
+		ModifierDef.Duration.PROSSIMO_SCONTRO_FANTASMA:
+			return "fino al prossimo scontro con un fantasma"
+	if def.duration_years <= 1:
+		return "per tutto l'anno prossimo"
+	return "per i prossimi %d anni" % def.duration_years
 
 
 static func _carica(percorso: String) -> Texture2D:
@@ -449,19 +603,38 @@ static func _righe_effetti(scudo_v: int, cura_v: int, corruzione_v: int, assedio
 	if corruzione_v > 0:
 		righe.append("%d Corruzione al nemico %s." % [corruzione_v, quando])
 	if assedio_v > 0:
-		righe.append("Danno d'assedio: toglie %d scudo al nemico." % assedio_v)
+		righe.append("Danno d'assedio: toglie fino a %d scudo al nemico." % assedio_v)
+	# Inefficienza e Sabotaggio colpiscono una sola tessera nemica, a caso e a turno (GDD §7.7.2).
 	if inefficienza_ms > 0:
-		righe.append("Inefficienza ai nemici (%s) per %s." % [TimerTarget.NAMES[bersaglio_inefficienza], secondi(inefficienza_ms)])
+		righe.append("Rende Inefficiente %s per %s, %s." % [_bersaglio_a_caso(bersaglio_inefficienza), secondi(inefficienza_ms), quando])
 	if sabotaggio_ms > 0:
-		righe.append("Sabotaggio ai nemici (%s) per %s." % [TimerTarget.NAMES[bersaglio_sabotaggio], secondi(sabotaggio_ms)])
+		righe.append("Sabota %s per %s, %s." % [_bersaglio_a_caso(bersaglio_sabotaggio), secondi(sabotaggio_ms), quando])
 	return righe
 
 
-static func _riga_tipi(tipi: Array[StringName], p_livello: int) -> String:
+## "1 truppa nemica a caso", secondo i bersagli ammessi (GDD §7.7.1).
+static func _bersaglio_a_caso(bersaglio: TimerTarget.Kind) -> String:
+	match bersaglio:
+		TimerTarget.Kind.TRUPPE:
+			return "1 truppa nemica a caso"
+		TimerTarget.Kind.EDIFICI:
+			return "1 edificio nemico a caso"
+	return "1 tessera nemica a caso"
+
+
+## Livello e tipi. La Capitale non ha livelli (nessun consigliere la potenzia): solo i tipi.
+## livello_massimo 0: non si conosce (nessuna partita), si scrive solo il livello.
+static func _riga_tipi(tipi: Array[StringName], p_livello: int, livello_massimo: int = 0, capitale: bool = false) -> String:
 	var nomi: PackedStringArray = PackedStringArray()
 	for tipo: StringName in tipi:
 		nomi.append(String(tipo))
-	return "Livello %d di 3 · Tipi: %s" % [p_livello, ", ".join(nomi) if not nomi.is_empty() else "nessuno"]
+	var testo_tipi: String = "Tipi: %s" % (", ".join(nomi) if not nomi.is_empty() else "nessuno")
+	if capitale:
+		return testo_tipi
+	var testo_livello: String = "Livello %d" % p_livello
+	if livello_massimo > 0:
+		testo_livello += " di %d" % livello_massimo
+	return "%s · %s" % [testo_livello, testo_tipi]
 
 
 static func _riassunto_azione(opportunita: OpportunityDef) -> String:
