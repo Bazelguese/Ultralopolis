@@ -42,7 +42,12 @@ const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola",
 const MASSIMO_GEMME_IN_VOLO: int = 24
 
 ## Altezza del telo dello stendardo della nazione.
-const ALTEZZA_STENDARDO: float = 2.6
+const ALTEZZA_STENDARDO: float = 1.9
+## Larghezza del telo dello stendardo e altezza da cui parte (più in basso: Davide, 8 novembre 2026).
+const LARGHEZZA_STENDARDO: float = 1.5
+const BASE_TELO: float = 0.45
+## La miccia del tempo, davanti allo stendardo.
+const POSIZIONE_MICCIA_Z: float = 0.95
 ## Lo stendardo steso: la base sta verso il davanti della plancia, il telo si stende all'indietro.
 const POSIZIONE_STESO_Z: float = 3.6
 ## Teatro di carta: il tavolo (x, z, larghezza, profondità) e il sole/luna.
@@ -95,6 +100,9 @@ var _stato_anelli: Array[int] = [-1, -1]
 var _materiale_anello_spento: StandardMaterial3D
 var _materiale_anello_acceso: StandardMaterial3D
 var _materiale_anello_logoramento: StandardMaterial3D
+## La brace in testa alla miccia del tempo e le parti dello stendardo che spariscono quando è steso.
+var _braci_miccia: Array[MeshInstance3D] = [null, null]
+var _aste_stendardo: Array[Array] = [[], []]
 const SEGMENTI_ANELLO: int = 48
 var _barre_resistenza: Array[MeshInstance3D] = [null, null]
 ## Teatro di carta: lo stendardo di ogni lato (materiale del telo e numero della Resistenza).
@@ -413,10 +421,10 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	var forma_asta: CylinderMesh = CylinderMesh.new()
 	forma_asta.top_radius = 0.05
 	forma_asta.bottom_radius = 0.07
-	forma_asta.height = ALTEZZA_STENDARDO + 0.9
+	forma_asta.height = ALTEZZA_STENDARDO + BASE_TELO + 0.1
 	asta.mesh = forma_asta
 	asta.material_override = StileVisivo.materiale(Color("1a1410"), 0.8)
-	asta.position = Vector3(-1.05, forma_asta.height * 0.5, 0.0)
+	asta.position = Vector3(-LARGHEZZA_STENDARDO * 0.5 - 0.05, forma_asta.height * 0.5, 0.0)
 	stendardo.add_child(asta)
 	var punta: MeshInstance3D = MeshInstance3D.new()
 	var forma_punta: SphereMesh = SphereMesh.new()
@@ -424,25 +432,26 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	forma_punta.height = 0.22
 	punta.mesh = forma_punta
 	punta.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
-	punta.position = Vector3(-1.05, forma_asta.height + 0.05, 0.0)
+	punta.position = Vector3(-LARGHEZZA_STENDARDO * 0.5 - 0.05, forma_asta.height + 0.05, 0.0)
 	stendardo.add_child(punta)
+	_aste_stendardo[lato] = [asta, punta]
 	var telo: MeshInstance3D = MeshInstance3D.new()
 	var forma_telo: QuadMesh = QuadMesh.new()
-	forma_telo.size = Vector2(2.0, ALTEZZA_STENDARDO)
+	forma_telo.size = Vector2(LARGHEZZA_STENDARDO, ALTEZZA_STENDARDO)
 	telo.mesh = forma_telo
 	var materiale_telo: ShaderMaterial = Figurina.materiale_carta(_trama_stendardo(colore))
 	telo.material_override = materiale_telo
-	telo.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.5, 0.0)
+	telo.position = Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.5, 0.0)
 	stendardo.add_child(telo)
 	_teli_stendardo[lato] = materiale_telo
 	# Al centro dello stendardo le iniziali della nazione, come lo stemma di un eroe.
-	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 150, Color("1a1410"), 0.0, 0)
-	iniziali.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.68, 0.02)
+	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 112, Color("1a1410"), 0.0, 0)
+	iniziali.position = Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.68, 0.02)
 	iniziali.rotation = Vector3.ZERO
 	stendardo.add_child(iniziali)
 	_iniziali[lato] = iniziali
-	var numero_telo: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 190, Color("1a1410"), 0.0, 0)
-	numero_telo.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.36, 0.02)
+	var numero_telo: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 140, Color("1a1410"), 0.0, 0)
+	numero_telo.position = Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.36, 0.02)
 	numero_telo.rotation = Vector3.ZERO
 	stendardo.add_child(numero_telo)
 	_numeri_stendardo[lato] = numero_telo
@@ -556,11 +565,15 @@ func _stendi_stendardo(lato: int, steso: bool, animato: bool) -> void:
 	var stendardo: Node3D = _stendardi[lato]
 	# Steso a faccia in su, con l'asta verso il davanti della plancia: resta dentro la colonna.
 	var angolo: float = -PI * 0.5 if steso else 0.0
-	var posizione: Vector3 = Vector3(0.0, 0.05, POSIZIONE_STESO_Z) if steso else Vector3.ZERO
-	var scala: Vector3 = Vector3.ONE * (0.85 if steso else 1.0)
+	var posizione: Vector3 = Vector3(0.0, 0.05, POSIZIONE_STESO_Z + BASE_TELO) if steso else Vector3.ZERO
+	var scala: Vector3 = Vector3.ONE
 	_dati_scontro[lato].visible = not steso
 	for segmento: MeshInstance3D in _anelli[lato]:
 		segmento.visible = not steso
+	_braci_miccia[lato].visible = false
+	# Steso a terra lo stendardo non ha l'asta.
+	for parte: Node3D in _aste_stendardo[lato]:
+		parte.visible = not steso
 	if not animato:
 		stendardo.rotation.x = angolo
 		stendardo.position = posizione
@@ -599,29 +612,39 @@ static func _iniziali_di(nome: String) -> String:
 
 
 ## Anello di segmenti attorno al ritratto: il tempo della battaglia.
+## La miccia del tempo dello scontro (Davide, 8 novembre 2026: l'anello attorno allo stendardo non
+## aveva senso). Una corda di carta davanti allo stendardo che brucia da sinistra a destra fino
+## all'inizio del logoramento; da lì in poi è tutta rossa. Si vede solo negli scontri.
 func _crea_anello(medaglione: Node3D, lato: int) -> void:
 	if _materiale_anello_spento == null:
-		_materiale_anello_spento = StileVisivo.materiale(Color("26304a"), 0.9)
-		_materiale_anello_acceso = StileVisivo.materiale_luminoso(StileVisivo.ORO, 0.7)
+		_materiale_anello_spento = StileVisivo.materiale(StileVisivo.CARTA_CREMA.darkened(0.25), 0.9)
+		_materiale_anello_acceso = StileVisivo.materiale(Color("1a1410"), 0.95)
 		_materiale_anello_logoramento = StileVisivo.materiale_luminoso(StileVisivo.PERICOLO, 1.4)
-	var raggio: float = 1.13
+	var lunghezza: float = 2.4
 	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(0.11, 0.06, 0.13)
+	forma.size = Vector3(lunghezza / float(SEGMENTI_ANELLO) * 0.9, 0.05, 0.08)
 	_anelli[lato] = []
 	for i: int in range(SEGMENTI_ANELLO):
-		# Dall'alto, in senso orario come una lancetta.
-		var angolo: float = -PI / 2.0 + TAU * float(i) / float(SEGMENTI_ANELLO)
 		var segmento: MeshInstance3D = MeshInstance3D.new()
 		segmento.mesh = forma
 		segmento.material_override = _materiale_anello_spento
-		segmento.position = Vector3(cos(angolo) * raggio, 0.05, sin(angolo) * raggio)
-		segmento.rotation.y = -angolo + PI / 2.0
+		var t: float = float(i) / float(SEGMENTI_ANELLO - 1)
+		# Una leggera onda: è una corda, non un righello.
+		segmento.position = Vector3(-lunghezza * 0.5 + lunghezza * t, 0.05, POSIZIONE_MICCIA_Z + sin(t * TAU * 1.5) * 0.05)
 		medaglione.add_child(segmento)
 		_anelli[lato].append(segmento)
+	var brace: MeshInstance3D = MeshInstance3D.new()
+	var forma_brace: SphereMesh = SphereMesh.new()
+	forma_brace.radius = 0.08
+	forma_brace.height = 0.16
+	brace.mesh = forma_brace
+	brace.material_override = StileVisivo.materiale_luminoso(StileVisivo.BRACE, 5.0)
+	medaglione.add_child(brace)
+	_braci_miccia[lato] = brace
 	_stato_anelli[lato] = 0
 
 
-## Riempie l'anello fino all'inizio del logoramento; da lì in poi è tutto rosso.
+## Brucia la miccia fino all'inizio del logoramento; da lì in poi è tutta rossa.
 func _aggiorna_anello(lato: int, millisecondi: int) -> void:
 	var inizio: int = maxi(1, run.battle_rules.attrition_start_ms)
 	var stato: int = -2 if millisecondi >= inizio else int(float(millisecondi) / float(inizio) * SEGMENTI_ANELLO)
@@ -634,6 +657,11 @@ func _aggiorna_anello(lato: int, millisecondi: int) -> void:
 			segmento.material_override = _materiale_anello_logoramento
 		else:
 			segmento.material_override = _materiale_anello_acceso if i < stato else _materiale_anello_spento
+	var brace: MeshInstance3D = _braci_miccia[lato]
+	var in_corso: bool = stato >= 0 and stato < _anelli[lato].size() and _dati_scontro[lato].visible
+	brace.visible = in_corso
+	if in_corso:
+		brace.position = (_anelli[lato][stato] as MeshInstance3D).position + Vector3(0.0, 0.05, 0.0)
 
 
 # --- Carte sulla plancia ---------------------------------------------------------
@@ -855,8 +883,12 @@ func _costruisci_scelte() -> void:
 			misura = MISURA_EDIFICIO
 		elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 			misura = MISURA_TRUPPA
-		var arrivo: Vector3 = Vector3(-0.4 + (i - (schede.size() - 1) * 0.5) * 4.4, 1.8, -2.4)
-		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6)
+		var arrivo: Vector3 = Vector3(-0.4 + (i - (schede.size() - 1) * 0.5) * 4.4, 2.3, -3.3)
+		# Consiglieri e avvenimenti con un'illustrazione: mezzo busto che esce dall'alto, tipi sotto.
+		var busto: bool = scheda.genere == SchedaCarta.Genere.CONSIGLIERE and scheda.illustrazione != null
+		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6, busto)
+		tessera.aggiungi_busto()
+		var sotto_tipi: float = LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA if busto and not scheda.tipi.is_empty() else 0.0
 		tessera.rotation_degrees = Vector3(38.0, 0.0, 0.0)
 		tessera.scale = Vector3.ONE * SCALA_SCELTA
 		if not scheda.simboli.is_empty():
@@ -865,11 +897,15 @@ func _costruisci_scelte() -> void:
 			var sopra: Label3D = StileVisivo.scritta(scheda.sopratitolo.to_upper(), StileVisivo.FONT_TITOLI, 42, StileVisivo.TESTO, 0.0, 10)
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
 			# Sopra la carta c'è la linguetta dei tipi: la scritta sale sopra la linguetta.
-			if not scheda.tipi.is_empty():
+			if not scheda.tipi.is_empty() and not busto:
 				sopra.position.z -= LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA
+			# Con il mezzo busto sopra, la scritta passa sotto la carta, dopo i tipi e il verbo.
+			if busto:
+				sopra.position.z = misura.y * 0.5 + sotto_tipi + 0.62
+				sopra.font_size = 34
 			tessera.add_child(sopra)
 		var costo: Label3D = StileVisivo.scritta(scheda.costo, StileVisivo.FONT_TITOLI, 54, StileVisivo.ORO_LUCE if scheda.disponibile else StileVisivo.PERICOLO, 0.0, 12)
-		costo.position = Vector3(0.0, 0.02, misura.y * 0.5 + 0.27)
+		costo.position = Vector3(0.0, 0.02, misura.y * 0.5 + 0.27 + sotto_tipi)
 		tessera.add_child(costo)
 		_costi_scelte.append(costo)
 		_scelte.append(tessera)
@@ -1565,7 +1601,7 @@ func _colpo(lato: int, danno: int, nota: String) -> void:
 	salto.tween_property(numero, "global_position", base + Vector3(0.0, 1.2, 0.0), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	salto.tween_property(numero, "modulate:a", 0.0, 0.5).set_delay(0.35)
 	salto.chain().tween_callback(numero.queue_free)
-	_brace(medaglione.global_position + Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.4, 0.2), mini(60, 14 + danno * 4))
+	_brace(medaglione.global_position + Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.4, 0.2), mini(60, 14 + danno * 4))
 	var centro: Vector3 = Vector3(X_MEDAGLIONE, 0.0, medaglione.position.z)
 	var scossa: Tween = create_tween()
 	for passo: int in range(4):
@@ -1589,7 +1625,7 @@ func _richiudi_sconfitto(esito: BattleSim.Outcome) -> void:
 			if tessera.figurina != null:
 				tessera.figurina.richiudi(ritardo)
 				ritardo += 0.06
-	_brace(_medaglioni[sconfitto].global_position + Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.5, 0.2), 90)
+	_brace(_medaglioni[sconfitto].global_position + Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.5, 0.2), 90)
 	var telo: ShaderMaterial = _teli_stendardo[sconfitto]
 	var brucia: Tween = create_tween()
 	brucia.tween_method(func(v: float) -> void: telo.set_shader_parameter("bruciatura", v), 0.5, 1.05, 1.6)
@@ -1634,7 +1670,7 @@ func _brace(dove: Vector3, quante: int) -> void:
 func _punto_scritta(lato: int) -> Vector3:
 	_scritte_uscite[lato] += 1
 	var turno: int = _scritte_uscite[lato] % 3
-	return _medaglioni[lato].global_position + Vector3(0.9 + turno * 0.6, 1.4 + ALTEZZA_STENDARDO * 0.6 + turno * 0.3, 0.3)
+	return _medaglioni[lato].global_position + Vector3(0.8 + turno * 0.6, 0.8 + ALTEZZA_STENDARDO * 0.6 + turno * 0.3, 0.3)
 
 
 ## Scritta che sale dallo stemma di un lato (scudo, cura, Corruzione, assedio).
