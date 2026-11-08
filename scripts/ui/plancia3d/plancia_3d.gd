@@ -28,7 +28,7 @@ const MARGINE_DESTRO_LASTRA: float = 0.35
 const PROFONDITA_LASTRA: float = 5.6
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
-const SCALA_MASSIMA: float = 1.25
+const SCALA_MASSIMA: float = 1.35
 const SCALA_MASSIMA_SCONTRO: float = 1.3
 const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
@@ -40,17 +40,21 @@ const MASSIMO_GEMME_IN_VOLO: int = 24
 
 ## Altezza del telo dello stendardo della nazione.
 const ALTEZZA_STENDARDO: float = 2.6
-## Teatro di carta: dove stanno il calendario pop-up e il sole/luna, sul fondo del palco.
-const POSIZIONE_CALENDARIO: Vector3 = Vector3(10.0, 0.0, -5.0)
-const POSIZIONE_ASTRO: Vector3 = Vector3(5.5, 0.0, -9.0)
+## Teatro di carta: il libro pop-up che fa da palco (x, z, larghezza, profondità), la fila dei mesi
+## che galleggia sullo sfondo sopra la città e il sole/luna.
+const LIBRO: Rect2 = Rect2(-19.0, -9.6, 38.0, 19.6)
+const POSIZIONE_FILA_MESI: Vector3 = Vector3(-0.4, 0.4, -12.6)
+const POSIZIONE_ASTRO: Vector3 = Vector3(13.5, -6.0, -16.0)
 
-const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 21.5, 20.0)
-const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -0.2)
+## Teatro di carta: la vista larga lascia vedere sopra la plancia la città e la fila dei mesi.
+const FOV_TELECAMERA: float = 40.0
+const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 19.5, 20.5)
+const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -1.8)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 1.2
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 22.0, 22.0)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.6)
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 17.0, 17.5)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 0.9)
 
 var run: RunState
 
@@ -220,9 +224,9 @@ func _crea_ambiente() -> void:
 	# sole/luna e calendario pop-up (solo scenografia).
 	_scena = ScenaTeatro.new()
 	add_child(_scena)
-	_scena.costruisci(POSIZIONE_CALENDARIO, POSIZIONE_ASTRO)
+	_scena.costruisci(LIBRO, POSIZIONE_FILA_MESI, POSIZIONE_ASTRO, CAMERA_PARTITA)
 	_camera = Camera3D.new()
-	_camera.fov = 30.0
+	_camera.fov = FOV_TELECAMERA
 	add_child(_camera)
 
 
@@ -846,6 +850,7 @@ func _aggiorna_tutto() -> void:
 	_aggiorna_stato_consiglieri()
 	_mostra_potenziabili(run.chosen_advisor)
 	_nomi_lato[Lato.GIOCATORE].text = run.nation_name.to_upper()
+	_scena.imposta_iniziali(_iniziali_di(run.nation_name))
 	_aggiorna_medaglione(Lato.GIOCATORE, run.player_resistance(), run.player_resistance())
 	# Il mese mostrato resta dentro la stagione in corso (durante un incontro il round va oltre il terzo).
 	var primo_mese: int = int(run.season) * run.run_rules.rounds_per_season + 1
@@ -1281,6 +1286,7 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	arrivo.tween_property(avversario, "position", Vector3.ZERO, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	arrivo.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_SCONTRO, MIRA_PARTITA, MIRA_SCONTRO), 0.0, 1.0, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	_hud.modalita_scontro(true, titolo)
+	_scena.mostra_fila_mesi(false)
 
 
 func _muovi_camera(t: float, da: Vector3, a: Vector3, mira_da: Vector3, mira_a: Vector3) -> void:
@@ -1616,6 +1622,7 @@ func _chiudi_scontro() -> void:
 	_sim = null
 	_modo = Modo.NORMALE
 	_hud.modalita_scontro(false)
+	_scena.mostra_fila_mesi(true)
 	# La plancia torna com'è fuori dagli scontri: niente riserva di mana, Scudo o Corruzione.
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_aggiorna_anello(lato, 0)

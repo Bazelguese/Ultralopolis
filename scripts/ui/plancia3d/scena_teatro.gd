@@ -1,7 +1,7 @@
 class_name ScenaTeatro
 extends Node3D
-## Scenografia del teatro di carta: la luce del momento del giorno, il tempo atmosferico e il
-## calendario pop-up sul fondo del palco.
+## Scenografia del teatro di carta: la luce del momento del giorno, il tempo atmosferico, il libro
+## pop-up che fa da palco e lo sfondo con la città e la fila dei mesi (SfondoCitta).
 ## SOLO SCENOGRAFIA (decisione di Davide, 8 novembre 2026): non ha alcun effetto sulle regole.
 ## Momento e tempo cambiano a ogni mese, scelti a caso ma coerenti con la stagione; lo stesso mese
 ## della stessa partita ha sempre lo stesso tempo. Il caso usa un generatore suo: la simulazione
@@ -25,8 +25,6 @@ const COLORE_AMBIENTE: Array[Color] = [Color("6a5060"), Color("8f949e"), Color("
 const ENERGIA_AMBIENTE: Array[float] = [0.5, 0.7, 0.5, 0.32]
 const ENERGIA_LANTERNA: Array[float] = [1.4, 0.35, 1.9, 3.4]
 
-## Colori delle stagioni sul calendario.
-const COLORE_STAGIONE: Array[Color] = [Color("8fb4d8"), Color("86c46e"), Color("e6a63c"), Color("c8643c")]
 const INCHIOSTRO: Color = Color("1a1410")
 const DURATA_CAMBIO: float = 1.6
 
@@ -46,8 +44,7 @@ var _nuvole: Array[MeshInstance3D] = []
 var _materiale_nuvole: StandardMaterial3D
 var _astro: Node3D
 var _materiale_astro: ShaderMaterial
-var _calendario: Node3D
-var _pagina: Node3D
+var _sfondo: SfondoCitta
 var _chiave_mese: String = ""
 var _tempo_scena: float = 0.0
 var _prossimo_lampo: float = 4.0
@@ -57,14 +54,17 @@ var _trame_astro: Dictionary = {}
 
 # --- Costruzione ------------------------------------------------------------------
 
-## Crea luci, pagina del tavolo, meteo, sole/luna e calendario.
-## calendario: dove sta il calendario pop-up; astro: dove sorgono sole e luna.
-func costruisci(calendario: Vector3, astro: Vector3) -> void:
+## Crea luci, libro pop-up, meteo, sole/luna e lo sfondo con la città e la fila dei mesi.
+## libro: rettangolo (x, z, larghezza, profondità) del libro; fila: dove galleggia il mese in corso;
+## astro: dove sorgono sole e luna; telecamera: da dove si guarda (i ritagli della città si girano lì).
+func costruisci(libro: Rect2, fila: Vector3, astro: Vector3, telecamera: Vector3) -> void:
 	_crea_luci()
-	_crea_pagina()
+	_crea_libro(libro)
 	_crea_meteo()
 	_crea_astro(astro)
-	_crea_calendario(calendario)
+	_sfondo = SfondoCitta.new()
+	add_child(_sfondo)
+	_sfondo.costruisci(libro, fila, telecamera, "")
 
 
 func _crea_luci() -> void:
@@ -109,16 +109,32 @@ func _crea_luci() -> void:
 	add_child(_lanterna)
 
 
-## Il tavolo è la pagina di fondo del libro pop-up: il suo colore è il cielo del momento.
-func _crea_pagina() -> void:
+## Il palco è un grande libro pop-up sospeso sopra la città: la sua pagina ha il colore del cielo
+## del momento, sotto si vedono il blocco delle pagine e la copertina.
+func _crea_libro(libro: Rect2) -> void:
+	var centro: Vector3 = Vector3(libro.get_center().x, 0.0, libro.get_center().y)
 	var pagina: MeshInstance3D = MeshInstance3D.new()
 	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(90.0, 0.5, 70.0)
+	forma.size = Vector3(libro.size.x, 0.5, libro.size.y)
 	pagina.mesh = forma
 	_materiale_pagina = materiale_carta(CIELO[Momento.NOTTE], 4.0)
 	pagina.material_override = _materiale_pagina
-	pagina.position.y = -0.45
+	pagina.position = centro + Vector3(0.0, -0.25, 0.0)
 	add_child(pagina)
+	var pagine: MeshInstance3D = MeshInstance3D.new()
+	var forma_pagine: BoxMesh = BoxMesh.new()
+	forma_pagine.size = Vector3(libro.size.x - 0.3, 1.4, libro.size.y - 0.3)
+	pagine.mesh = forma_pagine
+	pagine.material_override = StileVisivo.materiale(StileVisivo.CARTA_CREMA.darkened(0.15), 0.95)
+	pagine.position = centro + Vector3(0.0, -1.2, 0.0)
+	add_child(pagine)
+	var copertina: MeshInstance3D = MeshInstance3D.new()
+	var forma_copertina: BoxMesh = BoxMesh.new()
+	forma_copertina.size = Vector3(libro.size.x + 0.8, 0.35, libro.size.y + 0.8)
+	copertina.mesh = forma_copertina
+	copertina.material_override = StileVisivo.materiale(Color("4a1e16"), 0.7)
+	copertina.position = centro + Vector3(0.0, -2.05, 0.0)
+	add_child(copertina)
 
 
 func _crea_meteo() -> void:
@@ -280,79 +296,20 @@ func _disegna_astro(luna: bool) -> ImageTexture:
 	return trama
 
 
-## Il calendario pop-up: un foglio grande in piedi sul fondo del palco, che gira pagina a ogni mese.
-func _crea_calendario(posizione: Vector3) -> void:
-	_calendario = Node3D.new()
-	_calendario.position = posizione
-	add_child(_calendario)
-	var supporto: MeshInstance3D = MeshInstance3D.new()
-	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(3.6, 0.12, 0.6)
-	supporto.mesh = forma
-	supporto.material_override = StileVisivo.materiale(Color("2a2018"), 0.9)
-	supporto.position = Vector3(0.0, 0.06, 0.0)
-	_calendario.add_child(supporto)
+## Le iniziali della nazione sul sigillo dei mesi.
+func imposta_iniziali(testo: String) -> void:
+	_sfondo.imposta_iniziali(testo)
 
 
-func _nuova_pagina(anno: int, stagione: int, nome_mese: String, nome_stagione: String) -> Node3D:
-	var pagina: Node3D = Node3D.new()
-	# Il perno sta in alto: le pagine si girano all'insù, come un calendario da muro.
-	pagina.position = Vector3(0.0, 4.4, 0.0)
-	var foglio: MeshInstance3D = MeshInstance3D.new()
-	var forma: QuadMesh = QuadMesh.new()
-	forma.size = Vector2(3.4, 4.2)
-	foglio.mesh = forma
-	foglio.material_override = Figurina.materiale_carta(_trama_pagina(COLORE_STAGIONE[stagione]))
-	foglio.position = Vector3(0.0, -2.1, 0.0)
-	pagina.add_child(foglio)
-	var testa: Label3D = _scritta("ANNO %d" % anno, 64, INCHIOSTRO)
-	testa.position = Vector3(0.0, -0.42, 0.01)
-	pagina.add_child(testa)
-	# Il mese grande e inclinato, come una data di scena.
-	var mese: Label3D = _scritta(nome_mese.to_upper(), 150, INCHIOSTRO)
-	mese.position = Vector3(0.0, -1.75, 0.01)
-	mese.rotation.z = deg_to_rad(8.0)
-	mese.width = 760.0
-	mese.autowrap_mode = TextServer.AUTOWRAP_OFF
-	pagina.add_child(mese)
-	var fascia: Label3D = _scritta(nome_stagione.to_upper(), 82, Color("f4f1ea"))
-	fascia.position = Vector3(0.0, -3.35, 0.01)
-	fascia.outline_size = 14
-	fascia.outline_modulate = COLORE_STAGIONE[stagione].darkened(0.55)
-	pagina.add_child(fascia)
-	_calendario.add_child(pagina)
-	return pagina
-
-
-func _scritta(testo: String, dimensione: int, colore: Color) -> Label3D:
-	var s: Label3D = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, dimensione, colore, 0.0, 0)
-	s.rotation = Vector3.ZERO
-	s.pixel_size = 0.005
-	s.double_sided = false
-	return s
-
-
-func _trama_pagina(colore: Color) -> ImageTexture:
-	var img: Image = Image.create(170, 210, false, Image.FORMAT_RGBA8)
-	img.fill(Figurina.COLORE_CARTA)
-	img.fill_rect(Rect2i(0, 0, 170, 30), INCHIOSTRO)
-	img.fill_rect(Rect2i(0, 150, 170, 44), colore)
-	# Bordo inferiore strappato.
-	for x: int in range(170):
-		var strappo: int = 200 + int(absf(sin(x * 0.7) * 3.0 + sin(x * 0.23) * 4.0))
-		for y: int in range(mini(strappo, 210), 210):
-			img.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
-	# Fori degli anelli in alto.
-	for foro: int in [40, 85, 130]:
-		img.fill_rect(Rect2i(foro - 4, 10, 8, 8), Color(0.0, 0.0, 0.0, 0.0))
-	img.generate_mipmaps()
-	return ImageTexture.create_from_image(img)
+## La fila dei mesi si nasconde durante gli scontri.
+func mostra_fila_mesi(visibile: bool) -> void:
+	_sfondo.mostra_fila(visibile)
 
 
 # --- Il mese -----------------------------------------------------------------------
 
-## Il mese della partita: sceglie momento e tempo e, se il mese è cambiato, gira la pagina
-## del calendario. seme: diverso per ogni partita, ma fisso dentro la stessa partita.
+## Il mese della partita: sceglie momento e tempo e, se il mese è cambiato, fa scorrere la
+## fila dei mesi sullo sfondo. seme: diverso per ogni partita, ma fisso dentro la stessa partita.
 func imposta_mese(anno: int, stagione: int, mese: int, nome_mese: String, nome_stagione: String, seme: int, subito: bool) -> void:
 	var chiave: String = "%d-%d-%d" % [anno, stagione, mese]
 	if chiave == _chiave_mese:
@@ -363,7 +320,7 @@ func imposta_mese(anno: int, stagione: int, mese: int, nome_mese: String, nome_s
 	tempo = _pesca(PESI_TEMPO[stagione]) as Tempo
 	_applica_luce(0.0 if subito else DURATA_CAMBIO)
 	_applica_meteo(stagione)
-	_gira_pagina(anno, stagione, nome_mese, nome_stagione, subito)
+	_sfondo.vai_al_mese(anno, mese, nome_stagione, subito)
 
 
 func _pesca(pesi: Array) -> int:
@@ -414,6 +371,7 @@ func _applica_luce(durata: float) -> void:
 		t.tween_property(_ambiente, "fog_light_color", cielo.darkened(0.6), durata)
 		t.tween_property(_materiale_pagina, "albedo_color", cielo, durata)
 	_cambia_astro(m, durata)
+	_sfondo.imposta_finestre(1.0 if m == Momento.NOTTE else (0.55 if m != Momento.GIORNO else 0.0), durata)
 
 
 func _applica_meteo(stagione: int) -> void:
@@ -439,31 +397,6 @@ func _cambia_astro(m: int, durata: float) -> void:
 	t.tween_property(_astro, "position:y", altezza, durata * 0.55).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
-## La pagina vecchia si solleva e vola via; sotto c'è già quella nuova.
-func _gira_pagina(anno: int, stagione: int, nome_mese: String, nome_stagione: String, subito: bool) -> void:
-	var vecchia: Node3D = _pagina
-	_pagina = _nuova_pagina(anno, stagione, nome_mese, nome_stagione)
-	if vecchia == null or subito:
-		if vecchia != null:
-			vecchia.queue_free()
-		return
-	# La nuova sta appena dietro, la vecchia davanti finché non si gira.
-	_pagina.position.z = -0.02
-	var t: Tween = create_tween()
-	t.tween_property(vecchia, "rotation:x", -PI * 0.95, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-	t.parallel().tween_property(vecchia, "position:y", vecchia.position.y + 0.6, 0.7)
-	t.tween_property(vecchia, "position:z", vecchia.position.z - 2.0, 0.25)
-	t.parallel().tween_property(vecchia, "scale", Vector3(0.01, 0.01, 0.01), 0.25)
-	t.tween_callback(vecchia.queue_free)
-	var nuova: Node3D = _pagina
-	t.tween_callback(func() -> void: nuova.position.z = 0.0)
-	# Il calendario fa un piccolo salto quando cambia il mese.
-	var salto: Tween = create_tween()
-	salto.tween_interval(0.5)
-	salto.tween_property(_calendario, "scale", Vector3(1.08, 1.08, 1.08), 0.12)
-	salto.tween_property(_calendario, "scale", Vector3.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
-
 # --- Ogni fotogramma ---------------------------------------------------------------
 
 func aggiorna(delta: float) -> void:
@@ -475,7 +408,6 @@ func aggiorna(delta: float) -> void:
 		nuvola.position.x += delta * 1.2
 		if nuvola.position.x > 36.0:
 			nuvola.position.x -= 72.0
-	_calendario.rotation.y = sin(_tempo_scena * 0.5) * 0.04
 	if tempo == Tempo.TEMPORALE:
 		_prossimo_lampo -= delta
 		if _prossimo_lampo <= 0.0:
