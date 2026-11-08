@@ -56,9 +56,9 @@ var _animazione: Tween
 ## Crea la figurina sopra una carta larga "larghezza"; z_base è dove poggia (il centro della
 ## pedana, cioè della zona dove la carta avrebbe l'illustrazione).
 ## verso: -1 se l'avversario è lontano dalla telecamera, +1 se è vicino.
-func costruisci(illustrazione: Texture2D, larghezza: float, z_base: float, y_carta: float, verso: float) -> void:
+func costruisci(illustrazione: Texture2D, larghezza: float, z_base: float, y_carta: float, verso: float, fattore_altezza: float = 0.95) -> void:
 	_verso = verso
-	altezza = larghezza * 0.95
+	altezza = larghezza * fattore_altezza
 	_perno = Node3D.new()
 	_perno.position = Vector3(0.0, y_carta, z_base)
 	add_child(_perno)

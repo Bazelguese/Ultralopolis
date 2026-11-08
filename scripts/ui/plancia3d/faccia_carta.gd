@@ -395,9 +395,9 @@ func _crea_arte() -> void:
 ## Teatro di carta: la pedana su cui sta la figurina, carta scura con un'ombra ovale al centro.
 func _pedana() -> Texture2D:
 	var sfumatura: Gradient = Gradient.new()
-	sfumatura.set_color(0, Color("100c09"))
-	sfumatura.add_point(0.45, Color("2a2018"))
-	sfumatura.set_color(1, Color("3b2e22"))
+	sfumatura.set_color(0, Color("060403"))
+	sfumatura.add_point(0.45, Color("120d0a"))
+	sfumatura.set_color(1, Color("1e1711"))
 	var trama: GradientTexture2D = GradientTexture2D.new()
 	trama.gradient = sfumatura
 	trama.fill = GradientTexture2D.FILL_RADIAL

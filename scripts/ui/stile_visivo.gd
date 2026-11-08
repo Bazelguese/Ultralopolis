@@ -12,8 +12,8 @@ const NOTTE: Color = Color("0b1220")
 const PIETRA_SCURA: Color = Color("161f30")
 const PIETRA: Color = Color("2c3a52")
 const PIETRA_CHIARA: Color = Color("3f5273")
-const FACCIA_CARTA: Color = Color("18213a")
-const FASCIA_NOME: Color = Color("0e1526")
+const FACCIA_CARTA: Color = Color("241c16")
+const FASCIA_NOME: Color = Color("120d0a")
 
 # Teatro di carta (scelto da Davide l'8 novembre 2026): buio, una lanterna, plance di carta.
 const BUIO: Color = Color("050403")

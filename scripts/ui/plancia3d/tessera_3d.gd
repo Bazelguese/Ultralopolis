@@ -68,8 +68,9 @@ func _crea_faccia(nitidezza: float) -> void:
 	materiale.albedo_texture = _viewport.get_texture()
 	materiale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 	materiale.alpha_scissor_threshold = 0.5
-	materiale.roughness = 0.45
-	materiale.metallic_specular = 0.6
+	# Cartoncino opaco: niente riflessi biancastri della lanterna.
+	materiale.roughness = 0.9
+	materiale.metallic_specular = 0.15
 	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
 	carta.material_override = materiale
 	_materiale_faccia = materiale
@@ -322,13 +323,13 @@ func aggiungi_busto() -> void:
 ## Teatro di carta: la figurina ritagliata dall'illustrazione si alza dal bordo della carta.
 ## verso: -1 se l'avversario è lontano dalla telecamera, +1 se è vicino.
 ## Senza illustrazione non c'è figurina.
-func aggiungi_figurina(verso: float, ritardo: float, animata: bool) -> void:
+func aggiungi_figurina(verso: float, ritardo: float, animata: bool, fattore_altezza: float = 0.95) -> void:
 	if scheda.illustrazione == null or figurina != null:
 		return
 	figurina = Figurina.new()
 	_corpo.add_child(figurina)
 	var z_base: float = -profondita * 0.5 + profondita * _faccia.centro_arte()
-	figurina.costruisci(scheda.illustrazione, larghezza, z_base, SPESSORE, verso)
+	figurina.costruisci(scheda.illustrazione, larghezza, z_base, SPESSORE, verso, fattore_altezza)
 	if animata:
 		figurina.alza(ritardo)
 	else:

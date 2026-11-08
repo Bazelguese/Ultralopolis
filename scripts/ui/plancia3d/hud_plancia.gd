@@ -840,7 +840,7 @@ func _crea_comandi() -> void:
 	_comandi = VBoxContainer.new()
 	_comandi.alignment = BoxContainer.ALIGNMENT_CENTER
 	_comandi.add_theme_constant_override("separation", 8)
-	_suggerimento_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 19, StileVisivo.TESTO)
+	_suggerimento_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 16, Color(StileVisivo.TESTO, 0.85))
 	_suggerimento_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_suggerimento_fase.add_theme_constant_override("outline_size", 8)
 	_suggerimento_fase.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
