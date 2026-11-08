@@ -1485,16 +1485,39 @@ func _special_options(event: EventDef) -> Array[EventOptionDef]:
 	return built
 
 
-## Requisito di un'opzione, es. "Spirituale" o "Repubblica"; vuoto se non ne ha.
+## Requisito di un'opzione, es. "Spirituale", "Repubblica" o "truppa Fante"; vuoto se non ne ha.
+## Ricavato dai dati, con le stesse parole delle etichette scritte a mano ("truppa Fante",
+## "edificio di Materie prime"), così lo stesso requisito si legge sempre allo stesso modo.
 func option_requirement(option: EventOptionDef) -> String:
 	if option.requirement_label != "":
 		return option.requirement_label
 	var parts: PackedStringArray = PackedStringArray()
 	for element: Resource in option.requires_identity:
 		parts.append((element as IdentityDef).display_name)
-	for card_type: StringName in option.requires_types:
-		parts.append(String(card_type))
+	if not option.requires_types.is_empty():
+		var types: String = " o ".join(option.requires_types)
+		match option.requires_kind:
+			EventOptionDef.PieceKind.EDIFICIO:
+				parts.append("edificio di %s" % types)
+			EventOptionDef.PieceKind.TRUPPA:
+				parts.append("truppa %s" % types)
+			_:
+				parts.append(types)
 	return " o ".join(parts)
+
+
+## Che cosa serve sulla plancia per un'opzione con requisito di tipo, es. "un edificio di Materie
+## prime", "una truppa Fante", "una tessera di tipo Legge"; vuoto se l'opzione non chiede tipi.
+func option_requirement_need(option: EventOptionDef) -> String:
+	if option.requires_types.is_empty():
+		return ""
+	var types: String = " o ".join(option.requires_types)
+	match option.requires_kind:
+		EventOptionDef.PieceKind.EDIFICIO:
+			return "un edificio di %s" % types
+		EventOptionDef.PieceKind.TRUPPA:
+			return "una truppa %s" % types
+	return "una tessera di tipo %s" % types
 
 
 ## Perché l'opzione non si può scegliere adesso; stringa vuota se si può (principio P4).
