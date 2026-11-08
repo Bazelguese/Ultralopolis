@@ -295,7 +295,8 @@ func aggiungi_figurina(verso: float, ritardo: float, animata: bool) -> void:
 		return
 	figurina = Figurina.new()
 	_corpo.add_child(figurina)
-	figurina.costruisci(scheda.illustrazione, larghezza, profondita, SPESSORE, verso)
+	var z_base: float = -profondita * 0.5 + profondita * _faccia.centro_arte()
+	figurina.costruisci(scheda.illustrazione, larghezza, z_base, SPESSORE, verso)
 	if animata:
 		figurina.alza(ritardo)
 	else:

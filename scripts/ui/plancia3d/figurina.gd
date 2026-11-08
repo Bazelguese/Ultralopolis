@@ -1,12 +1,13 @@
 class_name Figurina
 extends Node3D
 ## Teatro di carta (scelta di Davide, 8 novembre 2026): la figura dell'illustrazione, ritagliata
-## come una figurina di carta, che si alza dal bordo posteriore della carta come in un libro pop-up.
+## come una figurina di carta, che si alza dal centro della carta come in un libro pop-up
+## (la carta le fa da base, Davide 8 novembre 2026).
 ## Il ritaglio si fa da solo: si toglie il fondo nero che tocca i bordi dell'immagine (non le linee
 ## d'inchiostro dentro la figura) e si aggiunge un bordo di carta color crema.
 ## Solo presentazione: nessuna regola di gioco.
 
-const COLORE_CARTA: Color = Color("ece2cc")
+const COLORE_CARTA: Color = StileVisivo.CARTA_CREMA
 ## Sotto questa luminosità un pixel del fondo conta come nero.
 const SOGLIA_NERO: float = 0.15
 ## Lato dell'immagine su cui si calcola la sagoma (più piccolo = più veloce, contorno più morbido).
@@ -50,13 +51,14 @@ var _verso: float = -1.0
 var _animazione: Tween
 
 
-## Crea la figurina sopra una carta larga "larghezza" e profonda "profondita".
+## Crea la figurina sopra una carta larga "larghezza"; z_base è dove poggia (il centro della
+## pedana, cioè della zona dove la carta avrebbe l'illustrazione).
 ## verso: -1 se l'avversario è lontano dalla telecamera, +1 se è vicino.
-func costruisci(illustrazione: Texture2D, larghezza: float, profondita: float, y_carta: float, verso: float) -> void:
+func costruisci(illustrazione: Texture2D, larghezza: float, z_base: float, y_carta: float, verso: float) -> void:
 	_verso = verso
 	altezza = larghezza * 0.95
 	_perno = Node3D.new()
-	_perno.position = Vector3(0.0, y_carta, -profondita * 0.5 + 0.06)
+	_perno.position = Vector3(0.0, y_carta, z_base)
 	add_child(_perno)
 	var forma: QuadMesh = QuadMesh.new()
 	forma.size = Vector2(altezza, altezza)
@@ -264,6 +266,15 @@ static func _immagine_maschera(valori: PackedFloat32Array, n: int) -> Image:
 	for i: int in range(n * n):
 		dati[i] = int(clampf(valori[i], 0.0, 1.0) * 255.0)
 	return Image.create_from_data(n, n, false, Image.FORMAT_L8, dati)
+
+
+## Materiale di carta del teatro (figurine, stendardi): può bruciare e lampeggiare.
+static func materiale_carta(trama: Texture2D) -> ShaderMaterial:
+	var materiale: ShaderMaterial = ShaderMaterial.new()
+	materiale.shader = _shader_condiviso()
+	materiale.set_shader_parameter("tex", trama)
+	materiale.set_shader_parameter("rumore", _rumore_condiviso())
+	return materiale
 
 
 static func _shader_condiviso() -> Shader:

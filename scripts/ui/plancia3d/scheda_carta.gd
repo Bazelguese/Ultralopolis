@@ -42,6 +42,9 @@ var prezzo: bool = false
 ## Testo completo del riquadro che compare passando il mouse.
 var dettagli: String = ""
 var illustrazione: Texture2D
+## Teatro di carta: la carta fa da base alla figurina, quindi non ripete l'illustrazione
+## (al suo posto c'è la pedana di carta su cui la figurina sta in piedi).
+var come_base: bool = false
 ## false se l'offerta non si può pagare: la carta appare spenta.
 var disponibile: bool = true
 ## Colore della categoria di un consigliere (solo grafica).
