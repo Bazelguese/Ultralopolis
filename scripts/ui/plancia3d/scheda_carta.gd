@@ -66,7 +66,18 @@ func colore_cornice() -> Color:
 
 # --- Costruzione dai dati del gioco --------------------------------------------
 
-static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = "") -> SchedaCarta:
+## p_livello_massimo: il livello più alto delle tessere nella partita (0 se non si conosce: allora
+## il riquadro dice solo il livello).
+static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = "", p_livello_massimo: int = 0) -> SchedaCarta:
+	return _edificio(def, p_livello, p_malus, _produzione_di_base(def), p_livello_massimo)
+
+
+static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p_affamata: bool = false, p_livello_massimo: int = 0) -> SchedaCarta:
+	return _truppa(def, p_livello, p_malus, p_affamata, def.food_tenths, p_livello_massimo)
+
+
+## produzione: quello che l'edificio deposita a ogni stagione, in unità interne (Res).
+static func _edificio(def: BuildingDef, p_livello: int, p_malus: String, produzione: Array[int], p_livello_massimo: int) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.EDIFICIO
 	scheda.id = def.id
@@ -82,32 +93,39 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 	scheda.corruzione = def.corruption
 	scheda.illustrazione = _carica("edifici/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
-	var produzione: PackedStringArray = PackedStringArray()
+	var sulla_carta: PackedStringArray = PackedStringArray()
+	var nel_riquadro: PackedStringArray = PackedStringArray()
 	for tipo: Res.Type in Res.NAMES:
-		var quanto: int = def.production(tipo)
-		if quanto != 0:
-			produzione.append("+%d %s" % [quanto, Res.NAMES[tipo]])
-	scheda.riga = " · ".join(produzione.slice(0, 2))
-	righe.append("A ogni stagione: %s." % (", ".join(produzione) if not produzione.is_empty() else "nessuna risorsa"))
+		var quanto: int = produzione[tipo]
+		if quanto == 0:
+			continue
+		var testo: String = "%s%s %s" % ["+" if quanto > 0 else "", Res.format(tipo, quanto), Res.NAMES[tipo]]
+		sulla_carta.append(testo)
+		# D'inverno gli edifici non producono Cibo (GDD §5.2).
+		nel_riquadro.append(testo + (" (non d'inverno)" if tipo == Res.Type.CIBO and quanto > 0 else ""))
+	scheda.riga = " · ".join(sulla_carta.slice(0, 2))
+	righe.append("A ogni stagione: %s." % (", ".join(nel_riquadro) if not nel_riquadro.is_empty() else "nessuna risorsa"))
+	var ciclo: String = "ogni ciclo di %s" % secondi(def.mana_interval_ms)
 	if def.mana_amount > 0:
-		righe.append("Nello scontro: %d %s ogni ciclo di %s." % [def.mana_amount, def.mana_type, secondi(def.mana_interval_ms)])
+		righe.append("Nello scontro: %d mana %s %s." % [def.mana_amount, def.mana_type, ciclo])
 	else:
 		righe.append("Edificio neutro: non produce mana.")
-	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, 0, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, "ogni %s" % secondi(def.mana_interval_ms)))
+	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, 0, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, ciclo))
 	if def.extra_building_slots > 0:
 		righe.append("+%d spazio edificio." % def.extra_building_slots)
 	if def.extra_troop_slots > 0:
 		righe.append("+%d spazio truppa." % def.extra_troop_slots)
 	if def.is_capital:
 		righe.append("Non si può vendere né sostituire.")
-	righe.append(_riga_tipi(def.types, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello, p_livello_massimo, def.is_capital))
 	if p_malus != "":
 		righe.append("Colpito da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
 	return scheda
 
 
-static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p_affamata: bool = false) -> SchedaCarta:
+## razione: il Cibo che la truppa mangia a inizio anno, in decimi (Res).
+static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: bool, razione: int, p_livello_massimo: int) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.TRUPPA
 	scheda.id = def.id
@@ -129,20 +147,32 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 	if def.mana_cost > 0:
 		righe.append("Costa %d mana %s (se manca, usa l'energetico)." % [def.mana_cost, def.mana_type])
 	else:
-		righe.append("Senza mana: agisce appena finisce la ricarica.")
+		righe.append("Non chiede mana: si attiva appena finisce la ricarica.")
 	if def.damage > 0:
-		righe.append("%d danni (prima allo scudo, poi alla Resistenza) · ricarica %s." % [def.damage, secondi(def.cooldown_ms)])
+		righe.append("%d %s (prima allo scudo, poi alla Resistenza) · ricarica %s." % [def.damage, "danno" if def.damage == 1 else "danni", secondi(def.cooldown_ms)])
 	else:
 		righe.append("Ricarica %s." % secondi(def.cooldown_ms))
 	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, def.siege_damage, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, "a ogni attivazione"))
-	righe.append("Mangia %s Cibo a inizio anno." % Res.format(Res.Type.CIBO, def.food_tenths))
+	# La razione si mangia dal secondo anno (GDD §5.4); quella vera passa per bonus e malus.
+	var riga_razione: String = "Razione: %s Cibo a inizio anno (dal secondo anno" % Res.format(Res.Type.CIBO, razione)
+	if razione != def.food_tenths:
+		riga_razione += "; di base %s" % Res.format(Res.Type.CIBO, def.food_tenths)
+	righe.append(riga_razione + ").")
 	if p_affamata:
 		righe.append("Affamata: ricarica più lenta fino al prossimo pasto.")
-	righe.append(_riga_tipi(def.types, p_livello))
+	righe.append(_riga_tipi(def.types, p_livello, p_livello_massimo, false))
 	if p_malus != "":
 		righe.append("Colpita da: %s." % p_malus)
 	scheda.dettagli = "\n".join(righe)
 	return scheda
+
+
+## Produzione di catalogo di un edificio, al livello 1 e senza bonus, in unità interne (Res).
+static func _produzione_di_base(def: BuildingDef) -> Array[int]:
+	var produzione: Array[int] = Res.empty()
+	for tipo: Res.Type in Res.NAMES:
+		produzione[tipo] = def.production(tipo) * Res.scale(tipo)
+	return produzione
 
 
 ## Un elemento della plancia del giocatore, con livello e modificatori che lo colpiscono.
@@ -153,10 +183,12 @@ static func da_pezzo(run: RunState, pezzo: BoardPiece) -> SchedaCarta:
 			nomi_malus.append(modificatore.def.display_name)
 	var malus_testo: String = ", ".join(nomi_malus)
 	var scheda: SchedaCarta
+	# Sulla plancia i numeri sono quelli veri: livello, bonus e malus, e per la Capitale anche le
+	# risorse in più dell'identità (GDD §6.2); la razione passa per i suoi modificatori (§5.4).
 	if pezzo.building != null:
-		scheda = da_edificio(run.effective_building(pezzo), pezzo.level, malus_testo)
+		scheda = _edificio(run.effective_building(pezzo), pezzo.level, malus_testo, run.building_production(pezzo), run.max_level())
 	else:
-		scheda = da_truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry)
+		scheda = _truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry, run.troop_ration(pezzo), run.max_level())
 	scheda.dettagli += _riga_mantenimento(run, pezzo)
 	if pezzo.building != null:
 		return scheda
@@ -171,10 +203,10 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	var scheda: SchedaCarta
 	match offerta.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
-			scheda = da_edificio(offerta.building)
+			scheda = da_edificio(offerta.building, 1, "", run.max_level())
 			scheda.sopratitolo = "Edificio"
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
-			scheda = da_truppa(offerta.troop)
+			scheda = da_truppa(offerta.troop, 1, "", false, run.max_level())
 			scheda.sopratitolo = "Truppa"
 		OpportunityDef.Kind.PERK:
 			scheda = SchedaCarta.new()
@@ -449,19 +481,38 @@ static func _righe_effetti(scudo_v: int, cura_v: int, corruzione_v: int, assedio
 	if corruzione_v > 0:
 		righe.append("%d Corruzione al nemico %s." % [corruzione_v, quando])
 	if assedio_v > 0:
-		righe.append("Danno d'assedio: toglie %d scudo al nemico." % assedio_v)
+		righe.append("Danno d'assedio: toglie fino a %d scudo al nemico." % assedio_v)
+	# Inefficienza e Sabotaggio colpiscono una sola tessera nemica, a caso e a turno (GDD §7.7.2).
 	if inefficienza_ms > 0:
-		righe.append("Inefficienza ai nemici (%s) per %s." % [TimerTarget.NAMES[bersaglio_inefficienza], secondi(inefficienza_ms)])
+		righe.append("Rende Inefficiente %s per %s, %s." % [_bersaglio_a_caso(bersaglio_inefficienza), secondi(inefficienza_ms), quando])
 	if sabotaggio_ms > 0:
-		righe.append("Sabotaggio ai nemici (%s) per %s." % [TimerTarget.NAMES[bersaglio_sabotaggio], secondi(sabotaggio_ms)])
+		righe.append("Sabota %s per %s, %s." % [_bersaglio_a_caso(bersaglio_sabotaggio), secondi(sabotaggio_ms), quando])
 	return righe
 
 
-static func _riga_tipi(tipi: Array[StringName], p_livello: int) -> String:
+## "1 truppa nemica a caso", secondo i bersagli ammessi (GDD §7.7.1).
+static func _bersaglio_a_caso(bersaglio: TimerTarget.Kind) -> String:
+	match bersaglio:
+		TimerTarget.Kind.TRUPPE:
+			return "1 truppa nemica a caso"
+		TimerTarget.Kind.EDIFICI:
+			return "1 edificio nemico a caso"
+	return "1 tessera nemica a caso"
+
+
+## Livello e tipi. La Capitale non ha livelli (nessun consigliere la potenzia): solo i tipi.
+## livello_massimo 0: non si conosce (nessuna partita), si scrive solo il livello.
+static func _riga_tipi(tipi: Array[StringName], p_livello: int, livello_massimo: int = 0, capitale: bool = false) -> String:
 	var nomi: PackedStringArray = PackedStringArray()
 	for tipo: StringName in tipi:
 		nomi.append(String(tipo))
-	return "Livello %d di 3 · Tipi: %s" % [p_livello, ", ".join(nomi) if not nomi.is_empty() else "nessuno"]
+	var testo_tipi: String = "Tipi: %s" % (", ".join(nomi) if not nomi.is_empty() else "nessuno")
+	if capitale:
+		return testo_tipi
+	var testo_livello: String = "Livello %d" % p_livello
+	if livello_massimo > 0:
+		testo_livello += " di %d" % livello_massimo
+	return "%s · %s" % [testo_livello, testo_tipi]
 
 
 static func _riassunto_azione(opportunita: OpportunityDef) -> String:
