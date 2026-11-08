@@ -91,6 +91,9 @@ static func _value(base: int, value: ModifierDef.BattleValue, piece: BoardPiece,
 	if base <= 0:
 		return base
 	var result: int = Modifiers.apply_percent(base, rules.troop_damage_percent_per_level * (level - 1))
+	# Ogni livello aumenta davvero il valore (GDD §6.5): con l'arrotondamento per difetto un
+	# valore 1 resterebbe 1 al livello 2, quindi c'è un aumento minimo per livello.
+	result = maxi(result, base + rules.min_value_gain_per_level * (level - 1))
 	if mods != null:
 		result = Modifiers.apply_percent(result, extra_percent + mods.battle_value(ModifierDef.Effect.VALORE_PERCENTUALE, value, piece))
 		result += mods.battle_value(ModifierDef.Effect.VALORE_FISSO, value, piece)
