@@ -112,12 +112,16 @@ func _esempi(catalogo: CatalogDef) -> Array:
 		offerta.research_price = def.cost_research
 		offerta.other_cost = def.cost_resources
 		esempi.append([SimboliEffetti.azione(offerta), "%s: %s" % [def.display_name, voce[1]]])
+	var proposte: RigaSimboli = RigaSimboli.new().icona(&"proposta").scritta(":").icona(&"edificio").scritta("/").icona(&"truppa")
+	proposte.rilievo = RigaSimboli.Rilievo.PRINCIPALE
+	esempi.append([proposte, "Riga colorata, in alto sul consigliere: che cosa ti propone in questo round (qui edifici e truppe dei suoi tipi). Sotto ci sono le sue azioni."])
 	var potenzia: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
-	esempi.append([potenzia, "Sul consigliere: potenzia le tue carte facendo pagare Ferro."])
+	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
+	esempi.append([potenzia, "Riga con il solo bordo, in fondo al consigliere: un servizio in più, non una proposta. Dopo averlo scelto puoi anche potenziare una tua carta dei suoi tipi, pagando Ferro, senza perdere la scelta del round."])
 	var pronto: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
+	pronto.rilievo = RigaSimboli.Rilievo.SECONDARIA
 	pronto.accesa = true
-	esempi.append([pronto, "Riga dorata: con questo consigliere puoi già potenziare qualche carta. Sotto la carta leggi quante: «Ascolta · ▲ Potenzia 2»."])
-	esempi.append([RigaSimboli.new().icona(&"edificio").scritta("/").icona(&"truppa"), "In questo round il consigliere propone anche edifici e truppe dei suoi tipi."])
+	esempi.append([pronto, "Potenzia dorato: puoi già potenziare qualche carta. Sotto la carta leggi quante: «Ascolta · ▲ Potenzia 2»."])
 	var due_effetti: RigaSimboli = RigaSimboli.new().icona(&"ricerca", "+2").scritta("·").icona(&"tecnologia", "+1")
 	esempi.append([due_effetti, "Il punto «·» separa due effetti della stessa scelta: li ottieni tutti e due."])
 	var bloccata: RigaSimboli = RigaSimboli.new().icona(&"bloccato").icona(&"documenti", "2", RigaSimboli.Tono.COSTO).scritta("→").icona(&"influenza", "+3")

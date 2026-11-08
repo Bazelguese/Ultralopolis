@@ -314,7 +314,10 @@ func _impacchetta(righe: Array[RigaSimboli], altezza: float, stacco: float) -> A
 	var occupata: float = 0.0
 	for riga: RigaSimboli in righe:
 		var serve: float = _larghezza_pastiglia(riga, altezza)
-		if linee.is_empty() or occupata + stacco + serve > _area_simboli.size.x:
+		# Una riga secondaria (il Potenzia) sta sempre su una linea sua, senza vicine.
+		var da_sola: bool = riga.rilievo == RigaSimboli.Rilievo.SECONDARIA
+		var precedente_sola: bool = not linee.is_empty() and (linee[linee.size() - 1][0] as RigaSimboli).rilievo == RigaSimboli.Rilievo.SECONDARIA
+		if linee.is_empty() or da_sola or precedente_sola or occupata + stacco + serve > _area_simboli.size.x:
 			linee.append([riga])
 			occupata = serve
 		else:
@@ -338,7 +341,7 @@ func _disegna_linea(linea: Array, y: float, altezza: float, stacco: float) -> vo
 		var larghezza: float = _area_simboli.size.x
 		if linea.size() > 1:
 			larghezza = richieste[i] + avanzo * richieste[i] / maxf(somma, 1.0)
-		DisegnoSimboli.pastiglia(_sopra, riga, Rect2(x, y, larghezza, altezza))
+		DisegnoSimboli.pastiglia(_sopra, riga, Rect2(x, y, larghezza, altezza), scheda.colore_cornice())
 		x += larghezza + stacco
 
 

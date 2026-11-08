@@ -37,6 +37,14 @@ var simboli: Array[Simbolo] = []
 var etichetta: String = ""
 ## La riga non si può usare adesso (es. opzione con un requisito mancante): appare spenta.
 var spenta: bool = false
+## Quanto conta la riga sulla carta: decide il fondo della pastiglia (gerarchia, richiesta di Davide).
+enum Rilievo {
+	NORMALE,     ## Fondo scuro: un'azione, un'opzione.
+	PRINCIPALE,  ## Fondo del colore della carta: ciò che il consigliere propone nel round.
+	SECONDARIA,  ## Solo un bordo sottile, più bassa, sempre su una linea sua: un extra (Potenzia).
+}
+
+var rilievo: Rilievo = Rilievo.NORMALE
 ## La riga si può già usare con vantaggio (es. Potenzia, con carte potenziabili): fondo dorato.
 var accesa: bool = false
 

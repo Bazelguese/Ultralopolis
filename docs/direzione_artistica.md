@@ -116,7 +116,8 @@ Regole della grafica:
 - Le righe corte stanno **affiancate** sulla stessa linea, ognuna nella sua pastiglia, per non sprecare spazio (richiesta di Davide); gli incanti e gli spionaggi di un consigliere si riuniscono in una riga sola.
 - Con il mouse sopra, una carta con i simboli **si ingrandisce** (×1,7) e il testo dei dettagli va sotto o di fianco, senza coprirla.
 - La **legenda** (pulsante «Legenda» a destra, accanto a Effetti e Cronaca) mostra come si legge una carta con esempi presi dalle carte vere, tutti i simboli, le gemme di mana e i colori dei numeri. Gli esempi si costruiscono dai dati, come le carte.
-- Se con un consigliere puoi già potenziare qualche carta, la sua riga del Potenzia è **dorata** e sotto la carta compare "Ascolta · ▲ Potenzia N" (quante carte).
+- **Gerarchia del consigliere**, dall'alto: la riga di ciò che propone nel round, con il fondo del colore della carta; le azioni, su fondo scuro; in fondo il Potenzia, con il solo bordo, più bassa e mai affiancata, perché è un servizio in più e non una proposta.
+- Se con un consigliere puoi già potenziare qualche carta, la riga del Potenzia ha il **bordo dorato** e sotto la carta compare "Ascolta · ▲ Potenzia N" (quante carte).
 
 ### 4.2 Dove sono
 
