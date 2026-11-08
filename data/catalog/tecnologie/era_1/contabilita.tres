@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_contabilita"
 display_name = "Contabilità"
-description = "+1 Oro per fase dalla Capitale."
+description = "+1 Oro per stagione dalla Capitale."
 is_malus = false
 effect = 8
 target_type = &"Capitale"
@@ -20,7 +20,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"contabilita"
 display_name = "Contabilità"
-description = "+1 Oro per fase dalla Capitale."
+description = "+1 Oro per stagione dalla Capitale."
 sphere = "Ricchezza"
 cost = 3
 permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])

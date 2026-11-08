@@ -8,7 +8,7 @@
 [sub_resource type="Resource" id="S1"]
 script = ExtResource("x3")
 label = "Segui la profezia"
-description = "Un elemento del fantasma partirà sabotato; il profeta si fida di più."
+description = "Una tessera del fantasma partirà sabotata; il profeta si fida di più."
 spy = ExtResource("x2")
 inclination_shift = PackedInt32Array(0, 0, 1, 0)
 character_affinity = 1

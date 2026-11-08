@@ -11,7 +11,7 @@
 script = ExtResource("x1")
 id = &"monarchia_assoluta"
 display_name = "Monarchia assoluta"
-description = "Il sovrano non risponde a nessuno. Il consigliere di corte compare sempre fra quelli del round. Carta esclusiva: Guardia del sovrano (era 2). Capitale: +1 Stabilità."
+description = "Il sovrano non risponde a nessuno. Il consigliere di corte compare sempre fra quelli del round. Tessera esclusiva: Guardia del sovrano (era 2). Capitale: +1 Stabilità."
 dimension = 1
 identity_type = &"Assolutista"
 resistance_bonus = 7

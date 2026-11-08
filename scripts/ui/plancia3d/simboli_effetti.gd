@@ -22,7 +22,7 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 	if def.special == AdvisorDef.Special.CLOWN:
 		# Un elemento per ogni colore di mana e un edificio neutro (GDD §4.2.2).
 		var colori: RigaSimboli = RigaSimboli.new()
-		colori.etichetta = "Propone: un elemento per ogni colore di mana (rosso, verde, blu, viola) e un edificio neutro."
+		colori.etichetta = "Propone: una tessera per ogni colore di mana (rosso, verde, blu, viola) e un edificio neutro."
 		colori.rilievo = RigaSimboli.Rilievo.PRINCIPALE
 		colori.icona(&"proposta").scritta(":")
 		for colore: StringName in [&"rosso", &"verde", &"blu", &"viola"]:
@@ -60,7 +60,7 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		AdvisorDef.Special.VISITATORE:
 			pass  # I visitatori non potenziano (GDD §4.2.5).
 		_:
-			potenzia.etichetta = "Potenzia: fa salire di livello una tua carta dei suoi tipi, pagando %s. Non consuma la scelta del round." % run.advisor_resource_text(def)
+			potenzia.etichetta = "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando %s. Non consuma la scelta del round." % run.advisor_resource_text(def)
 			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
 			if def.random_resource:
 				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)
@@ -108,7 +108,7 @@ static func nome_tipo_di_azione(def: OpportunityDef) -> String:
 		"[malus]": return "accorciare un malus"
 		"[spia]": return "spionaggio sul fantasma"
 		"[incanto]": return "incanti sulle truppe"
-		"[perk]": return "un perk"
+		"[perk]": return "una peculiarità"
 		"[tecnologia]": return "ripescare le tecnologie"
 	return "altre azioni"
 

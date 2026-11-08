@@ -14,7 +14,7 @@
 script = ExtResource("x1")
 id = &"oligarchia"
 display_name = "Oligarchia"
-description = "Poche famiglie tengono le redini. Tesoriere e Cancelliere più frequenti; i Visitatori compaiono più spesso. Carta esclusiva: Banco delle famiglie (era 2). Capitale: +1 Oro."
+description = "Poche famiglie tengono le redini. Tesoriere e Cancelliere più frequenti; i Visitatori compaiono più spesso. Tessera esclusiva: Banco delle famiglie (era 2). Capitale: +1 Oro."
 dimension = 1
 identity_type = &"Oligarchico"
 resistance_bonus = 3

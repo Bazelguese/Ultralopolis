@@ -11,6 +11,6 @@
 script = ExtResource("6_1wmat")
 id = &"veleni_sottili"
 display_name = "Veleni sottili"
-description = "Gli elementi che infliggono Corruzione ne infliggono 1 in più."
+description = "Le tessere che infliggono Corruzione ne infliggono 1 in più."
 dimension = 4
 permanent_modifiers = Array[ExtResource("4_1wypb")]([ExtResource("5_cfedr")])

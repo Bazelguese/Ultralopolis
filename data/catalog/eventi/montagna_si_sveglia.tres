@@ -34,12 +34,12 @@ gain = SubResource("S4")
 [sub_resource type="Resource" id="S6"]
 script = ExtResource("x3")
 label = "Forgia nella lava"
-description = "Un tuo edificio di Produzione sale di un livello."
-requires_types = Array[StringName]([&"Produzione"])
+description = "Un tuo edificio di Materie prime sale di un livello."
+requires_types = Array[StringName]([&"Materie prime"])
 requires_kind = 1
-requirement_label = "edificio di Produzione"
+requirement_label = "edificio di Materie prime"
 upgrade = true
-upgrade_types = Array[StringName]([&"Produzione"])
+upgrade_types = Array[StringName]([&"Materie prime"])
 upgrade_kind = 1
 
 [sub_resource type="Resource" id="N100_gain"]

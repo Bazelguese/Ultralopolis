@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_enciclopedia"
 display_name = "Enciclopedia"
-description = "+1 Ricerca per fase da ogni edificio Accademico."
+description = "+1 Ricerca per stagione da ogni edificio Accademico."
 is_malus = false
 effect = 8
 target_type = &"Accademico"
@@ -21,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"enciclopedia"
 display_name = "Enciclopedia"
-description = "+1 Ricerca per fase da ogni edificio Accademico."
+description = "+1 Ricerca per stagione da ogni edificio Accademico."
 sphere = "Conoscenza"
 era = 2
 cost = 5

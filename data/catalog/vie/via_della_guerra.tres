@@ -53,7 +53,7 @@ pieces = 1
 script = ExtResource("tr_mod")
 id = &"trad_arsenali"
 display_name = "Arsenali"
-description = "+1 Ferro per fase da ogni edificio Infrastruttura Bellica."
+description = "+1 Ferro per stagione da ogni edificio Infrastruttura Bellica."
 is_malus = false
 effect = 8
 target_type = &"Infrastruttura Bellica"
@@ -66,7 +66,7 @@ stacking = 1
 script = ExtResource("tr_trad")
 id = &"arsenali"
 display_name = "Arsenali"
-description = "+1 Ferro per fase da ogni edificio Infrastruttura Bellica."
+description = "+1 Ferro per stagione da ogni edificio Infrastruttura Bellica."
 deed = SubResource("tr_deed_arsenali")
 permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_arsenali")])
 

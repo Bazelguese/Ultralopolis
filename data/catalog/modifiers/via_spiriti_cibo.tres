@@ -6,10 +6,10 @@
 script = ExtResource("1_8s7yx")
 id = &"via_spiriti_cibo"
 display_name = "Via degli Spiriti"
-description = "+1 Cibo per fase da ogni edificio Fauna o di Produzione."
+description = "+1 Cibo per stagione da ogni edificio Fauna o di Materie prime."
 is_malus = false
 effect = 8
-target_types_any = Array[StringName]([&"Fauna", &"Produzione"])
+target_types_any = Array[StringName]([&"Fauna", &"Materie prime"])
 resource = 2
 amount = 1
 duration_kind = 2

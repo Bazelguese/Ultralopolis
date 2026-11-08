@@ -6,7 +6,7 @@
 script = ExtResource("1_41aks")
 id = &"via_oro_rinnovo"
 display_name = "Via dell'Oro"
-description = "Rinnovare le offerte costa 1 Oro in meno."
+description = "Rinnovare le opportunità costa 1 Oro in meno."
 is_malus = false
 effect = 4
 amount = -1

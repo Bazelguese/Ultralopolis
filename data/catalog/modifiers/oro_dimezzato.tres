@@ -6,6 +6,6 @@
 script = ExtResource("1_ermxo")
 id = &"oro_dimezzato"
 display_name = "Oro dimezzato"
-description = "I commerci sono interrotti: l'Oro prodotto a ogni fase è dimezzato."
+description = "I commerci sono interrotti: l'Oro prodotto a ogni stagione è dimezzato."
 effect = 0
 amount = -50

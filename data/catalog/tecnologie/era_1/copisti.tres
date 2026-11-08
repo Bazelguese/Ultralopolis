@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_copisti"
 display_name = "Copisti"
-description = "+1 Documenti per fase da ogni edificio Accademico."
+description = "+1 Documenti per stagione da ogni edificio Accademico."
 is_malus = false
 effect = 8
 target_type = &"Accademico"
@@ -21,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"copisti"
 display_name = "Copisti"
-description = "+1 Documenti per fase da ogni edificio Accademico."
+description = "+1 Documenti per stagione da ogni edificio Accademico."
 sphere = "Conoscenza"
 tier = 2
 cost = 4

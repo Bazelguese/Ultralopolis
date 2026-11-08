@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_lettere_di_credito"
 display_name = "Lettere di credito"
-description = "Ogni consigliere mostra una proposta in più."
+description = "Ogni consigliere mostra un'opportunità in più."
 is_malus = false
 effect = 5
 amount = 1
@@ -18,7 +18,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"lettere_di_credito"
 display_name = "Lettere di credito"
-description = "Ogni consigliere mostra una proposta in più."
+description = "Ogni consigliere mostra un'opportunità in più."
 sphere = "Ricchezza"
 era = 2
 tier = 2

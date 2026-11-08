@@ -6,7 +6,7 @@
 script = ExtResource("1_ivbjd")
 id = &"via_fede_sacri"
 display_name = "Via della Fede"
-description = "+1 Fede per fase da ogni edificio Spirituale."
+description = "+1 Fede per stagione da ogni edificio Spirituale."
 is_malus = false
 effect = 8
 target_type = &"Spirituale"

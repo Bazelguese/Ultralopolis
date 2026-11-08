@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_burocrazia"
 display_name = "Burocrazia"
-description = "+1 Stabilità per fase da ogni edificio di Legge."
+description = "+1 Stabilità per stagione da ogni edificio di Legge."
 is_malus = false
 effect = 8
 target_type = &"Legge"
@@ -21,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"burocrazia"
 display_name = "Burocrazia"
-description = "+1 Stabilità per fase da ogni edificio di Legge."
+description = "+1 Stabilità per stagione da ogni edificio di Legge."
 sphere = "Stato"
 era = 2
 cost = 5

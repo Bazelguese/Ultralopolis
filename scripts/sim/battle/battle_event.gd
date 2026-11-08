@@ -60,9 +60,9 @@ func describe() -> String:
 		Kind.ASSEDIO:
 			return "%d ms [%s] perde %d scudo per l'assedio" % [time_ms, who, amount]
 		Kind.RALLENTATO:
-			return "%d ms [%s] elemento %d rallentato per %d ms" % [time_ms, who, index, amount]
+			return "%d ms [%s] tessera %d inefficiente per %d ms" % [time_ms, who, index, amount]
 		Kind.SABOTATO:
-			return "%d ms [%s] elemento %d sabotato per %d ms" % [time_ms, who, index, amount]
+			return "%d ms [%s] tessera %d sabotata per %d ms" % [time_ms, who, index, amount]
 		Kind.IN_SABOTAGGIO:
 			return "%d ms [%s] truppa %d sabotata, non si attiva" % [time_ms, who, index]
 	return "%d ms evento sconosciuto" % time_ms

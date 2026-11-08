@@ -9,7 +9,7 @@
 script = ExtResource("1_id")
 id = &"maestria"
 display_name = "Maestria"
-description = "Le carte arrivano al livello 4."
+description = "Le tessere arrivano al livello 4."
 dimension = 6
 ascension_level = 2
 rule = 6

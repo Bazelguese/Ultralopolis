@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_diritto"
 display_name = "Diritto"
-description = "Gli elementi di Legge che producono scudo ne producono 2 in più."
+description = "Le tessere di Legge che producono scudo ne producono 2 in più."
 is_malus = false
 effect = 11
 target_type = &"Legge"
@@ -20,7 +20,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"diritto"
 display_name = "Diritto"
-description = "Gli elementi di Legge che producono scudo ne producono 2 in più."
+description = "Le tessere di Legge che producono scudo ne producono 2 in più."
 sphere = "Stato"
 era = 3
 cost = 7

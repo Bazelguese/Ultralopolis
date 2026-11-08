@@ -6,7 +6,7 @@
 script = ExtResource("x1")
 id = &"porti_franchi"
 display_name = "Porti franchi"
-description = "I Visitatori compaiono più spesso fra le carte del Consiglio."
+description = "I Visitatori compaiono più spesso nei round."
 dimension = 7
 inclination_axis = 1
 inclination_pole = 1

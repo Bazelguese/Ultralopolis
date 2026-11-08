@@ -11,6 +11,6 @@
 script = ExtResource("6_vpj1h")
 id = &"consiglio_allargato"
 display_name = "Consiglio allargato"
-description = "Ogni consigliere mostra una proposta in più."
+description = "Ogni consigliere mostra un'opportunità in più."
 dimension = 4
 permanent_modifiers = Array[ExtResource("4_30xj3")]([ExtResource("5_1cbss")])

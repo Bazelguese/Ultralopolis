@@ -28,7 +28,7 @@ func _ready() -> void:
 
 	var editing: bool = GameSession.editing_nation != null
 	root.add_child(UiKit.label("Modifica la nazione" if editing else "Crea la tua nazione", 36))
-	root.add_child(UiKit.label("Come in un gioco di ruolo: scegli un nome, un elemento per colonna e i perk. Tutte le opzioni sono disponibili.", 16))
+	root.add_child(UiKit.label("Come in un gioco di ruolo: scegli un nome, un elemento per colonna e le peculiarità. Tutte le opzioni sono disponibili.", 16))
 
 	var name_row: HBoxContainer = HBoxContainer.new()
 	root.add_child(name_row)
@@ -91,7 +91,7 @@ func _build_column(dimension: IdentityDef.Dimension, options: Array[IdentityDef]
 	var is_perk: bool = dimension == IdentityDef.Dimension.PERK
 	var title: String = IdentityDef.DIMENSION_NAMES[dimension]
 	if is_perk:
-		title = "Perk (%d/%d) — scorri per vederli tutti" % [_perks.size(), IdentityRules.starting_perk_count(_catalog, _rules)]
+		title = "Peculiarità (%d/%d) — scorri per vederle tutte" % [_perks.size(), IdentityRules.starting_perk_count(_catalog, _rules)]
 	column.add_child(UiKit.label(title, 24, UiKit.COLOR_WARNING))
 
 	var scroll: ScrollContainer = ScrollContainer.new()

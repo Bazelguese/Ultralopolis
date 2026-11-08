@@ -12,6 +12,6 @@ influenza = 2
 script = ExtResource("1_opp")
 id = &"perk_anziano"
 display_name = "Consiglio degli anziani"
-description = "Paghi 2 Fede e 2 Influenza: la nazione acquisisce un perk."
+description = "Paghi 2 Fede e 2 Influenza: la nazione acquisisce una peculiarità."
 kind = 9
 cost_resources = SubResource("Resource_cost")

@@ -8,7 +8,7 @@
 script = ExtResource("x1")
 id = &"assimilatori"
 display_name = "Assimilatori"
-description = "Dopo un incontro vinto puoi prendere, al posto della ricompensa, una truppa del nemico: diventa tua, con il tipo Assimilato e quello della tua razza. Ogni assimilazione porta +1 Malcontento."
+description = "Dopo un incontro vinto puoi prendere, al posto della ricompensa, una truppa del nemico: diventa tua, con il tipo Assimilato e quello del tuo popolo. Ogni assimilazione porta +1 Malcontento."
 dimension = 8
 rule = 9
 story = "Da allora i vinti non tornano a casa: diventano parte di noi."

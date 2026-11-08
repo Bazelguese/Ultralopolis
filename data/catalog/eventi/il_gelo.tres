@@ -49,7 +49,7 @@ script = ExtResource("x3")
 label = "Le scorte del granaio"
 description = "Ricevi 2 Cibo."
 gain = SubResource("S8")
-requires_types = Array[StringName]([&"Produzione"])
+requires_types = Array[StringName]([&"Materie prime"])
 
 [resource]
 script = ExtResource("x1")

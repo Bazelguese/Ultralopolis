@@ -7,7 +7,7 @@
 script = ExtResource("1_tech")
 id = &"ordini_ospitalieri"
 display_name = "Ordini ospitalieri"
-description = "Perk Erboristi di corte: gli elementi che curano curano 1 in più."
+description = "Peculiarità Erboristi di corte: le tessere che curano curano 1 in più."
 sphere = "Fede"
 era = 2
 cost = 5
