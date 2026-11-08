@@ -6,7 +6,7 @@
 script = ExtResource("1_cpdfy")
 id = &"via_rivelazione_sacri"
 display_name = "Via della Rivelazione"
-description = "Gli edifici Spirituali producono il 10% più in fretta."
+description = "Nello scontro gli edifici Spirituali hanno il ciclo più corto del 10%."
 is_malus = false
 effect = 2
 target_type = &"Spirituale"

@@ -111,7 +111,7 @@ amount = 2
 script = ExtResource("tr_mod")
 id = &"trad_santita"
 display_name = "Santità"
-description = "Gli edifici Spirituali producono il 10% più in fretta."
+description = "Nello scontro gli edifici Spirituali hanno il ciclo più corto del 10%."
 is_malus = false
 effect = 2
 target_type = &"Spirituale"
@@ -123,7 +123,7 @@ stacking = 1
 script = ExtResource("tr_trad")
 id = &"santita"
 display_name = "Santità"
-description = "Gli edifici Spirituali producono il 10% più in fretta."
+description = "Nello scontro gli edifici Spirituali hanno il ciclo più corto del 10%."
 deed = SubResource("tr_deed_santita")
 permanent_modifiers = Array[ExtResource("tr_mod")]([SubResource("tr_mod_santita")])
 
