@@ -201,7 +201,7 @@ func test_simboli_delle_carte_davanti_alle_parole() -> void:
 
 func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
 	# Richiesta di Davide (8 novembre): anche Propone, Potenzia e le altre parole base.
-	assert_eq(_tratti("Propone edifici; Potenzia: Ferro."), PackedStringArray(["{Propone}", " edifici; ", "{Potenzia}", ": ", "{Ferro}", "."]))
+	assert_eq(_tratti("Propone edifici; Potenzia: Ferro."), PackedStringArray(["{Propone}", " ", "{edifici}", "; ", "{Potenzia}", ": ", "{Ferro}", "."]))
 	assert_eq(_tratti("Carta esclusiva: Foro (era 2)."), PackedStringArray(["Carta ", "{esclusiva}", ": Foro (", "{era 2}", ")."]))
 	assert_eq(_tratti("c'era una volta"), PackedStringArray(["c'era una volta"]), "Il verbo \"era\" non è l'era.")
 	assert_eq(_tratti("la via del porto"), PackedStringArray(["la via del porto"]), "\"via\" minuscola non è la Via.")
@@ -214,7 +214,7 @@ func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
 func test_azioni_e_puo_proporre() -> void:
 	# Richiesta di Davide (8 novembre): "azioni" è una parola chiave, con il simbolo del timbro.
 	assert_eq(_tratti("Azioni possibili: scambi di risorse."), PackedStringArray(["{Azioni}", " possibili: scambi di risorse."]))
-	assert_eq(_tratti("Può proporre: edifici."), PackedStringArray(["Può ", "{proporre}", ": edifici."]))
+	assert_eq(_tratti("Può proporre: edifici."), PackedStringArray(["Può ", "{proporre}", ": ", "{edifici}", "."]))
 	assert_eq(_voce("Azione").simbolo, &"azione")
 	assert_ne(_voce("Azione").definizione, "")
 
@@ -249,3 +249,12 @@ func test_le_spiegazioni_dicono_le_eccezioni_delle_tue_ascensioni() -> void:
 	assert_string_contains(TestoRicco.definizione_di(_voce("Opportunità")), "Doppio ascolto")
 	assert_string_contains(TestoRicco.definizione_di(_voce("Energetico")), "Mana unito")
 	TestoRicco.imposta_regole([])
+
+
+func test_edifici_truppe_e_tessere_sono_parole_chiave() -> void:
+	# Richiesta di Davide (8 novembre): edifici e truppe hanno il loro colore e il loro simbolo.
+	assert_eq(_tratti("Può proporre edifici e truppe; una tua tessera."), PackedStringArray(["Può ", "{proporre}", " ", "{edifici}", " e ", "{truppe}", "; una tua ", "{tessera}", "."]))
+	assert_eq(_voce("Edificio").simbolo, &"edificio")
+	assert_eq(_voce("Truppa").simbolo, &"truppa")
+	assert_eq(_tratti("una tessera esclusiva"), PackedStringArray(["una ", "{tessera esclusiva}"]), "La forma più lunga vince.")
+	assert_true(_voce("Edificio").di_base, "Parole frequenti: si spiegano solo se resta posto.")
