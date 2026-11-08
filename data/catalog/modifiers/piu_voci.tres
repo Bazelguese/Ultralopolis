@@ -6,7 +6,7 @@
 script = ExtResource("1_e300t")
 id = &"piu_voci"
 display_name = "Più voci"
-description = "Ogni opportunità mostra un'alternativa in più."
+description = "Ogni consigliere mostra un'opportunità in più."
 is_malus = false
 effect = 5
 amount = 1

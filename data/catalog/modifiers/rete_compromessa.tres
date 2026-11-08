@@ -6,6 +6,6 @@
 script = ExtResource("1_yl7hu")
 id = &"rete_compromessa"
 display_name = "Rete compromessa"
-description = "In ogni scontro un edificio a caso parte sabotato per 3 s."
+description = "In ogni scontro un tuo edificio a caso parte sabotato per 3 s."
 effect = 14
 amount = 3000
