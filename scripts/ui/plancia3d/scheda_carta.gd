@@ -236,38 +236,21 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	scheda.sopratitolo = consigliere.category_name if consigliere.category_name != "" else "Consigliere speciale"
 	scheda.sopratitolo += " · %s" % run.council_level_name()
 	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
-	var righe: PackedStringArray = PackedStringArray()
-	righe.append(consigliere.description)
 	# Sotto la carta: "Ascolta" (scegli questo consigliere); se con lui puoi già potenziare
-	# qualche tua carta, anche quante (vedi sotto).
+	# qualche tua carta, anche quante.
 	scheda.costo = "Ascolta"
-	match consigliere.special:
-		AdvisorDef.Special.CLOWN:
-			scheda.riga = "5 colori"
-			righe.append("Ignora il tema del round. Non offre Potenzia; si rinnova solo in Oro.")
-		AdvisorDef.Special.ANZIANO:
-			scheda.riga = "Perk · neutri"
-			righe.append("Ignora il tema del round. Potenzia: solo edifici neutri, una volta all'anno, in Oro.")
-		AdvisorDef.Special.VISITATORE:
-			scheda.sopratitolo = "Visitatore · %s" % consigliere.category_name
-			scheda.riga = "Di passaggio"
-			righe.append("Ignora il tema del round. Non potenzia; si rinnova solo in Oro.")
-		_:
-			scheda.riga = "Potenzia: %s" % run.advisor_resource_text(consigliere)
-			righe.append("Tipi: %s." % ", ".join(consigliere.types))
-			righe.append("Potenzia e rinnovo con: %s." % run.advisor_resource_text(consigliere))
-			var pronte: PackedStringArray = PackedStringArray()
-			for pezzo: BoardPiece in run.affordable_upgrades(consigliere):
-				pronte.append(pezzo.display_name())
-			if not pronte.is_empty():
-				righe.append("Puoi già potenziare: %s." % ", ".join(pronte))
-				scheda.costo = "Ascolta · ▲ Potenzia %d" % pronte.size()
+	if consigliere.special == AdvisorDef.Special.VISITATORE:
+		scheda.sopratitolo = "Visitatore · %s" % consigliere.category_name
+	var pronte: int = run.affordable_upgrades(consigliere).size() if consigliere.special == AdvisorDef.Special.NESSUNO else 0
+	if pronte > 0:
+		scheda.costo = "Ascolta · ▲ Potenzia %d" % pronte
+	# Il riquadro dei dettagli dice solo ciò che si vede sulla carta (richiesta di Davide):
+	# una frase per ogni riga di simboli, nello stesso ordine.
 	scheda.simboli = SimboliEffetti.consigliere(run, consigliere)
-	var azioni: Array[Offer] = run.advisor_action_preview(consigliere)
-	if not azioni.is_empty():
-		righe.append("Azioni che può proporre in questo round:")
-		for azione: Offer in azioni:
-			righe.append("• %s (%s): %s" % [azione.describe(), azione.cost_text(), azione.description()])
+	var righe: PackedStringArray = PackedStringArray()
+	for riga: RigaSimboli in scheda.simboli:
+		if riga.etichetta != "":
+			righe.append(riga.etichetta)
 	scheda.dettagli = "\n".join(righe)
 	return scheda
 

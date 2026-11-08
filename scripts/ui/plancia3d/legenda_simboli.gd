@@ -13,7 +13,7 @@ const LARGHEZZA_TESTO: float = 330.0
 const GRUPPI: Array = [
 	["Risorse", [&"oro", &"ricerca", &"cibo", &"legno", &"pietra", &"ferro", &"fede", &"influenza", &"stabilita", &"documenti", &"malcontento"]],
 	["Battaglia", [&"danno", &"scudo", &"cura", &"corruzione", &"assedio", &"inefficienza", &"sabotaggio", &"resistenza", &"ricarica"]],
-	["Carte e plancia", [&"edificio", &"truppa", &"potenzia", &"malus", &"perk", &"incanto", &"governo", &"tecnologia", &"proposta"]],
+	["Carte e plancia", [&"edificio", &"truppa", &"potenzia", &"malus", &"perk", &"incanto", &"governo", &"tecnologia", &"proposta", &"azione", &"scambio"]],
 	["Tempo e altro", [&"anno", &"fantasma", &"rinnovo", &"caso", &"spia", &"bloccato"]],
 ]
 
@@ -28,6 +28,7 @@ const NOMI: Dictionary[StringName, String] = {
 	&"edificio": "Edificio", &"truppa": "Truppa", &"potenzia": "Potenzia", &"malus": "Malus",
 	&"perk": "Perk", &"incanto": "Incanto", &"governo": "Governo", &"tecnologia": "Tecnologia",
 	&"proposta": "Proposte del Consiglio",
+	&"azione": "Azioni del Consiglio", &"scambio": "Scambio di risorse",
 	&"anno": "Durata in anni", &"fantasma": "Prossimo scontro con il fantasma",
 	&"rinnovo": "Rinnovo, ripescare", &"caso": "A caso", &"spia": "Spionaggio",
 	&"bloccato": "Adesso non disponibile",
@@ -114,7 +115,9 @@ func _esempi(catalogo: CatalogDef) -> Array:
 		esempi.append([SimboliEffetti.azione(offerta), "%s: %s" % [def.display_name, voce[1]]])
 	var proposte: RigaSimboli = RigaSimboli.new().icona(&"proposta").scritta(":").icona(&"edificio").scritta("/").icona(&"truppa")
 	proposte.rilievo = RigaSimboli.Rilievo.PRINCIPALE
-	esempi.append([proposte, "Riga colorata, in alto sul consigliere: che cosa ti propone in questo round (qui edifici e truppe dei suoi tipi). Sotto ci sono le sue azioni."])
+	esempi.append([proposte, "Riga colorata, in alto sul consigliere: che cosa ti propone in questo round (qui edifici e truppe dei suoi tipi)."])
+	var tipi_azione: RigaSimboli = RigaSimboli.new().icona(&"azione").scritta(":").icona(&"scambio").icona(&"anno").icona(&"spia")
+	esempi.append([tipi_azione, "Sotto, il timbro e i tipi di azione che può proporre: qui scambi di risorse, bonus per un tempo e spionaggio. Costi ed effetti esatti li vedi sulle proposte, dopo averlo scelto."])
 	var potenzia: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
 	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
 	esempi.append([potenzia, "Riga con il solo bordo, in fondo al consigliere: un servizio in più, non una proposta. Dopo averlo scelto puoi anche potenziare una tua carta dei suoi tipi, pagando Ferro, senza perdere la scelta del round."])

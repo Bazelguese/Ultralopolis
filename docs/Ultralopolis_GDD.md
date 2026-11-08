@@ -1261,7 +1261,7 @@ Come nei giochi da tavolo, le carte dicono **che cosa fanno con dei simboli**: o
 
 | Carta | Righe |
 |---|---|
-| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore della carta: `[proposte]: [edificio] / [truppa]`); **le azioni** che può proporre (righe scure; incanti e spionaggi riuniti in una riga); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non una proposta; bordo dorato se puoi già potenziare qualche carta, e sotto la carta "Ascolta · ▲ Potenzia N") |
+| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore della carta: `[proposte]: [edificio] / [truppa]`); una sola riga **azioni** (scura): il timbro e un simbolo per ogni *tipo* di azione che può proporre (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, perk…), senza costi né numeri, che si vedono sulle proposte dopo averlo scelto (variante A, scelta di Davide); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non una proposta; bordo dorato se puoi già potenziare qualche carta, e sotto la carta "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
 | Azione o perk proposti | Costo → effetto |
 | Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
 | Opzione dell’evento scelto | Costo → effetti, su una o più righe |
@@ -1643,6 +1643,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
 - **Legenda dei simboli** nel gioco (§14.4), con esempi presi dalle carte vere.
 - **Gerarchia sulla carta del consigliere** (§14.4): prima ciò che propone (riga colorata), poi le azioni, il Potenzia in fondo e in disparte (Davide: la carta del Tesoriere sembrava offrire solo Potenzia).
+- Le azioni del consigliere sono riassunte in **una riga di macrocategorie** (tipi di azione, senza numeri) invece di una riga per azione; le righe mostrano solo ciò che può davvero uscire nel round, e il riquadro dei dettagli dice solo ciò che si vede (decisioni di Davide).
 
 **Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
 - Le azioni del Tesoriere (Esattori, Grandi esattori, Assemblea) sono **gratuite**, come già nel gioco: il GDD diceva che si pagavano in Influenza (§4.2.3, §16.3). Decisione di Davide: vale la versione del gioco.
