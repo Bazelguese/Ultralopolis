@@ -15,6 +15,8 @@ const MISURA_TRUPPA: Vector2 = Vector2(1.58, 1.95)
 const MISURA_EDIFICIO: Vector2 = Vector2(1.9, 1.6)
 const MISURA_AZIONE: Vector2 = Vector2(1.7, 1.95)
 const SCALA_SCELTA: float = 1.45
+## Le scelte con le righe di simboli si ingrandiscono così tanto al passaggio del mouse.
+const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
 const Z_EDIFICI: float = 4.4
 ## Bordo sinistro del primo spazio: gli spazi si allineano a destra dello stemma.
@@ -737,6 +739,8 @@ func _costruisci_scelte() -> void:
 		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6)
 		tessera.rotation_degrees = Vector3(28.0, 0.0, 0.0)
 		tessera.scale = Vector3.ONE * SCALA_SCELTA
+		if not scheda.simboli.is_empty():
+			tessera.imposta_ingrandimento(INGRANDIMENTO_SIMBOLI)
 		if scheda.sopratitolo != "":
 			var sopra: Label3D = StileVisivo.scritta(scheda.sopratitolo.to_upper(), StileVisivo.FONT_TITOLI, 42, StileVisivo.TESTO, 0.0, 10)
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
@@ -910,7 +914,11 @@ func _aggiorna_stato_consiglieri() -> void:
 		if not is_instance_valid(tessera) or tessera.indice < 0 or tessera.indice >= run.advisor_choices.size():
 			continue
 		var quante: int = run.affordable_upgrades(run.advisor_choices[tessera.indice]).size()
-		if quante > 0:
+		# Le carte con i simboli lo mostrano già con la riga del Potenzia dorata e con
+		# "Ascolta · ▲ Potenzia N" sotto la carta: la fascia coprirebbe i simboli.
+		if not tessera.scheda.simboli.is_empty():
+			tessera.imposta_stato("", StileVisivo.NOTTE)
+		elif quante > 0:
 			tessera.imposta_stato("▲ Potenzia pronto · %d %s" % [quante, "carta" if quante == 1 else "carte"], StileVisivo.ORO_LUCE)
 		else:
 			tessera.imposta_stato("", StileVisivo.NOTTE)
@@ -1498,6 +1506,23 @@ func _chiudi_scontro() -> void:
 
 # --- Mouse ---------------------------------------------------------------------
 
+## Il rettangolo che una carta occupa sullo schermo, ingrandita di "fattore": il riquadro dei
+## dettagli le si attacca, così non copre la carta (nemmeno quando è ingrandita con i simboli).
+func _area_sullo_schermo(tessera: Tessera3D, fattore: float = 1.0) -> Rect2:
+	var mezza_x: float = tessera.larghezza * 0.5 * fattore
+	var mezza_z: float = tessera.profondita * 0.5 * fattore
+	var area: Rect2 = Rect2()
+	var primo: bool = true
+	for angolo: Vector3 in [Vector3(-mezza_x, 0.0, -mezza_z), Vector3(mezza_x, 0.0, -mezza_z), Vector3(-mezza_x, 0.0, mezza_z), Vector3(mezza_x, 0.0, mezza_z)]:
+		var punto: Vector2 = _camera.unproject_position(tessera.to_global(angolo))
+		if primo:
+			area = Rect2(punto, Vector2.ZERO)
+			primo = false
+		else:
+			area = area.expand(punto)
+	return area
+
+
 func _physics_process(_delta: float) -> void:
 	var mouse: Vector2 = get_viewport().get_mouse_position()
 	var origine: Vector3 = _camera.project_ray_origin(mouse)
@@ -1510,6 +1535,9 @@ func _physics_process(_delta: float) -> void:
 		if oggetto != null and oggetto.has_meta("tessera"):
 			tessera = oggetto.get_meta("tessera") as Tessera3D
 	if tessera != null and (not is_instance_valid(tessera) or not tessera.is_visible_in_tree() or tessera.is_queued_for_deletion()):
+		tessera = null
+	# Un pannello aperto sopra le carte (es. la legenda) le copre: niente carta sotto il mouse.
+	if _hud.mouse_su_pannello():
 		tessera = null
 	if tessera != _evidenziata:
 		if _evidenziata != null and is_instance_valid(_evidenziata):
@@ -1538,6 +1566,8 @@ func _physics_process(_delta: float) -> void:
 			testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
 		if scheda.costo != "":
 			testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]
-		_hud.mostra_suggerimento(titolo, testo, mouse)
+		# Le carte che si ingrandiscono molto (con i simboli): il riquadro si attacca alla carta ingrandita.
+		var fattore: float = tessera.ingrandimento if tessera.ingrandimento > 1.2 else 1.0
+		_hud.mostra_suggerimento(titolo, testo, _area_sullo_schermo(tessera, fattore))
 	else:
 		_hud.nascondi_suggerimento()

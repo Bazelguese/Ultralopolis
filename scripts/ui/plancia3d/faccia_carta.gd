@@ -27,6 +27,8 @@ var _area_arte: Rect2
 var _area_nome: Rect2
 var _area_basso: Rect2
 var _pastiglie: Array[Rect2] = []
+## Zona delle righe di simboli (consiglieri, azioni, eventi): vuota se la carta non ne ha.
+var _area_simboli: Rect2
 
 
 func imposta(p_scheda: SchedaCarta, misura: Vector2) -> void:
@@ -68,14 +70,22 @@ func _calcola_misure() -> void:
 	_bordo = maxf(5.0, lato * 0.03)
 	_raggio = lato * 0.08
 	var margine: float = _bordo + lato * 0.03
+	var con_simboli: bool = not scheda.simboli.is_empty()
 	var altezza_arte: float = size.y * (0.5 if size.x < size.y else 0.46)
+	# Con i simboli l'illustrazione si abbassa: lo spazio serve alle righe di simboli.
+	if con_simboli:
+		altezza_arte = size.y * 0.27
 	_area_arte = Rect2(margine, margine, size.x - margine * 2.0, altezza_arte)
-	var altezza_nome: float = size.y * 0.14
+	var altezza_nome: float = size.y * (0.12 if con_simboli else 0.14)
 	_area_nome = Rect2(_bordo, _area_arte.end.y + lato * 0.02, size.x - _bordo * 2.0, altezza_nome)
 	# Le pastiglie restano ben dentro la cornice anche viste piccole e in prospettiva.
 	var inizio_basso: float = _area_nome.end.y + lato * 0.04
 	var rientro: float = margine + lato * 0.025
 	_area_basso = Rect2(rientro, inizio_basso, size.x - rientro * 2.0, size.y - _bordo - lato * 0.075 - inizio_basso)
+	_area_simboli = Rect2()
+	if con_simboli:
+		var inizio_simboli: float = _area_nome.end.y + lato * 0.03
+		_area_simboli = Rect2(margine, inizio_simboli, size.x - margine * 2.0, size.y - _bordo - lato * 0.04 - inizio_simboli)
 	_pastiglie.clear()
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var meta: float = (_area_basso.size.x - lato * 0.04) * 0.5
@@ -180,6 +190,8 @@ func _disegna_sopra() -> void:
 		_rombo(centro_rombo, passo * 0.42 + 2.0, Color("0b1220"))
 		_rombo(centro_rombo, passo * 0.42, StileVisivo.ORO_LUCE if pieno else Color("3a4560"))
 
+	_disegna_simboli()
+
 	if scheda.malus != "":
 		_pillola(_malus, StileVisivo.PERICOLO)
 	if scheda.affamata:
@@ -248,6 +260,86 @@ func _pillola(etichetta: Label, colore: Color) -> void:
 	fondo.bg_color = colore
 	fondo.set_corner_radius_all(int(etichetta.size.y * 0.5))
 	_sopra.draw_style_box(fondo, Rect2(etichetta.position, etichetta.size).grow_individual(8.0, 0.0, 8.0, 0.0))
+
+
+# --- Simboli -------------------------------------------------------------------
+# Righe di simboli come nei giochi da tavolo (RigaSimboli): numeri e simboli, centrati,
+# una riga per ogni cosa che la carta può fare. Le righe troppo lunghe si rimpiccioliscono.
+
+## Cambia le righe di simboli senza ricostruire la carta (es. un'opzione che diventa pagabile).
+func imposta_simboli(righe: Array[RigaSimboli]) -> void:
+	scheda.simboli = righe
+	_sopra.queue_redraw()
+
+
+func _disegna_simboli() -> void:
+	var righe: Array[RigaSimboli] = scheda.simboli
+	if righe.is_empty() or _area_simboli.size.y <= 0.0:
+		return
+	var stacco: float = minf(size.x, size.y) * 0.018
+	# Le righe corte si affiancano sulla stessa linea, ognuna nella sua pastiglia, così non si
+	# spreca spazio (richiesta di Davide). Meno linee = linee più alte = simboli più grandi:
+	# si riprova finché il numero di linee non cambia più.
+	var linee: Array[Array] = []
+	for riga: RigaSimboli in righe:
+		linee.append([riga])
+	for tentativo: int in range(4):
+		var nuove: Array[Array] = _impacchetta(righe, _altezza_linea(linee.size(), stacco), stacco)
+		var stabile: bool = nuove.size() == linee.size()
+		linee = nuove
+		if stabile:
+			break
+	var altezza: float = _altezza_linea(linee.size(), stacco)
+	var totale: float = altezza * linee.size() + stacco * (linee.size() - 1)
+	var y: float = _area_simboli.position.y + (_area_simboli.size.y - totale) * 0.5
+	for linea: Array in linee:
+		_disegna_linea(linea, y, altezza, stacco)
+		y += altezza + stacco
+
+
+## Altezza di ogni linea se le linee sono "quante".
+func _altezza_linea(quante: int, stacco: float) -> float:
+	var n: int = maxi(quante, 1)
+	return minf((_area_simboli.size.y - stacco * (n - 1)) / n, _area_simboli.size.y * 0.36)
+
+
+## Larghezza che serve a una riga, con il margine della sua pastiglia, su una linea alta "altezza".
+func _larghezza_pastiglia(riga: RigaSimboli, altezza: float) -> float:
+	return DisegnoSimboli.larghezza_pastiglia(riga, altezza)
+
+
+## Mette le righe, in ordine, sulle linee: una riga va accanto alla precedente se ci sta.
+func _impacchetta(righe: Array[RigaSimboli], altezza: float, stacco: float) -> Array[Array]:
+	var linee: Array[Array] = []
+	var occupata: float = 0.0
+	for riga: RigaSimboli in righe:
+		var serve: float = _larghezza_pastiglia(riga, altezza)
+		if linee.is_empty() or occupata + stacco + serve > _area_simboli.size.x:
+			linee.append([riga])
+			occupata = serve
+		else:
+			linee[linee.size() - 1].append(riga)
+			occupata += stacco + serve
+	return linee
+
+
+## Una linea: le pastiglie si dividono la larghezza in proporzione a quanto serve a ciascuna.
+func _disegna_linea(linea: Array, y: float, altezza: float, stacco: float) -> void:
+	var richieste: Array[float] = []
+	var somma: float = 0.0
+	for elemento: Variant in linea:
+		var serve: float = _larghezza_pastiglia(elemento as RigaSimboli, altezza)
+		richieste.append(serve)
+		somma += serve
+	var avanzo: float = _area_simboli.size.x - somma - stacco * (linea.size() - 1)
+	var x: float = _area_simboli.position.x
+	for i: int in range(linea.size()):
+		var riga: RigaSimboli = linea[i] as RigaSimboli
+		var larghezza: float = _area_simboli.size.x
+		if linea.size() > 1:
+			larghezza = richieste[i] + avanzo * richieste[i] / maxf(somma, 1.0)
+		DisegnoSimboli.pastiglia(_sopra, riga, Rect2(x, y, larghezza, altezza))
+		x += larghezza + stacco
 
 
 # --- Elementi ------------------------------------------------------------------
@@ -332,7 +424,7 @@ func _crea_scritte() -> void:
 		testo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		add_child(testo)
 		_testi_pastiglie.append(testo)
-	if testi.is_empty():
+	if testi.is_empty() and scheda.simboli.is_empty():
 		_riga = _etichetta(scheda.riga, StileVisivo.FONT_NUMERI, int(_area_basso.size.y * 0.42), StileVisivo.ORO_LUCE, 6)
 		_riga.position = _area_basso.position
 		_riga.size = _area_basso.size

@@ -20,7 +20,7 @@ func _init() -> void:
 func aggiorna(valori: PackedInt32Array, limite: int, testo_aiuto: String) -> void:
 	_valori = valori.duplicate()
 	_limite = maxi(1, limite)
-	tooltip_text = testo_aiuto
+	Suggerimenti.imposta(self, testo_aiuto, "Inclinazioni")
 	queue_redraw()
 
 

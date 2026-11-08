@@ -42,6 +42,9 @@ var illustrazione: Texture2D
 var disponibile: bool = true
 ## Colore della categoria di un consigliere (solo grafica).
 var colore_consigliere: StringName = &""
+## Righe di simboli stampate sulla carta, come nei giochi da tavolo (consiglieri, azioni, eventi).
+## Se ci sono, prendono il posto della riga di testo.
+var simboli: Array[RigaSimboli] = []
 
 
 func colore_cornice() -> Color:
@@ -178,6 +181,7 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda.dettagli = "%s\n%s" % [offerta.perk.description, offerta.opportunity.description]
 			scheda.illustrazione = _carica("perk/%s.png" % offerta.perk.id)
 			scheda.sopratitolo = "Perk"
+			scheda.simboli.append(SimboliEffetti.azione(offerta))
 		_:
 			scheda = SchedaCarta.new()
 			scheda.genere = Genere.AZIONE
@@ -187,6 +191,7 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda.dettagli = offerta.opportunity.description
 			scheda.illustrazione = _carica("azioni/%s.png" % offerta.opportunity.id)
 			scheda.sopratitolo = "Azione"
+			scheda.simboli.append(SimboliEffetti.azione(offerta))
 	# Mantenimento delle carte speciali (GDD §5.6), da sapere prima di comprarle.
 	if offerta.is_element():
 		var prova: BoardPiece = BoardPiece.of_building(offerta.building, 0) if offerta.building != null else BoardPiece.of_troop(offerta.troop, 0)
@@ -233,6 +238,9 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
 	var righe: PackedStringArray = PackedStringArray()
 	righe.append(consigliere.description)
+	# Sotto la carta: "Ascolta" (scegli questo consigliere); se con lui puoi già potenziare
+	# qualche tua carta, anche quante (vedi sotto).
+	scheda.costo = "Ascolta"
 	match consigliere.special:
 		AdvisorDef.Special.CLOWN:
 			scheda.riga = "5 colori"
@@ -254,7 +262,12 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 			if not pronte.is_empty():
 				righe.append("Puoi già potenziare: %s." % ", ".join(pronte))
 				scheda.costo = "Ascolta · ▲ Potenzia %d" % pronte.size()
-	scheda.costo = "Ascolta"
+	scheda.simboli = SimboliEffetti.consigliere(run, consigliere)
+	var azioni: Array[Offer] = run.advisor_action_preview(consigliere)
+	if not azioni.is_empty():
+		righe.append("Azioni che può proporre in questo round:")
+		for azione: Offer in azioni:
+			righe.append("• %s (%s): %s" % [azione.describe(), azione.cost_text(), azione.description()])
 	scheda.dettagli = "\n".join(righe)
 	return scheda
 
@@ -285,6 +298,7 @@ static func da_evento(run: RunState, evento: EventDef) -> SchedaCarta:
 		var requisito: String = run.option_requirement(opzione)
 		righe.append("• %s%s" % ["[%s] " % requisito if requisito != "" else "", opzione.label])
 	righe.append("Ignora il tema del round. Sceglierlo è la scelta del round.")
+	scheda.simboli = SimboliEffetti.evento(run, evento)
 	scheda.costo = "Scegli"
 	scheda.dettagli = "\n".join(righe)
 	return scheda
@@ -301,6 +315,8 @@ static func da_opzione(run: RunState, opzione: EventOptionDef) -> SchedaCarta:
 	scheda.costo = opzione.cost.describe() if opzione.cost != null and not opzione.cost.is_empty() else "gratis"
 	var motivo: String = run.option_block_reason(opzione)
 	scheda.disponibile = motivo == ""
+	var scala: int = run.era if run.chosen_event != null and run.chosen_event.scale_with_era else 1
+	scheda.simboli = SimboliEffetti.opzione_righe(opzione, scala)
 	scheda.dettagli = opzione.description if motivo == "" else "%s\nNon disponibile: %s" % [opzione.description, motivo]
 	return scheda
 
