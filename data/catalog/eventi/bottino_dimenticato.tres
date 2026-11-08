@@ -12,7 +12,7 @@ ferro = 3
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Prendi il dono"
-description = "Ricevi 3 Ferro, moltiplicati per l'era."
+description = "Ricevi 3 Ferro per il numero dell'era (es. in era 2: 6)."
 gain = SubResource("RA_2")
 
 [resource]
