@@ -8,7 +8,9 @@ var active: Array[ActiveModifier] = []
 
 
 ## Applica un modificatore. Restituisce una frase per la cronaca della run.
-## current_year: anno in cui arriva; resta attivo per duration_years anni interi successivi.
+## current_year: anno in cui arriva. Un malus resta attivo per duration_years anni interi successivi
+## (GDD §8.2.1); un bonus vale da subito fino alla fine dell'anno in cui arriva, più gli eventuali
+## anni in più (decisione di Davide, 8 novembre 2026: "per un anno" = fino alla fine dell'anno).
 ## chosen_piece: l'elemento scelto dal giocatore, per i modificatori EDIFICIO_SCELTO e TRUPPA_SCELTA.
 func apply(def: ModifierDef, origin_kind: ActiveModifier.OriginKind, origin_name: String,
 		current_year: int, board: NationBoard, rng: RandomNumberGenerator, chosen_piece: BoardPiece = null) -> String:
@@ -25,7 +27,7 @@ func apply(def: ModifierDef, origin_kind: ActiveModifier.OriginKind, origin_name
 	modifier.def = def
 	modifier.origin_kind = origin_kind
 	modifier.origin_name = origin_name
-	modifier.expires_at_year = current_year + 1 + def.duration_years
+	modifier.expires_at_year = current_year + def.duration_years + (1 if def.is_malus else 0)
 	match def.target:
 		ModifierDef.Target.EDIFICIO_A_CASO:
 			if board.buildings.is_empty():

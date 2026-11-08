@@ -13,7 +13,7 @@ legno = 2
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Razionamento"
-description = "Paghi 2 Legno: per un anno le truppe mangiano la metà."
+description = "Paghi 2 Legno: alla prossima razione, a inizio dell'anno prossimo, le truppe mangiano la metà del Cibo."
 cost = SubResource("RA_2")
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 
