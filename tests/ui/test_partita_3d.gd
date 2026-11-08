@@ -452,3 +452,24 @@ func test_suggerimenti_colorati_e_nessun_tooltip_di_sistema() -> void:
 	assert_true(pannello.spiegazioni_mostrate().has("Scudo"))
 	hud.nascondi_suggerimento()
 	assert_false(pannello.visible)
+
+
+func test_esito_e_cronaca_con_le_parole_colorate() -> void:
+	# Richiesta di Davide (8 novembre): anche esito e cronache con le parole chiave colorate.
+	var run: RunState = _run()
+	var hud: HudPlancia = _scena.get("_hud")
+	var righe: Array[String] = ["Prestigio: 20 → 17.", "Subisci il malus Carestia."]
+	hud.mostra_esito("Sconfitta", "Regno 0 · Fantasma 12", righe, StileVisivo.PERICOLO, func() -> void: pass)
+	var testi: PackedStringArray = PackedStringArray()
+	for riga: Node in (hud.get("_righe_esito") as VBoxContainer).get_children():
+		if riga is RichTextLabel and not riga.is_queued_for_deletion():
+			testi.append((riga as RichTextLabel).text)
+	assert_eq(testi.size(), 2)
+	assert_string_contains(testi[0], "Prestigio[/color]", "Il Prestigio è colorato.")
+	assert_string_contains(testi[1], "malus[/color]", "Il malus è colorato.")
+	assert_string_contains((hud.get("_sotto_esito") as RichTextLabel).text, "12[/color]", "I numeri risaltano.")
+	hud.call("_on_continua_esito")
+	# Il registro della Cronaca colora le parole chiave delle voci.
+	run.chronicle.append("Anno 1: ricevi 2 Oro.")
+	_scena.call("_aggiorna_tutto")
+	assert_string_contains((hud.get("_testo_cronaca") as RichTextLabel).text, "Oro[/color]")

@@ -70,7 +70,7 @@ var _effetti: PanelContainer
 var _lista_effetti: VBoxContainer
 var _pulsante_effetti: Button
 var _cronaca: PanelContainer
-var _testo_cronaca: Label
+var _testo_cronaca: RichTextLabel
 var _comandi: VBoxContainer
 var _suggerimento_fase: Label
 var _pulsante_rinnova: Button
@@ -95,7 +95,7 @@ var _sostituzione: PanelContainer
 var _testo_sostituzione: Label
 var _esito: PanelContainer
 var _titolo_esito: Label
-var _sotto_esito: Label
+var _sotto_esito: RichTextLabel
 var _righe_esito: VBoxContainer
 var _al_continua: Callable
 ## Riquadro delle carte della plancia (passando il mouse su una carta 3D).
@@ -114,7 +114,7 @@ var _usanze: Label
 var _pannello_cronaca: PanelContainer
 var _momento_cronaca: Label
 var _titolo_cronaca: Label
-var _racconto_cronaca: Label
+var _racconto_cronaca: RichTextLabel
 var _personaggio_cronaca: Label
 var _reazioni_cronaca: VBoxContainer
 var _firma_cronaca: String = ""
@@ -647,8 +647,7 @@ func _crea_pannelli_destra() -> void:
 	var colonna_cronaca: VBoxContainer = VBoxContainer.new()
 	_cronaca.add_child(colonna_cronaca)
 	colonna_cronaca.add_child(StileVisivo.etichetta("CRONACA", StileVisivo.FONT_TITOLI, 26, StileVisivo.ORO_LUCE))
-	_testo_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 17)
-	_testo_cronaca.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_testo_cronaca = PannelloSuggerimento.testo_colorato(17)
 	_testo_cronaca.custom_minimum_size = Vector2(480, 0)
 	colonna_cronaca.add_child(_testo_cronaca)
 	_ancora(_cronaca, Control.PRESET_CENTER_RIGHT, Vector2(-180, -220))
@@ -780,9 +779,8 @@ func _crea_esito() -> void:
 	_titolo_esito = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 80)
 	_titolo_esito.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	colonna.add_child(_titolo_esito)
-	_sotto_esito = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 21, StileVisivo.TESTO_TENUE)
-	_sotto_esito.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_sotto_esito.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_sotto_esito = PannelloSuggerimento.testo_colorato(21, StileVisivo.TESTO_TENUE)
+	_sotto_esito.custom_minimum_size = Vector2(640, 0)
 	colonna.add_child(_sotto_esito)
 	_righe_esito = VBoxContainer.new()
 	_righe_esito.add_theme_constant_override("separation", 6)
@@ -809,10 +807,8 @@ func _crea_pannello_cronaca() -> void:
 	_titolo_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 46, StileVisivo.ORO_LUCE)
 	_titolo_cronaca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	colonna.add_child(_titolo_cronaca)
-	_racconto_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TESTO, 21)
-	_racconto_cronaca.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_racconto_cronaca = PannelloSuggerimento.testo_colorato(21)
 	_racconto_cronaca.custom_minimum_size = Vector2(700, 0)
-	_racconto_cronaca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	colonna.add_child(_racconto_cronaca)
 	_personaggio_cronaca = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 17, StileVisivo.TESTO_TENUE)
 	_personaggio_cronaca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -847,7 +843,7 @@ func _aggiorna_cronaca(run: RunState) -> void:
 	_firma_cronaca = firma
 	_momento_cronaca.text = "%s · anno %d" % [run.chronicle_moment().to_upper(), run.year]
 	_titolo_cronaca.text = run.chronicle_text(cronaca.display_name)
-	_racconto_cronaca.text = run.chronicle_text(cronaca.description)
+	_racconto_cronaca.text = "[center]%s[/center]" % TestoRicco.colora(run.chronicle_text(cronaca.description))
 	_personaggio_cronaca.text = ""
 	if cronaca.requires_character != null:
 		var chi: NationCharacter = run.character_of(cronaca.requires_character)
@@ -891,8 +887,9 @@ func _reazione(run: RunState, opzione: EventOptionDef, indice: int) -> Control:
 	if motivo != "":
 		parti.append(motivo)
 	if not parti.is_empty():
-		var nota: Label = StileVisivo.etichetta("  ".join(parti), StileVisivo.FONT_TESTO, 16, StileVisivo.PERICOLO if motivo != "" else StileVisivo.TESTO_TENUE)
-		nota.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		# Che cosa fa la reazione, con le parole chiave colorate (risorse, Malcontento…).
+		var nota: RichTextLabel = PannelloSuggerimento.testo_colorato(16, StileVisivo.PERICOLO if motivo != "" else StileVisivo.TESTO_TENUE)
+		nota.text = TestoRicco.colora("  ".join(parti))
 		nota.custom_minimum_size = Vector2(700, 0)
 		riga.add_child(nota)
 	return riga
@@ -1041,7 +1038,10 @@ func aggiorna_partita(run: RunState) -> void:
 	ultime.reverse()
 	var storia: Array[String] = run.story.slice(maxi(0, run.story.size() - 5))
 	storia.reverse()
-	_testo_cronaca.text = ("STORIA DELLA NAZIONE\n%s\n\nREGISTRO\n" % "\n".join(storia) if not storia.is_empty() else "") + "\n".join(ultime)
+	var registro: String = TestoRicco.colora("\n".join(ultime))
+	if not storia.is_empty():
+		registro = "%s\n%s\n\n%s\n%s" % [_intestazione("STORIA DELLA NAZIONE"), TestoRicco.colora("\n".join(storia)), _intestazione("REGISTRO"), registro]
+	_testo_cronaca.text = registro
 
 	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty() or not run.ascension_choices.is_empty()
 	var consigliere: AdvisorDef = run.chosen_advisor
@@ -1246,14 +1246,14 @@ func nascondi_sostituzione() -> void:
 func mostra_esito(titolo: String, sottotitolo: String, righe: Array[String], colore: Color, al_continua: Callable) -> void:
 	_titolo_esito.text = titolo
 	_titolo_esito.add_theme_color_override("font_color", colore)
-	_sotto_esito.text = sottotitolo
+	_sotto_esito.text = "[center]%s[/center]" % TestoRicco.colora(sottotitolo)
 	for figlio: Node in _righe_esito.get_children():
 		figlio.queue_free()
+	# Conseguenze dello scontro con le parole chiave colorate (Prestigio, malus, risorse…).
 	for riga: String in righe:
-		var etichetta: Label = StileVisivo.etichetta("• " + riga, StileVisivo.FONT_TESTO, 19)
-		etichetta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var etichetta: RichTextLabel = PannelloSuggerimento.testo_colorato(19)
+		etichetta.text = "• " + TestoRicco.colora(riga)
 		etichetta.custom_minimum_size = Vector2(600, 0)
-		etichetta.size = Vector2(600, 0)
 		_righe_esito.add_child(etichetta)
 	_al_continua = al_continua
 	_esito.visible = true
@@ -1264,6 +1264,11 @@ func mostra_esito(titolo: String, sottotitolo: String, righe: Array[String], col
 	_esito.scale = Vector2.ONE * 0.9
 	var animazione: Tween = create_tween()
 	animazione.tween_property(_esito, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Titoletto di un testo colorato (es. "REGISTRO" nel pannello Cronaca).
+static func _intestazione(testo: String) -> String:
+	return "[b][color=#%s]%s[/color][/b]" % [StileVisivo.ORO_LUCE.to_html(false), testo]
 
 
 ## Dimensione minima e posizione al centro dello schermo (per i pannelli che cambiano contenuto).
