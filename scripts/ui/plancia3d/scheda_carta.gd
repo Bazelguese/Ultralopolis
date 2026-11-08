@@ -74,8 +74,22 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 	return _edificio(def, p_livello, p_malus, _produzione_di_base(def), p_livello_massimo)
 
 
-static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p_affamata: bool = false, p_livello_massimo: int = 0) -> SchedaCarta:
-	return _truppa(def, p_livello, p_malus, p_affamata, def.food_tenths, p_livello_massimo)
+## p_regole: le regole cambiate dalle ascensioni del giocatore (regole_di), per le sue truppe;
+## vuoto per le truppe del nemico, che seguono la regola normale.
+static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p_affamata: bool = false, p_livello_massimo: int = 0, p_regole: Array[int] = []) -> SchedaCarta:
+	return _truppa(def, p_livello, p_malus, p_affamata, def.food_tenths, p_livello_massimo, p_regole)
+
+
+## Le regole del gioco che le ascensioni della nazione cambiano (GDD §10.4.2): i testi le dicono
+## a chi le ha (decisione di Davide, 8 novembre 2026).
+static func regole_di(run: RunState) -> Array[int]:
+	var regole: Array[int] = []
+	if run == null:
+		return regole
+	for regola: int in IdentityDef.Rule.values():
+		if regola != IdentityDef.Rule.NESSUNA and run.has_rule(regola as IdentityDef.Rule):
+			regole.append(regola)
+	return regole
 
 
 ## produzione: quello che l'edificio deposita a ogni stagione, in unità interne (Res).
@@ -128,7 +142,7 @@ static func _edificio(def: BuildingDef, p_livello: int, p_malus: String, produzi
 
 
 ## razione: il Cibo che la truppa mangia a inizio anno, in decimi (Res).
-static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: bool, razione: int, p_livello_massimo: int) -> SchedaCarta:
+static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: bool, razione: int, p_livello_massimo: int, regole: Array[int] = []) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.TRUPPA
 	scheda.id = def.id
@@ -149,7 +163,10 @@ static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: 
 	scheda.illustrazione = _carica("truppe/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
 	if def.mana_cost > 0:
-		righe.append("Costa %d mana %s (se manca, usa l'energetico)." % [def.mana_cost, def.mana_type])
+		if regole.has(IdentityDef.Rule.MANA_UNITO):
+			righe.append("Costa %d mana %s (se manca, usa l'energetico e poi, con Mana unito, gli altri colori)." % [def.mana_cost, def.mana_type])
+		else:
+			righe.append("Costa %d mana %s (se manca, usa l'energetico)." % [def.mana_cost, def.mana_type])
 	else:
 		righe.append("Non chiede mana: si attiva appena finisce la ricarica.")
 	if def.damage > 0:
@@ -163,7 +180,10 @@ static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: 
 		riga_razione += "; di base %s" % Res.format(Res.Type.CIBO, def.food_tenths)
 	righe.append(riga_razione + ").")
 	if p_affamata:
-		righe.append("Affamata: ricarica più lenta fino al prossimo pasto.")
+		if regole.has(IdentityDef.Rule.ESERCITO_FRUGALE):
+			righe.append("Affamata, ma con Esercito frugale non rallenta.")
+		else:
+			righe.append("Affamata: ricarica più lenta fino al prossimo pasto.")
 	righe.append(_riga_tipi(def.types, p_livello, p_livello_massimo, false))
 	if p_malus != "":
 		righe.append("Colpita da: %s." % p_malus)
@@ -192,7 +212,7 @@ static func da_pezzo(run: RunState, pezzo: BoardPiece) -> SchedaCarta:
 	if pezzo.building != null:
 		scheda = _edificio(run.effective_building(pezzo), pezzo.level, malus_testo, run.building_production(pezzo), run.max_level())
 	else:
-		scheda = _truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry, run.troop_ration(pezzo), run.max_level())
+		scheda = _truppa(run.effective_troop(pezzo), pezzo.level, malus_testo, pezzo.hungry, run.troop_ration(pezzo), run.max_level(), regole_di(run))
 	scheda.dettagli += _riga_mantenimento(run, pezzo)
 	if pezzo.building != null:
 		return scheda
@@ -210,7 +230,7 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda = da_edificio(offerta.building, 1, "", run.max_level())
 			scheda.sopratitolo = "Edificio"
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
-			scheda = da_truppa(offerta.troop, 1, "", false, run.max_level())
+			scheda = da_truppa(offerta.troop, 1, "", false, run.max_level(), regole_di(run))
 			scheda.sopratitolo = "Truppa"
 		OpportunityDef.Kind.PERK:
 			scheda = SchedaCarta.new()
@@ -431,7 +451,7 @@ static func da_ricompensa(ricompensa: RewardDef, run: RunState = null) -> Scheda
 			scheda = da_edificio(ricompensa.building, 1, "", livello_massimo)
 			scheda.dettagli += _righe_tessera_in_regalo(ricompensa, run)
 		RewardDef.Kind.TRUPPA:
-			scheda = da_truppa(ricompensa.troop, 1, "", false, livello_massimo)
+			scheda = da_truppa(ricompensa.troop, 1, "", false, livello_massimo, regole_di(run))
 			scheda.dettagli += _righe_tessera_in_regalo(ricompensa, run)
 			if ricompensa.assimilation:
 				scheda.dettagli += "\nAssimilati (vocazione): una truppa del nemico vinto diventa tua, al posto della ricompensa. +1 Malcontento."

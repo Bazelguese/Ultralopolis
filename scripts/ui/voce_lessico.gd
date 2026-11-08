@@ -28,3 +28,7 @@ enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO, CONSIGLIO, C
 @export var di_base: bool = false
 ## Spiegazione breve, presa dal GDD. Vuota: la parola si colora ma non si spiega.
 @export_multiline var definizione: String = ""
+## Frasi in più per chi ha un'ascensione che cambia questa regola (GDD §10.4.2): la chiave è la
+## regola (IdentityDef.Rule), il valore la frase aggiunta alla spiegazione (decisione di Davide,
+## 8 novembre 2026). Es. Affamata con Esercito frugale.
+@export var eccezioni: Dictionary[int, String] = {}

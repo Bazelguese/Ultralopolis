@@ -234,3 +234,18 @@ func test_assedio_da_solo_e_il_tipo() -> void:
 	for voce: VoceLessico in TestoRicco.voci_da_spiegare("Tipi: Assedio"):
 		assert_ne(voce.nome, "Danno d'assedio", "Il tipo Assedio non è il danno d'assedio.")
 	assert_eq(TestoRicco.voci_da_spiegare("5 danno d'assedio")[0].nome, "Danno d'assedio")
+
+
+func test_le_spiegazioni_dicono_le_eccezioni_delle_tue_ascensioni() -> void:
+	# Decisione di Davide (8 novembre): chi ha un'ascensione che cambia una regola la legge nei testi.
+	var affamata: VoceLessico = _voce("Affamata")
+	TestoRicco.imposta_regole([])
+	assert_false(TestoRicco.definizione_di(affamata).contains("Esercito frugale"), "Senza l'ascensione, la regola normale.")
+	TestoRicco.imposta_regole([IdentityDef.Rule.ESERCITO_FRUGALE])
+	assert_string_contains(TestoRicco.definizione_di(affamata), "Esercito frugale")
+	TestoRicco.imposta_regole([IdentityDef.Rule.ULTIMA_TRINCEA, IdentityDef.Rule.PRIMA_SCINTILLA, IdentityDef.Rule.DOPPIO_ASCOLTO, IdentityDef.Rule.MANA_UNITO])
+	assert_string_contains(TestoRicco.definizione_di(_voce("Resistenza")), "Ultima trincea")
+	assert_string_contains(TestoRicco.definizione_di(_voce("Ciclo")), "Prima scintilla")
+	assert_string_contains(TestoRicco.definizione_di(_voce("Opportunità")), "Doppio ascolto")
+	assert_string_contains(TestoRicco.definizione_di(_voce("Energetico")), "Mana unito")
+	TestoRicco.imposta_regole([])
