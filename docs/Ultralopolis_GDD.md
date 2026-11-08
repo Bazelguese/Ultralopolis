@@ -794,6 +794,7 @@ Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzio
 | Il **governo** cambia durante la run per evoluzione o rivoluzione (§9.4.2). Popolo, credo e cultura restano fissi per ora. L’identità **cresce** anche con le vie scelte entrando nelle ere (§10.4) | Confermato (v0.24) |
 | Anche i fantasmi hanno un’identità, che vale per la loro Resistenza e per i loro tratti in battaglia | Confermato |
 | Le nazioni create **restano salvate** sul PC; si possono **modificare** o **eliminare** (con conferma). Da una nazione salvata si possono giocare più run | Confermato |
+| Lo **stendardo della nazione** (il drappo di carta con le iniziali e la Resistenza, §14.2) si **personalizza nella creazione della nazione**; che cosa si sceglie (colori, simbolo, forma) è da definire. Richiesta di Davide, 8 novembre 2026 | Direzione |
 
 ### 9.2 Che cosa fa un elemento dell’identità — Confermato, elenco aperto
 

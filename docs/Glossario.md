@@ -32,7 +32,9 @@ Nel codice i nomi tecnici interni (nomi di variabili, classi, cartelle come `opp
 
 # PARTE 1 — NOMI DA DECIDERE
 
-Nessuna decisione aperta: tutte le questioni sono state decise l'8 novembre 2026 (vedi il registro in fondo).
+| Questione | Proposta | Note |
+|---|---|---|
+| **Stendardo** indica già il simbolo dei tipi d'identità (GDD §14.4). Ora c'è anche lo **stendardo della nazione**: il drappo di carta con le iniziali e la Resistenza, steso sulla plancia e in piedi negli scontri (teatro di carta, 8 novembre 2026). | Tenere **Stendardo** per il drappo della nazione, che il giocatore vede e personalizza; chiamare il simbolo dei tipi d'identità **Vessillo**. | Da decidere con Davide. Finché non decide, nel codice il drappo si chiama *stendardo* e il simbolo resta com'è. |
 
 Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due cose, la questione si scrive qui con una proposta. Davide decide, la riga esce da qui, il nome diventa **Deciso** nella Parte 2 e la decisione entra nel registro.
 
