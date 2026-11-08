@@ -30,25 +30,36 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		colori.icona(&"edificio")
 		righe.append(colori)
 		return righe
+	# Edifici, truppe e azioni sono tutte opportunità: occupano gli stessi posti e si sceglie
+	# una sola cosa (GDD §4.2). Per questo stanno alla pari nella stessa riga colorata, con il
+	# timbro per le azioni; sotto, più sottile, quali azioni (variante 3, scelta di Davide).
 	var edifici: bool = run.advisor_offers_elements(def, false)
 	var truppe: bool = run.advisor_offers_elements(def, true)
-	if edifici or truppe:
-		var elementi: RigaSimboli = RigaSimboli.new()
-		elementi.etichetta = "Propone: %s." % ("edifici e truppe" if edifici and truppe else ("edifici" if edifici else "truppe"))
-		if def.special == AdvisorDef.Special.ANZIANO:
-			elementi.etichetta = "Propone: edifici neutri."
-		elementi.rilievo = RigaSimboli.Rilievo.PRINCIPALE
-		elementi.icona(&"proposta").scritta(":")
-		if edifici:
-			elementi.icona(&"edificio")
-		if edifici and truppe:
-			elementi.scritta("/")
-		if truppe:
-			elementi.icona(&"truppa")
-		if def.special == AdvisorDef.Special.VISITATORE:
-			_prezzo_visitatore(elementi, def)
-		righe.append(elementi)
 	var azioni: RigaSimboli = riga_azioni(run.advisor_action_preview(def))
+	var cose: PackedStringArray = PackedStringArray()
+	var simboli: Array[StringName] = []
+	if edifici:
+		cose.append("edifici neutri" if def.special == AdvisorDef.Special.ANZIANO else "edifici")
+		simboli.append(&"edificio")
+	if truppe:
+		cose.append("truppe")
+		simboli.append(&"truppa")
+	if not azioni.vuota():
+		cose.append("azioni")
+		simboli.append(&"azione")
+	if not simboli.is_empty():
+		var opportunita: RigaSimboli = RigaSimboli.new()
+		opportunita.rilievo = RigaSimboli.Rilievo.PRINCIPALE
+		opportunita.etichetta = "Propone: %s." % _elenco_con_o(cose)
+		opportunita.icona(&"proposta").scritta(":")
+		for i: int in range(simboli.size()):
+			if i > 0:
+				opportunita.scritta("/")
+			opportunita.icona(simboli[i])
+			# Il visitatore cambia i prezzi delle tessere: il prezzo va subito dopo di loro.
+			if def.special == AdvisorDef.Special.VISITATORE and simboli[i] != &"azione" and (i + 1 == simboli.size() or simboli[i + 1] == &"azione"):
+				_prezzo_visitatore(opportunita, def)
+		righe.append(opportunita)
 	if not azioni.vuota():
 		righe.append(azioni)
 	var potenzia: RigaSimboli = RigaSimboli.new()
@@ -78,14 +89,16 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 
 ## La riga "azioni" del consigliere (variante scelta da Davide): il timbro, poi un simbolo per
 ## ogni tipo di azione che può proporre, nell'ordine dei dati e senza ripetizioni.
-## Es. Tesoriere: "[azione] : [scambio] / [anno]". Vuota se non può proporre azioni.
+## Es. Tesoriere: "[azione] = [scambio] / [anno]". Vuota se non può proporre azioni.
 static func riga_azioni(azioni: Array[Offer]) -> RigaSimboli:
 	var riga: RigaSimboli = RigaSimboli.new()
 	if azioni.is_empty():
 		return riga
 	var nomi: PackedStringArray = PackedStringArray()
 	var tipi: Array[String] = []
-	riga.icona(&"azione").scritta(":")
+	# Riga sottile sotto le opportunità: «[timbro] = i tipi», cioè quali azioni può proporre.
+	riga.rilievo = RigaSimboli.Rilievo.SECONDARIA
+	riga.icona(&"azione").scritta("=")
 	for offerta: Offer in azioni:
 		var tipo: RigaSimboli = tipo_di_azione(offerta.opportunity)
 		if tipi.has(tipo.come_testo()):
@@ -145,6 +158,13 @@ static func tipo_di_azione(def: OpportunityDef) -> RigaSimboli:
 		_:
 			riga.icona(&"azione")
 	return riga
+
+
+## "edifici, truppe o azioni": le opportunità sono alternative, se ne prende una sola.
+static func _elenco_con_o(cose: PackedStringArray) -> String:
+	if cose.size() <= 1:
+		return "".join(cose)
+	return "%s o %s" % [", ".join(cose.slice(0, cose.size() - 1)), cose[cose.size() - 1]]
 
 
 ## Il visitatore cambia i prezzi (GDD §4.2.5): Oro in più o in meno e un costo aggiuntivo.
