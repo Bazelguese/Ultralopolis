@@ -286,7 +286,9 @@ func test_le_risorse_sono_tutte_sempre_visibili() -> void:
 func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	var run: RunState = _run()
 	var larghezze: Array = _scena.get("_larghezze")
-	var attesa: float = _scena.call("_larghezza_per", run.board.troop_capacity() + 1, run.board.building_capacity() + 1)
+	# Gli spazi vuoti sono sagome strette (Davide, 8 novembre 2026): contano anche i pezzi occupati.
+	var attesa: float = _scena.call("_larghezza_per", run.board.troop_capacity() + 1, run.board.building_capacity() + 1,
+			run.board.troops.size(), run.board.buildings.size())
 	assert_almost_eq(float(larghezze[0]), attesa, 0.001)
 	var plancia: Node3D = _scena.get("_plancia")
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")

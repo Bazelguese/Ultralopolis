@@ -28,7 +28,10 @@ const MARGINE_DESTRO_LASTRA: float = 0.35
 const PROFONDITA_LASTRA: float = 5.6
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
-const SCALA_MASSIMA: float = 1.25
+## Con gli spazi vuoti stretti la plancia è più corta e le carte si ingrandiscono di più.
+const SCALA_MASSIMA: float = 1.38
+## Larghezza di uno spazio vuoto (LIBERO o DA CONQUISTARE): una sagoma stretta, non una carta.
+const PASSO_SPAZIO_VUOTO: float = 0.85
 const SCALA_MASSIMA_SCONTRO: float = 1.3
 const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
@@ -40,6 +43,8 @@ const MASSIMO_GEMME_IN_VOLO: int = 24
 
 ## Altezza del telo dello stendardo della nazione.
 const ALTEZZA_STENDARDO: float = 2.6
+## Lo stendardo steso: la base sta verso il davanti della plancia, il telo si stende all'indietro.
+const POSIZIONE_STESO_Z: float = 3.6
 ## Teatro di carta: il tavolo (x, z, larghezza, profondità) e il sole/luna.
 const LIBRO: Rect2 = Rect2(-45.0, -35.0, 90.0, 70.0)
 const POSIZIONE_ASTRO: Vector3 = Vector3(5.5, 0.0, -9.0)
@@ -94,6 +99,9 @@ const SEGMENTI_ANELLO: int = 48
 var _barre_resistenza: Array[MeshInstance3D] = [null, null]
 ## Teatro di carta: lo stendardo di ogni lato (materiale del telo e numero della Resistenza).
 var _teli_stendardo: Array[ShaderMaterial] = [null, null]
+var _stendardi: Array[Node3D] = [null, null]
+## Nome e barra della Resistenza accanto allo stendardo: si vedono solo negli scontri.
+var _dati_scontro: Array[Node3D] = [null, null]
 var _numeri_stendardo: Array[Label3D] = [null, null]
 ## Scudo e Corruzione accanto allo stemma (GDD §7.6), visibili solo se non sono zero.
 var _segnalini_scudo: Array[Node3D] = [null, null]
@@ -353,8 +361,14 @@ func _imposta_larghezza_lastra(lato: int, larghezza: float) -> void:
 
 
 ## Larghezza della lastra che contiene tanti spazi (almeno due edifici, per non farla troppo corta).
-func _larghezza_per(spazi_truppe: int, spazi_edifici: int) -> float:
-	var contenuto: float = maxf(maxf(spazi_truppe * PASSO_TRUPPE, spazi_edifici * PASSO_EDIFICI), 2.0 * PASSO_EDIFICI)
+## Gli spazi vuoti (oltre i pezzi occupati) sono sagome strette (Davide, 8 novembre 2026);
+## senza il numero dei pezzi, tutti gli spazi contano come occupati.
+func _larghezza_per(spazi_truppe: int, spazi_edifici: int, truppe_occupate: int = -1, edifici_occupati: int = -1) -> float:
+	var piene_t: int = spazi_truppe if truppe_occupate < 0 else mini(truppe_occupate, spazi_truppe)
+	var piene_e: int = spazi_edifici if edifici_occupati < 0 else mini(edifici_occupati, spazi_edifici)
+	var fila_truppe: float = piene_t * PASSO_TRUPPE + (spazi_truppe - piene_t) * PASSO_SPAZIO_VUOTO
+	var fila_edifici: float = piene_e * PASSO_EDIFICI + (spazi_edifici - piene_e) * PASSO_SPAZIO_VUOTO
+	var contenuto: float = maxf(maxf(fila_truppe, fila_edifici), 2.0 * PASSO_EDIFICI)
 	return (X_INIZIO_SPAZI - BORDO_SINISTRO_LASTRA) + contenuto + MARGINE_DESTRO_LASTRA
 
 
@@ -368,7 +382,7 @@ func _scala_per(larghezza: float, massima: float) -> float:
 ## simmetrici rispetto al centro del tavolo.
 func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: float) -> void:
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
-	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 1.1
+	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0
 	# Un po' a destra: a sinistra c'è la colonna con la nazione e il calendario.
 	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
 	if _animazione_plancia != null and _animazione_plancia.is_valid():
@@ -389,7 +403,11 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	medaglione.position = Vector3(X_MEDAGLIONE, 0.0, z_centro - 1.35)
 	radice.add_child(medaglione)
 	_medaglioni[lato] = medaglione
-	# Teatro di carta (Davide, 8 novembre 2026): lo stendardo di carta della nazione.
+	# Teatro di carta (Davide, 8 novembre 2026): lo stendardo di carta della nazione. Fuori dagli
+	# scontri sta steso piatto sulla plancia; quando comincia la battaglia si alza in piedi.
+	var stendardo: Node3D = Node3D.new()
+	medaglione.add_child(stendardo)
+	_stendardi[lato] = stendardo
 	# Porta le iniziali e la Resistenza, e brucia dal basso man mano che la Resistenza scende.
 	var asta: MeshInstance3D = MeshInstance3D.new()
 	var forma_asta: CylinderMesh = CylinderMesh.new()
@@ -399,7 +417,7 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	asta.mesh = forma_asta
 	asta.material_override = StileVisivo.materiale(Color("1a1410"), 0.8)
 	asta.position = Vector3(-1.05, forma_asta.height * 0.5, 0.0)
-	medaglione.add_child(asta)
+	stendardo.add_child(asta)
 	var punta: MeshInstance3D = MeshInstance3D.new()
 	var forma_punta: SphereMesh = SphereMesh.new()
 	forma_punta.radius = 0.11
@@ -407,7 +425,7 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	punta.mesh = forma_punta
 	punta.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
 	punta.position = Vector3(-1.05, forma_asta.height + 0.05, 0.0)
-	medaglione.add_child(punta)
+	stendardo.add_child(punta)
 	var telo: MeshInstance3D = MeshInstance3D.new()
 	var forma_telo: QuadMesh = QuadMesh.new()
 	forma_telo.size = Vector2(2.0, ALTEZZA_STENDARDO)
@@ -415,23 +433,27 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	var materiale_telo: ShaderMaterial = Figurina.materiale_carta(_trama_stendardo(colore))
 	telo.material_override = materiale_telo
 	telo.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.5, 0.0)
-	medaglione.add_child(telo)
+	stendardo.add_child(telo)
 	_teli_stendardo[lato] = materiale_telo
 	# Al centro dello stendardo le iniziali della nazione, come lo stemma di un eroe.
 	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 150, Color("1a1410"), 0.0, 0)
 	iniziali.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.68, 0.02)
 	iniziali.rotation = Vector3.ZERO
-	medaglione.add_child(iniziali)
+	stendardo.add_child(iniziali)
 	_iniziali[lato] = iniziali
 	var numero_telo: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 190, Color("1a1410"), 0.0, 0)
 	numero_telo.position = Vector3(0.0, 0.9 + ALTEZZA_STENDARDO * 0.36, 0.02)
 	numero_telo.rotation = Vector3.ZERO
-	medaglione.add_child(numero_telo)
+	stendardo.add_child(numero_telo)
 	_numeri_stendardo[lato] = numero_telo
 	_crea_anello(medaglione, lato)
 	var nome: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 40, StileVisivo.TESTO, 0.0, 8)
 	nome.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.12)
-	radice.add_child(nome)
+	# Nome e barra della Resistenza servono nello scontro; fuori basta lo stendardo steso.
+	var dati: Node3D = Node3D.new()
+	radice.add_child(dati)
+	_dati_scontro[lato] = dati
+	dati.add_child(nome)
 	_nomi_lato[lato] = nome
 	# Sotto il nome la barra della Resistenza con i numeri sopra, come la vita di un eroe.
 	var fondo_barra: MeshInstance3D = MeshInstance3D.new()
@@ -440,18 +462,18 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	fondo_barra.mesh = forma_fondo
 	fondo_barra.material_override = StileVisivo.materiale(StileVisivo.NOTTE, 0.9)
 	fondo_barra.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.58)
-	radice.add_child(fondo_barra)
+	dati.add_child(fondo_barra)
 	var barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_barra: BoxMesh = BoxMesh.new()
 	forma_barra.size = Vector3(2.2, 0.05, 0.32)
 	barra.mesh = forma_barra
 	barra.material_override = StileVisivo.materiale_luminoso(Color("3fae6a"), 0.7)
 	barra.position = fondo_barra.position + Vector3(0.0, 0.01, 0.0)
-	radice.add_child(barra)
+	dati.add_child(barra)
 	_barre_resistenza[lato] = barra
 	var numero: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 60, Color.WHITE, 0.0, 12)
 	numero.position = fondo_barra.position + Vector3(0.0, 0.06, 0.0)
-	radice.add_child(numero)
+	dati.add_child(numero)
 	_scritte_resistenza[lato] = numero
 	var scudo: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, -0.55), Color("2f6fd0"))
 	_segnalini_scudo[lato] = scudo[0]
@@ -462,6 +484,9 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 
 
 ## Piccolo disco con un numero accanto allo stemma. Restituisce [nodo, scritta].
+	_stendi_stendardo(lato, true, false)
+
+
 func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color) -> Array:
 	var nodo: Node3D = Node3D.new()
 	nodo.position = posizione
@@ -523,6 +548,29 @@ func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
 	var colore: Color = Color("3fae6a") if frazione > 0.5 else (Color("e0b23a") if frazione > 0.25 else StileVisivo.PERICOLO)
 	(barra.material_override as StandardMaterial3D).albedo_color = colore
 	(barra.material_override as StandardMaterial3D).emission = colore
+
+
+## Lo stendardo steso piatto sulla plancia (fuori dagli scontri) oppure in piedi (in battaglia).
+## Steso, mostra solo iniziali e Resistenza; in piedi compaiono anche nome, barra e anello del tempo.
+func _stendi_stendardo(lato: int, steso: bool, animato: bool) -> void:
+	var stendardo: Node3D = _stendardi[lato]
+	# Steso a faccia in su, con l'asta verso il davanti della plancia: resta dentro la colonna.
+	var angolo: float = -PI * 0.5 if steso else 0.0
+	var posizione: Vector3 = Vector3(0.0, 0.05, POSIZIONE_STESO_Z) if steso else Vector3.ZERO
+	var scala: Vector3 = Vector3.ONE * (0.85 if steso else 1.0)
+	_dati_scontro[lato].visible = not steso
+	for segmento: MeshInstance3D in _anelli[lato]:
+		segmento.visible = not steso
+	if not animato:
+		stendardo.rotation.x = angolo
+		stendardo.position = posizione
+		stendardo.scale = scala
+		return
+	var t: Tween = create_tween()
+	t.set_parallel(true)
+	t.tween_property(stendardo, "rotation:x", angolo, 0.55 if not steso else 0.4).set_trans(Tween.TRANS_BACK if not steso else Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(stendardo, "position", posizione, 0.4)
+	t.tween_property(stendardo, "scale", scala, 0.4)
 
 
 ## Telo dello stendardo: carta color crema, fascia del colore del lato in alto, coda a punte in basso.
@@ -601,7 +649,8 @@ func _crea_tessera(genitore: Node3D, scheda: SchedaCarta, misura: Vector2, posiz
 	return tessera
 
 
-## Spazio vuoto: velato del colore del lato se è disponibile, scuro se va ancora conquistato.
+## Spazio vuoto: una sagoma stretta velata del colore del lato se è disponibile (con il +), scura
+## con il lucchetto se va ancora conquistata. La scritta corre in verticale.
 func _crea_spazio(genitore: Node3D, posizione: Vector3, misura: Vector2, disponibile: bool, colore_lato: Color) -> Node3D:
 	var spazio: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
@@ -611,10 +660,22 @@ func _crea_spazio(genitore: Node3D, posizione: Vector3, misura: Vector2, disponi
 	spazio.material_override = StileVisivo.materiale_velo(colore)
 	spazio.position = posizione + Vector3(0.0, 0.012, 0.0)
 	genitore.add_child(spazio)
-	var scritta: Label3D = StileVisivo.scritta("LIBERO" if disponibile else "DA CONQUISTARE", StileVisivo.FONT_TITOLI, 46 if disponibile else 34, Color(colore_lato, 0.85) if disponibile else Color(StileVisivo.TESTO_TENUE, 0.6), 0.0, 6)
-	scritta.position = Vector3(0.0, 0.004, 0.0)
+	var tinta: Color = Color(colore_lato, 0.9) if disponibile else Color(StileVisivo.TESTO_TENUE, 0.6)
+	var segno: Label3D = StileVisivo.scritta("+" if disponibile else "×", StileVisivo.FONT_TITOLI, 120, tinta, 0.0, 6)
+	segno.position = Vector3(0.0, 0.004, -misura.y * 0.3)
+	spazio.add_child(segno)
+	var scritta: Label3D = StileVisivo.scritta("LIBERO" if disponibile else "DA CONQUISTARE", StileVisivo.FONT_TITOLI, 34 if disponibile else 26, tinta, 0.0, 6)
+	scritta.rotation_degrees = Vector3(-90.0, 90.0, 0.0)
+	scritta.position = Vector3(0.0, 0.004, misura.y * 0.12)
 	spazio.add_child(scritta)
 	return spazio
+
+
+## Spazio vuoto numero i di una fila che ha "occupati" pezzi: dopo le carte, sagome strette.
+func _posizione_spazio_vuoto(lato: int, truppa: bool, occupati: int, i: int) -> Vector3:
+	var passo: float = PASSO_TRUPPE if truppa else PASSO_EDIFICI
+	var x: float = X_INIZIO_SPAZI + occupati * passo + (i - occupati + 0.5) * PASSO_SPAZIO_VUOTO
+	return Vector3(x, 0.02, (Z_TRUPPE if truppa else Z_EDIFICI) * _segno(lato))
 
 
 func _posizione_truppa(lato: int, i: int) -> Vector3:
@@ -648,20 +709,20 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 	var colore: Color = _colore_lato(lato)
 	var spazi_truppe: int = _spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, spazi_chiusi)
 	var spazi_edifici: int = _spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, spazi_chiusi)
-	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici))
+	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici, truppe.size(), edifici.size()))
 	for i: int in range(spazi_truppe):
 		if i < truppe.size():
 			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i, nitidezza, true))
 			_lampi[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
-			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_truppa(lato, i), MISURA_TRUPPA, i < capacita_truppe, colore)
+			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_spazio_vuoto(lato, true, truppe.size(), i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_TRUPPA.y), i < capacita_truppe, colore)
 			if i < capacita_truppe and _spazio_libero_truppa == null:
 				_spazio_libero_truppa = spazio
 	for i: int in range(spazi_edifici):
 		if i < edifici.size():
 			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i, nitidezza, true))
 		elif lato == Lato.GIOCATORE:
-			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_edificio(lato, i), MISURA_EDIFICIO, i < capacita_edifici, colore)
+			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_spazio_vuoto(lato, false, edifici.size(), i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_EDIFICIO.y), i < capacita_edifici, colore)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
 				_spazio_libero_edificio = spazio
 	_alza_figurine(lato, tutte_animate)
@@ -695,7 +756,8 @@ func _costruisci_plancia_giocatore() -> void:
 	var capacita_truppe: int = run.board.troop_capacity()
 	var larghezza: float = _larghezza_per(
 			_spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, true),
-			_spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, true))
+			_spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, true),
+			truppe.size(), edifici.size())
 	var scala: float = _scala_per(larghezza, SCALA_MASSIMA)
 	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, capacita_edifici, capacita_truppe, true, scala)
 	var animata: bool = not _disponi_subito and (_plancia.scale.x != scala or _modo == Modo.SCONTRO)
@@ -1283,6 +1345,9 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	arrivo.tween_property(avversario, "position", Vector3.ZERO, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	arrivo.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_SCONTRO, MIRA_PARTITA, MIRA_SCONTRO), 0.0, 1.0, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	_hud.modalita_scontro(true, titolo)
+	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
+		_stendi_stendardo(lato, true, false)
+		_stendi_stendardo(lato, false, true)
 	_scena.mostra_fila_mesi(false)
 
 
@@ -1619,6 +1684,7 @@ func _chiudi_scontro() -> void:
 	_sim = null
 	_modo = Modo.NORMALE
 	_hud.modalita_scontro(false)
+	_stendi_stendardo(Lato.GIOCATORE, true, true)
 	_scena.mostra_fila_mesi(true)
 	# La plancia torna com'è fuori dagli scontri: niente riserva di mana, Scudo o Corruzione.
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
