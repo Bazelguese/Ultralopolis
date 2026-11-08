@@ -210,3 +210,17 @@ func test_incanti_e_spionaggi_si_riuniscono_in_una_riga() -> void:
 	assert_eq(righe[0].come_testo(), "2[fede] → [incanto] [truppa] +[danno] / [scudo] +2[gemma qualsiasi]")
 	assert_eq(righe[1].come_testo(), "2/3[documenti] → [fantasma] : [sabotaggio] / [inefficienza]")
 	assert_eq(righe[2].come_testo(), "2[stabilita] → +4[oro]")
+
+
+# --- Sotto la carta del consigliere -----------------------------------------------
+
+func test_sotto_il_consigliere_si_vede_quante_carte_puoi_potenziare() -> void:
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione", &"Fante"], [], Res.Type.STABILITA)
+	catalog.advisors = [cancelliere]
+	var run: RunState = _run()
+	assert_eq(SchedaCarta.da_consigliere(run, cancelliere).costo, "Ascolta", "Senza Stabilità non si può potenziare nulla.")
+	run.stock[Res.Type.STABILITA] = 100
+	var pronte: int = run.affordable_upgrades(cancelliere).size()
+	assert_gt(pronte, 0, "La Fattoria e i Fanti sono dei tipi del consigliere.")
+	assert_eq(SchedaCarta.da_consigliere(run, cancelliere).costo, "Ascolta · ▲ Potenzia %d" % pronte)
+	assert_true(SimboliEffetti.consigliere(run, cancelliere)[0].accesa, "La riga del Potenzia si accende.")

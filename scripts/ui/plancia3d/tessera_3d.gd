@@ -19,6 +19,7 @@ var _corpo: Node3D
 var _viewport: SubViewport
 var _faccia: FacciaCarta
 var _materiale_alone: StandardMaterial3D
+var _materiale_faccia: StandardMaterial3D
 var _alone: MeshInstance3D
 var _velo: MeshInstance3D
 var _evidenziata: bool = false
@@ -68,6 +69,7 @@ func _crea_faccia(nitidezza: float) -> void:
 	materiale.metallic_specular = 0.6
 	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
 	carta.material_override = materiale
+	_materiale_faccia = materiale
 	carta.position.y = SPESSORE + 0.002
 	_corpo.add_child(carta)
 
@@ -129,6 +131,15 @@ func _ridisegna() -> void:
 
 # --- Stati e animazioni --------------------------------------------------------
 
+## Carta con le righe di simboli: con il mouse sopra si ingrandisce di "valore".
+## Il riflesso della luce la farebbe sembrare sbiadita, quindi la sua faccia è opaca:
+## così i simboli restano netti.
+func imposta_ingrandimento(valore: float) -> void:
+	ingrandimento = valore
+	_materiale_faccia.metallic_specular = 0.05
+	_materiale_faccia.roughness = 1.0
+
+
 ## Mouse sopra la carta: si solleva e si ingrandisce un poco.
 func evidenzia(attiva: bool) -> void:
 	if attiva == _evidenziata:
@@ -142,6 +153,7 @@ func evidenzia(attiva: bool) -> void:
 	var altezza: float = ALTEZZA_SOLLEVATA * maxf(1.0, ingrandimento * 2.0 - 1.0)
 	_animazione_sollevamento.tween_property(_corpo, "position:y", altezza if attiva else 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_animazione_sollevamento.tween_property(_corpo, "scale", Vector3.ONE * (ingrandimento if attiva else 1.0), 0.14)
+
 	_aggiorna_alone()
 
 
@@ -199,7 +211,7 @@ func aggiorna_scheda(nuova: SchedaCarta) -> void:
 static func _testo_simboli(p_scheda: SchedaCarta) -> String:
 	var testo: String = ""
 	for riga: RigaSimboli in p_scheda.simboli:
-		testo += "%s%s\n" % ["(spenta) " if riga.spenta else "", riga.come_testo()]
+		testo += "%s%s%s\n" % ["(spenta) " if riga.spenta else "", "(accesa) " if riga.accesa else "", riga.come_testo()]
 	return testo
 
 

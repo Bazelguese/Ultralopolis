@@ -276,21 +276,80 @@ func _disegna_simboli() -> void:
 	var righe: Array[RigaSimboli] = scheda.simboli
 	if righe.is_empty() or _area_simboli.size.y <= 0.0:
 		return
-	var lato: float = minf(size.x, size.y)
-	var stacco: float = lato * 0.018
-	var quante: int = righe.size()
-	var altezza: float = minf((_area_simboli.size.y - stacco * (quante - 1)) / quante, _area_simboli.size.y * 0.36)
-	var totale: float = altezza * quante + stacco * (quante - 1)
-	var y: float = _area_simboli.position.y + (_area_simboli.size.y - totale) * 0.5
+	var stacco: float = minf(size.x, size.y) * 0.018
+	# Le righe corte si affiancano sulla stessa linea, ognuna nella sua pastiglia, così non si
+	# spreca spazio (richiesta di Davide). Meno linee = linee più alte = simboli più grandi:
+	# si riprova finché il numero di linee non cambia più.
+	var linee: Array[Array] = []
 	for riga: RigaSimboli in righe:
-		var area: Rect2 = Rect2(_area_simboli.position.x, y, _area_simboli.size.x, altezza)
+		linee.append([riga])
+	for tentativo: int in range(4):
+		var nuove: Array[Array] = _impacchetta(righe, _altezza_linea(linee.size(), stacco), stacco)
+		var stabile: bool = nuove.size() == linee.size()
+		linee = nuove
+		if stabile:
+			break
+	var altezza: float = _altezza_linea(linee.size(), stacco)
+	var totale: float = altezza * linee.size() + stacco * (linee.size() - 1)
+	var y: float = _area_simboli.position.y + (_area_simboli.size.y - totale) * 0.5
+	for linea: Array in linee:
+		_disegna_linea(linea, y, altezza, stacco)
+		y += altezza + stacco
+
+
+## Altezza di ogni linea se le linee sono "quante".
+func _altezza_linea(quante: int, stacco: float) -> float:
+	var n: int = maxi(quante, 1)
+	return minf((_area_simboli.size.y - stacco * (n - 1)) / n, _area_simboli.size.y * 0.36)
+
+
+## Larghezza che serve a una riga, con il margine della sua pastiglia, su una linea alta "altezza".
+func _larghezza_pastiglia(riga: RigaSimboli, altezza: float) -> float:
+	return _larghezza_riga(riga, StileVisivo.FONT_TITOLI, int(altezza * 0.56), altezza * 0.8, altezza * 0.1) + altezza * 0.4
+
+
+## Mette le righe, in ordine, sulle linee: una riga va accanto alla precedente se ci sta.
+func _impacchetta(righe: Array[RigaSimboli], altezza: float, stacco: float) -> Array[Array]:
+	var linee: Array[Array] = []
+	var occupata: float = 0.0
+	for riga: RigaSimboli in righe:
+		var serve: float = _larghezza_pastiglia(riga, altezza)
+		if linee.is_empty() or occupata + stacco + serve > _area_simboli.size.x:
+			linee.append([riga])
+			occupata = serve
+		else:
+			linee[linee.size() - 1].append(riga)
+			occupata += stacco + serve
+	return linee
+
+
+## Una linea: le pastiglie si dividono la larghezza in proporzione a quanto serve a ciascuna.
+func _disegna_linea(linea: Array, y: float, altezza: float, stacco: float) -> void:
+	var richieste: Array[float] = []
+	var somma: float = 0.0
+	for elemento: Variant in linea:
+		var serve: float = _larghezza_pastiglia(elemento as RigaSimboli, altezza)
+		richieste.append(serve)
+		somma += serve
+	var avanzo: float = _area_simboli.size.x - somma - stacco * (linea.size() - 1)
+	var x: float = _area_simboli.position.x
+	for i: int in range(linea.size()):
+		var riga: RigaSimboli = linea[i] as RigaSimboli
+		var larghezza: float = _area_simboli.size.x
+		if linea.size() > 1:
+			larghezza = richieste[i] + avanzo * richieste[i] / maxf(somma, 1.0)
+		var area: Rect2 = Rect2(x, y, larghezza, altezza)
 		var fondo: StyleBoxFlat = StyleBoxFlat.new()
 		fondo.bg_color = Color(0.0, 0.0, 0.0, 0.18 if riga.spenta else 0.32)
+		if riga.accesa:
+			fondo.bg_color = Color(StileVisivo.ORO.darkened(0.35), 0.85)
+			fondo.border_color = StileVisivo.ORO_LUCE
+			fondo.set_border_width_all(maxi(2, int(altezza * 0.05)))
 		fondo.set_corner_radius_all(int(altezza * 0.3))
 		fondo.anti_aliasing = true
 		_sopra.draw_style_box(fondo, area)
 		_disegna_riga(riga, area)
-		y += altezza + stacco
+		x += larghezza + stacco
 
 
 func _disegna_riga(riga: RigaSimboli, area: Rect2) -> void:

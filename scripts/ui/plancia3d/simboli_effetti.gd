@@ -39,6 +39,8 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
 			if def.random_resource:
 				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)
+			# Con questo consigliere puoi già potenziare qualche tua carta (P4).
+			potenzia.accesa = not run.affordable_upgrades(def).is_empty()
 			righe.append(potenzia)
 	var edifici: bool = run.advisor_offers_elements(def, false)
 	var truppe: bool = run.advisor_offers_elements(def, true)

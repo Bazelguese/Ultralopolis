@@ -1317,16 +1317,25 @@ func _on_continua_esito() -> void:
 		_al_continua.call()
 
 
-## Con "sotto" il riquadro sta centrato sotto il punto indicato (il bordo basso di una carta
-## ingrandita), così non copre i simboli della carta; altrimenti sta in alto a destra del mouse.
-func mostra_suggerimento(titolo: String, testo: String, posizione: Vector2, sotto: bool = false) -> void:
+## Il riquadro sta in alto a destra del mouse. Se è indicata la carta da non coprire
+## (una carta ingrandita, con i simboli), sta sotto di lei; se lì non c'è posto, al suo fianco.
+func mostra_suggerimento(titolo: String, testo: String, posizione: Vector2, carta: Rect2 = Rect2()) -> void:
 	_titolo_suggerimento.text = titolo
 	_testo_suggerimento.text = testo
 	_suggerimento.visible = true
 	_suggerimento.reset_size()
-	var limite: Vector2 = get_viewport_rect().size - _suggerimento.size - Vector2(16, 16)
-	var scarto: Vector2 = Vector2(-_suggerimento.size.x * 0.5, 12) if sotto else Vector2(24, -_suggerimento.size.y - 16)
-	_suggerimento.position = (posizione + scarto).clamp(Vector2(16, 16), limite)
+	var schermo: Vector2 = get_viewport_rect().size
+	var misura: Vector2 = _suggerimento.size
+	var limite: Vector2 = schermo - misura - Vector2(16, 16)
+	var punto: Vector2 = posizione + Vector2(24, -misura.y - 16)
+	if carta.has_area():
+		if carta.end.y + 12 + misura.y <= schermo.y - 16:
+			punto = Vector2(carta.get_center().x - misura.x * 0.5, carta.end.y + 12)
+		elif carta.end.x + 12 + misura.x <= schermo.x - 16:
+			punto = Vector2(carta.end.x + 12, carta.position.y)
+		else:
+			punto = Vector2(carta.position.x - 12 - misura.x, carta.position.y)
+	_suggerimento.position = punto.clamp(Vector2(16, 16), limite)
 
 
 func nascondi_suggerimento() -> void:

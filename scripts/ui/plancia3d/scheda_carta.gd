@@ -238,6 +238,9 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
 	var righe: PackedStringArray = PackedStringArray()
 	righe.append(consigliere.description)
+	# Sotto la carta: "Ascolta" (scegli questo consigliere); se con lui puoi già potenziare
+	# qualche tua carta, anche quante (vedi sotto).
+	scheda.costo = "Ascolta"
 	match consigliere.special:
 		AdvisorDef.Special.CLOWN:
 			scheda.riga = "5 colori"
@@ -259,7 +262,6 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 			if not pronte.is_empty():
 				righe.append("Puoi già potenziare: %s." % ", ".join(pronte))
 				scheda.costo = "Ascolta · ▲ Potenzia %d" % pronte.size()
-	scheda.costo = "Ascolta"
 	scheda.simboli = SimboliEffetti.consigliere(run, consigliere)
 	var azioni: Array[Offer] = run.advisor_action_preview(consigliere)
 	if not azioni.is_empty():

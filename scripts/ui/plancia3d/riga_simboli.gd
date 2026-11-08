@@ -37,6 +37,8 @@ var simboli: Array[Simbolo] = []
 var etichetta: String = ""
 ## La riga non si può usare adesso (es. opzione con un requisito mancante): appare spenta.
 var spenta: bool = false
+## La riga si può già usare con vantaggio (es. Potenzia, con carte potenziabili): fondo dorato.
+var accesa: bool = false
 
 
 func vuota() -> bool:
