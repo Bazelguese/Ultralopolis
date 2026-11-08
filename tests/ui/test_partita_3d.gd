@@ -422,8 +422,8 @@ func test_annunci_in_alto_e_calendario_a_sinistra() -> void:
 	assert_string_contains((hud.get("_sotto_messaggio") as Label).text, run.month_name())
 
 
-func test_scheda_della_nazione_con_ricomincia_e_spiegazioni() -> void:
-	# Richiesta di Davide (6 novembre): Ricomincia accanto al nome; ogni caratteristica si spiega.
+func test_scheda_della_nazione_spiega_le_caratteristiche() -> void:
+	# Richiesta di Davide (6 novembre): ogni caratteristica si spiega. Dall'8 novembre Ricomincia non c'è più.
 	var run: RunState = _run()
 	var hud: HudPlancia = _scena.get("_hud")
 	var voci: HFlowContainer = hud.get("_identita")

@@ -121,6 +121,8 @@ var _dettagli_fase: VBoxContainer
 var _dettagli_fissati: bool = false
 ## Tutti i pulsanti della partita in un'unica fila di linguette, in basso a destra.
 var _riga_linguette: HBoxContainer
+var _riquadro_run: PanelContainer
+var _dettagli_run: HBoxContainer
 var _inclinazioni: BarreInclinazioni
 var _usanze: Label
 var _pannello_cronaca: PanelContainer
@@ -219,10 +221,10 @@ func _process(_delta: float) -> void:
 
 ## I dettagli si vedono se fissati con un clic o se il mouse è sopra il loro pannello.
 func _aggiorna_dettagli() -> void:
-	if _riquadro_nazione == null or _riquadro_fase == null:
+	if _riquadro_nazione == null or _riquadro_fase == null or _riquadro_run == null:
 		return
 	var mouse: Vector2 = get_viewport().get_mouse_position()
-	for coppia: Array in [[_riquadro_nazione, _dettagli_nazione], [_riquadro_fase, _dettagli_fase]]:
+	for coppia: Array in [[_riquadro_nazione, _dettagli_nazione], [_riquadro_fase, _dettagli_fase], [_riquadro_run, _dettagli_run]]:
 		var riquadro: Control = coppia[0]
 		var dettagli: Control = coppia[1]
 		var sopra: bool = riquadro.is_visible_in_tree() and riquadro.get_global_rect().grow(6.0).has_point(mouse)
@@ -312,18 +314,13 @@ func _crea_nazione() -> void:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 0)
 	riquadro.add_child(colonna)
-	# Nome della nazione e, accanto, Ricomincia (con la stessa nazione).
+	# Nome della nazione (Ricomincia tolto su richiesta di Davide, 8 novembre 2026).
 	var testa: HBoxContainer = HBoxContainer.new()
 	testa.add_theme_constant_override("separation", 12)
 	colonna.add_child(testa)
 	_nazione = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 34)
 	_nazione.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	testa.add_child(_nazione)
-	var ricomincia_pulsante: Button = _pulsante("Ricomincia", func() -> void: ricomincia.emit())
-	ricomincia_pulsante.add_theme_font_size_override("font_size", 16)
-	ricomincia_pulsante.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	Suggerimenti.imposta(ricomincia_pulsante, "Nuova partita con la stessa nazione.")
-	testa.add_child(ricomincia_pulsante)
 	_dettagli_nazione = VBoxContainer.new()
 	_dettagli_nazione.add_theme_constant_override("separation", 0)
 	_dettagli_nazione.visible = false
@@ -400,11 +397,21 @@ func _crea_fase() -> void:
 	_annuncio.modulate.a = 0.0
 
 
+## In alto a destra (Davide, 8 novembre 2026): una linguetta «Partita» con Menu; Prestigio,
+## Vittorie, Era e Malcontento si aprono passando il mouse o con un clic.
 func _crea_run() -> void:
 	var riquadro: PanelContainer = PanelContainer.new()
+	var esterna: HBoxContainer = HBoxContainer.new()
+	esterna.add_theme_constant_override("separation", 18)
+	riquadro.add_child(esterna)
 	var riga: HBoxContainer = HBoxContainer.new()
 	riga.add_theme_constant_override("separation", 24)
-	riquadro.add_child(riga)
+	riga.visible = false
+	esterna.add_child(riga)
+	_dettagli_run = riga
+	var titolo: Label = StileVisivo.etichetta("Partita", StileVisivo.FONT_TITOLI, 22, StileVisivo.TESTO_TENUE)
+	titolo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	esterna.add_child(titolo)
 	var prestigio: Array = _valore("Prestigio", StileVisivo.ORO_LUCE)
 	riga.add_child(prestigio[0])
 	_prestigio = prestigio[1]
@@ -420,7 +427,11 @@ func _crea_run() -> void:
 	_malcontento = malcontento[1]
 	_malcontento_cella = malcontento[0]
 	_malcontento_cella.mouse_filter = Control.MOUSE_FILTER_PASS
-	riga.add_child(_pulsante("Menu", func() -> void: menu.emit()))
+	var pulsante_menu: Button = _pulsante("Menu", func() -> void: menu.emit())
+	_rendi_linguetta(pulsante_menu)
+	esterna.add_child(pulsante_menu)
+	_riquadro_run = riquadro
+	_rendi_apribile(riquadro)
 	_ancora(riquadro, Control.PRESET_TOP_RIGHT, Vector2(-24, 20))
 	_ultima_possibilita = StileVisivo.etichetta("ULTIMA POSSIBILITÀ", StileVisivo.FONT_TITOLI, 22, StileVisivo.PERICOLO)
 	_ancora(_ultima_possibilita, Control.PRESET_TOP_RIGHT, Vector2(-30, 124))
