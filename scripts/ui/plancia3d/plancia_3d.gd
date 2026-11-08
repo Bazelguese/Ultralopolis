@@ -28,7 +28,7 @@ const MARGINE_DESTRO_LASTRA: float = 0.35
 const PROFONDITA_LASTRA: float = 5.6
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
-const SCALA_MASSIMA: float = 1.35
+const SCALA_MASSIMA: float = 1.25
 const SCALA_MASSIMA_SCONTRO: float = 1.3
 const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
@@ -40,21 +40,18 @@ const MASSIMO_GEMME_IN_VOLO: int = 24
 
 ## Altezza del telo dello stendardo della nazione.
 const ALTEZZA_STENDARDO: float = 2.6
-## Teatro di carta: il libro pop-up che fa da palco (x, z, larghezza, profondità), la fila dei mesi
-## che galleggia sullo sfondo sopra la città e il sole/luna.
-const LIBRO: Rect2 = Rect2(-19.0, -9.6, 38.0, 19.6)
-const POSIZIONE_FILA_MESI: Vector3 = Vector3(-0.4, 0.4, -12.6)
-const POSIZIONE_ASTRO: Vector3 = Vector3(13.5, -6.0, -16.0)
+## Teatro di carta: il tavolo (x, z, larghezza, profondità) e il sole/luna.
+const LIBRO: Rect2 = Rect2(-45.0, -35.0, 90.0, 70.0)
+const POSIZIONE_ASTRO: Vector3 = Vector3(5.5, 0.0, -9.0)
 
-## Teatro di carta: la vista larga lascia vedere sopra la plancia la città e la fila dei mesi.
-const FOV_TELECAMERA: float = 40.0
-const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 19.5, 20.5)
-const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -1.8)
+const FOV_TELECAMERA: float = 30.0
+const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 21.5, 20.0)
+const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -0.2)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 1.2
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 17.0, 17.5)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 0.9)
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 22.0, 22.0)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.6)
 
 var run: RunState
 
@@ -224,7 +221,7 @@ func _crea_ambiente() -> void:
 	# sole/luna e calendario pop-up (solo scenografia).
 	_scena = ScenaTeatro.new()
 	add_child(_scena)
-	_scena.costruisci(LIBRO, POSIZIONE_FILA_MESI, POSIZIONE_ASTRO, CAMERA_PARTITA)
+	_scena.costruisci(LIBRO, POSIZIONE_ASTRO)
 	_camera = Camera3D.new()
 	_camera.fov = FOV_TELECAMERA
 	add_child(_camera)

@@ -1,7 +1,7 @@
 class_name ScenaTeatro
 extends Node3D
 ## Scenografia del teatro di carta: la luce del momento del giorno, il tempo atmosferico, il libro
-## pop-up che fa da palco e lo sfondo con la città e la fila dei mesi (SfondoCitta).
+## pop-up che fa da palco e lo sfondo in trasparenza con la fila dei mesi (CalendarioSfondo).
 ## SOLO SCENOGRAFIA (decisione di Davide, 8 novembre 2026): non ha alcun effetto sulle regole.
 ## Momento e tempo cambiano a ogni mese, scelti a caso ma coerenti con la stagione; lo stesso mese
 ## della stessa partita ha sempre lo stesso tempo. Il caso usa un generatore suo: la simulazione
@@ -44,7 +44,7 @@ var _nuvole: Array[MeshInstance3D] = []
 var _materiale_nuvole: StandardMaterial3D
 var _astro: Node3D
 var _materiale_astro: ShaderMaterial
-var _sfondo: SfondoCitta
+var _calendario: CalendarioSfondo
 var _chiave_mese: String = ""
 var _tempo_scena: float = 0.0
 var _prossimo_lampo: float = 4.0
@@ -54,17 +54,19 @@ var _trame_astro: Dictionary = {}
 
 # --- Costruzione ------------------------------------------------------------------
 
-## Crea luci, libro pop-up, meteo, sole/luna e lo sfondo con la città e la fila dei mesi.
-## libro: rettangolo (x, z, larghezza, profondità) del libro; fila: dove galleggia il mese in corso;
-## astro: dove sorgono sole e luna; telecamera: da dove si guarda (i ritagli della città si girano lì).
-func costruisci(libro: Rect2, fila: Vector3, astro: Vector3, telecamera: Vector3) -> void:
+## Crea luci, libro pop-up, meteo, sole/luna e lo sfondo con la fila dei mesi.
+## libro: rettangolo (x, z, larghezza, profondità) del libro; astro: dove sorgono sole e luna.
+func costruisci(libro: Rect2, astro: Vector3) -> void:
 	_crea_luci()
 	_crea_libro(libro)
 	_crea_meteo()
 	_crea_astro(astro)
-	_sfondo = SfondoCitta.new()
-	add_child(_sfondo)
-	_sfondo.costruisci(libro, fila, telecamera, "")
+	# Il calendario è un velo trasparente sopra la scena e sotto l'interfaccia: non occupa spazio.
+	var livello: CanvasLayer = CanvasLayer.new()
+	livello.layer = 0
+	add_child(livello)
+	_calendario = CalendarioSfondo.new()
+	livello.add_child(_calendario)
 
 
 func _crea_luci() -> void:
@@ -109,8 +111,7 @@ func _crea_luci() -> void:
 	add_child(_lanterna)
 
 
-## Il palco è un grande libro pop-up sospeso sopra la città: la sua pagina ha il colore del cielo
-## del momento, sotto si vedono il blocco delle pagine e la copertina.
+## Il tavolo è la pagina di fondo del libro pop-up: il suo colore è il cielo del momento.
 func _crea_libro(libro: Rect2) -> void:
 	var centro: Vector3 = Vector3(libro.get_center().x, 0.0, libro.get_center().y)
 	var pagina: MeshInstance3D = MeshInstance3D.new()
@@ -121,20 +122,6 @@ func _crea_libro(libro: Rect2) -> void:
 	pagina.material_override = _materiale_pagina
 	pagina.position = centro + Vector3(0.0, -0.25, 0.0)
 	add_child(pagina)
-	var pagine: MeshInstance3D = MeshInstance3D.new()
-	var forma_pagine: BoxMesh = BoxMesh.new()
-	forma_pagine.size = Vector3(libro.size.x - 0.3, 1.4, libro.size.y - 0.3)
-	pagine.mesh = forma_pagine
-	pagine.material_override = StileVisivo.materiale(StileVisivo.CARTA_CREMA.darkened(0.15), 0.95)
-	pagine.position = centro + Vector3(0.0, -1.2, 0.0)
-	add_child(pagine)
-	var copertina: MeshInstance3D = MeshInstance3D.new()
-	var forma_copertina: BoxMesh = BoxMesh.new()
-	forma_copertina.size = Vector3(libro.size.x + 0.8, 0.35, libro.size.y + 0.8)
-	copertina.mesh = forma_copertina
-	copertina.material_override = StileVisivo.materiale(Color("4a1e16"), 0.7)
-	copertina.position = centro + Vector3(0.0, -2.05, 0.0)
-	add_child(copertina)
 
 
 func _crea_meteo() -> void:
@@ -298,12 +285,12 @@ func _disegna_astro(luna: bool) -> ImageTexture:
 
 ## Le iniziali della nazione sul sigillo dei mesi.
 func imposta_iniziali(testo: String) -> void:
-	_sfondo.imposta_iniziali(testo)
+	_calendario.imposta_iniziali(testo)
 
 
 ## La fila dei mesi si nasconde durante gli scontri.
 func mostra_fila_mesi(visibile: bool) -> void:
-	_sfondo.mostra_fila(visibile)
+	_calendario.mostra_fila(visibile)
 
 
 # --- Il mese -----------------------------------------------------------------------
@@ -320,7 +307,7 @@ func imposta_mese(anno: int, stagione: int, mese: int, nome_mese: String, nome_s
 	tempo = _pesca(PESI_TEMPO[stagione]) as Tempo
 	_applica_luce(0.0 if subito else DURATA_CAMBIO)
 	_applica_meteo(stagione)
-	_sfondo.vai_al_mese(anno, mese, nome_stagione, subito)
+	_calendario.vai_al_mese(anno, mese, nome_stagione, subito)
 
 
 func _pesca(pesi: Array) -> int:
@@ -371,7 +358,6 @@ func _applica_luce(durata: float) -> void:
 		t.tween_property(_ambiente, "fog_light_color", cielo.darkened(0.6), durata)
 		t.tween_property(_materiale_pagina, "albedo_color", cielo, durata)
 	_cambia_astro(m, durata)
-	_sfondo.imposta_finestre(1.0 if m == Momento.NOTTE else (0.55 if m != Momento.GIORNO else 0.0), durata)
 
 
 func _applica_meteo(stagione: int) -> void:
