@@ -1111,7 +1111,11 @@ func _seleziona(truppa: bool, i: int) -> void:
 		azioni.append({"testo": "◀ Sposta", "attiva": i > 0, "clic": func() -> void: _sposta(i, i - 1)})
 		azioni.append({"testo": "Sposta ▶", "attiva": i < run.board.troops.size() - 1, "clic": func() -> void: _sposta(i, i + 1)})
 	# Potenzia è un'opzione del consigliere scelto (GDD §6.5): se non si può, si dice perché (P4).
-	if run.is_shopping_phase() and pezzo.level < run.run_rules.max_level:
+	# Che cosa cambierebbe con il Potenzia, prima di decidere (richiesta di Davide, 8 novembre).
+	var anteprima: String = SchedaCarta.anteprima_potenzia(run, pezzo)
+	if anteprima != "":
+		dettagli += "\n\n" + anteprima
+	if run.is_shopping_phase() and pezzo.level < run.max_level():
 		var motivo: String = run.upgrade_block_reason(pezzo)
 		var costo: ResourceAmounts = run.upgrade_cost_of(pezzo)
 		if motivo == "" and costo != null:

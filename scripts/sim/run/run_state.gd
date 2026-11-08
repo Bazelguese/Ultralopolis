@@ -655,11 +655,13 @@ func upkeep_resource(card_types: Array[StringName]) -> int:
 
 
 ## Che cosa costa una carta prima di ogni scontro; null se non paga nulla.
-func upkeep_of(piece: BoardPiece) -> ResourceAmounts:
+## level: il livello da considerare (0 = quello attuale), per mostrare prima del Potenzia che cosa cambia.
+func upkeep_of(piece: BoardPiece, level: int = 0) -> ResourceAmounts:
+	var at_level: int = level if level > 0 else piece.level
 	var def: Resource = piece.building if piece.building != null else piece.troop
 	if piece.building != null and piece.building.is_capital:
 		return null
-	var quantity: int = run_rules.upkeep_per_level * maxi(0, piece.level - 1)
+	var quantity: int = run_rules.upkeep_per_level * maxi(0, at_level - 1)
 	if is_special_card(def):
 		quantity += run_rules.special_upkeep
 	if quantity <= 0:
@@ -855,12 +857,14 @@ func pieces_boosted_by(defs: Array[ModifierDef]) -> Array[BoardPiece]:
 
 ## Produzione per fase di un singolo edificio, in unità interne, con il suo livello
 ## e i modificatori che lo riguardano (GDD §6.5).
-func building_production(piece: BoardPiece) -> Array[int]:
+## level: il livello da considerare (0 = quello attuale).
+func building_production(piece: BoardPiece, level: int = 0) -> Array[int]:
+	var at_level: int = level if level > 0 else piece.level
 	var produced: Array[int] = Res.empty()
 	for type: Res.Type in Res.NAMES:
 		var amount: int = piece.building.production(type)
 		if amount > 0:
-			amount += run_rules.building_production_per_level * (piece.level - 1)
+			amount += run_rules.building_production_per_level * (at_level - 1)
 		amount += modifiers.flat_production(type, piece)
 		produced[type] = maxi(0, amount) * Res.scale(type)
 	return produced
@@ -1229,17 +1233,18 @@ func race_type() -> StringName:
 
 
 ## Edificio come entrerà in battaglia: livello e modificatori (GDD §6.5, §8).
-func effective_building(piece: BoardPiece) -> BuildingDef:
+## level: il livello da considerare (0 = quello attuale), per l'anteprima del Potenzia.
+func effective_building(piece: BoardPiece, level: int = 0) -> BuildingDef:
 	var neglect: int = run_rules.neglect_slowdown_percent if piece.neglected else 0
-	return ElementStats.building(piece.building, piece, modifiers, piece.level, run_rules, neglect)
+	return ElementStats.building(piece.building, piece, modifiers, level if level > 0 else piece.level, run_rules, neglect)
 
 
 ## Truppa come entrerà in battaglia: livello, modificatori e fame (GDD §5.4, §6.5, §8).
-func effective_troop(piece: BoardPiece) -> TroopDef:
+func effective_troop(piece: BoardPiece, level: int = 0) -> TroopDef:
 	# Con l'ascensione Esercito frugale le truppe senza Cibo non rallentano (GDD §10.4.2).
 	var hunger: int = run_rules.hunger_cooldown_percent if piece.hungry and not has_rule(IdentityDef.Rule.ESERCITO_FRUGALE) else 0
 	var neglect: int = run_rules.neglect_slowdown_percent if piece.neglected else 0
-	return ElementStats.troop(piece.troop, piece, modifiers, piece.level, run_rules, hunger + neglect)
+	return ElementStats.troop(piece.troop, piece, modifiers, level if level > 0 else piece.level, run_rules, hunger + neglect)
 
 
 ## Cibo consumato da una truppa a inizio anno, in decimi (GDD §5.4).
