@@ -211,7 +211,7 @@ func test_la_riga_azioni_mostra_ogni_tipo_una_volta() -> void:
 	for nome: String in ["incanto_danno", "incanto_scudo", "spia_sabotaggio_veloce", "veleno_nei_pozzi", "decreto_fiscale", "studiosi", "assemblea", "quartiermastro", "ordine_pubblico"]:
 		azioni.append(_offerta("res://data/catalog/opportunities/%s.tres" % nome))
 	var riga: RigaSimboli = SimboliEffetti.riga_azioni(azioni)
-	assert_eq(riga.come_testo(), "[azione] : [incanto] [spia] [scambio] [anno] [spazio truppa] [malcontento]")
+	assert_eq(riga.come_testo(), "[azione] : [incanto] / [spia] / [scambio] / [anno] / [spazio truppa] / [malcontento]", "La barra «/» separa i tipi: sono alternative, non una frase.")
 	assert_true(SimboliEffetti.riga_azioni([]).vuota(), "Senza azioni possibili la riga non c'è.")
 
 
@@ -267,10 +267,11 @@ func test_i_dettagli_del_consigliere_dicono_solo_cio_che_si_vede() -> void:
 	run.round_theme = RunState.RoundTheme.MISTO
 	var scheda: SchedaCarta = SchedaCarta.da_consigliere(run, cancelliere)
 	var righe: PackedStringArray = scheda.dettagli.split("\n")
-	assert_eq(righe.size(), scheda.simboli.size(), "Una frase per ogni riga di simboli.")
-	assert_eq(righe[0], "Propone: edifici e truppe.")
-	assert_eq(righe[1], "Azioni possibili: scambi di risorse.")
-	assert_string_starts_with(righe[2], "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando Stabilità.")
+	assert_eq(righe.size(), scheda.simboli.size() + 1, "I tipi della linguetta, poi una frase per ogni riga di simboli.")
+	assert_eq(righe[0], "Tipi: Materie prime, Fante.")
+	assert_eq(righe[1], "Propone: edifici e truppe.")
+	assert_eq(righe[2], "Azioni possibili: scambi di risorse.")
+	assert_string_starts_with(righe[3], "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando Stabilità.")
 	assert_false(scheda.dettagli.contains("Decreto fiscale"), "Niente elenco delle singole azioni: non si vedono sulla carta.")
 
 
@@ -281,3 +282,29 @@ func test_la_legenda_spiega_ogni_tipo_di_azione() -> void:
 		assert_ne(voce[1] as String, "Altre azioni", "%s ha un nome." % (voce[0] as RigaSimboli).come_testo())
 	assert_eq((tipi[0][0] as RigaSimboli).come_testo(), "[scambio]")
 	assert_eq(tipi[0][1], "Scambi di risorse")
+
+
+# --- Tipi ----------------------------------------------------------------------
+
+func test_ogni_tipo_ha_il_suo_simbolo_o_lo_stendardo() -> void:
+	assert_eq(Simboli.di_tipo(&"Infrastruttura Bellica"), &"tipo_infrastruttura_bellica")
+	assert_eq(Simboli.di_tipo(&"Materie prime"), &"tipo_materie_prime")
+	assert_eq(Simboli.di_tipo(&"Capitale"), &"tipo_capitale")
+	assert_eq(Simboli.di_tipo(&"Pietrosangue"), Simboli.TIPO_IDENTITA, "I tipi d'identità hanno lo stendardo.")
+	for consigliere: AdvisorDef in (load("res://data/catalog/catalog.tres") as CatalogDef).advisors:
+		for tipo: StringName in consigliere.types:
+			assert_ne(Simboli.di_tipo(tipo), Simboli.TIPO_IDENTITA, "Il tipo %s del %s deve avere un simbolo suo." % [tipo, consigliere.display_name])
+
+
+func test_tessere_e_consiglieri_mostrano_i_loro_tipi() -> void:
+	assert_eq(SchedaCarta.da_truppa(soldier).tipi, [&"Fante"] as Array[StringName])
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Legge", &"Nobile"], [], Res.Type.STABILITA)
+	catalog.advisors = [cancelliere]
+	assert_eq(SchedaCarta.da_consigliere(_run(), cancelliere).tipi, [&"Legge", &"Nobile"] as Array[StringName])
+
+
+func test_la_legenda_spiega_ogni_tipo() -> void:
+	var catalogo: CatalogDef = load("res://data/catalog/catalog.tres") as CatalogDef
+	var tipi: Array = LegendaSimboli.tipi_delle_tessere(catalogo)
+	assert_eq(tipi.size(), 17, "15 tipi delle categorie, la Capitale e lo stendardo dei tipi d'identità.")
+	assert_eq((tipi[tipi.size() - 1][0] as RigaSimboli).come_testo(), "[tipo tipo_identita]")

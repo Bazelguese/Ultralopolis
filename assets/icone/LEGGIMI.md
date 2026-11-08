@@ -57,6 +57,30 @@ Se un simbolo manca, al suo posto compare un cerchio con l'iniziale del concetto
 | `azione.svg` | Azioni del Consiglio (la riga «azioni» del consigliere) | stamper |
 | `scambio.svg` | Scambio di risorse | trade |
 
+### Tipi (medaglioni sulla linguetta)
+
+Il simbolo di un tipo è `tipo_<nome del tipo>.svg`, tutto minuscolo e con `_` al posto degli spazi (es. «Infrastruttura Bellica» → `tipo_infrastruttura_bellica.svg`). Per dare un simbolo a un tipo nuovo basta aggiungere il file. Un tipo senza file, come i tipi d'identità, usa lo stendardo `tipo_identita.svg`.
+
+| File | Tipo | Icona originale (game-icons.net) |
+|---|---|---|
+| `tipo_fante.svg` | Fante | spears |
+| `tipo_assedio.svg` | Assedio | siege-ram |
+| `tipo_guardiano.svg` | Guardiano | guarded-tower |
+| `tipo_infrastruttura_bellica.svg` | Infrastruttura Bellica | barracks |
+| `tipo_infrastruttura_strategica.svg` | Infrastruttura Strategica | harbor-dock |
+| `tipo_infrastruttura_segreta.svg` | Infrastruttura Segreta | all-seeing-eye |
+| `tipo_materie_prime.svg` | Materie prime | mine-wagon |
+| `tipo_economico.svg` | Economico | shop |
+| `tipo_fauna.svg` | Fauna | horse-head |
+| `tipo_nobile.svg` | Nobile | diamond-ring |
+| `tipo_accademico.svg` | Accademico | open-book |
+| `tipo_legge.svg` | Legge | gavel |
+| `tipo_criminale.svg` | Criminale | robber-mask |
+| `tipo_spirituale.svg` | Spirituale | temple-gate |
+| `tipo_patriota.svg` | Patriota | eagle-emblem |
+| `tipo_capitale.svg` | Capitale | capitol |
+| `tipo_identita.svg` | Tutti i tipi d'identità (Pietrosangue, Monarchico…) | knight-banner |
+
 Il mana non ha un file: le gemme colorate le disegna il gioco, perché il colore è il loro significato.
 L'unica eccezione è `gemma.svg`, un esagono bianco che serve solo nei testi dei riquadri: il gioco lo colora
 con il colore del mana davanti alle parole «rosso», «verde», «blu», «viola» ed «energetico».

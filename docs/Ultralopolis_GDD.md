@@ -1,5 +1,5 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.31
+## Game Design Document — v0.32
 
 **Data:** 8 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
@@ -1261,14 +1261,25 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 
 | Che cosa | Righe |
 |---|---|
-| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore del consigliere: `[proposte]: [edificio] / [truppa]`); una sola riga **azioni** (scura): il timbro e un simbolo per ogni *tipo* di azione che può proporre (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza costi né numeri, che si vedono sulle opportunità dopo averlo scelto (variante A, scelta di Davide); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
+| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore del consigliere: `[proposte]: [edificio] / [truppa]`); una sola riga **azioni** (scura): il timbro e un simbolo per ogni *tipo* di azione che può proporre, separati da `/` («oppure»: sono voci distinte, non una frase) (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza costi né numeri, che si vedono sulle opportunità dopo averlo scelto (variante A, scelta di Davide); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: i tipi della linguetta, poi una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
 | Azione o peculiarità proposte | Costo → effetto |
 | Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
 | Opzione dell’evento scelto | Costo → effetti, su una o più righe |
 
+**Tipi sulla linguetta — Confermato (v0.32, scelte di Davide):**
+
+| Regola | Stato |
+|---|---|
+| Ogni **tipo** (§6.6) ha un simbolo in un **medaglione tondo**: la forma tonda lo distingue dalle risorse; come i tipi, i medaglioni non hanno colore | Confermato |
+| I medaglioni stanno su una **linguetta sopra la tessera**, del colore della sua cornice, allineata a sinistra: su edifici e truppe i loro tipi, sul consigliere i tipi della sua categoria | Confermato |
+| Sopra e non di lato: sulla plancia le tessere della stessa fila sono troppo vicine per una linguetta laterale | Confermato |
+| I **tipi d'identità** hanno tutti lo stesso simbolo, uno **stendardo**; il nome è nei dettagli. La **Capitale** ha il suo | Confermato |
+| Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg`: un tipo nuovo prende un simbolo aggiungendo il file, senza toccare il codice; senza file prende lo stendardo | Confermato |
+| Lo stesso simbolo compare accanto al nome del tipo nei testi colorati (§16.3) e nella legenda | Confermato |
+
 | Questione | Stato |
 |---|---|
-| Simboli su edifici e truppe (produzione, mana, effetti di battaglia), ricompense degli incontri e cronache | Da definire (seconda fase, dopo la prova della prima) |
+| Altri simboli su edifici e truppe (produzione, mana, effetti di battaglia), ricompense degli incontri e cronache | Da definire (seconda fase, dopo la prova della prima) |
 | Gli otto poli delle inclinazioni delle cronache: per ora in parole | Da definire |
 | Disegni definitivi dei simboli | Da definire; per ora icone provvisorie (§16.3) |
 
@@ -1589,6 +1600,9 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 ---
 
 ## Registro delle versioni
+
+**v0.32 — 8 novembre 2026**
+- **Tipi sulla linguetta** (§14.4): ogni tipo ha un simbolo in un medaglione, su una linguetta sopra tessere e consiglieri; i tipi d'identità hanno tutti lo stendardo. Idea e scelte di Davide (linguetta sopra, medaglioni grandi, stendardo unico, anche sul consigliere).
 
 **v0.31 — 8 novembre 2026** (solo nomi: nessuna regola cambia)
 - Nuovo glossario in un documento a parte (`docs/Glossario.md`), approvato da Davide; la §19 rimanda a quello, e da lì vengono le spiegazioni delle parole chiave (§16.3).

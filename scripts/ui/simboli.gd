@@ -43,6 +43,32 @@ static func di_valore(valore: ModifierDef.BattleValue) -> StringName:
 	return &"danno"
 
 
+## Il concetto del simbolo di un tipo di tessera (GDD §6.6), es. "Infrastruttura Bellica" →
+## &"tipo_infrastruttura_bellica". Il simbolo è il file assets/icone/tipo_<nome>.svg: per dare un
+## simbolo a un tipo nuovo basta aggiungere il file. I tipi senza file, come i tipi d'identità
+## (Pietrosangue, Monarchico...), hanno tutti lo stesso stendardo (scelta di Davide).
+static func di_tipo(tipo: StringName) -> StringName:
+	var nome: String = String(tipo).to_lower().strip_edges()
+	for coppia: Array in [["à", "a"], ["è", "e"], ["é", "e"], ["ì", "i"], ["ò", "o"], ["ù", "u"], ["'", ""], [" ", "_"]]:
+		nome = nome.replace(coppia[0] as String, coppia[1] as String)
+	var concetto: StringName = StringName("tipo_" + nome)
+	return concetto if esiste(concetto) else TIPO_IDENTITA
+
+
+## Lo stendardo dei tipi d'identità.
+const TIPO_IDENTITA: StringName = &"tipo_identita"
+
+
+## true se c'è un'immagine per questo concetto in assets/icone.
+static func esiste(concetto: StringName) -> bool:
+	if concetto == &"" or _mancanti.has(concetto):
+		return false
+	if _carica(concetto) == null:
+		_mancanti[concetto] = true
+		return false
+	return true
+
+
 ## Il simbolo pronto per essere disegnato a circa "lato" pixel; null se l'immagine manca.
 ## L'immagine originale è grande: la si rimpicciolisce una volta sola con un buon filtro,
 ## così anche i simboli piccoli restano puliti.

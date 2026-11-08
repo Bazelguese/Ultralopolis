@@ -124,7 +124,7 @@ Regole della grafica:
 - Sul consigliere il riquadro dei dettagli dice **solo ciò che si vede**: una frase per ogni riga di simboli, nello stesso ordine.
 - Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli **si ingrandisce** (×1,7) e il testo dei dettagli va sotto o di fianco, senza coprirlo.
 - La **legenda** (pulsante «Legenda» a destra, accanto a Effetti e Annali) mostra come si leggono i simboli con esempi presi dal gioco, tutti i simboli, i tipi di azione della riga del timbro (con le stesse parole del riquadro dei dettagli), le gemme di mana e i colori dei numeri. Gli esempi si costruiscono dai dati, come le righe dei consiglieri.
-- **Gerarchia del consigliere**, dall'alto: la riga di ciò che propone nel round, con il fondo del colore del consigliere; una sola riga «azioni» su fondo scuro, con il timbro e i *tipi* di azione possibili (scambio, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza numeri; in fondo il Potenzia, con il solo bordo, più bassa e mai affiancata, perché è un servizio in più e non un'opportunità.
+- **Gerarchia del consigliere**, dall'alto: la riga di ciò che propone nel round, con il fondo del colore del consigliere; una sola riga «azioni» su fondo scuro, con il timbro e i *tipi* di azione possibili separati da «/» (scambio, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza numeri; in fondo il Potenzia, con il solo bordo, più bassa e mai affiancata, perché è un servizio in più e non un'opportunità.
 - Se con un consigliere puoi già potenziare qualche tessera, la riga del Potenzia ha il **bordo dorato** e sotto il consigliere compare "Ascolta · ▲ Potenzia N" (quante tessere).
 
 ### 4.2 Dove sono
@@ -138,8 +138,13 @@ Le righe si costruiscono da sole dai file dati del catalogo: cambiando un costo 
 | Che cosa | Stato |
 |---|---|
 | Consiglieri (Potenzia, edifici/truppe proposti, azioni possibili nel round), azioni e peculiarità proposte, Eventi, Fortune, Visitatori e le loro opzioni | Fatto (prima fase) |
-| Edifici e truppe (produzione, mana, effetti nello scontro), ricompense degli incontri, cronache | Da decidere con Davide (seconda fase) |
+| Tipi di tessere e consiglieri: medaglioni su una linguetta sopra la tessera (§4.4) | Fatto (8 novembre 2026) |
+| Altri simboli su edifici e truppe (produzione, mana, effetti nello scontro), ricompense degli incontri, cronache | Da decidere con Davide (seconda fase) |
 | Gli otto poli delle inclinazioni delle cronache | Per ora in parole |
+
+### 4.4 La linguetta dei tipi
+
+Sopra ogni tessera (e sopra ogni consigliere) sporge una **linguetta** del colore della cornice, come quella di una cartellina, con un **medaglione** per tipo: tondo scuro, bordo grigio, simbolo bianco. Sta sopra e non di lato perché sulla plancia le tessere della stessa fila sono troppo vicine; si solleva e si ingrandisce con la tessera. I tipi d'identità hanno tutti lo **stendardo**. Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg` (elenco in `assets/icone/LEGGIMI.md`).
 
 ## 5. Convenzioni provvisorie introdotte con questo stile
 
