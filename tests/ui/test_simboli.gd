@@ -211,7 +211,7 @@ func test_la_riga_azioni_mostra_ogni_tipo_una_volta() -> void:
 	for nome: String in ["incanto_danno", "incanto_scudo", "spia_sabotaggio_veloce", "veleno_nei_pozzi", "decreto_fiscale", "studiosi", "assemblea", "quartiermastro", "ordine_pubblico"]:
 		azioni.append(_offerta("res://data/catalog/opportunities/%s.tres" % nome))
 	var riga: RigaSimboli = SimboliEffetti.riga_azioni(azioni)
-	assert_eq(riga.come_testo(), "[azione] : [incanto] [spia] [scambio] [anno] [spazio truppa] [malcontento]")
+	assert_eq(riga.come_testo(), "[azione] : [incanto] / [spia] / [scambio] / [anno] / [spazio truppa] / [malcontento]", "La barra «/» separa i tipi: sono alternative, non una frase.")
 	assert_true(SimboliEffetti.riga_azioni([]).vuota(), "Senza azioni possibili la riga non c'è.")
 
 

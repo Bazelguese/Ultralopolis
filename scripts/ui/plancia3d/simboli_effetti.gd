@@ -78,7 +78,7 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 
 ## La riga "azioni" del consigliere (variante scelta da Davide): il timbro, poi un simbolo per
 ## ogni tipo di azione che può proporre, nell'ordine dei dati e senza ripetizioni.
-## Es. Tesoriere: "[azione] : [scambio] [anno]". Vuota se non può proporre azioni.
+## Es. Tesoriere: "[azione] : [scambio] / [anno]". Vuota se non può proporre azioni.
 static func riga_azioni(azioni: Array[Offer]) -> RigaSimboli:
 	var riga: RigaSimboli = RigaSimboli.new()
 	if azioni.is_empty():
@@ -90,6 +90,10 @@ static func riga_azioni(azioni: Array[Offer]) -> RigaSimboli:
 		var tipo: RigaSimboli = tipo_di_azione(offerta.opportunity)
 		if tipi.has(tipo.come_testo()):
 			continue
+		# La barra «/» vuol dire «oppure», come sulle opportunità e sugli avvenimenti: i tipi
+		# sono voci separate, non una frase (es. non «scambio nel tempo»; richiesta di Davide).
+		if not tipi.is_empty():
+			riga.scritta("/")
 		tipi.append(tipo.come_testo())
 		nomi.append(nome_tipo_di_azione(offerta.opportunity))
 		riga.accoda(tipo)
