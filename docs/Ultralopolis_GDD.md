@@ -1253,7 +1253,7 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 | Uno **spazio** della plancia è il simbolo in una cornice tratteggiata; una tessera che **sale di livello** ha una freccia dorata | Confermato |
 | Le righe si costruiscono **dai dati** del catalogo (costi, guadagni, modificatori di §8): cambiando un valore nei dati, la riga si aggiorna da sola | Confermato |
 | Le righe corte si **affiancano** sulla stessa linea, per non sprecare spazio | Confermato (richiesta di Davide) |
-| Gli stessi simboli delle risorse compaiono nella barra delle risorse e accanto al Malcontento, così il giocatore li impara | Confermato |
+| Nella **barra delle risorse** in basso ogni risorsa è **solo il suo simbolo**, lo stesso delle tessere; il nome è nel riquadro al passaggio del mouse (richiesta di Davide, v0.32). Il simbolo del Malcontento sta accanto al suo nome in alto | Confermato |
 | Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli si ingrandisce e il riquadro dei dettagli non lo copre | Confermato |
 | Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si leggono i simboli, con esempi presi dal gioco, che cosa vuol dire ogni simbolo, ogni tipo di azione della riga del timbro, ogni gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
 
@@ -1261,7 +1261,7 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 
 | Che cosa | Righe |
 |---|---|
-| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore del consigliere: `[proposte]: [edificio] / [truppa]`); una sola riga **azioni** (scura): il timbro e un simbolo per ogni *tipo* di azione che può proporre, separati da `/` («oppure»: sono voci distinte, non una frase) (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza costi né numeri, che si vedono sulle opportunità dopo averlo scelto (variante A, scelta di Davide); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: i tipi della linguetta, poi una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
+| Consigliere | In ordine di importanza: le sue **opportunità** del round (riga principale, del colore del consigliere: `[opportunità]: [edificio] / [truppa] / [timbro]`): edifici, truppe e azioni stanno **alla pari**, perché sono tutte opportunità e se ne prende una sola (scelta di Davide); sotto, una riga **più sottile** dice quali azioni: `[timbro] = ` e un simbolo per ogni *tipo* di azione possibile, separati da `/` («oppure»: sono voci distinte, non una frase) (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza costi né numeri, che si vedono sulle opportunità dopo averlo scelto; in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: i tipi della linguetta, poi una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
 | Azione o peculiarità proposte | Costo → effetto |
 | Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
 | Opzione dell’evento scelto | Costo → effetti, su una o più righe |
@@ -1615,6 +1615,8 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 - Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
 - **Legenda dei simboli** nel gioco (§14.4), con esempi presi dalle carte vere.
 - **Gerarchia sulla carta del consigliere** (§14.4): prima ciò che propone (riga colorata), poi le azioni, il Potenzia in fondo e in disparte (Davide: la carta del Tesoriere sembrava offrire solo Potenzia).
+- Nella barra delle risorse in basso i nomi sono sostituiti dai simboli; il nome resta nel riquadro al passaggio del mouse (richiesta di Davide).
+- Sul consigliere edifici, truppe e azioni stanno **alla pari** nella riga colorata (sono tutte opportunità); sotto, una riga sottile dice quali azioni (decisione di Davide).
 - Le azioni del consigliere sono riassunte in **una riga di macrocategorie** (tipi di azione, senza numeri) invece di una riga per azione; le righe mostrano solo ciò che può davvero uscire nel round, e il riquadro dei dettagli dice solo ciò che si vede (decisioni di Davide).
 
 **Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
