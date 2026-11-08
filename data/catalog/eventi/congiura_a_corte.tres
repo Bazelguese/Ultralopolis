@@ -14,7 +14,7 @@ stabilita = 3
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Reprimi"
-description = "Paghi 3 Stabilità: +10 Resistenza nel prossimo scontro con il fantasma."
+description = "Paghi 3 Stabilità: +10 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 cost = SubResource("RA_2")
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 

@@ -14,7 +14,7 @@ fede = 2
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Dottrina severa"
-description = "Paghi 2 Fede: +10 Resistenza nel prossimo scontro con il fantasma."
+description = "Paghi 2 Fede: +10 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 cost = SubResource("RA_2")
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 
