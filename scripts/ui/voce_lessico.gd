@@ -18,8 +18,10 @@ enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO, CONSIGLIO, C
 @export var forme: PackedStringArray = PackedStringArray()
 @export var colore: Color = Color.WHITE
 @export var grassetto: bool = true
-## Simbolo davanti alla parola, lo stesso disegnato sulle carte (spada, scudo, clessidra…).
-## Un'immagine bianca: nel testo prende il colore della parola. Vuoto: nessun simbolo.
-@export var icona: Texture2D = null
+## Simbolo davanti alla parola: lo stesso delle carte (GDD §14.4), cioè il nome di un file di
+## assets/icone (es. &"danno", &"oro"). Vuoto: nessun simbolo.
+@export var simbolo: StringName = &""
+## I simboli sono bianchi come sulle carte; solo le gemme del mana prendono il colore della parola.
+@export var simbolo_colorato: bool = false
 ## Spiegazione breve, presa dal GDD. Vuota: la parola si colora ma non si spiega.
 @export_multiline var definizione: String = ""

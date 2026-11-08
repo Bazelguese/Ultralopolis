@@ -1,7 +1,7 @@
 # Ultralopolis — Direzione artistica (proposta)
 
 **Stato:** proposta di lavoro, non approvata nel GDD. Quando le scelte saranno stabili, andranno riportate nel GDD (§14.2) con l'approvazione di Davide.
-**Ultimo aggiornamento:** 4 novembre 2026
+**Ultimo aggiornamento:** 8 novembre 2026
 
 Questo documento descrive l'aspetto attuale del gioco e spiega come preparare le illustrazioni perché restino coerenti tra loro.
 
@@ -86,7 +86,55 @@ Soggetti già preparati per il primo gruppo (gli elementi della prima era):
 Edifici: accademia, banca, biblioteca, bottega, cantiere, capitale, caserma, cattedrale, cava, cittadella, consolato, fattoria, fortezza, mercato, miniera, santuario, segheria, stalle, tempio, università.
 Truppe: arcieri, arieti, balestrieri, bombarde, catapulte, cavalieri, esploratori, frombolieri, guardie, lancieri, milizia, moschettieri, paladini.
 
-## 4. Convenzioni provvisorie introdotte con questo stile
+## 4. Simboli sulle carte
+
+Come nei giochi da tavolo, consiglieri, azioni ed eventi mostrano **che cosa fanno con dei simboli** invece che con il testo. Il testo completo resta nel riquadro che compare passando il mouse. Idea e scelte di Davide (8 novembre 2026), approvate nel GDD (§14.4, v0.30); i simboli attuali sono provvisori.
+
+### 4.1 Come si leggono
+
+Ogni riga è una cosa che la carta può fare e si legge da sinistra a destra: **quello che paghi → quello che ottieni**.
+
+| Esempio | Significato |
+|---|---|
+| `2[Stabilità] → +4[Oro]` | Paghi 2 Stabilità, ricevi 4 Oro (Decreto fiscale). |
+| `1[anno] +50%[Oro] / +50%[Ricerca]` | Per un anno, +50% Oro oppure +50% Ricerca, a scelta (Assemblea). |
+| `2[Ferro] → 1[anno] [truppa] −25%[clessidra]` | Paghi 2 Ferro: per un anno una truppa ha la ricarica più corta del 25% (Addestramento). |
+| `2[Pietra] → [fantasma]: +10[castello]` | Nel prossimo scontro con il fantasma, +10 Resistenza (Fortificazioni). |
+| `6[Oro] → +1[edificio tratteggiato]` | Uno spazio edificio in più (Architetti). |
+| `[potenzia]: [Influenza]` | Il consigliere potenzia le carte facendo pagare Influenza. |
+| `[edificio] / [truppa]` | In questo round il consigliere propone anche edifici e truppe. |
+| `[lucchetto] ...` | Opzione di un evento che adesso non si può scegliere: la riga è spenta. |
+
+Regole della grafica:
+
+- **Simboli monocromatici** (bianchi): si riconoscono dalla forma, non dal colore, così non si confondono con il mana (scelta di Davide).
+- Il colore sta solo nei **numeri**: oro per i costi, rosso per i malus, bianco per il resto (colori riservati del §2).
+- Il **mana** resta una gemma colorata disegnata dal gioco.
+- `/` separa le alternative, `·` separa due effetti diversi della stessa scelta.
+- Uno **spazio** della plancia è il simbolo dentro una cornice tratteggiata; una carta che **sale di livello** ha una freccia dorata.
+- Le stesse icone delle risorse compaiono nella barra delle risorse in basso e accanto al Malcontento, così il giocatore le impara.
+- Le righe corte stanno **affiancate** sulla stessa linea, ognuna nella sua pastiglia, per non sprecare spazio (richiesta di Davide).
+- Sul consigliere il riquadro dei dettagli dice **solo ciò che si vede**: una frase per ogni riga di simboli, nello stesso ordine.
+- Con il mouse sopra, una carta con i simboli **si ingrandisce** (×1,7) e il testo dei dettagli va sotto o di fianco, senza coprirla.
+- La **legenda** (pulsante «Legenda» a destra, accanto a Effetti e Cronaca) mostra come si legge una carta con esempi presi dalle carte vere, tutti i simboli, i tipi di azione della riga del timbro (con le stesse parole del riquadro dei dettagli), le gemme di mana e i colori dei numeri. Gli esempi si costruiscono dai dati, come le carte.
+- **Gerarchia del consigliere**, dall'alto: la riga di ciò che propone nel round, con il fondo del colore della carta; una sola riga «azioni» su fondo scuro, con il timbro e i *tipi* di azione possibili (scambio, bonus per un tempo, spazio, spionaggio, incanto, perk…), senza numeri; in fondo il Potenzia, con il solo bordo, più bassa e mai affiancata, perché è un servizio in più e non una proposta.
+- Se con un consigliere puoi già potenziare qualche carta, la riga del Potenzia ha il **bordo dorato** e sotto la carta compare "Ascolta · ▲ Potenzia N" (quante carte).
+
+### 4.2 Dove sono
+
+I simboli stanno in `assets/icone/`, un file per concetto (es. `stabilita.svg`). L'elenco e il modo per sostituirli sono in `assets/icone/LEGGIMI.md`. Quelli attuali vengono da game-icons.net (licenza CC BY 3.0): prima di pubblicare il gioco va aggiunta la citazione degli autori nei crediti.
+
+Le righe si costruiscono da sole dai file dati del catalogo: cambiando un costo o un effetto in un file `.tres`, la carta si aggiorna senza toccare il codice.
+
+### 4.3 Che cosa ha i simboli
+
+| Carte | Stato |
+|---|---|
+| Consiglieri (Potenzia, edifici/truppe proposti, azioni possibili nel round), azioni e perk proposti, Eventi, Fortune, Visitatori e le loro opzioni | Fatto (prima fase) |
+| Edifici e truppe (produzione, mana, effetti di battaglia), ricompense degli incontri, cronache | Da decidere con Davide (seconda fase) |
+| Gli otto poli delle inclinazioni delle cronache | Per ora in parole |
+
+## 5. Convenzioni provvisorie introdotte con questo stile
 
 Da proporre per il GDD (§16.3) se Davide le approva:
 
@@ -96,3 +144,4 @@ Da proporre per il GDD (§16.3) se Davide le approva:
 | Illustrazioni cercate per identificativo nelle cartelle di `assets/illustrazioni/` | Convenzione tecnica |
 | La partita si gioca solo sulla plancia 3D; l'interfaccia provvisoria è stata tolta (decisione di Davide) | Da riportare nel GDD (§14.3, §16.3) |
 | La plancia mostra gli spazi ancora da conquistare fino al massimo (12 truppe, 10 edifici) | Proposta visiva |
+| Simboli sulle carte (§4 di questo documento) al posto del testo, con il testo completo al passaggio del mouse | Riportato nel GDD (§14.4, v0.30) |

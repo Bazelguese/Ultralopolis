@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5ddg8k1bn58n"
-path="res://.godot/imported/pillola.svg-2f21c44528d1324ab0fda9e30b271ab9.ctex"
+uid="uid://b7vnot16w1eoa"
+path="res://.godot/imported/caso.svg-8988eac13a604a3d6158c7076346606f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icone/pillola.svg"
-dest_files=["res://.godot/imported/pillola.svg-2f21c44528d1324ab0fda9e30b271ab9.ctex"]
+source_file="res://assets/icone/caso.svg"
+dest_files=["res://.godot/imported/caso.svg-8988eac13a604a3d6158c7076346606f.ctex"]
 
 [params]
 

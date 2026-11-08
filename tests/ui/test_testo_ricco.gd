@@ -184,15 +184,18 @@ func test_la_stessa_carta_ha_il_riquadro_sempre_nello_stesso_punto() -> void:
 
 
 func test_simboli_delle_carte_davanti_alle_parole() -> void:
-	# Scelta di Davide (8 novembre): lo stesso simbolo della carta, nel colore della parola.
-	var testo: String = TestoRicco.colora("2 danni ogni 3 s, ricarica 1,8 s.", 18)
-	var danno: VoceLessico = _voce("Danno")
-	assert_not_null(danno.icona, "Il danno ha il simbolo della spada.")
-	assert_string_contains(testo, "[img width=16 height=16 color=#%s]%s[/img]" % [danno.colore.to_html(false), danno.icona.resource_path])
-	assert_string_contains(testo, _voce("Ricarica").icona.resource_path, "La ricarica ha la clessidra.")
-	assert_false(TestoRicco.colora("Ricevi 2 Oro.").contains("[img"), "Le risorse non hanno simboli.")
-	for nome: String in ["Danno", "Scudo", "Cura", "Corruzione", "Attacco d'assedio", "Ricarica", "Mana", "Livello", "Affamata"]:
-		assert_not_null(_voce(nome).icona, "%s ha il suo simbolo." % nome)
+	# Scelta di Davide (8 novembre): lo stesso simbolo delle carte; bianco come sulle carte (GDD §14.4).
+	var testo: String = TestoRicco.colora("2 danni ogni 3 s, ricarica 1,8 s. Ricevi 2 Oro.", 18)
+	assert_eq(_voce("Danno").simbolo, &"danno")
+	assert_string_contains(testo, "[img width=16 height=16 color=#ffffff]")
+	for concetto: String in ["danno", "ricarica", "oro"]:
+		assert_string_contains(testo, "%s%s" % [Simboli.CARTELLA, concetto], "C'è il simbolo %s." % concetto)
+	# Le gemme del mana hanno il colore del mana.
+	assert_string_contains(TestoRicco.colora("mana rosso", 18), "color=#%s" % _voce("Rosso").colore.to_html(false))
+	# Ogni simbolo del lessico ha il suo file, come quelli delle carte.
+	for voce: VoceLessico in TestoRicco.lessico().voci:
+		if voce.simbolo != &"":
+			assert_not_null(Simboli.trama(voce.simbolo, 16), "Manca il simbolo %s di %s." % [voce.simbolo, voce.nome])
 
 
 func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:

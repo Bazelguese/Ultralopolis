@@ -69,6 +69,8 @@ var _lista_tradizioni: VBoxContainer
 var _effetti: PanelContainer
 var _lista_effetti: VBoxContainer
 var _pulsante_effetti: Button
+## Legenda dei simboli delle carte (GDD §14.4).
+var _legenda: LegendaSimboli
 var _cronaca: PanelContainer
 var _testo_cronaca: RichTextLabel
 var _comandi: VBoxContainer
@@ -181,13 +183,34 @@ func _pulsante(testo: String, al_clic: Callable) -> Button:
 
 
 ## Coppia nome piccolo + numero grande. Restituisce [contenitore, etichetta del numero].
-func _valore(nome: String, colore: Color = StileVisivo.TESTO) -> Array:
+func _valore(nome: String, colore: Color = StileVisivo.TESTO, simbolo: StringName = &"") -> Array:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", -6)
-	colonna.add_child(StileVisivo.etichetta(nome.to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+	colonna.add_child(_intestazione(nome, simbolo))
 	var valore: Label = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 34, colore)
 	colonna.add_child(valore)
 	return [colonna, valore]
+
+
+## Nome di un valore della barra, con accanto il suo simbolo (se ne ha uno): è lo stesso
+## simbolo stampato sulle carte, così il giocatore impara a riconoscerlo.
+func _intestazione(nome: String, simbolo: StringName) -> HBoxContainer:
+	var testa: HBoxContainer = HBoxContainer.new()
+	testa.add_theme_constant_override("separation", 4)
+	testa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var trama: Texture2D = Simboli.trama(simbolo, 18.0)
+	if trama != null:
+		var immagine: TextureRect = TextureRect.new()
+		immagine.texture = trama
+		immagine.custom_minimum_size = Vector2(16, 16)
+		immagine.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		immagine.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		immagine.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		immagine.modulate = StileVisivo.TESTO_TENUE
+		immagine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		testa.add_child(immagine)
+	testa.add_child(StileVisivo.etichetta(nome.to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+	return testa
 
 
 ## Bordi dello schermo più scuri, per dare profondità alla scena.
@@ -307,7 +330,7 @@ func _crea_run() -> void:
 	riga.add_child(era[0])
 	_era = era[1]
 	# Malcontento (GDD §5.5, v0.24): sempre visibile, con la soglia della Rivoluzione.
-	var malcontento: Array = _valore("Malcontento")
+	var malcontento: Array = _valore("Malcontento", StileVisivo.TESTO, &"malcontento")
 	riga.add_child(malcontento[0])
 	_malcontento = malcontento[1]
 	_malcontento_cella = malcontento[0]
@@ -333,7 +356,7 @@ func _crea_risorse() -> void:
 		if tipo == Res.Type.RICERCA:
 			Suggerimenti.imposta(cella, "Va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende.", Res.NAMES[tipo])
 		cella.mouse_filter = Control.MOUSE_FILTER_PASS
-		cella.add_child(StileVisivo.etichetta(Res.NAMES[tipo].to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE))
+		cella.add_child(_intestazione(Res.NAMES[tipo], Simboli.di_risorsa(tipo as Res.Type)))
 		var valori: HBoxContainer = HBoxContainer.new()
 		valori.add_theme_constant_override("separation", 6)
 		var valore: Label = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30, COLORI_RISORSE[tipo])
@@ -631,7 +654,16 @@ func _crea_pannelli_destra() -> void:
 	_pulsante_effetti = _pulsante("Effetti", func() -> void: _alterna(_effetti))
 	colonna.add_child(_pulsante_effetti)
 	colonna.add_child(_pulsante("Cronaca", func() -> void: _alterna(_cronaca)))
+	var pulsante_legenda: Button = _pulsante("Legenda", func() -> void: _alterna(_legenda))
+	Suggerimenti.imposta(pulsante_legenda, "Che cosa vogliono dire i simboli sulle carte.", "Legenda")
+	colonna.add_child(pulsante_legenda)
 	_ancora(colonna, Control.PRESET_CENTER_RIGHT, Vector2(-24, -60))
+
+	_legenda = LegendaSimboli.new()
+	_legenda.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.97), StileVisivo.ORO))
+	_legenda.costruisci(GameSession.catalog())
+	_ancora(_legenda, Control.PRESET_CENTER_RIGHT, Vector2(-180, 0))
+	_legenda.visible = false
 
 	_effetti = PanelContainer.new()
 	var lista: VBoxContainer = VBoxContainer.new()
@@ -654,11 +686,26 @@ func _crea_pannelli_destra() -> void:
 	_cronaca.visible = false
 
 
+## true se il mouse è sopra uno dei pannelli di destra aperti (Effetti, Cronaca, Legenda):
+## allora le carte sotto non devono reagire al mouse.
+func mouse_su_pannello() -> bool:
+	var mouse: Vector2 = get_viewport().get_mouse_position()
+	for pannello: Control in [_effetti, _cronaca, _legenda]:
+		if pannello.visible and pannello.get_global_rect().has_point(mouse):
+			return true
+	return false
+
+
 func _alterna(pannello: Control) -> void:
 	var visibile: bool = not pannello.visible
 	_effetti.visible = false
 	_cronaca.visible = false
+	_legenda.visible = false
 	pannello.visible = visibile
+	# Il pannello aperto sta sopra le altre scritte dell'interfaccia.
+	if visibile:
+		pannello.move_to_front()
+		_suggerimento.move_to_front()
 
 
 func _crea_comandi() -> void:
@@ -1040,7 +1087,7 @@ func aggiorna_partita(run: RunState) -> void:
 	storia.reverse()
 	var registro: String = TestoRicco.colora("\n".join(ultime), 17)
 	if not storia.is_empty():
-		registro = "%s\n%s\n\n%s\n%s" % [_intestazione("STORIA DELLA NAZIONE"), TestoRicco.colora("\n".join(storia), 17), _intestazione("REGISTRO"), registro]
+		registro = "%s\n%s\n\n%s\n%s" % [_titolo_bbcode("STORIA DELLA NAZIONE"), TestoRicco.colora("\n".join(storia), 17), _titolo_bbcode("REGISTRO"), registro]
 	_testo_cronaca.text = registro
 
 	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty() or not run.ascension_choices.is_empty()
@@ -1167,6 +1214,7 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	_magazzino.visible = false
 	_effetti.visible = false
 	_cronaca.visible = false
+	_legenda.visible = false
 	nascondi_pezzo()
 	if attiva:
 		_flusso.visible = false
@@ -1267,7 +1315,7 @@ func mostra_esito(titolo: String, sottotitolo: String, righe: Array[String], col
 
 
 ## Titoletto di un testo colorato (es. "REGISTRO" nel pannello Cronaca).
-static func _intestazione(testo: String) -> String:
+static func _titolo_bbcode(testo: String) -> String:
 	return "[b][color=#%s]%s[/color][/b]" % [StileVisivo.ORO_LUCE.to_html(false), testo]
 
 

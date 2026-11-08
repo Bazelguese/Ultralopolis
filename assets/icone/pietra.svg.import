@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dci86epjr4n0d"
-path="res://.godot/imported/clessidra.svg-62868803b161558b1ff5b2045c6eb7cc.ctex"
+uid="uid://88ktk0cgwy8t"
+path="res://.godot/imported/pietra.svg-6893a4803c40d955c3257b3eeac57a1c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icone/clessidra.svg"
-dest_files=["res://.godot/imported/clessidra.svg-62868803b161558b1ff5b2045c6eb7cc.ctex"]
+source_file="res://assets/icone/pietra.svg"
+dest_files=["res://.godot/imported/pietra.svg-6893a4803c40d955c3257b3eeac57a1c.ctex"]
 
 [params]
 

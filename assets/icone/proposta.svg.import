@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dr6wky5yewvsw"
-path="res://.godot/imported/rombo.svg-31e40c96924eccb7bf95e637e1e858e8.ctex"
+uid="uid://hu7g1vh3qepp"
+path="res://.godot/imported/proposta.svg-d30819c76558d53b77c98a954b3f882c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icone/rombo.svg"
-dest_files=["res://.godot/imported/rombo.svg-31e40c96924eccb7bf95e637e1e858e8.ctex"]
+source_file="res://assets/icone/proposta.svg"
+dest_files=["res://.godot/imported/proposta.svg-d30819c76558d53b77c98a954b3f882c.ctex"]
 
 [params]
 
