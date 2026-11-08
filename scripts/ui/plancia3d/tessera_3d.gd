@@ -29,6 +29,8 @@ var _animazione_sollevamento: Tween
 ## (consiglieri, azioni, eventi) si ingrandiscono molto, perché i simboli si leggano bene.
 var ingrandimento: float = 1.06
 var _segnale: Label3D
+## Teatro di carta: la figura che si alza dalla carta (solo per i pezzi sulla plancia).
+var figurina: Figurina
 
 
 func costruisci(p_scheda: SchedaCarta, p_larghezza: float, p_profondita: float, nitidezza: float = 1.0) -> void:
@@ -276,6 +278,8 @@ func attiva(verso: float) -> void:
 	animazione.parallel().tween_property(_corpo, "scale", Vector3.ONE, 0.28)
 	var colore: Color = StileVisivo.ORO_LUCE if scheda.mana == &"" else StileVisivo.colore_mana_nome(scheda.mana)
 	scintille(colore, Vector3(0.0, 0.3, 0.0))
+	if figurina != null:
+		figurina.scatta()
 	var lampo: Color = _colore_alone
 	imposta_alone(Color(colore, 0.8))
 	var spegni: Tween = create_tween()
@@ -283,11 +287,34 @@ func attiva(verso: float) -> void:
 	spegni.tween_callback(imposta_alone.bind(lampo))
 
 
+## Teatro di carta: la figurina ritagliata dall'illustrazione si alza dal bordo della carta.
+## verso: -1 se l'avversario è lontano dalla telecamera, +1 se è vicino.
+## Senza illustrazione non c'è figurina.
+func aggiungi_figurina(verso: float, ritardo: float, animata: bool) -> void:
+	if scheda.illustrazione == null or figurina != null:
+		return
+	figurina = Figurina.new()
+	_corpo.add_child(figurina)
+	figurina.costruisci(scheda.illustrazione, larghezza, profondita, SPESSORE, verso)
+	if animata:
+		figurina.alza(ritardo)
+	else:
+		figurina.in_piedi()
+
+
+## Figurina grigia: la truppa aspetta il mana o è sabotata (principio P4). 0 = normale, 1 = spenta.
+func imposta_spenta(valore: float) -> void:
+	if figurina != null:
+		figurina.imposta_spenta(valore)
+
+
 ## Piccola scossa (per esempio quando un edificio produce mana).
 func pulsa() -> void:
 	var animazione: Tween = create_tween()
 	animazione.tween_property(_corpo, "scale", Vector3.ONE * 1.06, 0.07)
 	animazione.tween_property(_corpo, "scale", Vector3.ONE, 0.12)
+	if figurina != null:
+		figurina.lampeggia(0.5)
 
 
 ## Esplosione di scintille (usata anche dalla scena per i colpi).

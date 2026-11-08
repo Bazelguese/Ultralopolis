@@ -731,7 +731,30 @@ static func _carica(percorso: String) -> Texture2D:
 	var completo: String = CARTELLA_ILLUSTRAZIONI + percorso
 	if ResourceLoader.exists(completo):
 		return load(completo) as Texture2D
-	return null
+	return _bozzetto_provvisorio(percorso)
+
+
+## Convenzione provvisoria (Davide, 8 novembre 2026: "usale pure a caso"): finché un elemento non ha
+## la sua illustrazione, prende una delle immagini sciolte in assets/illustrazioni/ (quelle fuori dalle
+## sottocartelle), sempre la stessa per lo stesso elemento. Per toglierla: BOZZETTI_PROVVISORI = false.
+const BOZZETTI_PROVVISORI: bool = true
+static var _bozzetti: PackedStringArray = PackedStringArray()
+static var _bozzetti_letti: bool = false
+
+
+static func _bozzetto_provvisorio(percorso: String) -> Texture2D:
+	if not BOZZETTI_PROVVISORI:
+		return null
+	if not _bozzetti_letti:
+		_bozzetti_letti = true
+		for file: String in ResourceLoader.list_directory(CARTELLA_ILLUSTRAZIONI):
+			if file.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp"]:
+				_bozzetti.append(file)
+		_bozzetti.sort()
+	if _bozzetti.is_empty():
+		return null
+	var scelta: String = _bozzetti[absi(percorso.hash()) % _bozzetti.size()]
+	return load(CARTELLA_ILLUSTRAZIONI + scelta) as Texture2D
 
 
 ## Righe del riquadro dei dettagli per gli effetti di battaglia oltre al danno (GDD §7.6, §7.7).
