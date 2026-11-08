@@ -1506,15 +1506,21 @@ func _chiudi_scontro() -> void:
 
 # --- Mouse ---------------------------------------------------------------------
 
-## Dove sta sullo schermo una carta ingrandita di "fattore": il rettangolo dei suoi quattro angoli.
-func _rettangolo_sullo_schermo(tessera: Tessera3D, fattore: float) -> Rect2:
-	var mezza: Vector2 = Vector2(tessera.larghezza, tessera.profondita) * 0.5 * fattore
-	var angoli: Array[Vector2] = [Vector2(-1, -1), Vector2(1, -1), Vector2(1, 1), Vector2(-1, 1)]
-	var rettangolo: Rect2 = Rect2()
-	for i: int in range(angoli.size()):
-		var punto: Vector2 = _camera.unproject_position(tessera.to_global(Vector3(mezza.x * angoli[i].x, 0.0, mezza.y * angoli[i].y)))
-		rettangolo = Rect2(punto, Vector2.ZERO) if i == 0 else rettangolo.expand(punto)
-	return rettangolo
+## Il rettangolo che una carta occupa sullo schermo, ingrandita di "fattore": il riquadro dei
+## dettagli le si attacca, così non copre la carta (nemmeno quando è ingrandita con i simboli).
+func _area_sullo_schermo(tessera: Tessera3D, fattore: float = 1.0) -> Rect2:
+	var mezza_x: float = tessera.larghezza * 0.5 * fattore
+	var mezza_z: float = tessera.profondita * 0.5 * fattore
+	var area: Rect2 = Rect2()
+	var primo: bool = true
+	for angolo: Vector3 in [Vector3(-mezza_x, 0.0, -mezza_z), Vector3(mezza_x, 0.0, -mezza_z), Vector3(-mezza_x, 0.0, mezza_z), Vector3(mezza_x, 0.0, mezza_z)]:
+		var punto: Vector2 = _camera.unproject_position(tessera.to_global(angolo))
+		if primo:
+			area = Rect2(punto, Vector2.ZERO)
+			primo = false
+		else:
+			area = area.expand(punto)
+	return area
 
 
 func _physics_process(_delta: float) -> void:
@@ -1560,10 +1566,8 @@ func _physics_process(_delta: float) -> void:
 			testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
 		if scheda.costo != "":
 			testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]
-		# Le carte che si ingrandiscono molto (con i simboli) non vanno coperte dal testo.
-		var carta: Rect2 = Rect2()
-		if tessera.ingrandimento > 1.2:
-			carta = _rettangolo_sullo_schermo(tessera, tessera.ingrandimento)
-		_hud.mostra_suggerimento(titolo, testo, mouse, carta)
+		# Le carte che si ingrandiscono molto (con i simboli): il riquadro si attacca alla carta ingrandita.
+		var fattore: float = tessera.ingrandimento if tessera.ingrandimento > 1.2 else 1.0
+		_hud.mostra_suggerimento(titolo, testo, _area_sullo_schermo(tessera, fattore))
 	else:
 		_hud.nascondi_suggerimento()
