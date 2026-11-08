@@ -124,6 +124,8 @@ func test_il_riquadro_mostra_testo_e_spiegazioni() -> void:
 	assert_true(spiegazioni.has("Attacco d'assedio"))
 	pannello.mostra("Granaio", "Ricevi 2 Cibo.", Vector2(400, 400))
 	assert_true(pannello.spiegazioni_mostrate().is_empty(), "Senza parole da spiegare, niente riquadro accanto.")
+	pannello.mostra("Malcontento", "Sale con le sconfitte e i malus.", Vector2(400, 400))
+	assert_eq(pannello.spiegazioni_mostrate(), PackedStringArray(["Malus"]), "La parola del titolo non si rispiega.")
 	pannello.nascondi()
 	assert_false(pannello.visible)
 

@@ -63,7 +63,7 @@ func _init() -> void:
 
 ## Un RichTextLabel con i caratteri e i colori del gioco, che si allunga quanto il suo testo.
 ## La larghezza la decide chi lo usa (custom_minimum_size.x).
-static func testo_colorato(dimensione: int) -> RichTextLabel:
+static func testo_colorato(dimensione: int, colore: Color = StileVisivo.TESTO) -> RichTextLabel:
 	var risultato: RichTextLabel = RichTextLabel.new()
 	risultato.bbcode_enabled = true
 	risultato.fit_content = true
@@ -74,7 +74,7 @@ static func testo_colorato(dimensione: int) -> RichTextLabel:
 	risultato.add_theme_font_override("bold_font", StileVisivo.FONT_TESTO_FORTE)
 	risultato.add_theme_font_size_override("normal_font_size", dimensione)
 	risultato.add_theme_font_size_override("bold_font_size", dimensione)
-	risultato.add_theme_color_override("default_color", StileVisivo.TESTO)
+	risultato.add_theme_color_override("default_color", colore)
 	risultato.add_theme_constant_override("line_separation", 2)
 	return risultato
 
@@ -96,7 +96,7 @@ func mostra(titolo: String, testo: String, punto: Vector2, sopra: bool = false) 
 	_testo.text = TestoRicco.colora(testo)
 	_testo.visible = testo != ""
 	_testo.custom_minimum_size = Vector2(larghezza, 0.0)
-	_aggiorna_spiegazioni(titolo + "\n" + testo)
+	_aggiorna_spiegazioni(titolo, testo)
 	visible = true
 	_attesa_impaginazione = FOTOGRAMMI_IMPAGINAZIONE
 	_fila.modulate.a = 0.0
@@ -124,8 +124,7 @@ func titolo_mostrato() -> String:
 func spiegazioni_mostrate() -> PackedStringArray:
 	var nomi: PackedStringArray = PackedStringArray()
 	for riquadro: Node in _spiegazioni.get_children():
-		if not riquadro.is_queued_for_deletion():
-			nomi.append(String(riquadro.get_meta(&"voce", "")))
+		nomi.append(String(riquadro.get_meta(&"voce", "")))
 	return nomi
 
 
@@ -170,12 +169,15 @@ static func _riga_piu_lunga(testo: String, font: Font, dimensione: int) -> float
 	return massima
 
 
-func _aggiorna_spiegazioni(testo: String) -> void:
+## La parola del titolo non si spiega di nuovo: il riquadro parla già di lei (es. "Malcontento").
+func _aggiorna_spiegazioni(titolo: String, testo: String) -> void:
+	# Liberati subito: sono solo scritte, nessuno le usa più.
 	for vecchio: Node in _spiegazioni.get_children():
 		_spiegazioni.remove_child(vecchio)
-		vecchio.queue_free()
-	for voce: VoceLessico in TestoRicco.voci_da_spiegare(testo):
-		_spiegazioni.add_child(_riquadro_spiegazione(voce))
+		vecchio.free()
+	for voce: VoceLessico in TestoRicco.voci_da_spiegare(titolo + "\n" + testo):
+		if voce.nome.to_lower() != titolo.strip_edges().to_lower():
+			_spiegazioni.add_child(_riquadro_spiegazione(voce))
 	_spiegazioni.visible = _spiegazioni.get_child_count() > 0
 
 
