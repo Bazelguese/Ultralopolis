@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_rotte_carovaniere"
 display_name = "Rotte carovaniere"
-description = "+1 Oro per stagione da ogni edificio Infrastruttura Strategica."
+description = "+1 Oro per stagione da ogni edificio Infrastruttura Strategica (si somma a Chiatte)."
 is_malus = false
 effect = 8
 target_type = &"Infrastruttura Strategica"
@@ -21,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"rotte_carovaniere"
 display_name = "Rotte carovaniere"
-description = "+1 Oro per stagione da ogni edificio Infrastruttura Strategica."
+description = "+1 Oro per stagione da ogni edificio Infrastruttura Strategica (si somma a Chiatte)."
 sphere = "Ricchezza"
 era = 2
 cost = 5

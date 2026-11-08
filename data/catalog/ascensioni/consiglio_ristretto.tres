@@ -8,7 +8,7 @@
 [resource]
 script = ExtResource("1_id")
 id = &"consiglio_ristretto"
-display_name = "Consiglio ristretto"
+display_name = "Corte affollata"
 description = "In ogni round compare un consigliere in più."
 dimension = 6
 ascension_level = 1

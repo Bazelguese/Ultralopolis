@@ -543,7 +543,7 @@ func _aggiorna_tradizioni(run: RunState) -> void:
 	if not prese.is_empty():
 		_lista_tradizioni.add_child(_riga_tradizioni("ASCENSIONI", StileVisivo.ORO_LUCE, 22))
 		for ascensione: IdentityDef in prese:
-			_lista_tradizioni.add_child(_riga_tradizioni("%s (livello %d) → %s" % [ascensione.display_name, ascensione.ascension_level, ascensione.description], StileVisivo.ORO_LUCE, 17))
+			_lista_tradizioni.add_child(_riga_tradizioni("%s (ascensione %s) → %s" % [ascensione.display_name, SchedaCarta.grado_ascensione(ascensione), ascensione.description], StileVisivo.ORO_LUCE, 17))
 	_pulsante_tradizioni.text = "Tradizioni · %d" % fatti
 
 
@@ -996,7 +996,8 @@ func _aggiorna_identita(run: RunState) -> void:
 	for elemento: IdentityDef in run.identity:
 		if elemento.dimension not in [IdentityDef.Dimension.USANZA, IdentityDef.Dimension.VOCAZIONE]:
 			elementi.append(elemento)
-	var firma: String = ""
+	# Anche l'era: le tessere esclusive di un'era passata spariscono dal riquadro.
+	var firma: String = "era %d" % run.era
 	for elemento: IdentityDef in elementi:
 		firma += "|%s" % elemento.id
 	if firma == _firma_identita:
@@ -1011,14 +1012,15 @@ func _aggiorna_identita(run: RunState) -> void:
 				StileVisivo.FONT_TESTO, 16, StileVisivo.TESTO if perk else StileVisivo.TESTO_TENUE)
 		voce.mouse_filter = Control.MOUSE_FILTER_STOP
 		voce.mouse_default_cursor_shape = Control.CURSOR_HELP
-		Suggerimenti.imposta(voce, testo_identita(elemento), elemento.display_name)
+		Suggerimenti.imposta(voce, testo_identita(elemento, run.era), elemento.display_name)
 		_identita.add_child(voce)
 
 
 ## Il riquadro di un elemento dell'identità: che cos'è, che cosa fa e, se ne dà, la Resistenza
-## in più negli scontri (GDD §7.1.1), es. "Resistenza +8".
-static func testo_identita(elemento: IdentityDef) -> String:
-	var testo: String = "%s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], elemento.description]
+## in più negli scontri (GDD §7.1.1), es. "Resistenza +8". era_attuale: per non promettere
+## tessere esclusive di un'era già passata (0 = non si filtra).
+static func testo_identita(elemento: IdentityDef, era_attuale: int = 0) -> String:
+	var testo: String = "%s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], SchedaCarta.senza_esclusive_passate(elemento.description, era_attuale)]
 	if elemento.resistance_bonus != 0:
 		testo += "\nResistenza %+d" % elemento.resistance_bonus
 	return testo

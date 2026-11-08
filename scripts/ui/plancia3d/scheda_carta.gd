@@ -80,6 +80,24 @@ static func da_truppa(def: TroopDef, p_livello: int = 1, p_malus: String = "", p
 	return _truppa(def, p_livello, p_malus, p_affamata, def.food_tenths, p_livello_massimo, p_regole)
 
 
+## Toglie da una descrizione le frasi "Tessera esclusiva: X (era N)." di un'era già passata:
+## si offrono solo le tessere dell'era corrente (GDD §10.3), quindi quella tessera non arriverà
+## più (decisione di Davide, 8 novembre 2026).
+static func senza_esclusive_passate(testo: String, era_attuale: int) -> String:
+	var regola: RegEx = RegEx.create_from_string("\\s?Tessera esclusiva: [^.]*\\(era (\\d+)\\)\\.")
+	var risultato: String = testo
+	for trovata: RegExMatch in regola.search_all(testo):
+		if int(trovata.get_string(1)) < era_attuale:
+			risultato = risultato.replace(trovata.get_string(0), "")
+	return risultato.strip_edges()
+
+
+## "minore" o "maggiore": le ascensioni non hanno livelli, che restano alle tessere (glossario,
+## decisione di Davide, 8 novembre 2026). Le maggiori cambiano una regola.
+static func grado_ascensione(ascensione: IdentityDef) -> String:
+	return "maggiore" if ascensione.ascension_level >= 2 else "minore"
+
+
 ## Le regole del gioco che le ascensioni della nazione cambiano (GDD §10.4.2): i testi le dicono
 ## a chi le ha (decisione di Davide, 8 novembre 2026).
 static func regole_di(run: RunState) -> Array[int]:
@@ -191,6 +209,42 @@ static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: 
 	return scheda
 
 
+## Un'offerta mostra i valori del catalogo e, se diversi, quelli che la tessera avrà sulla tua
+## plancia con i tuoi bonus, al livello 1 (decisione di Davide, 8 novembre 2026). pezzo è una
+## tessera di prova, non sulla plancia: i valori li calcolano le regole (RunState).
+static func righe_da_te(run: RunState, pezzo: BoardPiece) -> String:
+	var righe: PackedStringArray = PackedStringArray()
+	if pezzo.building != null:
+		var catalogo_e: BuildingDef = pezzo.building
+		var vero_e: BuildingDef = run.effective_building(pezzo)
+		var di_base: Array[int] = _produzione_di_base(catalogo_e)
+		var vera: Array[int] = run.building_production(pezzo)
+		for tipo: Res.Type in Res.NAMES:
+			if di_base[tipo] != vera[tipo]:
+				righe.append("%s a ogni stagione: +%s → +%s" % [Res.NAMES[tipo], Res.format(tipo, di_base[tipo]), Res.format(tipo, vera[tipo])])
+		_confronta(righe, "scudo", catalogo_e.shield, vero_e.shield)
+		_confronta(righe, "cura", catalogo_e.heal, vero_e.heal)
+		_confronta(righe, "Corruzione", catalogo_e.corruption, vero_e.corruption)
+		_confronta_secondi(righe, "Inefficienza", catalogo_e.inefficiency_ms, vero_e.inefficiency_ms)
+		_confronta_secondi(righe, "Sabotaggio", catalogo_e.sabotage_ms, vero_e.sabotage_ms)
+		_confronta_secondi(righe, "ciclo", catalogo_e.mana_interval_ms, vero_e.mana_interval_ms)
+	else:
+		var catalogo_t: TroopDef = pezzo.troop
+		var vero_t: TroopDef = run.effective_troop(pezzo)
+		_confronta(righe, "danno", catalogo_t.damage, vero_t.damage)
+		_confronta(righe, "scudo", catalogo_t.shield, vero_t.shield)
+		_confronta(righe, "cura", catalogo_t.heal, vero_t.heal)
+		_confronta(righe, "Corruzione", catalogo_t.corruption, vero_t.corruption)
+		_confronta(righe, "danno d'assedio", catalogo_t.siege_damage, vero_t.siege_damage)
+		_confronta_secondi(righe, "Inefficienza", catalogo_t.inefficiency_ms, vero_t.inefficiency_ms)
+		_confronta_secondi(righe, "Sabotaggio", catalogo_t.sabotage_ms, vero_t.sabotage_ms)
+		_confronta_secondi(righe, "ricarica", catalogo_t.cooldown_ms, vero_t.cooldown_ms)
+		_confronta(righe, "mana", catalogo_t.mana_cost, vero_t.mana_cost)
+	if righe.is_empty():
+		return ""
+	return "\nDa te, con i tuoi bonus:\n• %s" % "\n• ".join(righe)
+
+
 ## Produzione di catalogo di un edificio, al livello 1 e senza bonus, in unità interne (Res).
 static func _produzione_di_base(def: BuildingDef) -> Array[int]:
 	var produzione: Array[int] = Res.empty()
@@ -228,9 +282,11 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	match offerta.kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
 			scheda = da_edificio(offerta.building, 1, "", run.max_level())
+			scheda.dettagli += righe_da_te(run, BoardPiece.of_building(offerta.building, 0))
 			scheda.sopratitolo = "Edificio"
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
 			scheda = da_truppa(offerta.troop, 1, "", false, run.max_level(), regole_di(run))
+			scheda.dettagli += righe_da_te(run, BoardPiece.of_troop(offerta.troop, 0))
 			scheda.sopratitolo = "Truppa"
 		OpportunityDef.Kind.PERK:
 			scheda = SchedaCarta.new()
@@ -505,7 +561,7 @@ static func da_ascensione(ascensione: IdentityDef) -> SchedaCarta:
 	scheda.genere = Genere.VIA
 	scheda.id = ascensione.id
 	scheda.titolo = ascensione.display_name
-	scheda.sopratitolo = "Ascensione · livello %d" % ascensione.ascension_level
+	scheda.sopratitolo = "Ascensione %s" % grado_ascensione(ascensione)
 	scheda.riga = ascensione.description
 	scheda.costo = "Scegli"
 	scheda.dettagli = ascensione.description + "\nÈ permanente." + ("\nCambia una regola del gioco." if ascensione.rule != IdentityDef.Rule.NESSUNA else "")
@@ -514,7 +570,8 @@ static func da_ascensione(ascensione: IdentityDef) -> SchedaCarta:
 
 
 ## Un governo a cui la nazione può evolvere entrando nell'era (GDD §9.4, v0.24).
-static func da_governo(governo: IdentityDef) -> SchedaCarta:
+## run: la partita, per non promettere una tessera esclusiva di un'era già passata (può mancare).
+static func da_governo(governo: IdentityDef, run: RunState = null) -> SchedaCarta:
 	var scheda: SchedaCarta = SchedaCarta.new()
 	scheda.genere = Genere.VIA
 	scheda.id = governo.id
@@ -522,7 +579,8 @@ static func da_governo(governo: IdentityDef) -> SchedaCarta:
 	scheda.sopratitolo = "Governo · rango %d" % governo.tier
 	scheda.riga = "Evolvi verso questo governo"
 	scheda.costo = "Evolvi"
-	scheda.dettagli = governo.description + "\nIl tratto del governo attuale finisce e vale questo; le tessere sulla plancia restano."
+	var descrizione: String = senza_esclusive_passate(governo.description, run.era) if run != null else governo.description
+	scheda.dettagli = descrizione + "\nIl tratto del governo attuale finisce e vale questo; le tessere sulla plancia restano."
 	scheda.illustrazione = _carica("identita/%s.png" % governo.id)
 	return scheda
 

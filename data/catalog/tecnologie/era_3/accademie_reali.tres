@@ -8,11 +8,12 @@
 script = ExtResource("2_x")
 id = &"tec_accademie_reali"
 display_name = "Accademie reali"
-description = "+20% Ricerca prodotta."
+description = "+2 Ricerca per stagione dalla Capitale."
 is_malus = false
-effect = 7
+effect = 8
+target_type = &"Capitale"
 resource = 1
-amount = 20
+amount = 2
 duration_kind = 2
 stacking = 1
 
@@ -20,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"accademie_reali"
 display_name = "Accademie reali"
-description = "+20% Ricerca prodotta."
+description = "+2 Ricerca per stagione dalla Capitale."
 sphere = "Conoscenza"
 era = 3
 cost = 7
