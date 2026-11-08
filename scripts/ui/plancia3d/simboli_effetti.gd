@@ -73,8 +73,9 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		AdvisorDef.Special.VISITATORE:
 			pass  # I visitatori non potenziano (GDD §4.2.5).
 		_:
-			potenzia.etichetta = "Potenzia: fa salire di livello una tua tessera di tipo %s, pagando %s. Si usa una volta per round e non consuma la scelta del round." % [
-					elenco_con_o(def.types), run.advisor_resource_text(def)]
+			# I tipi sono già nella prima frase del riquadro ("Tipi: …"): qui non si ripetono
+			# (richiesta di Davide, 8 novembre).
+			potenzia.etichetta = "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando %s. Si usa una volta per round e non consuma la scelta del round." % run.advisor_resource_text(def)
 			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
 			if def.random_resource:
 				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)

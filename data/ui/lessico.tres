@@ -767,7 +767,36 @@ forme = PackedStringArray("bottino")
 colore = Color(0.4941, 0.8784, 0.5059, 1)
 definizione = "Oro e Ricerca che ricevi sempre quando vinci (o pareggi) uno scontro."
 
+[sub_resource type="Resource" id="voce_edificio"]
+script = ExtResource("1_voce")
+nome = "Edificio"
+famiglia = 8
+forme = PackedStringArray("edificio", "edifici")
+colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"edificio"
+di_base = true
+definizione = "Fuori dallo scontro produce risorse; nello scontro produce mana, altri effetti o entrambi."
+
+[sub_resource type="Resource" id="voce_truppa"]
+script = ExtResource("1_voce")
+nome = "Truppa"
+famiglia = 8
+forme = PackedStringArray("truppa", "truppe")
+colore = Color(0.9412, 0.851, 0.6588, 1)
+simbolo = &"truppa"
+di_base = true
+definizione = "Nello scontro si attiva quando la ricarica è finita e c'è il mana che chiede."
+
+[sub_resource type="Resource" id="voce_tessera"]
+script = ExtResource("1_voce")
+nome = "Tessera"
+famiglia = 8
+forme = PackedStringArray("tessera", "tessere")
+colore = Color(0.9412, 0.851, 0.6588, 1)
+di_base = true
+definizione = "Un edificio o una truppa: ciò che metti sulla plancia."
+
 [resource]
 script = ExtResource("2_lessico")
-voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51"), SubResource("voce_52"), SubResource("voce_n00"), SubResource("voce_n01"), SubResource("voce_n02"), SubResource("voce_n03"), SubResource("voce_n04"), SubResource("voce_n05"), SubResource("voce_n06"), SubResource("voce_n07"), SubResource("voce_n08"), SubResource("voce_n09"), SubResource("voce_n10"), SubResource("voce_n11"), SubResource("voce_n12"), SubResource("voce_n13"), SubResource("voce_n14"), SubResource("voce_n15"), SubResource("voce_n16"), SubResource("voce_n17"), SubResource("voce_n18"), SubResource("voce_n19"), SubResource("voce_n20"), SubResource("voce_n21"), SubResource("voce_n22"), SubResource("voce_n23"), SubResource("voce_n24"), SubResource("voce_n25"), SubResource("voce_n26"), SubResource("voce_n27"), SubResource("voce_n28"), SubResource("voce_n29"), SubResource("voce_n30"), SubResource("voce_n31"), SubResource("voce_n32"), SubResource("voce_n33"), SubResource("voce_n34"), SubResource("voce_azione"), SubResource("voce_tipo_assedio"), SubResource("voce_pareggio"), SubResource("voce_bottino")])
+voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51"), SubResource("voce_52"), SubResource("voce_n00"), SubResource("voce_n01"), SubResource("voce_n02"), SubResource("voce_n03"), SubResource("voce_n04"), SubResource("voce_n05"), SubResource("voce_n06"), SubResource("voce_n07"), SubResource("voce_n08"), SubResource("voce_n09"), SubResource("voce_n10"), SubResource("voce_n11"), SubResource("voce_n12"), SubResource("voce_n13"), SubResource("voce_n14"), SubResource("voce_n15"), SubResource("voce_n16"), SubResource("voce_n17"), SubResource("voce_n18"), SubResource("voce_n19"), SubResource("voce_n20"), SubResource("voce_n21"), SubResource("voce_n22"), SubResource("voce_n23"), SubResource("voce_n24"), SubResource("voce_n25"), SubResource("voce_n26"), SubResource("voce_n27"), SubResource("voce_n28"), SubResource("voce_n29"), SubResource("voce_n30"), SubResource("voce_n31"), SubResource("voce_n32"), SubResource("voce_n33"), SubResource("voce_n34"), SubResource("voce_azione"), SubResource("voce_tipo_assedio"), SubResource("voce_pareggio"), SubResource("voce_bottino"), SubResource("voce_edificio"), SubResource("voce_truppa"), SubResource("voce_tessera")])
 colore_numeri = Color(1, 1, 1, 1)
