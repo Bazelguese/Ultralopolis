@@ -1482,6 +1482,22 @@ func option_block_reason(option: EventOptionDef) -> String:
 		return "Nessuna truppa a cui applicarlo."
 	if option.spy != null and _spy_candidates(option.spy).is_empty():
 		return "Il fantasma non ha un bersaglio adatto."
+	# Un regalo che non può arrivare non si paga per niente (decisione di Davide, 8 novembre 2026):
+	# l'opzione resta visibile, spenta, con il motivo (GDD §4.2.5). Ogni evento ha comunque
+	# un'opzione gratuita senza regali.
+	if option.give_building != null and not board.can_add_building(option.give_building):
+		return "Nessuno spazio edificio libero per %s." % option.give_building.display_name
+	if option.give_troop != null and not board.has_free_troop_slot():
+		return "Nessuno spazio truppa libero per %s." % option.give_troop.display_name
+	if option.give_random:
+		if option.give_random_kind == EventOptionDef.PieceKind.TRUPPA and not board.has_free_troop_slot():
+			return "Nessuno spazio truppa libero."
+		if option.give_random_kind != EventOptionDef.PieceKind.TRUPPA and not board.has_free_building_slot():
+			return "Nessuno spazio edificio libero."
+	if option.extra_building_slots > 0 and board.building_capacity() >= board.max_building_slots:
+		return "Hai già il massimo di spazi edificio."
+	if option.extra_troop_slots > 0 and board.troop_capacity() >= board.max_troop_slots:
+		return "Hai già il massimo di spazi truppa."
 	return ""
 
 

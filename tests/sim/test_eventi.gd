@@ -386,3 +386,20 @@ func test_si_vede_chi_riceve_un_bonus_legato_a_un_tipo() -> void:
 	assert_string_contains(lines[0], "Via della Guerra")
 	assert_true(run.type_bonuses_for([&"Fante"] as Array[StringName], true).is_empty(), "Un bonus delle truppe non tocca gli edifici.")
 	assert_true(run.type_bonuses_for([&"Spirituale"] as Array[StringName], false).is_empty())
+
+
+func test_un_regalo_senza_spazio_blocca_l_opzione() -> void:
+	# Decisione di Davide (8 novembre 2026): non si paga un regalo che non può arrivare.
+	var gift: EventOptionDef = _option("Arruola")
+	gift.give_troop = monk
+	var slot: EventOptionDef = _option("Costruisci", {}, {})
+	slot.extra_building_slots = 1
+	catalog.events = [_event(&"dono", [gift, slot])]
+	var run: RunState = _run()
+	assert_eq(run.option_block_reason(gift), "", "Con uno spazio libero il regalo si può prendere.")
+	while run.board.has_free_troop_slot():
+		run.board.troops.append(BoardPiece.of_troop(monk, 0))
+	assert_string_contains(run.option_block_reason(gift), "Nessuno spazio truppa libero")
+	assert_eq(run.option_block_reason(slot), "")
+	run.board.max_building_slots = run.board.building_capacity()
+	assert_eq(run.option_block_reason(slot), "Hai già il massimo di spazi edificio.")
