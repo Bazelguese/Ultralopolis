@@ -6,7 +6,7 @@
 script = ExtResource("1_famdq")
 id = &"fortificazioni"
 display_name = "Fortificazioni"
-description = "+10 Resistenza nel prossimo scontro con il fantasma."
+description = "+10 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 is_malus = false
 effect = 6
 amount = 10

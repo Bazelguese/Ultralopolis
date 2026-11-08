@@ -6,7 +6,7 @@
 script = ExtResource("1_opp")
 id = &"grandi_esattori"
 display_name = "Grandi esattori"
-description = "Dal livello Ministri: ottieni subito 6 Oro."
+description = "Ottieni subito 6 Oro."
 kind = 4
 min_level = 2
 gain_gold = 6

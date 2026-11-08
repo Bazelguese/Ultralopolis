@@ -11,7 +11,7 @@
 script = ExtResource("x1")
 id = &"repubblica_parlamentare"
 display_name = "Repubblica parlamentare"
-description = "Il parlamento decide. Compaiono 4 consiglieri e le opportunità non costano Oro in più; rinnovare le opportunità costa 1 Oro in meno. Tessera esclusiva: Parlamento (era 3). Capitale: +1 Influenza."
+description = "Il parlamento decide. Compaiono 4 consiglieri; rinnovare le opportunità costa 1 Oro in meno. Tessera esclusiva: Parlamento (era 3). Capitale: +1 Influenza."
 dimension = 1
 identity_type = &"Parlamentare"
 resistance_bonus = 4

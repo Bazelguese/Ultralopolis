@@ -6,7 +6,7 @@
 script = ExtResource("1_x0xvq")
 id = &"macine"
 display_name = "Macine"
-description = "Tutti gli edifici producono mana il 10% più in fretta."
+description = "Nello scontro tutti gli edifici hanno il ciclo più corto del 10%."
 is_malus = false
 effect = 2
 amount = -10

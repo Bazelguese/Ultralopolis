@@ -11,6 +11,6 @@
 script = ExtResource("6_31kpj")
 id = &"mulini"
 display_name = "Mulini"
-description = "Tutti gli edifici producono mana il 10% più in fretta."
+description = "Nello scontro tutti gli edifici hanno il ciclo più corto del 10%."
 dimension = 4
 permanent_modifiers = Array[ExtResource("4_7krt0")]([ExtResource("5_2jrxi")])

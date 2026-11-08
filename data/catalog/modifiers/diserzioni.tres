@@ -6,7 +6,7 @@
 script = ExtResource("1_c72gj")
 id = &"diserzioni"
 display_name = "Diserzioni"
-description = "Una truppa a caso consuma il doppio del Cibo."
+description = "Una tua truppa a caso consuma il doppio del Cibo alla razione."
 effect = 15
 target = 2
 amount = 100

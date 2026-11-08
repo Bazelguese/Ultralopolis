@@ -6,7 +6,7 @@
 script = ExtResource("1_mod")
 id = &"giuramento_dei_nobili"
 display_name = "Giuramento dei nobili"
-description = "Per un anno le truppe Nobili ricaricano il 10% più in fretta."
+description = "Fino alla fine dell'anno le truppe Nobili hanno la ricarica più corta del 10%."
 is_malus = false
 effect = 3
 target_type = &"Nobile"

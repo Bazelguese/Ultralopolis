@@ -10,6 +10,7 @@ description = "La Capitale produce 1 Influenza in più a ogni stagione."
 is_malus = false
 effect = 8
 target_type = &"Capitale"
+resource = 7
 amount = 1
 duration_kind = 2
 stacking = 1

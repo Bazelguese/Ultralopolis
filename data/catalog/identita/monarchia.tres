@@ -16,7 +16,7 @@
 script = ExtResource("7_swsbc")
 id = &"monarchia"
 display_name = "Monarchia"
-description = "Un sovrano e i suoi feudatari. Il primo consigliere che ascolti diventa il consigliere di corte e compare più spesso; Fortificazioni più frequenti e Tributi feudali esclusivi. Tessera esclusiva: Castello del re (era 2). Capitale: +1 Stabilità."
+description = "Un sovrano e i suoi feudatari. Il primo consigliere ascoltato nella partita (non Giullare né Anziano) è il consigliere di corte e compare più spesso; l'Architetto e la sua azione Fortificazioni più frequenti; azione esclusiva Tributi feudali. Tessera esclusiva: Castello del re (era 2). Capitale: +1 Stabilità."
 dimension = 1
 identity_type = &"Monarchico"
 resistance_bonus = 6
