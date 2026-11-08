@@ -182,8 +182,6 @@ func _disegna_sopra() -> void:
 		_esagono(centro, raggio, colore)
 		_esagono(centro + Vector2(0.0, -raggio * 0.2), raggio * 0.55, colore.lightened(0.35))
 
-	_disegna_tipi()
-
 	# Livello: rombi in alto a destra.
 	var passo: float = lato * 0.075
 	for i: int in range(3):
@@ -262,29 +260,6 @@ func _pillola(etichetta: Label, colore: Color) -> void:
 	fondo.bg_color = colore
 	fondo.set_corner_radius_all(int(etichetta.size.y * 0.5))
 	_sopra.draw_style_box(fondo, Rect2(etichetta.position, etichetta.size).grow_individual(8.0, 0.0, 8.0, 0.0))
-
-
-# --- Tipi ----------------------------------------------------------------------
-
-## I tipi della carta come medaglioni sul lato sinistro dell'illustrazione, sotto la gemma del
-## mana se c'è (richiesta di Davide). Se non stanno in una colonna, ne cominciano un'altra.
-func _disegna_tipi() -> void:
-	if scheda.tipi.is_empty():
-		return
-	var lato: float = minf(size.x, size.y)
-	var diametro: float = lato * 0.13
-	var passo: float = diametro + lato * 0.015
-	var inizio_y: float = _area_arte.position.y + lato * 0.025
-	if scheda.mana != &"":
-		inizio_y = _bordo + lato * 0.1 + lato * 0.105 + lato * 0.035
-	var x: float = _area_arte.position.x + lato * 0.025
-	var righe: int = maxi(1, int((_area_arte.end.y - inizio_y + lato * 0.015) / passo))
-	for i: int in range(scheda.tipi.size()):
-		@warning_ignore("integer_division")
-		var colonna: int = i / righe
-		var riga: int = i % righe
-		var centro: Vector2 = Vector2(x + diametro * 0.5 + colonna * passo, inizio_y + diametro * 0.5 + riga * passo)
-		DisegnoSimboli.medaglione(_sopra, Simboli.di_tipo(scheda.tipi[i]), centro, diametro)
 
 
 # --- Simboli -------------------------------------------------------------------

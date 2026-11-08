@@ -744,6 +744,9 @@ func _costruisci_scelte() -> void:
 		if scheda.sopratitolo != "":
 			var sopra: Label3D = StileVisivo.scritta(scheda.sopratitolo.to_upper(), StileVisivo.FONT_TITOLI, 42, StileVisivo.TESTO, 0.0, 10)
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
+			# Sopra la carta c'è la linguetta dei tipi: la scritta sale sopra la linguetta.
+			if not scheda.tipi.is_empty():
+				sopra.position.z -= LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA
 			tessera.add_child(sopra)
 		var costo: Label3D = StileVisivo.scritta(scheda.costo, StileVisivo.FONT_TITOLI, 54, StileVisivo.ORO_LUCE if scheda.disponibile else StileVisivo.PERICOLO, 0.0, 12)
 		costo.position = Vector3(0.0, 0.02, misura.y * 0.5 + 0.27)

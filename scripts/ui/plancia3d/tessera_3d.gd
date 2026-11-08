@@ -38,6 +38,7 @@ func costruisci(p_scheda: SchedaCarta, p_larghezza: float, p_profondita: float, 
 	_corpo = Node3D.new()
 	add_child(_corpo)
 	_crea_faccia(nitidezza)
+	_crea_linguetta(nitidezza)
 	_crea_supporto()
 	_crea_alone()
 	_crea_velo()
@@ -72,6 +73,40 @@ func _crea_faccia(nitidezza: float) -> void:
 	_materiale_faccia = materiale
 	carta.position.y = SPESSORE + 0.002
 	_corpo.add_child(carta)
+
+
+## La linguetta dei tipi sopra la carta (GDD §14.4): un pezzo attaccato alla carta, che si
+## solleva e si ingrandisce con lei. Allineata a sinistra se c'è posto, altrimenti centrata.
+func _crea_linguetta(nitidezza: float) -> void:
+	if scheda.tipi.is_empty():
+		return
+	var misura: Vector2 = LinguettaTipi.misura(scheda.tipi.size())
+	var scala: float = PIXEL_PER_UNITA * nitidezza
+	var viewport: SubViewport = SubViewport.new()
+	viewport.size = Vector2i(int(misura.x * scala), int(misura.y * scala))
+	viewport.transparent_bg = true
+	viewport.disable_3d = true
+	viewport.gui_disable_input = true
+	viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	add_child(viewport)
+	var linguetta: LinguettaTipi = LinguettaTipi.new()
+	viewport.add_child(linguetta)
+	linguetta.imposta(scheda.tipi, scheda.colore_cornice(), scala)
+	var piano: MeshInstance3D = MeshInstance3D.new()
+	var forma: PlaneMesh = PlaneMesh.new()
+	forma.size = misura
+	piano.mesh = forma
+	var materiale: StandardMaterial3D = StandardMaterial3D.new()
+	materiale.albedo_texture = viewport.get_texture()
+	materiale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	materiale.alpha_scissor_threshold = 0.5
+	materiale.roughness = 1.0
+	materiale.metallic_specular = 0.05
+	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+	piano.material_override = materiale
+	var rientro: float = minf(larghezza * 0.08, maxf(0.0, (larghezza - misura.x) * 0.5))
+	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, SPESSORE * 0.6, -profondita * 0.5 - misura.y * 0.5 + LinguettaTipi.SOTTO_LA_CARTA)
+	_corpo.add_child(piano)
 
 
 ## Spessore scuro sotto la faccia: dà profondità e proietta l'ombra.

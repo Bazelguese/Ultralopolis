@@ -49,7 +49,7 @@ var colore_consigliere: StringName = &""
 ## Righe di simboli stampate sulla carta, come nei giochi da tavolo (consiglieri, azioni, eventi).
 ## Se ci sono, prendono il posto della riga di testo.
 var simboli: Array[RigaSimboli] = []
-## Tipi della tessera, o del consigliere (i tipi della sua categoria): medaglioni a sinistra.
+## Tipi della tessera, o del consigliere (i tipi della sua categoria): medaglioni sulla linguetta sopra la carta.
 var tipi: Array[StringName] = []
 
 
