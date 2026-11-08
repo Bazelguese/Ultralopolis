@@ -9,6 +9,6 @@
 script = ExtResource("4_17m5y")
 id = &"assemblea"
 display_name = "Assemblea"
-description = "Per un anno: +50% Oro oppure +50% Ricerca, a tua scelta."
+description = "Fino alla fine dell'anno, a tua scelta: l'Oro prodotto a ogni stagione +50% oppure la Ricerca prodotta a ogni stagione +50%."
 kind = 5
 modifiers = Array[ExtResource("1_rdbe1")]([ExtResource("2_56fot"), ExtResource("3_b36bs")])
