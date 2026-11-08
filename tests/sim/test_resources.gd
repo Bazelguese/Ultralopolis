@@ -337,10 +337,16 @@ func test_si_vede_da_dove_arriva_la_produzione() -> void:
 	bonus.amount = 1
 	bonus.duration_kind = ModifierDef.Duration.PERMANENTE
 	capital.documents_per_phase = 0
+	capital.iron_per_phase = 0
 	var run: RunState = _new_run()
 	run.modifiers.apply(bonus, ActiveModifier.OriginKind.IDENTITA, "Cinerali", run.year, run.board, RandomNumberGenerator.new())
 	var lines: PackedStringArray = run.production_origin_lines(Res.Type.FERRO)
 	var text: String = "\n".join(lines)
 	assert_string_contains(text, "Capitale", "L'edificio che la produce.")
 	assert_string_contains(text, "da Cinerali", "Il bonus con il suo nome.")
+	assert_string_contains(text, "Capitale +1 (da Cinerali)", "Senza produzione di base basta dire da dove viene (revisione n. 68).")
+	assert_false(text.contains("di base 0"))
+	capital.iron_per_phase = 1
+	assert_string_contains("\n".join(run.production_origin_lines(Res.Type.FERRO)), "Capitale +2 (di base 1; +1 da Cinerali)",
+			"Con una produzione di base si vede il conto intero.")
 	assert_string_contains("\n".join(run.production_origin_lines(Res.Type.DOCUMENTI)), "Nessun edificio")

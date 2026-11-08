@@ -586,7 +586,13 @@ func production_origin_lines(type: Res.Type) -> PackedStringArray:
 		var line: String = "• %s +%s" % [piece.display_name(), Res.format(type, total * Res.scale(type))]
 		if not parts.is_empty():
 			var level_text: String = ", livello %d" % piece.level if piece.level > 1 and piece.building.production(type) > 0 else ""
-			line += " (di base %d%s; %s)" % [maxi(0, base), level_text, ", ".join(parts)]
+			if base > 0:
+				line += " (di base %d%s; %s)" % [base, level_text, ", ".join(parts)]
+			elif parts.size() == 1:
+				# Senza produzione di base tutto viene da un solo bonus: basta dire da dove.
+				line += " (%s)" % parts[0].substr(parts[0].find(" da ") + 1)
+			else:
+				line += " (%s)" % ", ".join(parts)
 		elif piece.level > 1:
 			line += " (livello %d)" % piece.level
 		lines.append(line)
@@ -666,46 +672,73 @@ func upkeep_of(piece: BoardPiece) -> ResourceAmounts:
 	return amounts
 
 
-## Chi chiede una risorsa (principio P4): i consiglieri che la vogliono per il Potenzia o per
-## le loro azioni (solo quelle che la nazione può vedere), i Visitatori e il Cibo delle truppe.
-## Il mantenimento ha le sue righe (upkeep_lines).
+## Chi chiede una risorsa (principio P4): per l'Oro tessere, spazi e rinnovi; i consiglieri che la
+## vogliono per Potenzia, per il rinnovo o per le loro azioni (solo quelle che la nazione può
+## vedere); i Visitatori e le razioni delle truppe. Il mantenimento ha le sue righe (upkeep_lines).
 func resource_demand_lines(type: Res.Type) -> PackedStringArray:
 	var lines: PackedStringArray = PackedStringArray()
+	if type == Res.Type.ORO:
+		lines.append("• Tessere, spazi e rinnovi delle opportunità")
 	var excluded: Array[AdvisorDef] = _excluded_advisors()
+	var round_resources: Array[Res.Type] = _shadow_resource_options()
 	for advisor: AdvisorDef in catalog.advisors:
 		if excluded.has(advisor):
 			continue
 		var uses: PackedStringArray = PackedStringArray()
-		if advisor.upgrade_resource == type and advisor.special == AdvisorDef.Special.NESSUNO:
-			uses.append("Potenzia")
-		elif advisor.random_resource and type != Res.Type.ORO and type != Res.Type.RICERCA:
-			uses.append("Potenzia, quando esce questa risorsa")
+		if advisor.special == AdvisorDef.Special.ANZIANO:
+			if type == Res.Type.ORO:
+				uses.append("Potenzia")
+		elif advisor.special == AdvisorDef.Special.NESSUNO:
+			if advisor.random_resource:
+				# Potenzia chiede la sua risorsa più quella del round; il rinnovo solo quella del round.
+				if advisor.upgrade_resource == type:
+					uses.append("Potenzia, insieme alla risorsa del round")
+				elif round_resources.has(type):
+					uses.append("Potenzia e rinnovo, %s" % ("è la risorsa di questo round" if shadow_resource == type else "quando esce questa risorsa"))
+			elif advisor.upgrade_resource == type:
+				uses.append("Potenzia e rinnovo")
 		var actions: PackedStringArray = PackedStringArray()
 		for action: OpportunityDef in advisor.actions:
-			if action.cost_resources == null or action.cost_resources.whole(type) <= 0:
-				continue
 			if _is_exclusive_action(action) and not _has_exclusive_action(action):
 				continue
 			if action.min_level > council_level():
 				continue
-			var cost: ResourceAmounts = _discounted_action_cost(advisor, action)
-			actions.append("%s %d" % [action.display_name, cost.whole(type) if cost != null else action.cost_resources.whole(type)])
+			var amount: int = 0
+			if action.cost_resources != null and action.cost_resources.whole(type) > 0:
+				var cost: ResourceAmounts = _discounted_action_cost(advisor, action)
+				amount = cost.whole(type) if cost != null else action.cost_resources.whole(type)
+			if type == Res.Type.ORO and action.cost_gold > 0:
+				amount += maxi(0, action.cost_gold + _identity_int(&"proposal_gold_change"))
+			if amount > 0:
+				actions.append("%s %d" % [action.display_name, amount])
 		if not actions.is_empty():
 			uses.append("azioni: %s" % ", ".join(actions))
 		if not uses.is_empty():
 			lines.append("• %s — %s" % [advisor.display_name, "; ".join(uses)])
-	var visitors: PackedStringArray = PackedStringArray()
 	for visitor: AdvisorDef in catalog.visitors:
 		if visitor.extra_cost != null and visitor.extra_cost.whole(type) > 0 and _roots_ok(visitor.requires_any, 0, 0, []):
-			visitors.append(visitor.display_name)
-	if not visitors.is_empty():
-		lines.append("• Visitatori — %s" % ", ".join(visitors))
+			lines.append("• %s (Visitatore)" % visitor.display_name)
 	if type == Res.Type.CIBO and not board.troops.is_empty():
 		var ration: int = 0
 		for piece: BoardPiece in board.troops:
 			ration += troop_ration(piece)
-		lines.append("• Le truppe a inizio anno — %s" % Res.format(type, ration))
+		lines.append("• Razioni delle truppe, a inizio del prossimo anno — %s" % Res.format(type, ration))
 	return lines
+
+
+## Le risorse che possono uscire come risorsa del round del Maestro delle spie: le stesse fra cui
+## pesca _draw_shadow_resource (solo lettura, per i testi).
+func _shadow_resource_options() -> Array[Res.Type]:
+	var types: Array[Res.Type] = []
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special != AdvisorDef.Special.NESSUNO or advisor.random_resource:
+			continue
+		if advisor.upgrade_resource == Res.Type.ORO or types.has(advisor.upgrade_resource):
+			continue
+		types.append(advisor.upgrade_resource)
+	if types.is_empty():
+		types.append(Res.Type.FERRO)
+	return types
 
 
 ## Carte nell'ordine in cui pagano: da destra, prima le truppe e poi gli edifici.

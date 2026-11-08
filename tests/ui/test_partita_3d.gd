@@ -470,6 +470,24 @@ func test_riquadri_di_malcontento_era_e_identita() -> void:
 	assert_false(HudPlancia.testo_identita(popolo).contains("Resistenza"))
 
 
+## Revisione n. 18, 36, 48, 73: l'elenco di chi chiede una risorsa è completo e senza voci false.
+func test_chi_chiede_una_risorsa_elenco_completo() -> void:
+	var run: RunState = _run()
+	var pietra: String = "\n".join(run.resource_demand_lines(Res.Type.PIETRA))
+	assert_string_contains(pietra, "Architetto — Potenzia e rinnovo", "Il rinnovo si paga anche con la risorsa del consigliere.")
+	var oro: String = "\n".join(run.resource_demand_lines(Res.Type.ORO))
+	assert_string_contains(oro, "Tessere, spazi e rinnovi")
+	assert_string_contains(oro, "Anziano — Potenzia")
+	# La risorsa del round del Maestro delle spie si pesca solo fra quelle di Potenzia: mai il Cibo.
+	var cibo: String = "\n".join(run.resource_demand_lines(Res.Type.CIBO))
+	assert_false(cibo.contains("Maestro delle spie"), cibo)
+	assert_string_contains(cibo, "Razioni delle truppe, a inizio del prossimo anno")
+	var ferro: String = "\n".join(run.resource_demand_lines(Res.Type.FERRO))
+	assert_string_contains(ferro, "Maestro delle spie — Potenzia e rinnovo")
+	for tipo: Res.Type in Res.NAMES:
+		assert_false("\n".join(run.resource_demand_lines(tipo)).contains("Visitatori —"), "Il visitatore si scrive \"Nome (Visitatore)\".")
+
+
 func test_suggerimenti_colorati_e_nessun_tooltip_di_sistema() -> void:
 	# Richiesta di Davide (8 novembre): tutti i suggerimenti con il riquadro nuovo, come in The Bazaar.
 	_run()
