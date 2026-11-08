@@ -202,8 +202,21 @@ func test_la_seconda_altezza_si_apre_con_una_tecnologia_della_prima_nello_stesso
 	assert_eq(run.tech_block_reason(drill), "", "Aperta da Carpenteria, dello stesso ramo rosso.")
 
 
+## Il motivo del blocco usa l'altezza vera dell'albero: nell'era 2 la seconda altezza è la 4
+## e si apre con la 3 (GDD §10.5.2; revisione n. 17).
+func test_il_motivo_del_blocco_dice_l_altezza_vera() -> void:
+	var faith2_top: TechDef = _tech(&"fede2_alta", "Stato", 2, 2, 6)
+	catalog.technologies.append(faith2_top)
+	var run: RunState = _run()
+	assert_eq(run.tech_block_reason(drill), "Si apre dopo 1 tecnologia dell'altezza 1 del ramo Rosso.")
+	run.era = 2
+	assert_eq(faith2_top.height(), 4)
+	assert_eq(run.tech_block_reason(faith2_top), "Si apre dopo 1 tecnologia dell'altezza 3 del ramo Blu.")
+
+
 func test_prerequisito_preciso() -> void:
 	var run: RunState = _run()
+	assert_eq(run.tech_block_reason(deep), "Serve prima monete.")
 	assert_string_contains(run.tech_block_reason(deep), "monete")
 	_complete(run, coins)
 	assert_eq(run.tech_block_reason(deep), "")

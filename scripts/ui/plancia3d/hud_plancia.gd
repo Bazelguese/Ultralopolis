@@ -22,6 +22,8 @@ signal scegli_cronaca(indice: int)
 
 ## Distanza dal fondo dello schermo dei comandi che stanno sopra la barra delle risorse.
 const SOPRA_BARRA: float = -112.0
+## Che cosa succede entrando nella prossima era (GDD §10.2, §10.3).
+const TESTO_ERA: String = "Entri quando vuoi, senza consumare il round: scegli una via, ottieni spazi e Resistenza, il Consiglio sale di livello e puoi far evolvere il governo; si aprono le tecnologie della nuova era. Le tessere dell'era attuale spariscono dalle opportunità; quelle sulla plancia restano."
 const COLORI_RISORSE: Dictionary[int, Color] = {
 	Res.Type.ORO: Color("ffd76a"),
 	Res.Type.RICERCA: Color("7fb4ff"),
@@ -602,18 +604,38 @@ func _testo_carta(run: RunState, tecnologia: TechDef) -> String:
 		stato = "In studio · "
 	elif run.tech_status(tecnologia) == RunState.TechStatus.INIZIATA:
 		stato = "Iniziata · "
-	var testo: String = "%s\n%s%s · %s · altezza %d\n%d/%d Ricerca\n%s" % [tecnologia.display_name, stato,
-			TechDef.BRANCH_NAMES.get(tecnologia.branch(), "?"), tecnologia.sphere, tecnologia.tier,
+	var testo: String = "%s\n%s%s\n%d/%d Ricerca\n%s" % [tecnologia.display_name, stato, posto_nell_albero(tecnologia),
 			run.tech_progress_of(tecnologia), tecnologia.cost, tecnologia.description]
 	return testo + _riga_beneficiari(run, tecnologia.permanent_modifiers)
 
 
+## Dove sta la tecnologia nell'albero, es. "Ramo Blu (Fede) · altezza 3": il ramo con la sua
+## sfera fra parentesi (così non si confonde con la risorsa) e l'altezza vera, contata su tutta la
+## partita (l'era 2 ha le altezze 3 e 4, GDD §10.5.2).
+static func posto_nell_albero(tecnologia: TechDef) -> String:
+	return "Ramo %s (%s) · altezza %d" % [TechDef.BRANCH_NAMES.get(tecnologia.branch(), "?"), tecnologia.sphere, tecnologia.height()]
+
+
 ## "Ne beneficiano: Milizia, Lancieri" per un bonus legato a un tipo (GDD §6.6), vuoto se nessuna.
 static func _riga_beneficiari(run: RunState, modificatori: Array[ModifierDef]) -> String:
-	var nomi: PackedStringArray = PackedStringArray()
-	for pezzo: BoardPiece in run.pieces_boosted_by(modificatori):
-		nomi.append(pezzo.display_name())
-	return "\n▲ Ne beneficiano: %s" % ", ".join(nomi) if not nomi.is_empty() else ""
+	var pezzi: Array[BoardPiece] = run.pieces_boosted_by(modificatori)
+	return "\n▲ Ne beneficiano: %s" % nomi_raggruppati(pezzi) if not pezzi.is_empty() else ""
+
+
+## Nomi delle tessere con quelle uguali raggruppate, nell'ordine in cui compaiono:
+## "Milizia ×2, Lancieri".
+static func nomi_raggruppati(pezzi: Array[BoardPiece]) -> String:
+	var ordine: PackedStringArray = PackedStringArray()
+	var quante: Dictionary[String, int] = {}
+	for pezzo: BoardPiece in pezzi:
+		var nome: String = pezzo.display_name()
+		if not quante.has(nome):
+			ordine.append(nome)
+		quante[nome] = quante.get(nome, 0) + 1
+	var voci: PackedStringArray = PackedStringArray()
+	for nome: String in ordine:
+		voci.append(nome if quante[nome] == 1 else "%s ×%d" % [nome, quante[nome]])
+	return ", ".join(voci)
 
 
 ## Una tecnologia dell'albero: colore e parola dicono lo stato, il suggerimento il perché (P4).
@@ -636,10 +658,11 @@ func _voce_albero(run: RunState, tecnologia: TechDef) -> Label:
 			nota = " · bloccata"
 	var voce: Label = StileVisivo.etichetta("%s%s (%d)%s" % ["  " if tecnologia.tier == 2 else "", tecnologia.display_name, tecnologia.cost, nota], StileVisivo.FONT_TESTO, 16, colore)
 	voce.mouse_filter = Control.MOUSE_FILTER_PASS
-	var aiuto: String = "%s, altezza %d\n%s%s" % [tecnologia.sphere, tecnologia.tier, tecnologia.description,
+	var aiuto: String = "%s\n%s%s" % [posto_nell_albero(tecnologia), tecnologia.description,
 			_riga_beneficiari(run, tecnologia.permanent_modifiers)]
 	if stato == RunState.TechStatus.BLOCCATA:
-		aiuto += "\nBloccata: %s" % run.tech_block_reason(tecnologia)
+		var motivo: String = run.tech_block_reason(tecnologia)
+		aiuto += "\nBloccata: %s%s" % [motivo.left(1).to_lower(), motivo.substr(1)]
 	Suggerimenti.imposta(voce, aiuto, tecnologia.display_name)
 	return voce
 
@@ -967,8 +990,17 @@ func _aggiorna_identita(run: RunState) -> void:
 				StileVisivo.FONT_TESTO, 16, StileVisivo.TESTO if perk else StileVisivo.TESTO_TENUE)
 		voce.mouse_filter = Control.MOUSE_FILTER_STOP
 		voce.mouse_default_cursor_shape = Control.CURSOR_HELP
-		Suggerimenti.imposta(voce, "%s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], elemento.description], elemento.display_name)
+		Suggerimenti.imposta(voce, testo_identita(elemento), elemento.display_name)
 		_identita.add_child(voce)
+
+
+## Il riquadro di un elemento dell'identità: che cos'è, che cosa fa e, se ne dà, la Resistenza
+## in più negli scontri (GDD §7.1.1), es. "Resistenza +8".
+static func testo_identita(elemento: IdentityDef) -> String:
+	var testo: String = "%s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], elemento.description]
+	if elemento.resistance_bonus != 0:
+		testo += "\nResistenza %+d" % elemento.resistance_bonus
+	return testo
 
 
 ## Inclinazioni, usanze, vocazioni e personaggi sulla scheda della nazione.
@@ -993,7 +1025,7 @@ func _aggiorna_nazione(run: RunState) -> void:
 	_usanze.text = "\n".join(testo)
 	_usanze.visible = not testo.is_empty()
 	Suggerimenti.imposta(_usanze, "\n".join(aiuto), "Usanze, vocazioni e personaggi" if not aiuto.is_empty() else "")
-	var spiegazione: String = "Inclinazioni della nazione: le cronache le spostano con le tue scelte. A %d passi da un lato nasce un'usanza; due usanze adatte aprono una vocazione." % run.run_rules.inclination_limit
+	var spiegazione: String = "Inclinazioni della nazione: le cronache le spostano con le tue scelte. Quando una barra arriva in fondo (%d) da un lato, nasce un'usanza; due usanze adatte aprono una vocazione." % run.run_rules.inclination_limit
 	_inclinazioni.aggiorna(run.inclinations, run.run_rules.inclination_limit, spiegazione)
 
 
@@ -1008,6 +1040,28 @@ func _crea_messaggio() -> void:
 
 
 # --- Aggiornamento della partita ---------------------------------------------------
+
+## Il riquadro del Malcontento (GDD §5.5, §5.6): da dove sale, come si fa scendere (le azioni dei
+## consiglieri che lo calmano, lette dai dati) e quando scoppia la Rivoluzione.
+static func testo_malcontento(run: RunState) -> String:
+	var rimedi: PackedStringArray = PackedStringArray()
+	for consigliere: AdvisorDef in run.catalog.advisors:
+		for azione: OpportunityDef in consigliere.actions:
+			if azione.malcontent_change >= 0 or azione.cost_resources == null:
+				continue
+			for tipo: Res.Type in Res.NAMES:
+				var voce: String = "%s (%s)" % [Res.NAMES[tipo], consigliere.display_name]
+				if azione.cost_resources.whole(tipo) > 0 and not rimedi.has(voce):
+					rimedi.append(voce)
+	var scende: String = ""
+	if not rimedi.is_empty():
+		var elenco: String = rimedi[0]
+		if rimedi.size() > 1:
+			elenco = "%s o %s" % [", ".join(rimedi.slice(0, rimedi.size() - 1)), rimedi[rimedi.size() - 1]]
+		scende = "; scende spendendo %s" % elenco
+	return "Sale con sconfitte, carestie, malus, tessere trascurate, assimilazioni, eventi e cronache%s. Quando arriva a %d, il round dopo scoppia la Rivoluzione." % [
+			scende, run.run_rules.malcontent_threshold]
+
 
 func aggiorna_partita(run: RunState) -> void:
 	_nazione.text = run.nation_name.to_upper()
@@ -1030,8 +1084,7 @@ func aggiorna_partita(run: RunState) -> void:
 	_malcontento.text = "%d/%d" % [run.malcontent, run.run_rules.malcontent_threshold]
 	var vicina: bool = run.malcontent >= run.run_rules.malcontent_warning
 	_malcontento.add_theme_color_override("font_color", StileVisivo.PERICOLO if vicina else StileVisivo.TESTO)
-	Suggerimenti.imposta(_malcontento_cella, "Sale con sconfitte, carestie, malus ed eventi; scende spendendo Stabilità (Cancelliere), Fede o Cibo. A %d scoppia la Rivoluzione.%s" % [
-			run.run_rules.malcontent_threshold, "\nLa Rivoluzione si avvicina!" if vicina else ""], "Malcontento")
+	Suggerimenti.imposta(_malcontento_cella, testo_malcontento(run) + ("\nLa Rivoluzione si avvicina!" if vicina else ""), "Malcontento")
 
 	var produzione: Array[int] = run.next_season_production()
 	for tipo: int in _celle_risorse:
@@ -1061,7 +1114,8 @@ func aggiorna_partita(run: RunState) -> void:
 		_pulsante_era.text = "Entra in %s · %d/%d tecnologie" % [run.era_name(run.era + 1), fatte, tecnologie_era]
 		_pulsante_era.visible = true
 		_pulsante_era.disabled = not comprando or run.era_block_reason() != ""
-		Suggerimenti.imposta(_pulsante_era, run.era_block_reason() if run.era_block_reason() != "" else "Entri quando vuoi: le tessere dell'era attuale spariscono dalle opportunità.")
+		var motivo_era: String = run.era_block_reason()
+		Suggerimenti.imposta(_pulsante_era, (motivo_era + "\n" if motivo_era != "" else "") + TESTO_ERA)
 	else:
 		_pulsante_era.visible = false
 	_aggiorna_ricerca(run)

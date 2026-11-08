@@ -1512,10 +1512,7 @@ func _testo_riquadro(tessera: Tessera3D) -> String:
 	var testo: String = scheda.dettagli
 	var beneficiari: Array[BoardPiece] = _beneficiari_sotto(tessera)
 	if not beneficiari.is_empty():
-		var nomi: PackedStringArray = PackedStringArray()
-		for pezzo: BoardPiece in beneficiari:
-			nomi.append(pezzo.display_name())
-		testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
+		testo += "\n▲ Ne beneficiano: %s." % HudPlancia.nomi_raggruppati(beneficiari)
 	# Solo un prezzo vero è un costo; "Ascolta" o "Scegli" restano scritti sotto la carta.
 	if scheda.prezzo and scheda.costo != "":
 		testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]

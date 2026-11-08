@@ -403,3 +403,23 @@ func test_un_regalo_senza_spazio_blocca_l_opzione() -> void:
 	assert_eq(run.option_block_reason(slot), "")
 	run.board.max_building_slots = run.board.building_capacity()
 	assert_eq(run.option_block_reason(slot), "Hai già il massimo di spazi edificio.")
+
+
+## Lo stesso requisito si legge sempre allo stesso modo, che sia scritto nei dati o ricavato
+## dai tipi (revisione n. 52).
+func test_il_requisito_di_tipo_si_scrive_come_le_etichette() -> void:
+	var run: RunState = _run()
+	var truppa: EventOptionDef = _option("Giostra")
+	truppa.requires_types = [&"Fante"]
+	truppa.requires_kind = EventOptionDef.PieceKind.TRUPPA
+	assert_eq(run.option_requirement(truppa), "truppa Fante")
+	assert_eq(run.option_requirement_need(truppa), "una truppa Fante")
+	var edificio: EventOptionDef = _option("Cava")
+	edificio.requires_types = [&"Materie prime"]
+	edificio.requires_kind = EventOptionDef.PieceKind.EDIFICIO
+	assert_eq(run.option_requirement(edificio), "edificio di Materie prime")
+	assert_eq(run.option_requirement_need(edificio), "un edificio di Materie prime")
+	var qualsiasi: EventOptionDef = _option("Processo")
+	qualsiasi.requires_types = [&"Legge"]
+	assert_eq(run.option_requirement(qualsiasi), "Legge")
+	assert_eq(run.option_requirement_need(qualsiasi), "una tessera di tipo Legge")

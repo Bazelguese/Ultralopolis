@@ -375,6 +375,19 @@ func test_il_flusso_dell_anno_mostra_mesi_e_scontri() -> void:
 	assert_string_contains(primo, run.theme_name(), "Con il tema del round.")
 	var fantasma: String = Suggerimenti.testo_di(flusso, (zone[14][0] as Rect2).get_center())
 	assert_string_contains(fantasma, "fantasma")
+	# Revisione n. 38: la nota dell'inverno c'è anche nel mese in corso e su tutti e tre i mesi.
+	for i: int in range(3):
+		assert_string_contains(Suggerimenti.testo_di(flusso, (zone[i][0] as Rect2).get_center()),
+				"Inverno: a inizio stagione gli edifici non producono Cibo; nessuno scontro")
+	# Revisione n. 70: incontri spiegati in primavera e in estate, con l'esito a parole.
+	run.history[-1].encounter_result = "Vittoria · Sconfitta"
+	flusso.aggiorna(run)
+	var primavera: String = Suggerimenti.testo_di(flusso, (zone[6][0] as Rect2).get_center())
+	assert_string_contains(primavera, "Ne scegli 1 fra 3; se perdi, l'Oro si dimezza.")
+	assert_string_contains(primavera, "Vinto")
+	var estate: String = Suggerimenti.testo_di(flusso, (zone[10][0] as Rect2).get_center())
+	assert_string_contains(estate, "Ne scegli 1 fra 3; se perdi, l'Oro si dimezza.")
+	assert_string_contains(estate, "Perso")
 
 
 func test_senza_tecnologia_in_studio_c_e_un_avviso() -> void:
@@ -432,6 +445,47 @@ func test_il_riquadro_delle_risorse_dice_chi_le_chiede() -> void:
 	assert_string_contains(pietra, "Chi la chiede")
 	assert_string_contains(pietra, "Architetto")
 	assert_string_contains(pietra, "Potenzia")
+
+
+## Revisione n. 35, 69, 72: Malcontento, pulsante dell'era e identità dicono tutto quello che serve.
+func test_riquadri_di_malcontento_era_e_identita() -> void:
+	var run: RunState = _run()
+	_scena.call("_aggiorna_tutto")
+	var hud: HudPlancia = _scena.get("_hud")
+	var malcontento: String = Suggerimenti.testo_di(hud.get("_malcontento_cella") as Control)
+	assert_string_contains(malcontento, "tessere trascurate")
+	assert_string_contains(malcontento, "cronache")
+	assert_string_contains(malcontento, "Stabilità (Cancelliere)")
+	assert_string_contains(malcontento, "Fede (Sacerdote)")
+	assert_string_contains(malcontento, "Cibo (Fattore)")
+	assert_string_contains(malcontento, "Quando arriva a %d, il round dopo scoppia la Rivoluzione." % run.run_rules.malcontent_threshold)
+	var era: String = Suggerimenti.testo_di(hud.get("_pulsante_era") as Control)
+	assert_string_contains(era, "Servono", "Il motivo del blocco resta.")
+	assert_string_contains(era, "il Consiglio sale di livello", "E dice anche che cosa si ottiene.")
+	var popolo: IdentityDef = IdentityDef.new()
+	popolo.display_name = "Pietrosangue"
+	popolo.resistance_bonus = 8
+	assert_string_contains(HudPlancia.testo_identita(popolo), "Resistenza +8")
+	popolo.resistance_bonus = 0
+	assert_false(HudPlancia.testo_identita(popolo).contains("Resistenza"))
+
+
+## Revisione n. 18, 36, 48, 73: l'elenco di chi chiede una risorsa è completo e senza voci false.
+func test_chi_chiede_una_risorsa_elenco_completo() -> void:
+	var run: RunState = _run()
+	var pietra: String = "\n".join(run.resource_demand_lines(Res.Type.PIETRA))
+	assert_string_contains(pietra, "Architetto — Potenzia e rinnovo", "Il rinnovo si paga anche con la risorsa del consigliere.")
+	var oro: String = "\n".join(run.resource_demand_lines(Res.Type.ORO))
+	assert_string_contains(oro, "Tessere, spazi e rinnovi")
+	assert_string_contains(oro, "Anziano — Potenzia")
+	# La risorsa del round del Maestro delle spie si pesca solo fra quelle di Potenzia: mai il Cibo.
+	var cibo: String = "\n".join(run.resource_demand_lines(Res.Type.CIBO))
+	assert_false(cibo.contains("Maestro delle spie"), cibo)
+	assert_string_contains(cibo, "Razioni delle truppe, a inizio del prossimo anno")
+	var ferro: String = "\n".join(run.resource_demand_lines(Res.Type.FERRO))
+	assert_string_contains(ferro, "Maestro delle spie — Potenzia e rinnovo")
+	for tipo: Res.Type in Res.NAMES:
+		assert_false("\n".join(run.resource_demand_lines(tipo)).contains("Visitatori —"), "Il visitatore si scrive \"Nome (Visitatore)\".")
 
 
 func test_suggerimenti_colorati_e_nessun_tooltip_di_sistema() -> void:

@@ -423,7 +423,8 @@ func reroll_resource_cost() -> ResourceAmounts:
 	return amounts
 
 
-## Risorse che un consigliere chiede per Potenzia, es. "Ferro" oppure "Oro + Pietra" (per Ombra).
+## Risorse che un consigliere chiede per Potenzia, es. "Ferro" oppure, per il Maestro delle spie,
+## "Oro + Pietra (la risorsa di questo round)".
 func advisor_resource_text(advisor: AdvisorDef) -> String:
 	match advisor.special:
 		AdvisorDef.Special.CLOWN:
@@ -433,7 +434,7 @@ func advisor_resource_text(advisor: AdvisorDef) -> String:
 		AdvisorDef.Special.VISITATORE:
 			return "nessuna: i visitatori non potenziano"
 	if advisor.random_resource:
-		return "%s + %s" % [Res.NAMES[advisor.upgrade_resource], Res.NAMES[shadow_resource]]
+		return "%s + %s (la risorsa di questo round)" % [Res.NAMES[advisor.upgrade_resource], Res.NAMES[shadow_resource]]
 	return Res.NAMES[advisor.upgrade_resource]
 
 
@@ -585,7 +586,13 @@ func production_origin_lines(type: Res.Type) -> PackedStringArray:
 		var line: String = "• %s +%s" % [piece.display_name(), Res.format(type, total * Res.scale(type))]
 		if not parts.is_empty():
 			var level_text: String = ", livello %d" % piece.level if piece.level > 1 and piece.building.production(type) > 0 else ""
-			line += " (di base %d%s; %s)" % [maxi(0, base), level_text, ", ".join(parts)]
+			if base > 0:
+				line += " (di base %d%s; %s)" % [base, level_text, ", ".join(parts)]
+			elif parts.size() == 1:
+				# Senza produzione di base tutto viene da un solo bonus: basta dire da dove.
+				line += " (%s)" % parts[0].substr(parts[0].find(" da ") + 1)
+			else:
+				line += " (%s)" % ", ".join(parts)
 		elif piece.level > 1:
 			line += " (livello %d)" % piece.level
 		lines.append(line)
@@ -665,46 +672,73 @@ func upkeep_of(piece: BoardPiece) -> ResourceAmounts:
 	return amounts
 
 
-## Chi chiede una risorsa (principio P4): i consiglieri che la vogliono per il Potenzia o per
-## le loro azioni (solo quelle che la nazione può vedere), i Visitatori e il Cibo delle truppe.
-## Il mantenimento ha le sue righe (upkeep_lines).
+## Chi chiede una risorsa (principio P4): per l'Oro tessere, spazi e rinnovi; i consiglieri che la
+## vogliono per Potenzia, per il rinnovo o per le loro azioni (solo quelle che la nazione può
+## vedere); i Visitatori e le razioni delle truppe. Il mantenimento ha le sue righe (upkeep_lines).
 func resource_demand_lines(type: Res.Type) -> PackedStringArray:
 	var lines: PackedStringArray = PackedStringArray()
+	if type == Res.Type.ORO:
+		lines.append("• Tessere, spazi e rinnovi delle opportunità")
 	var excluded: Array[AdvisorDef] = _excluded_advisors()
+	var round_resources: Array[Res.Type] = _shadow_resource_options()
 	for advisor: AdvisorDef in catalog.advisors:
 		if excluded.has(advisor):
 			continue
 		var uses: PackedStringArray = PackedStringArray()
-		if advisor.upgrade_resource == type and advisor.special == AdvisorDef.Special.NESSUNO:
-			uses.append("Potenzia")
-		elif advisor.random_resource and type != Res.Type.ORO and type != Res.Type.RICERCA:
-			uses.append("Potenzia, quando esce questa risorsa")
+		if advisor.special == AdvisorDef.Special.ANZIANO:
+			if type == Res.Type.ORO:
+				uses.append("Potenzia")
+		elif advisor.special == AdvisorDef.Special.NESSUNO:
+			if advisor.random_resource:
+				# Potenzia chiede la sua risorsa più quella del round; il rinnovo solo quella del round.
+				if advisor.upgrade_resource == type:
+					uses.append("Potenzia, insieme alla risorsa del round")
+				elif round_resources.has(type):
+					uses.append("Potenzia e rinnovo, %s" % ("è la risorsa di questo round" if shadow_resource == type else "quando esce questa risorsa"))
+			elif advisor.upgrade_resource == type:
+				uses.append("Potenzia e rinnovo")
 		var actions: PackedStringArray = PackedStringArray()
 		for action: OpportunityDef in advisor.actions:
-			if action.cost_resources == null or action.cost_resources.whole(type) <= 0:
-				continue
 			if _is_exclusive_action(action) and not _has_exclusive_action(action):
 				continue
 			if action.min_level > council_level():
 				continue
-			var cost: ResourceAmounts = _discounted_action_cost(advisor, action)
-			actions.append("%s %d" % [action.display_name, cost.whole(type) if cost != null else action.cost_resources.whole(type)])
+			var amount: int = 0
+			if action.cost_resources != null and action.cost_resources.whole(type) > 0:
+				var cost: ResourceAmounts = _discounted_action_cost(advisor, action)
+				amount = cost.whole(type) if cost != null else action.cost_resources.whole(type)
+			if type == Res.Type.ORO and action.cost_gold > 0:
+				amount += maxi(0, action.cost_gold + _identity_int(&"proposal_gold_change"))
+			if amount > 0:
+				actions.append("%s %d" % [action.display_name, amount])
 		if not actions.is_empty():
 			uses.append("azioni: %s" % ", ".join(actions))
 		if not uses.is_empty():
 			lines.append("• %s — %s" % [advisor.display_name, "; ".join(uses)])
-	var visitors: PackedStringArray = PackedStringArray()
 	for visitor: AdvisorDef in catalog.visitors:
 		if visitor.extra_cost != null and visitor.extra_cost.whole(type) > 0 and _roots_ok(visitor.requires_any, 0, 0, []):
-			visitors.append(visitor.display_name)
-	if not visitors.is_empty():
-		lines.append("• Visitatori — %s" % ", ".join(visitors))
+			lines.append("• %s (Visitatore)" % visitor.display_name)
 	if type == Res.Type.CIBO and not board.troops.is_empty():
 		var ration: int = 0
 		for piece: BoardPiece in board.troops:
 			ration += troop_ration(piece)
-		lines.append("• Le truppe a inizio anno — %s" % Res.format(type, ration))
+		lines.append("• Razioni delle truppe, a inizio del prossimo anno — %s" % Res.format(type, ration))
 	return lines
+
+
+## Le risorse che possono uscire come risorsa del round del Maestro delle spie: le stesse fra cui
+## pesca _draw_shadow_resource (solo lettura, per i testi).
+func _shadow_resource_options() -> Array[Res.Type]:
+	var types: Array[Res.Type] = []
+	for advisor: AdvisorDef in catalog.advisors:
+		if advisor.special != AdvisorDef.Special.NESSUNO or advisor.random_resource:
+			continue
+		if advisor.upgrade_resource == Res.Type.ORO or types.has(advisor.upgrade_resource):
+			continue
+		types.append(advisor.upgrade_resource)
+	if types.is_empty():
+		types.append(Res.Type.FERRO)
+	return types
 
 
 ## Carte nell'ordine in cui pagano: da destra, prima le truppe e poi gli edifici.
@@ -1451,16 +1485,39 @@ func _special_options(event: EventDef) -> Array[EventOptionDef]:
 	return built
 
 
-## Requisito di un'opzione, es. "Spirituale" o "Repubblica"; vuoto se non ne ha.
+## Requisito di un'opzione, es. "Spirituale", "Repubblica" o "truppa Fante"; vuoto se non ne ha.
+## Ricavato dai dati, con le stesse parole delle etichette scritte a mano ("truppa Fante",
+## "edificio di Materie prime"), così lo stesso requisito si legge sempre allo stesso modo.
 func option_requirement(option: EventOptionDef) -> String:
 	if option.requirement_label != "":
 		return option.requirement_label
 	var parts: PackedStringArray = PackedStringArray()
 	for element: Resource in option.requires_identity:
 		parts.append((element as IdentityDef).display_name)
-	for card_type: StringName in option.requires_types:
-		parts.append(String(card_type))
+	if not option.requires_types.is_empty():
+		var types: String = " o ".join(option.requires_types)
+		match option.requires_kind:
+			EventOptionDef.PieceKind.EDIFICIO:
+				parts.append("edificio di %s" % types)
+			EventOptionDef.PieceKind.TRUPPA:
+				parts.append("truppa %s" % types)
+			_:
+				parts.append(types)
 	return " o ".join(parts)
+
+
+## Che cosa serve sulla plancia per un'opzione con requisito di tipo, es. "un edificio di Materie
+## prime", "una truppa Fante", "una tessera di tipo Legge"; vuoto se l'opzione non chiede tipi.
+func option_requirement_need(option: EventOptionDef) -> String:
+	if option.requires_types.is_empty():
+		return ""
+	var types: String = " o ".join(option.requires_types)
+	match option.requires_kind:
+		EventOptionDef.PieceKind.EDIFICIO:
+			return "un edificio di %s" % types
+		EventOptionDef.PieceKind.TRUPPA:
+			return "una truppa %s" % types
+	return "una tessera di tipo %s" % types
 
 
 ## Perché l'opzione non si può scegliere adesso; stringa vuota se si può (principio P4).
@@ -1802,20 +1859,27 @@ func tech_block_reason(def: TechDef, ignore_tier: bool = false) -> String:
 	if def.is_exclusive() and not _has_any_identity(def.requires_any):
 		return "Esclusiva di: %s." % _identity_names(def.requires_any)
 	if not def.requires_types.is_empty() and _pieces_with(def.requires_types, EventOptionDef.PieceKind.QUALSIASI).is_empty():
-		return "Serve sulla plancia una tessera %s." % ", ".join(def.requires_types)
+		return "Serve sulla plancia una tessera di tipo %s." % " o ".join(def.requires_types)
 	var missing: PackedStringArray = PackedStringArray()
 	for needed: Resource in def.prerequisites:
 		var prerequisite: TechDef = needed as TechDef
 		if prerequisite != null and not techs_done.has(prerequisite):
 			missing.append(prerequisite.display_name)
 	if not missing.is_empty():
-		return "Richiede: %s." % ", ".join(missing)
+		var names: String = missing[0]
+		if missing.size() > 1:
+			names = "%s e %s" % [", ".join(missing.slice(0, missing.size() - 1)), missing[missing.size() - 1]]
+		return "Serve prima %s." % names
 	if def.perk != null and identity.has(def.perk):
 		return "Hai già la peculiarità %s." % def.perk.display_name
 	if not ignore_tier and def.tier > 1:
 		var needed_first: int = run_rules.tech_second_tier_needed
 		if _first_tier_done(def.era, def.branch()) < needed_first:
-			return "Si apre con %d tecnologia della prima altezza del ramo %s in quest'era." % [needed_first, TechDef.BRANCH_NAMES.get(def.branch(), "?")]
+			# Conta solo la prima altezza della stessa era della tecnologia, con l'altezza vera
+			# di tutta la partita (l'era 2 ha le altezze 3 e 4, GDD §10.5.2).
+			return "Si apre dopo %d %s dell'altezza %d del ramo %s." % [needed_first,
+					"tecnologia" if needed_first == 1 else "tecnologie", def.height() - 1,
+					TechDef.BRANCH_NAMES.get(def.branch(), "?")]
 	return ""
 
 
