@@ -213,6 +213,24 @@ func _intestazione(nome: String, simbolo: StringName) -> HBoxContainer:
 	return testa
 
 
+## Il simbolo di una risorsa nella barra in basso, al posto del nome (che resta nel suggerimento).
+func _simbolo_risorsa(tipo: Res.Type) -> Control:
+	var lato: float = 34.0
+	var trama: Texture2D = Simboli.trama(Simboli.di_risorsa(tipo), lato)
+	if trama == null:
+		var nome: Label = StileVisivo.etichetta(Res.NAMES[tipo].to_upper(), StileVisivo.FONT_TESTO_FORTE, 14, StileVisivo.TESTO_TENUE)
+		nome.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		return nome
+	var immagine: TextureRect = TextureRect.new()
+	immagine.texture = trama
+	immagine.custom_minimum_size = Vector2(lato, lato)
+	immagine.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	immagine.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	immagine.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	immagine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return immagine
+
+
 ## Bordi dello schermo più scuri, per dare profondità alla scena.
 func _crea_vignetta() -> void:
 	var sfumatura: Gradient = Gradient.new()
@@ -346,19 +364,22 @@ func _crea_run() -> void:
 func _crea_risorse() -> void:
 	var barra: PanelContainer = PanelContainer.new()
 	var riga: HBoxContainer = HBoxContainer.new()
-	riga.add_theme_constant_override("separation", 6)
+	riga.add_theme_constant_override("separation", 20)
 	barra.add_child(riga)
 	for tipo: int in Res.NAMES:
-		var cella: VBoxContainer = VBoxContainer.new()
-		cella.add_theme_constant_override("separation", -6)
-		cella.custom_minimum_size = Vector2(100, 0)
+		# Ogni risorsa è il suo simbolo, lo stesso delle tessere; il nome è nel suggerimento
+		# (richiesta di Davide). Se l'immagine manca, resta il nome scritto.
+		var cella: HBoxContainer = HBoxContainer.new()
+		cella.add_theme_constant_override("separation", 6)
+		cella.custom_minimum_size = Vector2(78, 0)
 		Suggerimenti.imposta(cella, "Quantità nel Magazzino e produzione della prossima stagione (d'inverno niente Cibo).", Res.NAMES[tipo])
 		if tipo == Res.Type.RICERCA:
 			Suggerimenti.imposta(cella, "Va nella tecnologia che stai studiando (raccolta / costo).\nSenza una tecnologia in studio resta in attesa. Non si vende.", Res.NAMES[tipo])
 		cella.mouse_filter = Control.MOUSE_FILTER_PASS
-		cella.add_child(_intestazione(Res.NAMES[tipo], Simboli.di_risorsa(tipo as Res.Type)))
+		cella.add_child(_simbolo_risorsa(tipo as Res.Type))
 		var valori: HBoxContainer = HBoxContainer.new()
-		valori.add_theme_constant_override("separation", 6)
+		valori.add_theme_constant_override("separation", 4)
+		valori.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var valore: Label = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 30, COLORI_RISORSE[tipo])
 		valori.add_child(valore)
 		var produzione: Label = StileVisivo.etichetta("", StileVisivo.FONT_NUMERI, 17, StileVisivo.TESTO_TENUE)
