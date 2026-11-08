@@ -291,6 +291,7 @@ Nei round, oltre ai consiglieri, possono comparire **avvenimenti** di altre fami
 | Ogni avvenimento ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo); dalla v0.25 anche le **stagioni** in cui l'avvenimento può comparire | Confermato |
 | Eventi legati alle stagioni: *Un inverno lungo* e *Il passo innevato* d'inverno, *La piena del fiume* e *Le terre di confine* in primavera, *Il torneo* d'estate, *Raccolto abbondante* d'estate o d'autunno, *La grande fiera* d'autunno; nuovi eventi invernali; d'inverno la Riforma e i Tumulti in piazza sono più frequenti (+1 di peso) | Proposta (v0.25) |
 | Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una tessera con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione **gratuita e senza requisiti**, così si può sempre scegliere qualcosa (v0.24) | Confermato |
+| Un'opzione che regala una tessera o uno spazio è **bloccata**, con il motivo, se il regalo non può arrivare (nessuno spazio libero, spazi già al massimo): così non si paga per niente. L'opzione gratuita dell'evento non ha regali, quindi resta sempre scegliere qualcosa | Confermato (decisione di Davide, 8 novembre 2026) |
 | Nessun evento arriva da solo senza essere scelto, con due eccezioni: la **Rivoluzione** (§9.4.2) e le **cronache** della nazione all'inizio di ogni stagione (§9.6, v0.29) | Confermato (Rivoluzione dalla v0.24, cronache dalla v0.29) |
 | Le opzioni possono anche **cambiare il governo** (Riforma, Rivoluzione) e far salire o scendere il **Malcontento** (§5.5) | Confermato (v0.24) |
 
@@ -736,6 +737,7 @@ Il campo **Origine** è **mostrato al giocatore con il nome** di chi ha inflitto
 |---|---|
 | Lo stesso sistema regge **malus e bonus** (peculiarità, ricompense durature) | Confermato |
 | La durata si conta in **anni interi a partire dall’anno successivo**: un malus di 1 anno subito alla fine dell’anno N vale per tutto l’anno N+1 e sparisce all’inizio dell’anno N+2 | Confermato |
+| Un **bonus** vale invece da subito **fino alla fine dell’anno in cui arriva** (più gli eventuali anni in più): un bonus di 1 anno preso nell’anno N sparisce all’inizio dell’anno N+1. Un bonus che agisce sulla razione di inizio anno (es. Razioni) dura un anno in più, così vale per la razione dell’anno dopo | Confermato (decisione di Davide, 8 novembre 2026) |
 | Se arriva un malus già attivo, **si allunga solo la durata**; l’effetto non si somma | Confermato |
 | Ogni fantasma ha nei dati i propri malus: li applica se il giocatore **perde o pareggia** contro di lui (§3.4, §11.1) | Confermato |
 | La sconfitta contro un incontro del mondo **dimezza solo l’Oro**: gli incontri non lasciano malus (§3.3) | Confermato |
@@ -1005,16 +1007,16 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | Le imprese sono scritte nei dati della via; accanto a ognuna si vede quanto manca (P4) | Confermato |
 | Imprese che guardano dentro la battaglia | Spunto (servono statistiche della battaglia che oggi non si registrano) |
 
-#### 10.4.2 Ascensioni — Confermato (v0.27; il livello 2 è una modifica del nucleo)
+#### 10.4.2 Ascensioni — Confermato (v0.27; le ascensioni maggiori sono una modifica del nucleo)
 
 | Regola | Stato |
 |---|---|
 | Completando le 4 tradizioni di una via si sceglie **1 ascensione fra 3**, pescate con più probabilità per quelle coerenti con l'identità e le vie | Confermato |
 | Le ascensioni sono **permanenti**; una già presa non si ripresenta; alcune possono essere esclusive di una via o di un elemento dell'identità | Confermato |
-| **Livello 1**: effetti forti con il linguaggio di oggi. **Livello 2**: cambiano una regola e compaiono solo a chi ha già un'ascensione. Nel prototipo la prima ascensione è di livello 1, la seconda di livello 2 | Confermato |
+| **Ascensioni minori** (prima “livello 1”): effetti forti con il linguaggio di oggi. **Ascensioni maggiori** (prima “livello 2”): cambiano una regola e compaiono solo a chi ha già un'ascensione. Nel prototipo la prima ascensione è minore, la seconda maggiore (nomi decisi da Davide, 8 novembre 2026: “Livello” resta solo alle tessere) | Confermato |
 | Un'ascensione che cambia una regola si vede in battaglia o sulla plancia (P4) | Confermato |
 
-**Ascensioni del livello 2 — Confermato (modifica del nucleo, v0.27), valori placeholder.** Ognuna è un'eccezione scritta anche nella sezione della regola che cambia.
+**Ascensioni maggiori — Confermato (modifica del nucleo, v0.27), valori placeholder.** Ognuna è un'eccezione scritta anche nella sezione della regola che cambia.
 
 | Ascensione | Effetto | Regola che cambia |
 |---|---|---|
@@ -1027,7 +1029,7 @@ Le tradizioni di Stellaris entrano in Ultralopolis attraverso le vie, non come s
 | **Doppio ascolto** | Una volta per stagione si prendono due opportunità dallo stesso consigliere (Proposta con le stagioni) | §4.2 |
 | **Esercito frugale** | Le truppe senza Cibo non rallentano | §5.4 |
 
-Le ascensioni del livello 1 (es. +1 spazio truppa e +1 spazio edificio; +20 Resistenza; +25% delle risorse prodotte) sono nel Catalogo (§4.5).
+Le ascensioni minori (es. +1 spazio truppa e +1 spazio edificio; +20 Resistenza; +25% delle risorse prodotte) sono nel Catalogo (§4.5).
 
 ### 10.5 Tecnologie — Confermato (modifica del nucleo, v0.26)
 
@@ -1253,7 +1255,7 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 | Uno **spazio** della plancia è il simbolo in una cornice tratteggiata; una tessera che **sale di livello** ha una freccia dorata | Confermato |
 | Le righe si costruiscono **dai dati** del catalogo (costi, guadagni, modificatori di §8): cambiando un valore nei dati, la riga si aggiorna da sola | Confermato |
 | Le righe corte si **affiancano** sulla stessa linea, per non sprecare spazio | Confermato (richiesta di Davide) |
-| Gli stessi simboli delle risorse compaiono nella barra delle risorse e accanto al Malcontento, così il giocatore li impara | Confermato |
+| Nella **barra delle risorse** in basso ogni risorsa è **solo il suo simbolo**, lo stesso delle tessere; il nome è nel riquadro al passaggio del mouse (richiesta di Davide, v0.32). Il simbolo del Malcontento sta accanto al suo nome in alto | Confermato |
 | Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli si ingrandisce e il riquadro dei dettagli non lo copre | Confermato |
 | Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si leggono i simboli, con esempi presi dal gioco, che cosa vuol dire ogni simbolo, ogni tipo di azione della riga del timbro, ogni gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
 
@@ -1261,7 +1263,7 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 
 | Che cosa | Righe |
 |---|---|
-| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore del consigliere: `[proposte]: [edificio] / [truppa]`); una sola riga **azioni** (scura): il timbro e un simbolo per ogni *tipo* di azione che può proporre, separati da `/` («oppure»: sono voci distinte, non una frase) (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza costi né numeri, che si vedono sulle opportunità dopo averlo scelto (variante A, scelta di Davide); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: i tipi della linguetta, poi una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
+| Consigliere | In ordine di importanza: le sue **opportunità** del round (riga principale, del colore del consigliere: `[opportunità]: [edificio] / [truppa] / [timbro]`): edifici, truppe e azioni stanno **alla pari**, perché sono tutte opportunità e se ne prende una sola (scelta di Davide); sotto, una riga **più sottile** dice quali azioni: `[timbro] = ` e un simbolo per ogni *tipo* di azione possibile, separati da `/` («oppure»: sono voci distinte, non una frase) (scambio di risorse, bonus per un tempo, spazio, spionaggio, incanto, peculiarità…), senza costi né numeri, che si vedono sulle opportunità dopo averlo scelto; in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non un'opportunità; bordo dorato se puoi già potenziare qualche tessera, e sotto il consigliere "Ascolta · ▲ Potenzia N"). Il riquadro dei dettagli **dice solo ciò che si vede**: i tipi della linguetta, poi una frase per ogni riga, nello stesso ordine (richiesta di Davide) |
 | Azione o peculiarità proposte | Costo → effetto |
 | Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
 | Opzione dell’evento scelto | Costo → effetti, su una o più righe |
@@ -1430,7 +1432,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Spionaggio: il bersaglio si sceglie quando si compra, sul fantasma dell’anno; “estremità” = la truppa più a destra; con “più lento” o “più veloce” per le truppe conta la ricarica, per gli edifici il ciclo; a parità vince la posizione più a destra e le truppe stanno a destra degli edifici (v0.21) | Provvisoria. |
 | Incanti: Furia (danno), Egida (scudo), Grazia (cura) 2/4/6 secondo l’era della truppa; Maledizione (Corruzione) 1/3/4; Torpore (Inefficienza su truppe) 2/4/6 s; colori rosso, blu, blu, viola, viola | Placeholder (v0.22). |
 | Risorsa della Capitale per elemento dell’identità e produzioni di Stabilità e Documenti: vedi `docs/Catalogo.md` | Placeholder (v0.22). |
-| Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto; gli edifici anche +1 a ogni risorsa che producono per stagione. Il mana prodotto non cambia | Placeholder. |
+| Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto, ma **almeno +1 per livello**, così anche un valore piccolo sale davvero (danno 1 → 2 → 3; 10 → 15 → 20); gli edifici anche +1 a ogni risorsa che producono per stagione. Il mana prodotto non cambia. Minimo nelle regole (`min_value_gain_per_level`) | Placeholder; il minimo per livello è una decisione di Davide (8 novembre 2026). |
 | I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
@@ -1615,6 +1617,8 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 - Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
 - **Legenda dei simboli** nel gioco (§14.4), con esempi presi dalle carte vere.
 - **Gerarchia sulla carta del consigliere** (§14.4): prima ciò che propone (riga colorata), poi le azioni, il Potenzia in fondo e in disparte (Davide: la carta del Tesoriere sembrava offrire solo Potenzia).
+- Nella barra delle risorse in basso i nomi sono sostituiti dai simboli; il nome resta nel riquadro al passaggio del mouse (richiesta di Davide).
+- Sul consigliere edifici, truppe e azioni stanno **alla pari** nella riga colorata (sono tutte opportunità); sotto, una riga sottile dice quali azioni (decisione di Davide).
 - Le azioni del consigliere sono riassunte in **una riga di macrocategorie** (tipi di azione, senza numeri) invece di una riga per azione; le righe mostrano solo ciò che può davvero uscire nel round, e il riquadro dei dettagli dice solo ciò che si vede (decisioni di Davide).
 
 **Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)

@@ -104,7 +104,7 @@ func test_spiegazioni_delle_parole_di_battaglia() -> void:
 	var nomi: PackedStringArray = PackedStringArray()
 	for voce: VoceLessico in voci:
 		nomi.append(voce.nome)
-	assert_eq(nomi, PackedStringArray(["Danno", "Scudo", "Corruzione"]), "Nell'ordine, senza ripetizioni, senza le risorse.")
+	assert_eq(nomi, PackedStringArray(["Corruzione", "Danno", "Scudo"]), "Prima le parole rare, poi quelle di base; senza ripetizioni né risorse.")
 
 
 func test_spiegazioni_al_massimo_quante_previste() -> void:
@@ -124,8 +124,9 @@ func test_il_riquadro_mostra_testo_e_spiegazioni() -> void:
 	assert_true(spiegazioni.has("Danno d'assedio"))
 	pannello.mostra("Granaio", "Ricevi 2 Cibo.", Rect2(400, 400, 100, 120))
 	assert_true(pannello.spiegazioni_mostrate().is_empty(), "Senza parole da spiegare, niente riquadro accanto.")
-	pannello.mostra("Malcontento", "Sale con le sconfitte e i malus.", Rect2(400, 400, 100, 120))
-	assert_eq(pannello.spiegazioni_mostrate(), PackedStringArray(["Malus"]), "La parola del titolo non si rispiega.")
+	pannello.mostra("Malcontento", "Sale con le sconfitte e i malus. Il Malcontento pesa.", Rect2(400, 400, 100, 120))
+	assert_false(pannello.spiegazioni_mostrate().has("Malcontento"), "La parola del titolo non si rispiega.")
+	assert_true(pannello.spiegazioni_mostrate().has("Malus"))
 	pannello.nascondi()
 	assert_false(pannello.visible)
 
@@ -200,7 +201,7 @@ func test_simboli_delle_carte_davanti_alle_parole() -> void:
 
 func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
 	# Richiesta di Davide (8 novembre): anche Propone, Potenzia e le altre parole base.
-	assert_eq(_tratti("Propone edifici; Potenzia: Ferro."), PackedStringArray(["{Propone}", " edifici; ", "{Potenzia}", ": ", "{Ferro}", "."]))
+	assert_eq(_tratti("Propone edifici; Potenzia: Ferro."), PackedStringArray(["{Propone}", " ", "{edifici}", "; ", "{Potenzia}", ": ", "{Ferro}", "."]))
 	assert_eq(_tratti("Carta esclusiva: Foro (era 2)."), PackedStringArray(["Carta ", "{esclusiva}", ": Foro (", "{era 2}", ")."]))
 	assert_eq(_tratti("c'era una volta"), PackedStringArray(["c'era una volta"]), "Il verbo \"era\" non è l'era.")
 	assert_eq(_tratti("la via del porto"), PackedStringArray(["la via del porto"]), "\"via\" minuscola non è la Via.")
@@ -208,3 +209,52 @@ func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
 	for nome: String in ["Opportunità", "Potenzia", "Livello", "Era", "Capitale", "Spazio", "Fantasma", "Peculiarità"]:
 		assert_ne(_voce(nome).definizione, "", "%s ha una spiegazione." % nome)
 	assert_eq(_voce("Ricevi").definizione, "", "Ricevi e Paghi si colorano senza spiegazione.")
+
+
+func test_azioni_e_puo_proporre() -> void:
+	# Richiesta di Davide (8 novembre): "azioni" è una parola chiave, con il simbolo del timbro.
+	assert_eq(_tratti("Azioni possibili: scambi di risorse."), PackedStringArray(["{Azioni}", " possibili: scambi di risorse."]))
+	assert_eq(_tratti("Può proporre: edifici."), PackedStringArray(["Può ", "{proporre}", ": ", "{edifici}", "."]))
+	assert_eq(_voce("Azione").simbolo, &"azione")
+	assert_ne(_voce("Azione").definizione, "")
+
+
+func test_le_parole_rare_si_spiegano_prima_di_quelle_di_base() -> void:
+	# Una truppa che chiede mana: Mana, Danno e Scudo non tolgono posto a Sabotaggio e Corruzione.
+	var testo: String = "Costa 2 mana rosso. 3 danni, +1 scudo, ricarica 2 s. Sabota 1 truppa nemica. 2 Corruzione al nemico."
+	var nomi: PackedStringArray = PackedStringArray()
+	for voce: VoceLessico in TestoRicco.voci_da_spiegare(testo):
+		nomi.append(voce.nome)
+	assert_eq(nomi.size(), TestoRicco.lessico().massimo_spiegazioni)
+	assert_true(nomi.has("Sabotaggio"))
+	assert_true(nomi.has("Corruzione"))
+
+
+func test_assedio_da_solo_e_il_tipo() -> void:
+	for voce: VoceLessico in TestoRicco.voci_da_spiegare("Tipi: Assedio"):
+		assert_ne(voce.nome, "Danno d'assedio", "Il tipo Assedio non è il danno d'assedio.")
+	assert_eq(TestoRicco.voci_da_spiegare("5 danno d'assedio")[0].nome, "Danno d'assedio")
+
+
+func test_le_spiegazioni_dicono_le_eccezioni_delle_tue_ascensioni() -> void:
+	# Decisione di Davide (8 novembre): chi ha un'ascensione che cambia una regola la legge nei testi.
+	var affamata: VoceLessico = _voce("Affamata")
+	TestoRicco.imposta_regole([])
+	assert_false(TestoRicco.definizione_di(affamata).contains("Esercito frugale"), "Senza l'ascensione, la regola normale.")
+	TestoRicco.imposta_regole([IdentityDef.Rule.ESERCITO_FRUGALE])
+	assert_string_contains(TestoRicco.definizione_di(affamata), "Esercito frugale")
+	TestoRicco.imposta_regole([IdentityDef.Rule.ULTIMA_TRINCEA, IdentityDef.Rule.PRIMA_SCINTILLA, IdentityDef.Rule.DOPPIO_ASCOLTO, IdentityDef.Rule.MANA_UNITO])
+	assert_string_contains(TestoRicco.definizione_di(_voce("Resistenza")), "Ultima trincea")
+	assert_string_contains(TestoRicco.definizione_di(_voce("Ciclo")), "Prima scintilla")
+	assert_string_contains(TestoRicco.definizione_di(_voce("Opportunità")), "Doppio ascolto")
+	assert_string_contains(TestoRicco.definizione_di(_voce("Energetico")), "Mana unito")
+	TestoRicco.imposta_regole([])
+
+
+func test_edifici_truppe_e_tessere_sono_parole_chiave() -> void:
+	# Richiesta di Davide (8 novembre): edifici e truppe hanno il loro colore e il loro simbolo.
+	assert_eq(_tratti("Può proporre edifici e truppe; una tua tessera."), PackedStringArray(["Può ", "{proporre}", " ", "{edifici}", " e ", "{truppe}", "; una tua ", "{tessera}", "."]))
+	assert_eq(_voce("Edificio").simbolo, &"edificio")
+	assert_eq(_voce("Truppa").simbolo, &"truppa")
+	assert_eq(_tratti("una tessera esclusiva"), PackedStringArray(["una ", "{tessera esclusiva}"]), "La forma più lunga vince.")
+	assert_true(_voce("Edificio").di_base, "Parole frequenti: si spiegano solo se resta posto.")

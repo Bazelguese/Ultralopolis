@@ -58,7 +58,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Vittoria** | Vinci lo scontro con il fantasma: aggiungi una vittoria e ricevi un bottino. Con 10 vittorie vinci la partita. | GDD §3.4. Deciso. |
 | **Sconfitta** | Perdi lo scontro con il fantasma: perdi tanto Prestigio quanto il numero dell'anno. | GDD §3.4. Deciso. |
 | **Pareggio** | Le due nazioni cadono nello stesso istante. Conta come vittoria, ma subisci i malus del fantasma. | GDD §3.4. Deciso. |
-| **Prestigio** | Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; ogni sconfitta lo fa scendere. | GDD §3.4. È separato dalla Resistenza. Deciso. |
+| **Prestigio** | Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; ogni sconfitta contro il fantasma lo fa scendere. | GDD §3.4. È separato dalla Resistenza. Deciso. |
 | **Ultima possibilità** | Quando il Prestigio finisce per la prima volta, la partita continua; la prossima sconfitta la chiude. | GDD §3.4. Anche perdere un incontro del mondo la chiude (§3.3); un pareggio no. Deciso. |
 | **Bottino** | Oro e Ricerca che ricevi sempre quando vinci (o pareggi) uno scontro. | GDD §3.3, §3.4. Diverso dalla ricompensa. Deciso. |
 | **Ricompensa** | Dopo un incontro del mondo vinto, una tessera, una peculiarità, delle risorse o una carta dorata da scegliere; puoi anche non prendere nulla. | GDD §3.3. Deciso. |
@@ -114,7 +114,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Livelli del Consiglio** | Il Consiglio cresce con le ere: Funzionari, poi Ministri, poi Gran Consiglieri. | GDD §4.2.1. Il giocatore vede questi nomi, non un numero: “Livello” è solo delle tessere. Nomi Provvisori. |
 | **Categoria** | Il campo di un consigliere: i tipi di tessere di cui si occupa. | GDD §4.2.4. Militare, Opera, Terra, Ricchezza, Conoscenza, Fede, Stato, Ombra (Provvisori). Le tessere non hanno categoria, solo tipi. Per gli effetti di battaglia non si dice “categoria di bersaglio” ma *bersagli ammessi*. Deciso. |
 | **Opportunità** | Una delle tre cose che un consigliere ti offre: un'azione, un edificio o una truppa. Ne prendi una sola. | GDD §4.2 (*proposta*). Fino alla v0.20 era il nome del sistema di scelte prima del Consiglio. Non usare *proposta* (resta solo come stato del GDD) né *offerta*. Deciso. |
-| **Azione** | Un'opportunità che non è una tessera: un effetto subito o per un anno. Non costa Oro, ma a volte altre risorse. | GDD §4.2, §4.2.3. Non chiamarla *carta*. Deciso. |
+| **Azione** | Un'opportunità che non è una tessera: un effetto subito o per un anno. Non costa Oro (tranne gli spazi), ma a volte altre risorse. | GDD §4.2, §4.2.3. Non chiamarla *carta*. Deciso. |
 | **Potenzia** | Fa salire di livello una tua tessera che ha un tipo del consigliere. Non conta come scelta del round e si usa una volta per round. | GDD §6.5. Deciso. |
 | **Rinnovo** | Paghi per vedere tre opportunità nuove dallo stesso consigliere. Costa Oro o la risorsa del consigliere, ogni volta un po' di più. | GDD §4.2. Deciso. |
 | **Avvenimento** | Ciò che può comparire in un round al posto di un consigliere: un Evento, un Visitatore o una Fortuna. | GDD §4.2.5 (*carta speciale*, *carte del round*). Non chiamarli *carte*. Deciso. |
@@ -197,7 +197,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Bonus immediato** | Ciò che una via ti dà subito, appena la scegli. | GDD §10.4. Deciso. |
 | **Tradizione** | Una delle 4 tappe dell'albero di una via. Si completa da sola appena riesci nella sua impresa, e dà un effetto permanente. | GDD §10.4.1. Non usare *passo*. Deciso. |
 | **Impresa** | L'obiettivo che completa una tradizione: un traguardo (es. vincere 3 scontri) o uno stato della nazione (es. 4 tessere Fante sulla plancia). | GDD §10.4.1. Deciso. |
-| **Ascensione** | Completate le 4 tradizioni di una via, scegli un'ascensione fra 3: un effetto permanente forte. Quelle di livello 2 cambiano una regola del gioco. | GDD §10.4.2. Deciso. |
+| **Ascensione** | Completate le 4 tradizioni di una via, scegli un'ascensione fra 3: un effetto permanente forte. Le ascensioni maggiori cambiano una regola del gioco. | GDD §10.4.2. **Ascensione minore** (prima “livello 1”) e **ascensione maggiore** (prima “livello 2”): “Livello” resta solo alle tessere. Deciso. |
 
 ## Tecnologie
 
@@ -296,6 +296,8 @@ Non vanno più usati nel gioco né nei documenti nuovi.
 | Avversario | Nemico | Glossario, 8 nov. 2026 |
 | Modificatore, conseguenza (nei testi del gioco) | Effetti attivi: malus e bonus | Glossario, 8 nov. 2026 |
 | Perk | Peculiarità | Glossario, 8 nov. 2026 |
+| Livello 1, livello 2 (delle ascensioni) | Ascensione minore, ascensione maggiore | Glossario, 8 nov. 2026 |
+| Consiglio ristretto (ascensione) | Corte affollata | Glossario, 8 nov. 2026 |
 | Tier (del governo) | Rango | Glossario, 8 nov. 2026 |
 | Clown | Giullare | Glossario, 8 nov. 2026 |
 | Produzione (tipo) | Materie prime | Glossario, 8 nov. 2026 |
@@ -327,3 +329,4 @@ Non vanno più usati nel gioco né nei documenti nuovi.
 | 8 novembre 2026 | Le parti dell'anno sono le **stagioni**, come nel GDD v0.25 (inverno, primavera, estate, autunno). La proposta di rinominare l'azione *Mercante* non serve più: l'azione è stata tolta nella v0.26. |
 | 8 novembre 2026 | Edifici e truppe si chiamano **tessere**; “carta” vale **solo per le tecnologie** (mano, carta dorata). Consiglieri, azioni, avvenimenti e vie si chiamano con il loro nome. |
 | 8 novembre 2026 | Il Cibo delle truppe è la **razione**; **mantenimento** è solo il costo delle tessere prima degli scontri. Le tappe delle vie sono **tradizioni** (non *passi*). Il pannello con la storia della partita si chiama **Annali**; **Cronaca** resta la scena di inizio stagione. |
+| 8 novembre 2026 | Le ascensioni sono **minori** e **maggiori** (non di livello 1 e 2): “Livello” resta solo alle tessere. L'ascensione *Consiglio ristretto* diventa **Corte affollata**, perché dà un consigliere in più. |

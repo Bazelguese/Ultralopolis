@@ -386,3 +386,40 @@ func test_si_vede_chi_riceve_un_bonus_legato_a_un_tipo() -> void:
 	assert_string_contains(lines[0], "Via della Guerra")
 	assert_true(run.type_bonuses_for([&"Fante"] as Array[StringName], true).is_empty(), "Un bonus delle truppe non tocca gli edifici.")
 	assert_true(run.type_bonuses_for([&"Spirituale"] as Array[StringName], false).is_empty())
+
+
+func test_un_regalo_senza_spazio_blocca_l_opzione() -> void:
+	# Decisione di Davide (8 novembre 2026): non si paga un regalo che non può arrivare.
+	var gift: EventOptionDef = _option("Arruola")
+	gift.give_troop = monk
+	var slot: EventOptionDef = _option("Costruisci", {}, {})
+	slot.extra_building_slots = 1
+	catalog.events = [_event(&"dono", [gift, slot])]
+	var run: RunState = _run()
+	assert_eq(run.option_block_reason(gift), "", "Con uno spazio libero il regalo si può prendere.")
+	while run.board.has_free_troop_slot():
+		run.board.troops.append(BoardPiece.of_troop(monk, 0))
+	assert_string_contains(run.option_block_reason(gift), "Nessuno spazio truppa libero")
+	assert_eq(run.option_block_reason(slot), "")
+	run.board.max_building_slots = run.board.building_capacity()
+	assert_eq(run.option_block_reason(slot), "Hai già il massimo di spazi edificio.")
+
+
+## Lo stesso requisito si legge sempre allo stesso modo, che sia scritto nei dati o ricavato
+## dai tipi (revisione n. 52).
+func test_il_requisito_di_tipo_si_scrive_come_le_etichette() -> void:
+	var run: RunState = _run()
+	var truppa: EventOptionDef = _option("Giostra")
+	truppa.requires_types = [&"Fante"]
+	truppa.requires_kind = EventOptionDef.PieceKind.TRUPPA
+	assert_eq(run.option_requirement(truppa), "truppa Fante")
+	assert_eq(run.option_requirement_need(truppa), "una truppa Fante")
+	var edificio: EventOptionDef = _option("Cava")
+	edificio.requires_types = [&"Materie prime"]
+	edificio.requires_kind = EventOptionDef.PieceKind.EDIFICIO
+	assert_eq(run.option_requirement(edificio), "edificio di Materie prime")
+	assert_eq(run.option_requirement_need(edificio), "un edificio di Materie prime")
+	var qualsiasi: EventOptionDef = _option("Processo")
+	qualsiasi.requires_types = [&"Legge"]
+	assert_eq(run.option_requirement(qualsiasi), "Legge")
+	assert_eq(run.option_requirement_need(qualsiasi), "una tessera di tipo Legge")

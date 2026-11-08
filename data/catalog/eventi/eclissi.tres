@@ -25,7 +25,7 @@ gain = SubResource("RA_3")
 [sub_resource type="Resource" id="OPT_4"]
 script = ExtResource("e2")
 label = "Presagio di guerra"
-description = "Fino al prossimo fantasma le truppe ricaricano il 10% più in fretta."
+description = "In ogni scontro fino a quello con il fantasma (compreso) le truppe hanno la ricarica più corta del 10%."
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 
 [sub_resource type="Resource" id="RA_6"]

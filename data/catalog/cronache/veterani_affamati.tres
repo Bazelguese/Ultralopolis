@@ -8,7 +8,7 @@
 [sub_resource type="Resource" id="S1"]
 script = ExtResource("x2")
 display_name = "Fame di guerra"
-description = "Danno delle truppe +10% per un anno."
+description = "Danno delle truppe +10% fino alla fine dell'anno."
 is_malus = false
 effect = 9
 amount = 10
@@ -18,7 +18,7 @@ duration_years = 1
 [sub_resource type="Resource" id="S2"]
 script = ExtResource("x3")
 label = "Prepara la prossima campagna"
-description = "Le truppe fanno il 10% di danno in più per un anno."
+description = "Fino alla fine dell'anno le truppe fanno il 10% di danno in più."
 modifiers = Array[ExtResource("x2")]([SubResource("S1")])
 inclination_shift = PackedInt32Array(1, 0, 0, 0)
 story = "Si affilarono le spade per la prossima campagna."

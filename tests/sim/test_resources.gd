@@ -337,10 +337,38 @@ func test_si_vede_da_dove_arriva_la_produzione() -> void:
 	bonus.amount = 1
 	bonus.duration_kind = ModifierDef.Duration.PERMANENTE
 	capital.documents_per_phase = 0
+	capital.iron_per_phase = 0
 	var run: RunState = _new_run()
 	run.modifiers.apply(bonus, ActiveModifier.OriginKind.IDENTITA, "Cinerali", run.year, run.board, RandomNumberGenerator.new())
 	var lines: PackedStringArray = run.production_origin_lines(Res.Type.FERRO)
 	var text: String = "\n".join(lines)
 	assert_string_contains(text, "Capitale", "L'edificio che la produce.")
 	assert_string_contains(text, "da Cinerali", "Il bonus con il suo nome.")
+	assert_string_contains(text, "Capitale +1 (da Cinerali)", "Senza produzione di base basta dire da dove viene (revisione n. 68).")
+	assert_false(text.contains("di base 0"))
+	capital.iron_per_phase = 1
+	assert_string_contains("\n".join(run.production_origin_lines(Res.Type.FERRO)), "Capitale +2 (di base 1; +1 da Cinerali)",
+			"Con una produzione di base si vede il conto intero.")
 	assert_string_contains("\n".join(run.production_origin_lines(Res.Type.DOCUMENTI)), "Nessun edificio")
+
+
+func test_ogni_livello_aumenta_anche_i_valori_piccoli() -> void:
+	# GDD §6.5: ogni livello aumenta tutti i valori d'effetto. Con +50% e l'arrotondamento per
+	# difetto un danno 1 restava 1 al livello 2: c'è un aumento minimo di 1 per livello.
+	var regole: RunRules = RunRules.new()
+	var piccola: TroopDef = TroopDef.new()
+	piccola.damage = 1
+	piccola.shield = 1
+	piccola.cooldown_ms = 2000
+	var pezzo: BoardPiece = BoardPiece.of_troop(piccola, 0)
+	var mods: Modifiers = Modifiers.new()
+	assert_eq(ElementStats.troop(piccola, pezzo, mods, 1, regole).damage, 1)
+	assert_eq(ElementStats.troop(piccola, pezzo, mods, 2, regole).damage, 2, "Livello 2: 1 → 2.")
+	assert_eq(ElementStats.troop(piccola, pezzo, mods, 3, regole).damage, 3, "Livello 3: 3.")
+	assert_eq(ElementStats.troop(piccola, pezzo, mods, 2, regole).shield, 2, "Anche lo scudo.")
+	var grande: TroopDef = TroopDef.new()
+	grande.damage = 10
+	grande.cooldown_ms = 2000
+	var pezzo_grande: BoardPiece = BoardPiece.of_troop(grande, 0)
+	assert_eq(ElementStats.troop(grande, pezzo_grande, mods, 2, regole).damage, 15, "I valori grandi seguono il +50%.")
+	assert_eq(ElementStats.troop(grande, pezzo_grande, mods, 3, regole).damage, 20)

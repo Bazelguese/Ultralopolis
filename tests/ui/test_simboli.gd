@@ -174,10 +174,11 @@ func test_consigliere_in_un_round_di_azioni() -> void:
 	var run: RunState = _run()
 	run.round_theme = RunState.RoundTheme.AZIONI
 	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
-	assert_eq(righe.size(), 2, "Potenzia e l'unica azione: niente edifici o truppe in un round di Azioni.")
-	assert_eq(righe[0].come_testo(), "[azione] : [scambio]", "Una riga sola con i tipi di azione, senza numeri.")
-	assert_eq(righe[1].come_testo(), "[potenzia] : [stabilita]", "Il Potenzia va in fondo: è un extra.")
-	assert_eq(righe[1].rilievo, RigaSimboli.Rilievo.SECONDARIA)
+	assert_eq(righe.size(), 3, "Opportunità, quali azioni, Potenzia: niente edifici o truppe in un round di Azioni.")
+	assert_eq(righe[0].come_testo(), "[proposta] : [azione]")
+	assert_eq(righe[1].come_testo(), "[azione] = [scambio]", "Sotto, quali azioni, senza numeri.")
+	assert_eq(righe[2].come_testo(), "[potenzia] : [stabilita]", "Il Potenzia va in fondo: è un extra.")
+	assert_eq(righe[2].rilievo, RigaSimboli.Rilievo.SECONDARIA)
 
 
 func test_consigliere_in_un_round_misto_propone_anche_carte() -> void:
@@ -188,9 +189,10 @@ func test_consigliere_in_un_round_misto_propone_anche_carte() -> void:
 	run.round_theme = RunState.RoundTheme.MISTO
 	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
 	assert_eq(righe.size(), 3)
-	assert_eq(righe[0].come_testo(), "[proposta] : [edificio] / [truppa]", "Prima ciò che propone.")
+	assert_eq(righe[0].come_testo(), "[proposta] : [edificio] / [truppa] / [azione]", "Edifici, truppe e azioni alla pari: sono tutte opportunità.")
 	assert_eq(righe[0].rilievo, RigaSimboli.Rilievo.PRINCIPALE)
-	assert_eq(righe[1].come_testo(), "[azione] : [scambio]")
+	assert_eq(righe[1].come_testo(), "[azione] = [scambio]")
+	assert_eq(righe[1].rilievo, RigaSimboli.Rilievo.SECONDARIA)
 	assert_eq(righe[2].come_testo(), "[potenzia] : [stabilita]")
 
 
@@ -211,7 +213,7 @@ func test_la_riga_azioni_mostra_ogni_tipo_una_volta() -> void:
 	for nome: String in ["incanto_danno", "incanto_scudo", "spia_sabotaggio_veloce", "veleno_nei_pozzi", "decreto_fiscale", "studiosi", "assemblea", "quartiermastro", "ordine_pubblico"]:
 		azioni.append(_offerta("res://data/catalog/opportunities/%s.tres" % nome))
 	var riga: RigaSimboli = SimboliEffetti.riga_azioni(azioni)
-	assert_eq(riga.come_testo(), "[azione] : [incanto] / [spia] / [scambio] / [anno] / [spazio truppa] / [malcontento]", "La barra «/» separa i tipi: sono alternative, non una frase.")
+	assert_eq(riga.come_testo(), "[azione] = [incanto] / [spia] / [scambio] / [anno] / [spazio truppa] / [malcontento]", "La barra «/» separa i tipi: sono alternative, non una frase.")
 	assert_true(SimboliEffetti.riga_azioni([]).vuota(), "Senza azioni possibili la riga non c'è.")
 
 
@@ -269,10 +271,22 @@ func test_i_dettagli_del_consigliere_dicono_solo_cio_che_si_vede() -> void:
 	var righe: PackedStringArray = scheda.dettagli.split("\n")
 	assert_eq(righe.size(), scheda.simboli.size() + 1, "I tipi della linguetta, poi una frase per ogni riga di simboli.")
 	assert_eq(righe[0], "Tipi: Materie prime, Fante.")
-	assert_eq(righe[1], "Propone: edifici e truppe.")
+	assert_eq(righe[1], "Può proporre: edifici, truppe o azioni.")
 	assert_eq(righe[2], "Azioni possibili: scambi di risorse.")
-	assert_string_starts_with(righe[3], "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando Stabilità.")
+	assert_string_starts_with(righe[3], "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando Stabilità. Si usa una volta per round e non consuma la scelta del round.")
 	assert_false(scheda.dettagli.contains("Decreto fiscale"), "Niente elenco delle singole azioni: non si vedono sulla carta.")
+
+
+## Il Maestro delle spie paga Oro più la risorsa uscita in questo round: va detto (revisione n. 63).
+func test_il_potenzia_del_maestro_delle_spie_dice_la_risorsa_del_round() -> void:
+	var spie: AdvisorDef = Aiuti.consigliere(&"spie", [&"Materie prime"], [], Res.Type.ORO)
+	spie.random_resource = true
+	catalog.advisors = [spie, Aiuti.consigliere(&"base", [&"Fante"])]
+	var run: RunState = _run()
+	run.shadow_resource = Res.Type.FERRO
+	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, spie)
+	var potenzia: String = righe[righe.size() - 1].etichetta
+	assert_string_contains(potenzia, "pagando Oro + Ferro (la risorsa di questo round)")
 
 
 func test_la_legenda_spiega_ogni_tipo_di_azione() -> void:
@@ -282,6 +296,30 @@ func test_la_legenda_spiega_ogni_tipo_di_azione() -> void:
 		assert_ne(voce[1] as String, "Altre azioni", "%s ha un nome." % (voce[0] as RigaSimboli).come_testo())
 	assert_eq((tipi[0][0] as RigaSimboli).come_testo(), "[scambio]")
 	assert_eq(tipi[0][1], "Scambi di risorse")
+
+
+## La carta e l'albero delle tecnologie dicono ramo, sfera e altezza vera: l'era 2 ha le
+## altezze 3 e 4 (GDD §10.5.2; revisione n. 16 e 66).
+func test_posto_nell_albero_con_l_altezza_vera() -> void:
+	var tecnologia: TechDef = TechDef.new()
+	tecnologia.sphere = "Militare"
+	assert_eq(HudPlancia.posto_nell_albero(tecnologia), "Ramo Rosso (Militare) · altezza 1")
+	tecnologia.tier = 2
+	assert_eq(HudPlancia.posto_nell_albero(tecnologia), "Ramo Rosso (Militare) · altezza 2")
+	tecnologia.sphere = "Fede"
+	tecnologia.era = 2
+	tecnologia.tier = 1
+	assert_eq(HudPlancia.posto_nell_albero(tecnologia), "Ramo Blu (Fede) · altezza 3")
+
+
+## Le tessere uguali che beneficiano di un bonus si contano invece di ripeterle (revisione n. 67).
+func test_beneficiari_raggruppati() -> void:
+	var lancieri: TroopDef = TroopDef.new()
+	lancieri.display_name = "Lancieri"
+	var milizia: TroopDef = TroopDef.new()
+	milizia.display_name = "Milizia"
+	var pezzi: Array[BoardPiece] = [BoardPiece.of_troop(milizia, 0), BoardPiece.of_troop(lancieri, 0), BoardPiece.of_troop(milizia, 0)]
+	assert_eq(HudPlancia.nomi_raggruppati(pezzi), "Milizia ×2, Lancieri")
 
 
 # --- Tipi ----------------------------------------------------------------------

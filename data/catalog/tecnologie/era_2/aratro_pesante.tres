@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_aratro_pesante"
 display_name = "Aratro pesante"
-description = "+1 Cibo per stagione da ogni edificio di Materie prime."
+description = "+1 Cibo per stagione da ogni edificio di Materie prime, tranne d'inverno."
 is_malus = false
 effect = 8
 target_type = &"Materie prime"
@@ -20,7 +20,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"aratro_pesante"
 display_name = "Aratro pesante"
-description = "+1 Cibo per stagione da ogni edificio di Materie prime."
+description = "+1 Cibo per stagione da ogni edificio di Materie prime, tranne d'inverno."
 sphere = "Terra"
 era = 2
 cost = 5

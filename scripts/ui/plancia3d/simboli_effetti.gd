@@ -14,7 +14,7 @@ const VOCI_PER_RIGA: int = 7
 
 ## Il "menu" di un consigliere (GDD §4.2), in ordine di importanza (richiesta di Davide):
 ## 1. che cosa propone in questo round (riga principale, colorata): edifici, truppe;
-## 2. una sola riga "azioni": i tipi di azione che potrebbe proporre adesso (scambi, bonus per un
+## 2. una sola riga "azioni": i tipi di azione che potrebbe proporre adesso (scambi, bonus temporanei,
 ##    anno, spionaggio...), senza costi né numeri, che si vedono sulle proposte dopo averlo scelto;
 ## 3. per ultimo, in disparte, il Potenzia: è un servizio in più del consigliere, non una proposta.
 static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
@@ -30,25 +30,38 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		colori.icona(&"edificio")
 		righe.append(colori)
 		return righe
+	# Edifici, truppe e azioni sono tutte opportunità: occupano gli stessi posti e si sceglie
+	# una sola cosa (GDD §4.2). Per questo stanno alla pari nella stessa riga colorata, con il
+	# timbro per le azioni; sotto, più sottile, quali azioni (variante 3, scelta di Davide).
 	var edifici: bool = run.advisor_offers_elements(def, false)
 	var truppe: bool = run.advisor_offers_elements(def, true)
-	if edifici or truppe:
-		var elementi: RigaSimboli = RigaSimboli.new()
-		elementi.etichetta = "Propone: %s." % ("edifici e truppe" if edifici and truppe else ("edifici" if edifici else "truppe"))
-		if def.special == AdvisorDef.Special.ANZIANO:
-			elementi.etichetta = "Propone: edifici neutri."
-		elementi.rilievo = RigaSimboli.Rilievo.PRINCIPALE
-		elementi.icona(&"proposta").scritta(":")
-		if edifici:
-			elementi.icona(&"edificio")
-		if edifici and truppe:
-			elementi.scritta("/")
-		if truppe:
-			elementi.icona(&"truppa")
-		if def.special == AdvisorDef.Special.VISITATORE:
-			_prezzo_visitatore(elementi, def)
-		righe.append(elementi)
 	var azioni: RigaSimboli = riga_azioni(run.advisor_action_preview(def))
+	var cose: PackedStringArray = PackedStringArray()
+	var simboli: Array[StringName] = []
+	if edifici:
+		cose.append("edifici neutri" if def.special == AdvisorDef.Special.ANZIANO else "edifici")
+		simboli.append(&"edificio")
+	if truppe:
+		cose.append("truppe")
+		simboli.append(&"truppa")
+	if not azioni.vuota():
+		cose.append("azioni")
+		simboli.append(&"azione")
+	if not simboli.is_empty():
+		var opportunita: RigaSimboli = RigaSimboli.new()
+		opportunita.rilievo = RigaSimboli.Rilievo.PRINCIPALE
+		# "Può proporre": delle tre opportunità pescate nessuna è garantita (richiesta di Davide,
+		# 8 novembre). Solo il Giullare propone sempre le sue tessere (GDD §4.2.2).
+		opportunita.etichetta = "Può proporre: %s." % _elenco_con_o(cose)
+		opportunita.icona(&"proposta").scritta(":")
+		for i: int in range(simboli.size()):
+			if i > 0:
+				opportunita.scritta("/")
+			opportunita.icona(simboli[i])
+			# Il visitatore cambia i prezzi delle tessere: il prezzo va subito dopo di loro.
+			if def.special == AdvisorDef.Special.VISITATORE and simboli[i] != &"azione" and (i + 1 == simboli.size() or simboli[i + 1] == &"azione"):
+				_prezzo_visitatore(opportunita, def)
+		righe.append(opportunita)
 	if not azioni.vuota():
 		righe.append(azioni)
 	var potenzia: RigaSimboli = RigaSimboli.new()
@@ -60,7 +73,9 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		AdvisorDef.Special.VISITATORE:
 			pass  # I visitatori non potenziano (GDD §4.2.5).
 		_:
-			potenzia.etichetta = "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando %s. Non consuma la scelta del round." % run.advisor_resource_text(def)
+			# I tipi sono già nella prima frase del riquadro ("Tipi: …"): qui non si ripetono
+			# (richiesta di Davide, 8 novembre).
+			potenzia.etichetta = "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando %s. Si usa una volta per round e non consuma la scelta del round." % run.advisor_resource_text(def)
 			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
 			if def.random_resource:
 				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)
@@ -78,14 +93,16 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 
 ## La riga "azioni" del consigliere (variante scelta da Davide): il timbro, poi un simbolo per
 ## ogni tipo di azione che può proporre, nell'ordine dei dati e senza ripetizioni.
-## Es. Tesoriere: "[azione] : [scambio] / [anno]". Vuota se non può proporre azioni.
+## Es. Tesoriere: "[azione] = [scambio] / [anno]". Vuota se non può proporre azioni.
 static func riga_azioni(azioni: Array[Offer]) -> RigaSimboli:
 	var riga: RigaSimboli = RigaSimboli.new()
 	if azioni.is_empty():
 		return riga
 	var nomi: PackedStringArray = PackedStringArray()
 	var tipi: Array[String] = []
-	riga.icona(&"azione").scritta(":")
+	# Riga sottile sotto le opportunità: «[timbro] = i tipi», cioè quali azioni può proporre.
+	riga.rilievo = RigaSimboli.Rilievo.SECONDARIA
+	riga.icona(&"azione").scritta("=")
 	for offerta: Offer in azioni:
 		var tipo: RigaSimboli = tipo_di_azione(offerta.opportunity)
 		if tipi.has(tipo.come_testo()):
@@ -106,7 +123,7 @@ static func nome_tipo_di_azione(def: OpportunityDef) -> String:
 	match tipo_di_azione(def).come_testo():
 		"[scambio]": return "scambi di risorse"
 		"[malcontento]": return "calmare il Malcontento"
-		"[anno]": return "bonus per un tempo"
+		"[anno]": return "bonus temporanei"
 		"[spazio edificio]": return "uno spazio edificio"
 		"[spazio truppa]": return "uno spazio truppa"
 		"[malus]": return "accorciare un malus"
@@ -117,8 +134,8 @@ static func nome_tipo_di_azione(def: OpportunityDef) -> String:
 	return "altre azioni"
 
 
-## Il simbolo del tipo di un'azione: scambio di risorse, bonus per un tempo (calendario),
-## spazio, malus da accorciare, spionaggio, incanto, perk, ripescare le tecnologie.
+## Il simbolo del tipo di un'azione: scambio di risorse, bonus temporanei (calendario),
+## spazio, malus da accorciare, spionaggio, incanto, peculiarità, ripescare la mano delle tecnologie.
 ## Uno scambio che serve solo a calmare il Malcontento ha il simbolo del Malcontento.
 static func tipo_di_azione(def: OpportunityDef) -> RigaSimboli:
 	var riga: RigaSimboli = RigaSimboli.new()
@@ -145,6 +162,13 @@ static func tipo_di_azione(def: OpportunityDef) -> RigaSimboli:
 		_:
 			riga.icona(&"azione")
 	return riga
+
+
+## "edifici, truppe o azioni": le opportunità sono alternative, se ne prende una sola.
+static func _elenco_con_o(cose: PackedStringArray) -> String:
+	if cose.size() <= 1:
+		return "".join(cose)
+	return "%s o %s" % [", ".join(cose.slice(0, cose.size() - 1)), cose[cose.size() - 1]]
 
 
 ## Il visitatore cambia i prezzi (GDD §4.2.5): Oro in più o in meno e un costo aggiuntivo.
@@ -489,6 +513,16 @@ static func _risorse(riga: RigaSimboli, quantita: ResourceAmounts, scala: int, t
 		riga.icona(Simboli.di_risorsa(tipo), _con_segno(unita) if segno else str(unita), tono)
 		aggiunte = true
 	return aggiunte
+
+
+## Nomi in elenco con "o" prima dell'ultimo, es. "Assedio, Fante o Guardiano".
+static func elenco_con_o(nomi: Array[StringName]) -> String:
+	var parole: PackedStringArray = PackedStringArray()
+	for nome: StringName in nomi:
+		parole.append(String(nome))
+	if parole.size() <= 1:
+		return "".join(parole)
+	return "%s o %s" % [", ".join(parole.slice(0, parole.size() - 1)), parole[parole.size() - 1]]
 
 
 ## Nomi dei tipi separati da "/", es. "Spirituale / Patriota".

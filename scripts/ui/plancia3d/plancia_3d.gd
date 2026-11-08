@@ -671,9 +671,9 @@ func _costruisci_scelte() -> void:
 		# Evoluzione del governo entrando nell'era (GDD §9.4): l'ultima carta la rifiuta.
 		tipo = TipoScelta.GOVERNO
 		for governo: IdentityDef in run.government_choices:
-			schede.append(SchedaCarta.da_governo(governo))
+			schede.append(SchedaCarta.da_governo(governo, run))
 			origini.append(governo)
-		schede.append(SchedaCarta.da_resta(run.government()))
+		schede.append(SchedaCarta.da_resta(run.government(), run))
 		origini.append(run.government())
 		fase = -1
 	match fase:
@@ -699,12 +699,12 @@ func _costruisci_scelte() -> void:
 		RunState.Phase.SCELTA_INCONTRO:
 			tipo = TipoScelta.INCONTRO
 			for incontro: EncounterDef in run.encounter_choices:
-				schede.append(SchedaCarta.da_incontro(incontro))
+				schede.append(SchedaCarta.da_incontro(incontro, run))
 				origini.append(incontro)
 		RunState.Phase.RICOMPENSA_INCONTRO:
 			tipo = TipoScelta.RICOMPENSA
 			for ricompensa: RewardDef in run.reward_choices():
-				schede.append(SchedaCarta.da_ricompensa(ricompensa))
+				schede.append(SchedaCarta.da_ricompensa(ricompensa, run))
 				origini.append(ricompensa)
 		RunState.Phase.SCONTRO_FANTASMA:
 			if run.current_ghost != null:
@@ -781,6 +781,8 @@ func _togli_scelte() -> void:
 # --- Aggiornamento ---------------------------------------------------------------
 
 func _aggiorna_tutto() -> void:
+	# Le spiegazioni delle parole chiave dicono le eccezioni delle ascensioni della nazione.
+	TestoRicco.imposta_regole(SchedaCarta.regole_di(run))
 	_annulla()
 	_costruisci_plancia_giocatore()
 	_costruisci_scelte()
@@ -1111,7 +1113,11 @@ func _seleziona(truppa: bool, i: int) -> void:
 		azioni.append({"testo": "◀ Sposta", "attiva": i > 0, "clic": func() -> void: _sposta(i, i - 1)})
 		azioni.append({"testo": "Sposta ▶", "attiva": i < run.board.troops.size() - 1, "clic": func() -> void: _sposta(i, i + 1)})
 	# Potenzia è un'opzione del consigliere scelto (GDD §6.5): se non si può, si dice perché (P4).
-	if run.is_shopping_phase() and pezzo.level < run.run_rules.max_level:
+	# Che cosa cambierebbe con il Potenzia, prima di decidere (richiesta di Davide, 8 novembre).
+	var anteprima: String = SchedaCarta.anteprima_potenzia(run, pezzo)
+	if anteprima != "":
+		dettagli += "\n\n" + anteprima
+	if run.is_shopping_phase() and pezzo.level < run.max_level():
 		var motivo: String = run.upgrade_block_reason(pezzo)
 		var costo: ResourceAmounts = run.upgrade_cost_of(pezzo)
 		if motivo == "" and costo != null:
@@ -1185,9 +1191,9 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	var stessi_edifici: bool = run.board.buildings.size() == _setups[0].buildings.size()
 	var stesse_truppe: bool = run.board.troops.size() == _setups[0].troops.size()
 	for i: int in range(_setups[0].buildings.size()):
-		edifici.append(SchedaCarta.da_edificio(_setups[0].buildings[i], run.board.buildings[i].level if stessi_edifici else 1))
+		edifici.append(SchedaCarta.da_edificio(_setups[0].buildings[i], run.board.buildings[i].level if stessi_edifici else 1, "", run.max_level()))
 	for i: int in range(_setups[0].troops.size()):
-		truppe.append(SchedaCarta.da_truppa(_setups[0].troops[i], run.board.troops[i].level if stesse_truppe else 1))
+		truppe.append(SchedaCarta.da_truppa(_setups[0].troops[i], run.board.troops[i].level if stesse_truppe else 1, "", false, run.max_level(), SchedaCarta.regole_di(run)))
 	var edifici_avversari: Array[SchedaCarta] = []
 	for def: BuildingDef in _setups[1].buildings:
 		edifici_avversari.append(SchedaCarta.da_edificio(def))
@@ -1515,10 +1521,7 @@ func _testo_riquadro(tessera: Tessera3D) -> String:
 	var testo: String = scheda.dettagli
 	var beneficiari: Array[BoardPiece] = _beneficiari_sotto(tessera)
 	if not beneficiari.is_empty():
-		var nomi: PackedStringArray = PackedStringArray()
-		for pezzo: BoardPiece in beneficiari:
-			nomi.append(pezzo.display_name())
-		testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
+		testo += "\n▲ Ne beneficiano: %s." % HudPlancia.nomi_raggruppati(beneficiari)
 	# Solo un prezzo vero è un costo; "Ascolta" o "Scegli" restano scritti sotto la carta.
 	if scheda.prezzo and scheda.costo != "":
 		testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]

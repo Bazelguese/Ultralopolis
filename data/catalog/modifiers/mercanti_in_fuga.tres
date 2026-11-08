@@ -6,6 +6,6 @@
 script = ExtResource("1_3kpsr")
 id = &"mercanti_in_fuga"
 display_name = "Mercanti in fuga"
-description = "Ogni opportunità mostra un'alternativa in meno."
+description = "Ogni consigliere mostra un'opportunità in meno."
 effect = 5
 amount = -1

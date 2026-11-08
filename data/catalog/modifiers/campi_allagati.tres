@@ -6,7 +6,7 @@
 script = ExtResource("1_mod")
 id = &"campi_allagati"
 display_name = "Campi allagati"
-description = "Per un anno gli edifici di Materie prime producono 1 Cibo in più a ogni stagione."
+description = "Fino alla fine dell'anno gli edifici di Materie prime producono 1 Cibo in più a ogni stagione, tranne d'inverno."
 is_malus = false
 effect = 8
 target_type = &"Materie prime"

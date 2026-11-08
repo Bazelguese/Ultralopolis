@@ -59,6 +59,10 @@ extends Resource
 ## Aumento di tutti i valori d'effetto per ogni livello oltre il primo, in percentuale
 ## (danno, scudo, cura, Corruzione, assedio, durate; il mana non cambia, GDD §6.5).
 @export var troop_damage_percent_per_level: int = 50
+## Aumento minimo di ogni valore d'effetto per ogni livello oltre il primo: così anche un
+## valore piccolo sale davvero (es. danno 1 → 2 → 3). Vale il più grande fra questo e la
+## percentuale sopra (GDD §6.5; convenzione provvisoria, decisione di Davide, 8 novembre 2026).
+@export var min_value_gain_per_level: int = 1
 ## Unità in più, per ogni livello oltre il primo, di ogni risorsa che l'edificio produce.
 @export var building_production_per_level: int = 1
 

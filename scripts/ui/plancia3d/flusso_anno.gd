@@ -74,8 +74,9 @@ func _prepara_zone() -> void:
 				testo += " · tema %s" % RunState.THEME_NAMES[tema]
 			if mese == mese_corrente:
 				testo += " (adesso)"
-			elif stagione == int(RunState.Season.INVERNO):
-				testo += " · niente Cibo, nessuno scontro"
+			# La nota dell'inverno vale per tutti e tre i mesi, anche per quello in corso (GDD §5.2).
+			if stagione == int(RunState.Season.INVERNO):
+				testo += "\nInverno: a inizio stagione gli edifici non producono Cibo; nessuno scontro."
 			_zone.append([Rect2(x, y, LATO_MESE, ALTEZZA_MESE), testo, stagione, mese, tema])
 			x += LATO_MESE + (SPAZIO if i < 2 else 0.0)
 		x += SPAZIO_STAGIONE
@@ -152,11 +153,11 @@ func _casella_scontro(rettangolo: Rect2, stagione: int) -> void:
 		_fantasma(centro, 10.0, Color(colore, alfa))
 	else:
 		_spade_incrociate(centro, 11.0, Color(colore, alfa))
-	# Esito dell'incontro già giocato: pallino verde (vinto) o rosso (perso).
+	# Esito dell'incontro già giocato: pallino verde (vinto o pari, GDD §3.4) o rosso (perso).
 	var esito: String = _esito_incontro(stagione)
 	if esito != "":
 		draw_circle(rettangolo.position + Vector2(rettangolo.size.x - 5.0, 5.0), 3.5,
-				Color("3fae6a") if esito == "Vittoria" or esito == "Pareggio" else StileVisivo.PERICOLO)
+				StileVisivo.PERICOLO if esito == "Sconfitta" else Color("3fae6a"))
 
 
 func _esito_incontro(stagione: int) -> String:
@@ -167,13 +168,31 @@ func _esito_incontro(stagione: int) -> String:
 	return esiti[indice] if indice < esiti.size() else ""
 
 
+## L'esito di un incontro già giocato, a parole (il pallino da solo non basta, principio P4).
+static func parola_esito(esito: String) -> String:
+	match esito:
+		"Vittoria":
+			return "Vinto"
+		"Sconfitta":
+			return "Perso"
+		"Pareggio":
+			return "Pareggio, vale come vittoria"
+		"Interrotto":
+			return "Interrotto, vale come vittoria"
+	return esito
+
+
 func _testo_scontro(stagione: int) -> String:
+	var testo: String = "Fine autunno: scontro con il fantasma, che chiude l'anno."
 	match stagione:
 		int(RunState.Season.PRIMAVERA):
-			return "Fine primavera: incontro del mondo, 1 fra 3."
+			testo = "Fine primavera: incontro del mondo. Ne scegli 1 fra 3; se perdi, l'Oro si dimezza."
 		int(RunState.Season.ESTATE):
-			return "Fine estate: incontro del mondo, più forte di quello di primavera."
-	return "Fine autunno: scontro con il fantasma, che chiude l'anno."
+			testo = "Fine estate: incontro del mondo, più forte di quello di primavera. Ne scegli 1 fra 3; se perdi, l'Oro si dimezza."
+	var esito: String = _esito_incontro(stagione)
+	if esito != "":
+		testo += "\nQuest'anno: %s." % parola_esito(esito)
+	return testo
 
 
 # --- Icone disegnate (niente emoji) -----------------------------------------------------

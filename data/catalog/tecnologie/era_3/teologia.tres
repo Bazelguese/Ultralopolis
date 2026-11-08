@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_teologia"
 display_name = "Teologia"
-description = "Gli edifici Spirituali producono il 10% più in fretta."
+description = "Nello scontro gli edifici Spirituali hanno il ciclo più corto del 10%."
 is_malus = false
 effect = 2
 target_type = &"Spirituale"
@@ -19,7 +19,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"teologia"
 display_name = "Teologia"
-description = "Gli edifici Spirituali producono il 10% più in fretta."
+description = "Nello scontro gli edifici Spirituali hanno il ciclo più corto del 10%."
 sphere = "Fede"
 era = 3
 cost = 7

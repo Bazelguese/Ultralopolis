@@ -222,6 +222,6 @@ func _riquadro_spiegazione(voce: VoceLessico) -> PanelContainer:
 	testo.custom_minimum_size = Vector2(LARGHEZZA_SPIEGAZIONI, 0.0)
 	# Il nome nel suo colore, poi la spiegazione con le sue parole chiave colorate.
 	var nome: String = "[font_size=%d][b][color=#%s]%s[/color][/b][/font_size]" % [DIMENSIONE_SPIEGAZIONE + 3, voce.colore.to_html(false), voce.nome]
-	testo.text = "%s\n%s" % [nome, TestoRicco.colora(voce.definizione, DIMENSIONE_SPIEGAZIONE)]
+	testo.text = "%s\n%s" % [nome, TestoRicco.colora(TestoRicco.definizione_di(voce), DIMENSIONE_SPIEGAZIONE)]
 	riquadro.add_child(testo)
 	return riquadro

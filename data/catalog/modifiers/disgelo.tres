@@ -6,7 +6,7 @@
 script = ExtResource("1_mod")
 id = &"disgelo"
 display_name = "Disgelo"
-description = "Per un anno la Capitale produce 1 Pietra in più a ogni stagione."
+description = "Fino alla fine dell'anno la Capitale produce 1 Pietra in più a ogni stagione."
 is_malus = false
 effect = 8
 target_type = &"Capitale"

@@ -6,7 +6,8 @@
 script = ExtResource("1_raz")
 id = &"razioni"
 display_name = "Razioni"
-description = "Per un anno le truppe mangiano la metà del Cibo."
+description = "Alla prossima razione, a inizio dell'anno prossimo, le truppe mangiano la metà del Cibo."
 is_malus = false
+duration_years = 2
 effect = 15
 amount = -50

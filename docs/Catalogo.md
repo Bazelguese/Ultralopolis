@@ -339,7 +339,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | **Spiriti** | Boschi sacri | Abbi 2 edifici di Materie prime o Fauna | +1 Legno per stagione dalla Capitale |
 | | Branchi | Abbi 3 tessere Fauna | Le truppe Fauna ricaricano il 10% più in fretta |
 | | Antenati | Scegli 2 Eventi di Terra o di Fede | +8 Resistenza in ogni scontro |
-| | Grande madre | Raccogli almeno 10 Cibo in una sola produzione | +1 Cibo per stagione da ogni edificio Fauna o di Materie prime |
+| | Grande madre | Raccogli almeno 10 Cibo in una sola produzione | Un altro +1 Cibo per stagione da ogni edificio Fauna o di Materie prime, oltre a quello del tratto (in tutto +2; voluto, Davide 8 novembre 2026) |
 
 ### 4.5 Ascensioni (GDD §10.4.2, v0.27)
 
@@ -350,7 +350,7 @@ Pool di **4 vie per era** (se ne mostrano 3, §10.4 del GDD), più vie esclusive
 | Ascensione | Effetto |
 |---|---|
 | **Nazione in armi** | +1 spazio truppa e +1 spazio edificio |
-| **Consiglio ristretto** | In ogni round compare un consigliere in più (effetto già usato dai governi, v0.24) |
+| **Corte affollata** | In ogni round compare un consigliere in più (effetto già usato dai governi, v0.24; nome cambiato da *Consiglio ristretto*, decisione di Davide, 8 novembre 2026) |
 | **Botteghe maestre** | Potenzia costa 1 in meno, mai sotto 1 (effetto già usato dalla cultura artigiana, v0.24) |
 | **Eredità imperiale** | +20 Resistenza in ogni scontro |
 | **Età dell'oro** | +25% di tutte le risorse prodotte |
@@ -749,14 +749,14 @@ Compaiono solo per chi ha la via o il popolo, alla prima altezza della loro era 
 
 | Via | Era | Tecnologia | Sfera | Effetto |
 |---|---:|---|---|---|
-| Commercio | 2 | **Rotte carovaniere** | Ricchezza | +1 Oro per stagione da ogni edificio Infrastruttura Strategica |
+| Commercio | 2 | **Rotte carovaniere** | Ricchezza | +1 Oro per stagione da ogni edificio Infrastruttura Strategica; si somma a Chiatte (progressione voluta, Davide 8 novembre 2026) |
 | Commercio | 3 | **Monopoli** | Ricchezza | +10% Oro prodotto |
 | Guerra | 2 | **Veterani di cento battaglie** | Militare | Le truppe Fante che fanno danno ne fanno 1 in più |
 | Guerra | 3 | **Arte della guerra** | Militare | +1 spazio truppa |
 | Fede | 2 | **Pellegrinaggi** | Fede | +1 Fede per stagione dalla Capitale |
 | Fede | 3 | **Concilio** | Fede | Gli elementi Spirituali che curano curano 1 in più |
 | Sapere | 2 | **Enciclopedia** | Conoscenza | +1 Ricerca per stagione da ogni edificio Accademico |
-| Sapere | 3 | **Accademie reali** | Conoscenza | +20% Ricerca prodotta |
+| Sapere | 3 | **Accademie reali** | Conoscenza | +2 Ricerca per stagione dalla Capitale (prima +20% Ricerca, uguale a Stampa; decisione di Davide, 8 novembre 2026) |
 | Impero | 3 | **Legioni di frontiera** | Militare | +10 Resistenza in ogni scontro |
 | Oro | 3 | **Zecca** | Ricchezza | +1 Oro per stagione da ogni edificio Economico |
 | Rivelazione | 3 | **Miracoli** | Fede | Gli elementi Spirituali che producono scudo ne producono 2 in più |

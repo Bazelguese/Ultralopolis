@@ -19,7 +19,7 @@ gain = SubResource("S1")
 [sub_resource type="Resource" id="S3"]
 script = ExtResource("x3")
 label = "Chiedigli una profezia"
-description = "Fino al prossimo fantasma le truppe ricaricano il 10% più in fretta, ma il popolo si spaventa: Malcontento +1."
+description = "In ogni scontro fino a quello con il fantasma (compreso) le truppe hanno la ricarica più corta del 10%, ma il popolo si spaventa: Malcontento +1."
 malcontent_change = 1
 modifiers = Array[ExtResource("x4")]([ExtResource("x5")])
 

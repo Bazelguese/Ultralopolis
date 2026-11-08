@@ -43,7 +43,7 @@ documenti = 2
 [sub_resource type="Resource" id="OPT_7"]
 script = ExtResource("e2")
 label = "Il trattato fondamentale"
-description = "Ricevi 2 Ricerca e 2 Documenti, e una tecnologia di Conoscenza già iniziata a metà."
+description = "Ricevi 2 Ricerca e 2 Documenti, e una carta dorata di Conoscenza (tecnologia già studiata a metà), se ce n'è una."
 requires_types = Array[StringName]([&"Accademico"])
 gain = SubResource("RA_8")
 give_random_tech = true

@@ -14,7 +14,7 @@ influenza = 1
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Prendi il dono"
-description = "Ricevi 2 Stabilità, 1 Influenza, moltiplicati per l'era."
+description = "Ricevi 2 Stabilità e 1 Influenza per il numero dell'era (es. in era 2: 4 e 2)."
 gain = SubResource("RA_2")
 
 [resource]

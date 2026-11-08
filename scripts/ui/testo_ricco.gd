@@ -30,6 +30,9 @@ static var _lessico: Lessico = null
 ## così "Infrastruttura Bellica" vince su un'eventuale "Infrastruttura".
 static var _forme_per_iniziale: Dictionary[String, Array] = {}
 static var _caricato: bool = false
+## Regole cambiate dalle ascensioni della nazione in gioco (SchedaCarta.regole_di): le
+## spiegazioni aggiungono le loro eccezioni.
+static var _regole_attive: Array[int] = []
 ## Nome dato a ogni simbolo rimpicciolito, per grandezza (es. "danno@16").
 static var _percorsi_simboli: Dictionary[String, String] = {}
 
@@ -90,20 +93,40 @@ static func colora(testo: String, dimensione: int = 18) -> String:
 	return "".join(parti)
 
 
-## Le parole chiave con una spiegazione che compaiono nel testo, nell'ordine in cui compaiono,
-## senza ripetizioni e al massimo quante ne prevede il lessico.
+## Le regole che le ascensioni della nazione in gioco hanno cambiato (le imposta la partita).
+static func imposta_regole(regole: Array[int]) -> void:
+	_regole_attive = regole.duplicate()
+
+
+## La spiegazione di una parola chiave, con le eccezioni delle ascensioni che la nazione ha.
+static func definizione_di(voce: VoceLessico) -> String:
+	var testo: String = voce.definizione
+	for regola: int in voce.eccezioni:
+		if _regole_attive.has(regola):
+			testo += " " + voce.eccezioni[regola]
+	return testo
+
+
+## Le parole chiave con una spiegazione che compaiono nel testo, senza ripetizioni e al massimo
+## quante ne prevede il lessico: prima le parole più rare, nell'ordine in cui compaiono, poi
+## quelle di base se resta posto (così Corruzione o Sabotaggio non restano mai senza spiegazione).
 static func voci_da_spiegare(testo: String) -> Array[VoceLessico]:
 	var risultato: Array[VoceLessico] = []
 	var lessico_attuale: Lessico = lessico()
 	if lessico_attuale == null:
 		return risultato
+	var di_base: Array[VoceLessico] = []
 	for pezzo: Pezzo in scomponi(testo):
-		if pezzo.voce == null or pezzo.voce.definizione.strip_edges().is_empty() or risultato.has(pezzo.voce):
+		if pezzo.voce == null or pezzo.voce.definizione.strip_edges().is_empty():
 			continue
-		risultato.append(pezzo.voce)
-		if risultato.size() >= lessico_attuale.massimo_spiegazioni:
-			break
-	return risultato
+		if risultato.has(pezzo.voce) or di_base.has(pezzo.voce):
+			continue
+		if pezzo.voce.di_base:
+			di_base.append(pezzo.voce)
+		else:
+			risultato.append(pezzo.voce)
+	risultato.append_array(di_base)
+	return risultato.slice(0, lessico_attuale.massimo_spiegazioni)
 
 
 ## Divide il testo in tratti semplici, parole chiave e numeri.
