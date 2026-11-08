@@ -18,17 +18,18 @@ const SCALA_SCELTA: float = 1.45
 ## Le scelte con le righe di simboli si ingrandiscono così tanto al passaggio del mouse.
 const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
-const Z_EDIFICI: float = 4.4
+## Teatro di carta: fra truppe ed edifici c'è posto per le figurine, che non coprono le carte dietro.
+const Z_EDIFICI: float = 5.0
 ## Bordo sinistro del primo spazio: gli spazi si allineano a destra dello stemma.
 const X_INIZIO_SPAZI: float = -9.6
 ## Bordo sinistro della lastra (fisso: stemma e riserva stanno qui).
 const BORDO_SINISTRO_LASTRA: float = -12.605
 const MARGINE_DESTRO_LASTRA: float = 0.35
-const PROFONDITA_LASTRA: float = 5.0
+const PROFONDITA_LASTRA: float = 5.6
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
-const SCALA_MASSIMA: float = 1.4
-const SCALA_MASSIMA_SCONTRO: float = 1.2
+const SCALA_MASSIMA: float = 1.25
+const SCALA_MASSIMA_SCONTRO: float = 1.4
 const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
 const SPAZI_TRUPPE: int = 12
@@ -37,12 +38,17 @@ const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola",
 ## Oltre questo numero di gemme in volo non se ne lanciano altre (solo effetto visivo).
 const MASSIMO_GEMME_IN_VOLO: int = 24
 
+## Teatro di carta: lanterna sopra il tavolo, un po' verso il giocatore.
+const POSIZIONE_LANTERNA: Vector3 = Vector3(0.0, 12.0, 5.0)
+const ENERGIA_LANTERNA: float = 3.4
+
 const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 27.0, 14.6)
 const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, 0.9)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 1.2
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 28.4, 15.6)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.1)
+## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 21.0, 22.5)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 2.6)
 
 var run: RunState
 
@@ -115,6 +121,9 @@ var _lampi: Array[Array] = [[], []]
 var _gemme_in_volo: int = 0
 ## Conta le scritte uscite da ogni stemma, per non sovrapporle.
 var _scritte_uscite: Array[int] = [0, 0]
+## Teatro di carta: quante carte di ogni elemento c'erano nell'ultima costruzione di un lato.
+## Solo le figurine dei pezzi nuovi si alzano con l'animazione pop-up.
+var _gia_viste: Array[Dictionary] = [{}, {}]
 
 
 func _ready() -> void:
@@ -127,6 +136,7 @@ func _ready() -> void:
 	_contenitore_scelte = Node3D.new()
 	add_child(_contenitore_scelte)
 	_crea_atmosfera()
+	_crea_grana()
 	var livello: CanvasLayer = CanvasLayer.new()
 	add_child(livello)
 	_hud = HudPlancia.new()
@@ -198,39 +208,44 @@ func _nazione_di_prova(catalogo: CatalogDef, regole_run: RunRules) -> NationTemp
 # --- Ambiente ------------------------------------------------------------------
 
 func _crea_ambiente() -> void:
+	# Teatro di carta: buio quasi totale, una lanterna calda che oscilla e fa ombre lunghe.
 	var mondo: WorldEnvironment = WorldEnvironment.new()
 	var ambiente: Environment = Environment.new()
 	ambiente.background_mode = Environment.BG_COLOR
-	ambiente.background_color = StileVisivo.NOTTE
+	ambiente.background_color = StileVisivo.BUIO
 	ambiente.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	ambiente.ambient_light_color = Color("4a5a80")
-	ambiente.ambient_light_energy = 0.45
-	ambiente.tonemap_mode = Environment.TONE_MAPPER_ACES
+	ambiente.ambient_light_color = Color("3a2c3c")
+	ambiente.ambient_light_energy = 0.3
+	ambiente.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	ambiente.glow_enabled = true
-	ambiente.glow_intensity = 0.55
-	ambiente.glow_bloom = 0.0
-	ambiente.glow_hdr_threshold = 1.2
+	ambiente.glow_intensity = 0.7
+	ambiente.glow_bloom = 0.06
+	ambiente.glow_hdr_threshold = 1.0
+	ambiente.fog_enabled = true
+	ambiente.fog_light_color = Color("0b0806")
+	ambiente.fog_density = 0.008
 	mondo.environment = ambiente
 	add_child(mondo)
 
-	var sole: DirectionalLight3D = DirectionalLight3D.new()
-	sole.light_color = Color("fff0d8")
-	sole.light_energy = 0.9
-	sole.shadow_enabled = true
-	sole.rotation_degrees = Vector3(-60.0, -25.0, 0.0)
-	add_child(sole)
+	var riempi: DirectionalLight3D = DirectionalLight3D.new()
+	riempi.light_color = Color("ffd9a8")
+	riempi.light_energy = 0.12
+	riempi.rotation_degrees = Vector3(-60.0, -25.0, 0.0)
+	add_child(riempi)
 
 	var controluce: DirectionalLight3D = DirectionalLight3D.new()
-	controluce.light_color = Color("6a8cff")
+	controluce.light_color = Color("5a78c8")
 	controluce.light_energy = 0.35
 	controluce.rotation_degrees = Vector3(-30.0, 155.0, 0.0)
 	add_child(controluce)
 
 	_luce_atmosfera = OmniLight3D.new()
-	_luce_atmosfera.light_color = Color("4f6bff")
-	_luce_atmosfera.light_energy = 1.6
-	_luce_atmosfera.omni_range = 22.0
-	_luce_atmosfera.position = Vector3(-15.0, 5.0, -8.0)
+	_luce_atmosfera.light_color = StileVisivo.LUCE_LANTERNA
+	_luce_atmosfera.light_energy = ENERGIA_LANTERNA
+	_luce_atmosfera.omni_range = 48.0
+	_luce_atmosfera.omni_attenuation = 1.1
+	_luce_atmosfera.shadow_enabled = true
+	_luce_atmosfera.position = POSIZIONE_LANTERNA
 	add_child(_luce_atmosfera)
 
 	_camera = Camera3D.new()
@@ -243,9 +258,55 @@ func _crea_tavolo() -> void:
 	var forma: BoxMesh = BoxMesh.new()
 	forma.size = Vector3(70.0, 0.5, 50.0)
 	terreno.mesh = forma
-	terreno.material_override = StileVisivo.materiale_pietra(StileVisivo.PIETRA_SCURA.darkened(0.2), 3.0)
+	terreno.material_override = _materiale_carta(StileVisivo.LEGNO_TAVOLO, 4.0)
 	terreno.position.y = -0.45
 	add_child(terreno)
+
+
+## Grana da stampa e vignetta sopra la scena 3D, sotto l'interfaccia (che resta nitida).
+func _crea_grana() -> void:
+	var strato: CanvasLayer = CanvasLayer.new()
+	strato.layer = 0
+	add_child(strato)
+	var velo: ColorRect = ColorRect.new()
+	velo.set_anchors_preset(Control.PRESET_FULL_RECT)
+	velo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var shader: Shader = Shader.new()
+	shader.code = """
+shader_type canvas_item;
+uniform float forza = 0.045;
+float caso(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+void fragment() {
+	float n = caso(floor(FRAGCOORD.xy) + floor(TIME * 24.0) * vec2(17.0, 31.0));
+	float v = smoothstep(0.38, 0.95, length((SCREEN_UV - 0.5) * vec2(1.25, 1.0)));
+	COLOR = mix(vec4(vec3(n), forza), vec4(0.0, 0.0, 0.0, 0.85), v);
+}
+"""
+	var materiale: ShaderMaterial = ShaderMaterial.new()
+	materiale.shader = shader
+	velo.material = materiale
+	strato.add_child(velo)
+
+
+## Carta spessa con la grana: tavolo e plance del teatro di carta.
+func _materiale_carta(colore: Color, scala: float) -> StandardMaterial3D:
+	var materiale: StandardMaterial3D = StileVisivo.materiale(colore, 0.95)
+	var grana: NoiseTexture2D = NoiseTexture2D.new()
+	grana.width = 256
+	grana.height = 256
+	grana.seamless = true
+	var rumore: FastNoiseLite = FastNoiseLite.new()
+	rumore.frequency = 0.03
+	rumore.fractal_octaves = 4
+	grana.noise = rumore
+	var rampa: Gradient = Gradient.new()
+	rampa.set_color(0, Color(0.72, 0.68, 0.64))
+	rampa.set_color(1, Color(1.0, 1.0, 1.0))
+	grana.color_ramp = rampa
+	materiale.albedo_texture = grana
+	materiale.uv1_scale = Vector3(scala, scala, scala)
+	materiale.uv1_triplanar = true
+	return materiale
 
 
 ## Pulviscolo luminoso che fluttua sopra il tavolo (solo atmosfera).
@@ -254,7 +315,7 @@ func _crea_atmosfera() -> void:
 	var granello: SphereMesh = SphereMesh.new()
 	granello.radius = 0.018
 	granello.height = 0.036
-	var materiale: StandardMaterial3D = StileVisivo.materiale_velo(Color(0.62, 0.76, 1.0, 0.35))
+	var materiale: StandardMaterial3D = StileVisivo.materiale_velo(Color(StileVisivo.BRACE, 0.4))
 	materiale.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	granello.material = materiale
 	polvere.mesh = granello
@@ -311,11 +372,12 @@ func _crea_lastra(radice: Node3D, lato: int, z_centro: float, colore: Color) -> 
 	var forma: BoxMesh = BoxMesh.new()
 	forma.size = Vector3(LARGHEZZA_LASTRA_PIENA, 0.4, PROFONDITA_LASTRA)
 	lastra.mesh = forma
-	lastra.material_override = StileVisivo.materiale_pietra(StileVisivo.PIETRA, 2.5)
+	lastra.material_override = _materiale_carta(StileVisivo.CARTA_PLANCIA if lato == Lato.GIOCATORE else StileVisivo.CARTA_PLANCIA_NEMICO, 2.0)
 	lastra.position = Vector3(0.0, -0.18, z_centro)
 	radice.add_child(lastra)
 	_lastre[lato] = lastra
-	var luce: StandardMaterial3D = StileVisivo.materiale_luminoso(colore, 1.3)
+	# Filetto stampato del colore del lato (prima era un bordo al neon).
+	var luce: StandardMaterial3D = StileVisivo.materiale_luminoso(colore.darkened(0.45), 0.12)
 	_materiali_bordo.append(luce)
 	_bordi_lastre[lato] = []
 	for i: int in range(4):
@@ -596,7 +658,7 @@ func _spazi_mostrati(occupati: int, capacita: int, massimo: int, chiuso: bool) -
 
 ## Ricostruisce le carte di un lato e allarga la sua lastra quanto serve.
 ## Gli spazi vuoti si mostrano solo per il giocatore. nitidezza: risoluzione delle facce.
-func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int, spazi_chiusi: bool, nitidezza: float) -> void:
+func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int, spazi_chiusi: bool, nitidezza: float, tutte_animate: bool = false) -> void:
 	for figlio: Node in _pezzi[lato].get_children():
 		figlio.queue_free()
 	_truppe[lato] = []
@@ -624,6 +686,24 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_edificio(lato, i), MISURA_EDIFICIO, i < capacita_edifici, colore)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
 				_spazio_libero_edificio = spazio
+	_alza_figurine(lato, tutte_animate)
+
+
+## Teatro di carta: su ogni pezzo con illustrazione si alza la figurina ritagliata.
+## Si animano tutte (inizio di uno scontro) oppure solo quelle dei pezzi appena arrivati.
+func _alza_figurine(lato: int, tutte_animate: bool) -> void:
+	var verso: float = -1.0 if lato == Lato.GIOCATORE else 1.0
+	var conteggi: Dictionary = {}
+	var ritardo: float = 0.1
+	for gruppo: Array in [_edifici[lato], _truppe[lato]]:
+		for tessera: Tessera3D in gruppo:
+			var chiave: String = "%d:%s" % [tessera.scheda.genere, tessera.scheda.id]
+			conteggi[chiave] = int(conteggi.get(chiave, 0)) + 1
+			var nuova: bool = tutte_animate or int(conteggi[chiave]) > int(_gia_viste[lato].get(chiave, 0))
+			tessera.aggiungi_figurina(verso, ritardo, nuova)
+			if nuova:
+				ritardo += 0.07
+	_gia_viste[lato] = conteggi
 
 
 func _costruisci_plancia_giocatore() -> void:
@@ -1203,8 +1283,8 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	# Nello scontro si vedono solo gli elementi schierati; i due lati hanno la stessa scala.
 	var larghezza: float = maxf(_larghezza_per(truppe.size(), edifici.size()), _larghezza_per(truppe_avversarie.size(), edifici_avversari.size()))
 	var scala: float = _scala_per(larghezza, SCALA_MASSIMA_SCONTRO)
-	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size(), false, scala)
-	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0, false, scala)
+	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size(), false, scala, true)
+	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0, false, scala, true)
 	_disponi_plancia(scala, larghezza, true, 0.7)
 	_nomi_lato[Lato.AVVERSARIO].text = run.last_opponent_name.trim_prefix("Fantasma: ").to_upper()
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
@@ -1240,9 +1320,9 @@ func _salta_scontro() -> void:
 
 func _process(delta: float) -> void:
 	_tempo += delta
-	_luce_atmosfera.light_energy = 1.6 + sin(_tempo * 1.3) * 0.25
-	for materiale: StandardMaterial3D in _materiali_bordo:
-		materiale.emission_energy_multiplier = 1.2 + sin(_tempo * 2.0) * 0.25
+	# La lanterna oscilla piano e la fiamma tremola.
+	_luce_atmosfera.position = POSIZIONE_LANTERNA + Vector3(sin(_tempo * 0.6) * 4.0, 0.0, cos(_tempo * 0.45) * 1.2)
+	_luce_atmosfera.light_energy = ENERGIA_LANTERNA + sin(_tempo * 13.0) * 0.12 + sin(_tempo * 7.3) * 0.1
 	if _modo != Modo.SCONTRO or _sim == null:
 		return
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
@@ -1258,6 +1338,7 @@ func _process(delta: float) -> void:
 	_aggiorna_visuale_scontro()
 	if _sim.outcome != BattleSim.Outcome.IN_CORSO and not _esito_programmato:
 		_esito_programmato = true
+		_richiudi_sconfitto(_sim.outcome)
 		var attesa: Tween = create_tween()
 		attesa.tween_interval(0.9)
 		attesa.tween_callback(_mostra_esito)
@@ -1335,6 +1416,8 @@ func _aggiorna_visuale_scontro() -> void:
 			var def: TroopDef = _setups[lato].troops[i]
 			var rimasto: int = _sim.get_troop_cooldown_left_ms(lato, i)
 			var stato: BattleSim.TroopState = _sim.get_troop_state(lato, i)
+			var ferma: bool = stato in [BattleSim.TroopState.SABOTATA, BattleSim.TroopState.MANA_PRENOTATO, BattleSim.TroopState.IN_ATTESA_DI_MANA]
+			tessera.imposta_spenta(0.85 if ferma else 0.0)
 			if stato == BattleSim.TroopState.SABOTATA:
 				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
 				tessera.imposta_stato("Sabotata: non può attivarsi", StileVisivo.COLORE_SABOTATO)
@@ -1434,12 +1517,66 @@ func _colpo(lato: int, danno: int, nota: String) -> void:
 	salto.tween_property(numero, "global_position", base + Vector3(0.0, 1.2, 0.0), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	salto.tween_property(numero, "modulate:a", 0.0, 0.5).set_delay(0.35)
 	salto.chain().tween_callback(numero.queue_free)
+	_brace(medaglione.global_position + Vector3(0.0, 0.4, 0.0), mini(60, 14 + danno * 4))
 	var centro: Vector3 = Vector3(X_MEDAGLIONE, 0.0, medaglione.position.z)
 	var scossa: Tween = create_tween()
 	for passo: int in range(4):
 		var spostamento: Vector3 = Vector3(randf_range(-0.12, 0.12), 0.0, randf_range(-0.08, 0.08))
 		scossa.tween_property(medaglione, "position", centro + spostamento, 0.035)
 	scossa.tween_property(medaglione, "position", centro, 0.05)
+
+
+## Teatro di carta: a fine scontro le figurine del lato sconfitto si richiudono come un libro.
+func _richiudi_sconfitto(esito: BattleSim.Outcome) -> void:
+	var sconfitto: int = -1
+	if esito == BattleSim.Outcome.VITTORIA_A:
+		sconfitto = Lato.AVVERSARIO
+	elif esito == BattleSim.Outcome.VITTORIA_B:
+		sconfitto = Lato.GIOCATORE
+	if sconfitto < 0:
+		return
+	var ritardo: float = 0.0
+	for gruppo: Array in [_truppe[sconfitto], _edifici[sconfitto]]:
+		for tessera: Tessera3D in gruppo:
+			if tessera.figurina != null:
+				tessera.figurina.richiudi(ritardo)
+				ritardo += 0.06
+	_brace(_medaglioni[sconfitto].global_position + Vector3(0.0, 0.5, 0.0), 90)
+
+
+## Scintille di brace che salgono (colpi sullo stemma, sconfitta).
+func _brace(dove: Vector3, quante: int) -> void:
+	var particelle: CPUParticles3D = CPUParticles3D.new()
+	var granello: QuadMesh = QuadMesh.new()
+	granello.size = Vector2(0.09, 0.09)
+	var materiale: StandardMaterial3D = StileVisivo.materiale_luminoso(StileVisivo.BRACE, 4.0)
+	materiale.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	materiale.vertex_color_use_as_albedo = true
+	materiale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	materiale.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	granello.material = materiale
+	particelle.mesh = granello
+	particelle.amount = quante
+	particelle.lifetime = 1.0
+	particelle.one_shot = true
+	particelle.explosiveness = 0.95
+	particelle.direction = Vector3.UP
+	particelle.spread = 180.0
+	particelle.initial_velocity_min = 1.5
+	particelle.initial_velocity_max = 4.5
+	particelle.gravity = Vector3(0.0, 2.0, 0.0)
+	particelle.damping_min = 1.0
+	particelle.damping_max = 3.0
+	var rampa: Gradient = Gradient.new()
+	rampa.set_color(0, Color("ffd27a"))
+	rampa.set_color(1, Color(StileVisivo.BRACE, 0.0))
+	particelle.color_ramp = rampa
+	add_child(particelle)
+	particelle.global_position = dove
+	particelle.emitting = true
+	var pulizia: Tween = create_tween()
+	pulizia.tween_interval(1.6)
+	pulizia.tween_callback(particelle.queue_free)
 
 
 ## Punto di partenza delle scritte sopra lo stemma: si alternano su tre posizioni.

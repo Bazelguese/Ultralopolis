@@ -15,6 +15,14 @@ const PIETRA_CHIARA: Color = Color("3f5273")
 const FACCIA_CARTA: Color = Color("18213a")
 const FASCIA_NOME: Color = Color("0e1526")
 
+# Teatro di carta (scelto da Davide l'8 novembre 2026): buio, una lanterna, plance di carta.
+const BUIO: Color = Color("050403")
+const LUCE_LANTERNA: Color = Color("ffb067")
+const LEGNO_TAVOLO: Color = Color("0c0806")
+const CARTA_PLANCIA: Color = Color("3d2f22")
+const CARTA_PLANCIA_NEMICO: Color = Color("30221c")
+const BRACE: Color = Color("ff7a1a")
+
 # Testi e accenti.
 const TESTO: Color = Color("f4f1ea")
 const TESTO_TENUE: Color = Color("9fb0cc")
