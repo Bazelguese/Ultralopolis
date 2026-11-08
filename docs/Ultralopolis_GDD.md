@@ -1584,55 +1584,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 ## 19. Glossario
 
-| Termine | Definizione |
-|---|---|
-| Nucleo | Insieme delle regole su cui si appoggiano tutti i contenuti; cambia solo con una nuova versione del documento. |
-| Spunto | Idea per il futuro, annotata ma non introdotta nella base. |
-| Run | Partita indipendente che racconta la storia di una civiltà. |
-| Anno | Unità di progressione di 12 round in quattro stagioni, con due incontri del mondo e uno scontro finale contro un fantasma (§3.2). |
-| Stagione | Una delle quattro parti dell'anno (inverno, primavera, estate, autunno), di 3 round; all'inizio di ognuna gli edifici producono (v0.25). |
-| Mese | Un round dell'anno: gennaio è il primo, dicembre l'ultimo (v0.25). |
-| Produzione, Preparazione | Le due metà dell'anno fino alla v0.24; dalla v0.25 sostituite dalle stagioni. |
-| Opportunità | Momento di scelta interno a una macrofase; dalla v0.21 sostituita dai round del Consiglio. |
-| Tipo | Caratteristica di un edificio o di una truppa che decide quali consiglieri lo propongono e lo potenziano e a quali perk risponde (§6.6). Sostituisce le etichette. |
-| Categoria | Insieme di tipi che forma il campo di un consigliere (§4.2.4). |
-| Potenzia | Opzione dei consiglieri che porta di livello una carta senza consumare la scelta del round (§6.5). |
-| Evento | Carta del round con un testo e 2-3 opzioni, alcune sbloccate dalla nazione (§4.2.5). |
-| Visitatore | Consigliere di passaggio con proposte e prezzi propri (§4.2.5). |
-| Fortuna | Carta del round con un dono semplice (§4.2.5). |
-| Radici | Ciò che fa comparire una carta speciale o la rende più frequente (§4.2.5). |
-| Incontro del mondo | Minaccia o evento dell’anno (es. barbari, pirati); inizialmente uno scontro contro una plancia generata. |
-| Plancia generata | Plancia avversaria creata dal gioco per un incontro del mondo. |
-| Magazzino | Riserva persistente di tutte le risorse (§5.3). |
-| Stabilità | Risorsa dello Stato: paga il Potenzia del Cancelliere (§5.3). |
-| Documenti | Risorsa della Conoscenza: paga il Potenzia dello Studioso (§5.3). |
-| Mana | Risorsa prodotta in battaglia e spesa per attivare le truppe. |
-| Cooldown | Tempo di attesa fra due attivazioni. |
-| Resistenza | Capacità della nazione di sopravvivere al singolo scontro. |
-| Scudo | Riserva di battaglia che assorbe il danno prima della Resistenza. |
-| Cura | Effetto che ridà Resistenza persa, senza superare il massimo. |
-| Corruzione | Contatore di battaglia che sconfigge la nazione quando raggiunge la Resistenza. |
-| Attacco d’assedio | Danno che colpisce solo lo scudo; proprio delle truppe Assedio. |
-| Prestigio | Risorsa che determina la sopravvivenza della run dopo le sconfitte. |
-| Fantasma | Copia di una nazione avversaria usata per uno scontro asincrono. |
-| Era | Livello di sviluppo raggiunto completando un certo numero di tecnologie (v0.26). |
-| Tecnologia | Carta dell’albero che si completa con la Ricerca e dà un effetto permanente (§10.5). |
-| Altezza | Livello di una tecnologia nell’albero; ogni era ne occupa due. |
-| Mano | Le 3 tecnologie proposte, fra cui si sceglie quella da studiare. |
-| Linea | Serie di elementi, uno per era, sbloccata da una tecnologia. |
-| Carta dorata | Tecnologia già iniziata, ottenuta da eventi, fortune o incontri. |
-| Tradizione | Uno dei 4 passi dell'albero di una via; si completa con un'impresa (§10.4.1). |
-| Impresa | Obiettivo che completa una tradizione: un traguardo o uno stato della nazione. |
-| Ascensione | Effetto permanente scelto completando l'albero di una via; il livello 2 cambia una regola (§10.4.2). |
-| Modificatore | Effetto con bersaglio, durata, origine e regole di cumulo. |
-| Origine | Fonte di un modificatore; permette in futuro i malus con nome. |
-| Conseguenza | Modifica dello stato della run che persiste dopo un evento o uno scontro. |
-| Cronaca | Scena che arriva da sola all'inizio di una stagione; il giocatore sceglie come reagisce la nazione (§9.6). |
-| Inclinazione | Una delle quattro tendenze della nazione fra due poli opposti (Spada, Porta, Altare, Legge). |
-| Usanza | Tratto permanente preso quando un'inclinazione arriva a un estremo. |
-| Vocazione | Modo di giocare aperto da due usanze, accettato in una cronaca. |
-| Personaggio | Persona con un nome e una fiducia che torna nelle cronache. |
-| Ricordo | Traccia di una scelta che la nazione conserva e che apre altre cronache (catene). |
+Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine indica il nome ufficiale, una frase per il giocatore e le note per noi; raccoglie anche i nomi ritirati e il registro delle decisioni sui nomi.
 
 ---
 
