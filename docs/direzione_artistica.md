@@ -138,8 +138,13 @@ Le righe si costruiscono da sole dai file dati del catalogo: cambiando un costo 
 | Che cosa | Stato |
 |---|---|
 | Consiglieri (Potenzia, edifici/truppe proposti, azioni possibili nel round), azioni e peculiarità proposte, Eventi, Fortune, Visitatori e le loro opzioni | Fatto (prima fase) |
-| Edifici e truppe (produzione, mana, effetti nello scontro), ricompense degli incontri, cronache | Da decidere con Davide (seconda fase) |
+| Tipi di tessere e consiglieri: medaglioni su una linguetta sopra la tessera (§4.4) | Fatto (8 novembre 2026) |
+| Altri simboli su edifici e truppe (produzione, mana, effetti nello scontro), ricompense degli incontri, cronache | Da decidere con Davide (seconda fase) |
 | Gli otto poli delle inclinazioni delle cronache | Per ora in parole |
+
+### 4.4 La linguetta dei tipi
+
+Sopra ogni tessera (e sopra ogni consigliere) sporge una **linguetta** del colore della cornice, come quella di una cartellina, con un **medaglione** per tipo: tondo scuro, bordo grigio, simbolo bianco. Sta sopra e non di lato perché sulla plancia le tessere della stessa fila sono troppo vicine; si solleva e si ingrandisce con la tessera. I tipi d'identità hanno tutti lo **stendardo**. Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg` (elenco in `assets/icone/LEGGIMI.md`).
 
 ## 5. Convenzioni provvisorie introdotte con questo stile
 
