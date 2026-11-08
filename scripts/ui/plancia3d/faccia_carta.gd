@@ -408,6 +408,11 @@ func _pedana() -> Texture2D:
 	return trama
 
 
+## Fondo della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
+func fondo_arte() -> float:
+	return _area_arte.end.y / maxf(size.y, 1.0)
+
+
 ## Centro verticale della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
 func centro_arte() -> float:
 	return (_area_arte.position.y + _area_arte.size.y * 0.5) / maxf(size.y, 1.0)

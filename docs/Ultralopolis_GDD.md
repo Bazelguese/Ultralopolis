@@ -1275,6 +1275,7 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 |---|---|
 | Ogni **tipo** (§6.6) ha un simbolo in un **medaglione tondo**: la forma tonda lo distingue dalle risorse; come i tipi, i medaglioni non hanno colore | Confermato |
 | I medaglioni stanno su una **linguetta sopra la tessera**, del colore della sua cornice, allineata a sinistra: su edifici e truppe i loro tipi, sul consigliere i tipi della sua categoria | Confermato |
+| **Consiglieri e avvenimenti con un'illustrazione**: il **mezzo busto** del personaggio esce dal bordo alto della carta, come i ritratti nei dialoghi dei giochi di ruolo; per questo la linguetta dei tipi sta **sotto la carta** (Davide, 8 novembre 2026) | Confermato |
 | Sopra e non di lato: sulla plancia le tessere della stessa fila sono troppo vicine per una linguetta laterale | Confermato |
 | I **tipi d'identità** hanno tutti lo stesso simbolo, un **vessillo**; il nome è nei dettagli. La **Capitale** ha il suo | Confermato |
 | Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg`: un tipo nuovo prende un simbolo aggiungendo il file, senza toccare il codice; senza file prende il vessillo | Confermato |

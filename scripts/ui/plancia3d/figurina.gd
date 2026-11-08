@@ -14,6 +14,8 @@ const SOGLIA_NERO: float = 0.15
 const LATO_MASCHERA: int = 128
 ## Lato dell'immagine finale della figurina.
 const LATO_FIGURA: int = 256
+## Quanta parte (dall'alto) della figura fa il mezzo busto.
+const QUOTA_BUSTO: float = 0.72
 
 const SHADER: String = """
 shader_type spatial;
@@ -205,6 +207,23 @@ static func ritaglia(illustrazione: Texture2D) -> Texture2D:
 	var risultato: Image = Image.create_from_data(LATO_FIGURA, LATO_FIGURA, false, Image.FORMAT_RGBA8, uscita)
 	risultato.generate_mipmaps()
 	var trama: ImageTexture = ImageTexture.create_from_image(risultato)
+	_ritagli[chiave] = trama
+	return trama
+
+
+## Il mezzo busto di un'illustrazione (consiglieri e avvenimenti): la parte alta della figurina
+## ritagliata, tagliata dritta in basso. Il risultato si ricorda.
+static func ritaglia_busto(illustrazione: Texture2D) -> Texture2D:
+	var chiave: String = "busto:" + (illustrazione.resource_path if illustrazione.resource_path != "" else str(illustrazione.get_instance_id()))
+	if _ritagli.has(chiave):
+		return _ritagli[chiave]
+	var intera: Image = ritaglia(illustrazione).get_image()
+	if intera.has_mipmaps():
+		intera.clear_mipmaps()
+	var alto: int = int(intera.get_height() * QUOTA_BUSTO)
+	var busto: Image = intera.get_region(Rect2i(0, 0, intera.get_width(), alto))
+	busto.generate_mipmaps()
+	var trama: ImageTexture = ImageTexture.create_from_image(busto)
 	_ritagli[chiave] = trama
 	return trama
 

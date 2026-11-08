@@ -93,7 +93,7 @@ func _crea_linguetta(nitidezza: float) -> void:
 	add_child(viewport)
 	var linguetta: LinguettaTipi = LinguettaTipi.new()
 	viewport.add_child(linguetta)
-	linguetta.imposta(scheda.tipi, scheda.colore_cornice(), scala)
+	linguetta.imposta(scheda.tipi, scheda.colore_cornice(), scala, con_busto())
 	var piano: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
 	forma.size = misura
@@ -107,7 +107,11 @@ func _crea_linguetta(nitidezza: float) -> void:
 	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
 	piano.material_override = materiale
 	var rientro: float = minf(larghezza * 0.08, maxf(0.0, (larghezza - misura.x) * 0.5))
-	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, SPESSORE * 0.6, -profondita * 0.5 - misura.y * 0.5 + LinguettaTipi.SOTTO_LA_CARTA)
+	var z_linguetta: float = -profondita * 0.5 - misura.y * 0.5 + LinguettaTipi.SOTTO_LA_CARTA
+	# Con il mezzo busto che esce dall'alto, i tipi stanno sotto la carta.
+	if con_busto():
+		z_linguetta = profondita * 0.5 + misura.y * 0.5 - LinguettaTipi.SOTTO_LA_CARTA
+	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, SPESSORE * 0.6, z_linguetta)
 	_corpo.add_child(piano)
 
 
@@ -285,6 +289,34 @@ func attiva(verso: float) -> void:
 	var spegni: Tween = create_tween()
 	spegni.tween_interval(0.25)
 	spegni.tween_callback(imposta_alone.bind(lampo))
+
+
+## Consiglieri e avvenimenti con un'illustrazione: il mezzo busto esce dall'alto della carta, come
+## i ritratti nei dialoghi dei giochi di ruolo (Davide, 8 novembre 2026).
+func con_busto() -> bool:
+	return scheda.genere == SchedaCarta.Genere.CONSIGLIERE and scheda.illustrazione != null
+
+
+## Il mezzo busto ritagliato: poggia sul fondo della finestra del disegno e sporge oltre il bordo alto.
+func aggiungi_busto() -> void:
+	if not con_busto():
+		return
+	var larghezza_busto: float = larghezza * 1.08
+	var altezza_busto: float = larghezza_busto * Figurina.QUOTA_BUSTO
+	var busto: MeshInstance3D = MeshInstance3D.new()
+	var forma: QuadMesh = QuadMesh.new()
+	forma.size = Vector2(larghezza_busto, altezza_busto)
+	forma.orientation = PlaneMesh.FACE_Y
+	busto.mesh = forma
+	busto.material_override = Figurina.materiale_carta(Figurina.ritaglia_busto(scheda.illustrazione))
+	var fondo: float = -profondita * 0.5 + profondita * _faccia.fondo_arte()
+	busto.position = Vector3(0.0, SPESSORE + 0.014, fondo - altezza_busto * 0.5)
+	_corpo.add_child(busto)
+	# Esce dalla finestra con un piccolo salto.
+	busto.scale = Vector3(0.85, 1.0, 0.6)
+	var t: Tween = create_tween()
+	t.tween_interval(0.25)
+	t.tween_property(busto, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 ## Teatro di carta: la figurina ritagliata dall'illustrazione si alza dal bordo della carta.

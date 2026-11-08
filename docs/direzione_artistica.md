@@ -144,7 +144,7 @@ Le righe si costruiscono da sole dai file dati del catalogo: cambiando un costo 
 
 ### 4.4 La linguetta dei tipi
 
-Sopra ogni tessera (e sopra ogni consigliere) sporge una **linguetta** del colore della cornice, come quella di una cartellina, con un **medaglione** per tipo: tondo scuro, bordo grigio, simbolo bianco. Sta sopra e non di lato perché sulla plancia le tessere della stessa fila sono troppo vicine; si solleva e si ingrandisce con la tessera. I tipi d'identità hanno tutti il **vessillo**. Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg` (elenco in `assets/icone/LEGGIMI.md`).
+Sopra ogni tessera (e sopra ogni consigliere) sporge una **linguetta** del colore della cornice, come quella di una cartellina, con un **medaglione** per tipo: tondo scuro, bordo grigio, simbolo bianco. Sta sopra e non di lato perché sulla plancia le tessere della stessa fila sono troppo vicine; si solleva e si ingrandisce con la tessera. I tipi d'identità hanno tutti il **vessillo**. Su consiglieri e avvenimenti con un'illustrazione il **mezzo busto** esce dal bordo alto della carta e la linguetta sta **sotto** (Davide, 8 novembre 2026). Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg` (elenco in `assets/icone/LEGGIMI.md`).
 
 ## 5. Convenzioni provvisorie introdotte con questo stile
 
