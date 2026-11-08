@@ -890,7 +890,7 @@ func _aggiorna_cronaca(run: RunState) -> void:
 	_firma_cronaca = firma
 	_momento_cronaca.text = "%s · anno %d" % [run.chronicle_moment().to_upper(), run.year]
 	_titolo_cronaca.text = run.chronicle_text(cronaca.display_name)
-	_racconto_cronaca.text = "[center]%s[/center]" % TestoRicco.colora(run.chronicle_text(cronaca.description))
+	_racconto_cronaca.text = "[center]%s[/center]" % TestoRicco.colora(run.chronicle_text(cronaca.description), 21)
 	_personaggio_cronaca.text = ""
 	if cronaca.requires_character != null:
 		var chi: NationCharacter = run.character_of(cronaca.requires_character)
@@ -936,7 +936,7 @@ func _reazione(run: RunState, opzione: EventOptionDef, indice: int) -> Control:
 	if not parti.is_empty():
 		# Che cosa fa la reazione, con le parole chiave colorate (risorse, Malcontento…).
 		var nota: RichTextLabel = PannelloSuggerimento.testo_colorato(16, StileVisivo.PERICOLO if motivo != "" else StileVisivo.TESTO_TENUE)
-		nota.text = TestoRicco.colora("  ".join(parti))
+		nota.text = TestoRicco.colora("  ".join(parti), 16)
 		nota.custom_minimum_size = Vector2(700, 0)
 		riga.add_child(nota)
 	return riga
@@ -1087,9 +1087,9 @@ func aggiorna_partita(run: RunState) -> void:
 	ultime.reverse()
 	var storia: Array[String] = run.story.slice(maxi(0, run.story.size() - 5))
 	storia.reverse()
-	var registro: String = TestoRicco.colora("\n".join(ultime))
+	var registro: String = TestoRicco.colora("\n".join(ultime), 17)
 	if not storia.is_empty():
-		registro = "%s\n%s\n\n%s\n%s" % [_titolo_bbcode("STORIA DELLA NAZIONE"), TestoRicco.colora("\n".join(storia)), _titolo_bbcode("REGISTRO"), registro]
+		registro = "%s\n%s\n\n%s\n%s" % [_titolo_bbcode("STORIA DELLA NAZIONE"), TestoRicco.colora("\n".join(storia), 17), _titolo_bbcode("REGISTRO"), registro]
 	_testo_cronaca.text = registro
 
 	var scelta_via: bool = not run.way_choices.is_empty() or not run.government_choices.is_empty() or not run.ascension_choices.is_empty()
@@ -1296,13 +1296,13 @@ func nascondi_sostituzione() -> void:
 func mostra_esito(titolo: String, sottotitolo: String, righe: Array[String], colore: Color, al_continua: Callable) -> void:
 	_titolo_esito.text = titolo
 	_titolo_esito.add_theme_color_override("font_color", colore)
-	_sotto_esito.text = "[center]%s[/center]" % TestoRicco.colora(sottotitolo)
+	_sotto_esito.text = "[center]%s[/center]" % TestoRicco.colora(sottotitolo, 21)
 	for figlio: Node in _righe_esito.get_children():
 		figlio.queue_free()
 	# Conseguenze dello scontro con le parole chiave colorate (Prestigio, malus, risorse…).
 	for riga: String in righe:
 		var etichetta: RichTextLabel = PannelloSuggerimento.testo_colorato(19)
-		etichetta.text = "• " + TestoRicco.colora(riga)
+		etichetta.text = "• " + TestoRicco.colora(riga, 19)
 		etichetta.custom_minimum_size = Vector2(600, 0)
 		_righe_esito.add_child(etichetta)
 	_al_continua = al_continua

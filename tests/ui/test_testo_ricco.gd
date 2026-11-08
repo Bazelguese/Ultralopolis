@@ -79,7 +79,7 @@ func test_solo_parole_intere() -> void:
 
 
 func test_la_forma_piu_lunga_vince() -> void:
-	assert_eq(_tratti("Tipi: Infrastruttura Bellica"), PackedStringArray(["Tipi: ", "{Infrastruttura Bellica}"]))
+	assert_eq(_tratti("Tipi: Infrastruttura Bellica"), PackedStringArray(["{Tipi}", ": ", "{Infrastruttura Bellica}"]))
 	assert_eq(_tratti("un danno d'assedio"), PackedStringArray(["un ", "{danno d'assedio}"]))
 
 
@@ -87,8 +87,8 @@ func test_numeri_secondi_e_percentuali() -> void:
 	assert_eq(_tratti("ricarica 2,5 s."), PackedStringArray(["{ricarica}", " ", "<2,5 s>", "."]))
 	assert_eq(_tratti("il 10% più in fretta"), PackedStringArray(["il ", "<10%>", " più in fretta"]))
 	assert_eq(_tratti("−1 anno, ×1,5"), PackedStringArray(["<−1>", " anno, ", "<×1,5>"]))
-	# "2 spazi" e "10 secondi" non sono secondi abbreviati.
-	assert_eq(_tratti("2 spazi"), PackedStringArray(["<2>", " spazi"]))
+	# "2 giorni" e "10 secondi" non sono secondi abbreviati.
+	assert_eq(_tratti("2 giorni"), PackedStringArray(["<2>", " giorni"]))
 	assert_eq(_tratti("10 secondi"), PackedStringArray(["<10>", " secondi"]))
 
 
@@ -181,3 +181,30 @@ func test_la_stessa_carta_ha_il_riquadro_sempre_nello_stesso_punto() -> void:
 	pannello.mostra("Arieti", "10 danni allo scudo.", carta)
 	await wait_process_frames(3)
 	assert_eq(pannello.rettangolo_principale(), prima)
+
+
+func test_simboli_delle_carte_davanti_alle_parole() -> void:
+	# Scelta di Davide (8 novembre): lo stesso simbolo delle carte; bianco come sulle carte (GDD §14.4).
+	var testo: String = TestoRicco.colora("2 danni ogni 3 s, ricarica 1,8 s. Ricevi 2 Oro.", 18)
+	assert_eq(_voce("Danno").simbolo, &"danno")
+	assert_string_contains(testo, "[img width=16 height=16 color=#ffffff]")
+	for concetto: String in ["danno", "ricarica", "oro"]:
+		assert_string_contains(testo, "%s%s" % [Simboli.CARTELLA, concetto], "C'è il simbolo %s." % concetto)
+	# Le gemme del mana hanno il colore del mana.
+	assert_string_contains(TestoRicco.colora("mana rosso", 18), "color=#%s" % _voce("Rosso").colore.to_html(false))
+	# Ogni simbolo del lessico ha il suo file, come quelli delle carte.
+	for voce: VoceLessico in TestoRicco.lessico().voci:
+		if voce.simbolo != &"":
+			assert_not_null(Simboli.trama(voce.simbolo, 16), "Manca il simbolo %s di %s." % [voce.simbolo, voce.nome])
+
+
+func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
+	# Richiesta di Davide (8 novembre): anche Propone, Potenzia e le altre parole base.
+	assert_eq(_tratti("Propone edifici; Potenzia: Ferro."), PackedStringArray(["{Propone}", " edifici; ", "{Potenzia}", ": ", "{Ferro}", "."]))
+	assert_eq(_tratti("Carta esclusiva: Foro (era 2)."), PackedStringArray(["Carta ", "{esclusiva}", ": Foro (", "{era 2}", ")."]))
+	assert_eq(_tratti("c'era una volta"), PackedStringArray(["c'era una volta"]), "Il verbo \"era\" non è l'era.")
+	assert_eq(_tratti("la via del porto"), PackedStringArray(["la via del porto"]), "\"via\" minuscola non è la Via.")
+	assert_eq(_tratti("Ricevi 2 Oro, paghi 1 Fede."), PackedStringArray(["{Ricevi}", " ", "<2>", " ", "{Oro}", ", ", "{paghi}", " ", "<1>", " ", "{Fede}", "."]))
+	for nome: String in ["Opportunità", "Potenzia", "Livello", "Era", "Capitale", "Spazio", "Fantasma", "Peculiarità"]:
+		assert_ne(_voce(nome).definizione, "", "%s ha una spiegazione." % nome)
+	assert_eq(_voce("Ricevi").definizione, "", "Ricevi e Paghi si colorano senza spiegazione.")

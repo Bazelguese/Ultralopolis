@@ -56,6 +56,8 @@ Se un simbolo manca, la carta mostra un cerchio con l'iniziale del concetto.
 | `scambio.svg` | Scambio di risorse | trade |
 
 Il mana non ha un file: le gemme colorate le disegna il gioco, perché il colore è il loro significato.
+L'unica eccezione è `gemma.svg`, un esagono bianco che serve solo nei testi dei riquadri: il gioco lo colora
+con il colore del mana davanti alle parole «rosso», «verde», «blu», «viola» ed «energetico».
 
 ## Licenza
 

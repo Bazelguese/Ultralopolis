@@ -4,9 +4,10 @@ extends Resource
 ## se serve, che cosa vuol dire (il riquadro delle spiegazioni accanto ai suggerimenti).
 ## Solo presentazione: non cambia nessuna regola.
 
-## Famiglie di parole (scelta di Davide, 8 novembre): ognuna ha una tinta di base,
-## ma ogni parola può avere un colore proprio.
-enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO }
+## Famiglie di parole (scelte di Davide, 8 novembre): ognuna ha una tinta di base,
+## ma ogni parola può avere un colore proprio. Le nuove famiglie vanno in fondo,
+## così i numeri già scritti nei dati non cambiano.
+enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO, CONSIGLIO, CRESCITA, PLANCIA, COSTO }
 
 ## Nome mostrato nel riquadro delle spiegazioni (es. "Scudo").
 @export var nome: String = ""
@@ -17,5 +18,10 @@ enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO }
 @export var forme: PackedStringArray = PackedStringArray()
 @export var colore: Color = Color.WHITE
 @export var grassetto: bool = true
+## Simbolo davanti alla parola: lo stesso delle carte (GDD §14.4), cioè il nome di un file di
+## assets/icone (es. &"danno", &"oro"). Vuoto: nessun simbolo.
+@export var simbolo: StringName = &""
+## I simboli sono bianchi come sulle carte; solo le gemme del mana prendono il colore della parola.
+@export var simbolo_colorato: bool = false
 ## Spiegazione breve, presa dal GDD. Vuota: la parola si colora ma non si spiega.
 @export_multiline var definizione: String = ""

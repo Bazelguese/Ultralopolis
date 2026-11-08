@@ -30,6 +30,8 @@ static var _lessico: Lessico = null
 ## così "Infrastruttura Bellica" vince su un'eventuale "Infrastruttura".
 static var _forme_per_iniziale: Dictionary[String, Array] = {}
 static var _caricato: bool = false
+## Nome dato a ogni simbolo rimpicciolito, per grandezza (es. "danno@16").
+static var _percorsi_simboli: Dictionary[String, String] = {}
 
 
 static func lessico() -> Lessico:
@@ -69,14 +71,15 @@ static func _aggiungi_forma(forma: String, voce: VoceLessico) -> void:
 	_forme_per_iniziale[iniziale].append([forma, voce])
 
 
-## Il testo con i codici di colore del RichTextLabel (BBCode).
-static func colora(testo: String) -> String:
+## Il testo con i codici di colore del RichTextLabel (BBCode). dimensione: grandezza del
+## carattere del testo, per disegnare i simboli della stessa altezza.
+static func colora(testo: String, dimensione: int = 18) -> String:
 	var lessico_attuale: Lessico = lessico()
 	var parti: PackedStringArray = PackedStringArray()
 	for pezzo: Pezzo in scomponi(testo):
 		var sicuro: String = _proteggi(pezzo.testo)
 		if pezzo.voce != null:
-			parti.append(_stile(sicuro, pezzo.voce.colore, pezzo.voce.grassetto))
+			parti.append(_simbolo(pezzo.voce, dimensione) + _stile(sicuro, pezzo.voce.colore, pezzo.voce.grassetto))
 		elif pezzo.numero and lessico_attuale != null:
 			var colore: Color = lessico_attuale.colore_numeri
 			if pezzo.voce_vicina != null and lessico_attuale.numeri_col_colore_della_parola:
@@ -202,6 +205,37 @@ static func _cifra(carattere: String) -> bool:
 ## Lettere (anche accentate) e cifre: separano le parole chiave dal resto.
 static func _fa_parte_di_parola(carattere: String) -> bool:
 	return _cifra(carattere) or carattere.to_lower() != carattere.to_upper()
+
+
+## Il simbolo della carta davanti alla parola (vuoto se non ne ha): bianco come sulle carte
+## (GDD §14.4), colorato solo per le gemme del mana.
+static func _simbolo(voce: VoceLessico, dimensione: int) -> String:
+	if voce.simbolo == &"" or _lessico == null or not _lessico.simboli_nel_testo:
+		return ""
+	var lato: int = maxi(8, roundi(dimensione * 0.9))
+	var percorso: String = _percorso_simbolo(voce.simbolo, lato)
+	if percorso == "":
+		return ""
+	var colore: Color = voce.colore if voce.simbolo_colorato else Color.WHITE
+	# Dopo il simbolo uno spazio sottilissimo, per staccarlo dalla parola.
+	return "[img width=%d height=%d color=#%s]%s[/img]\u200a" % [lato, lato, colore.to_html(false), percorso]
+
+
+## Il RichTextLabel trova le immagini per nome: al simbolo già rimpicciolito da Simboli (lo stesso
+## delle carte, nitido anche piccolo) si dà un nome tutto suo, una volta sola per grandezza.
+static func _percorso_simbolo(concetto: StringName, lato: int) -> String:
+	var chiave: String = "%s@%d" % [concetto, lato]
+	if _percorsi_simboli.has(chiave):
+		return _percorsi_simboli[chiave]
+	var trama: Texture2D = Simboli.trama(concetto, lato)
+	var percorso: String = ""
+	if trama != null:
+		percorso = trama.resource_path
+		if percorso.is_empty():
+			percorso = "%s%s@%d.testo" % [Simboli.CARTELLA, concetto, lato]
+			trama.take_over_path(percorso)
+	_percorsi_simboli[chiave] = percorso
+	return percorso
 
 
 static func _stile(testo: String, colore: Color, grassetto: bool) -> String:

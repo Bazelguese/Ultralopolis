@@ -1506,6 +1506,22 @@ func _chiudi_scontro() -> void:
 
 # --- Mouse ---------------------------------------------------------------------
 
+## Il testo del riquadro di una carta: i dettagli, chi ne beneficia e, se è un'offerta, il costo.
+func _testo_riquadro(tessera: Tessera3D) -> String:
+	var scheda: SchedaCarta = tessera.scheda
+	var testo: String = scheda.dettagli
+	var beneficiari: Array[BoardPiece] = _beneficiari_sotto(tessera)
+	if not beneficiari.is_empty():
+		var nomi: PackedStringArray = PackedStringArray()
+		for pezzo: BoardPiece in beneficiari:
+			nomi.append(pezzo.display_name())
+		testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
+	# Solo un prezzo vero è un costo; "Ascolta" o "Scegli" restano scritti sotto la carta.
+	if scheda.prezzo and scheda.costo != "":
+		testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]
+	return testo
+
+
 ## Il rettangolo che una carta occupa sullo schermo, ingrandita di "fattore": il riquadro dei
 ## dettagli le si attacca, così non copre la carta (nemmeno quando è ingrandita con i simboli).
 func _area_sullo_schermo(tessera: Tessera3D, fattore: float = 1.0) -> Rect2:
@@ -1557,17 +1573,8 @@ func _physics_process(_delta: float) -> void:
 		var titolo: String = scheda.titolo
 		if scheda.sopratitolo != "" and scheda.sopratitolo != scheda.titolo:
 			titolo = "%s · %s" % [scheda.sopratitolo, scheda.titolo]
-		var testo: String = scheda.dettagli
-		var beneficiari_testo: Array[BoardPiece] = _beneficiari_sotto(tessera)
-		if not beneficiari_testo.is_empty():
-			var nomi: PackedStringArray = PackedStringArray()
-			for pezzo: BoardPiece in beneficiari_testo:
-				nomi.append(pezzo.display_name())
-			testo += "\n▲ Ne beneficiano: %s." % ", ".join(nomi)
-		if scheda.costo != "":
-			testo += "\nCosto: %s%s" % [scheda.costo, "" if scheda.disponibile else " (non basta)"]
 		# Le carte che si ingrandiscono molto (con i simboli): il riquadro si attacca alla carta ingrandita.
 		var fattore: float = tessera.ingrandimento if tessera.ingrandimento > 1.2 else 1.0
-		_hud.mostra_suggerimento(titolo, testo, _area_sullo_schermo(tessera, fattore))
+		_hud.mostra_suggerimento(titolo, _testo_riquadro(tessera), _area_sullo_schermo(tessera, fattore))
 	else:
 		_hud.nascondi_suggerimento()

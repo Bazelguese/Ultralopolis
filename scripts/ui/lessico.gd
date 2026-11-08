@@ -11,5 +11,7 @@ extends Resource
 @export var numeri_in_grassetto: bool = true
 ## Un numero seguito da una parola chiave (es. "+3 scudo") prende il colore della parola.
 @export var numeri_col_colore_della_parola: bool = true
+## Simboli delle carte davanti alle parole che ne hanno uno (scelta di Davide, 8 novembre).
+@export var simboli_nel_testo: bool = true
 ## Quante spiegazioni al massimo compaiono accanto a un suggerimento.
 @export var massimo_spiegazioni: int = 4
