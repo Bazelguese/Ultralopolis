@@ -27,6 +27,9 @@ const ENERGIA_LANTERNA: Array[float] = [1.4, 0.35, 1.9, 3.4]
 
 const INCHIOSTRO: Color = Color("1a1410")
 const DURATA_CAMBIO: float = 1.6
+## Il calendario stampato sul tavolo: centro e misura (la fila dei mesi cade dietro la plancia).
+const POSIZIONE_CALENDARIO_TAVOLO: Vector3 = Vector3(-0.4, 0.004, -1.3)
+const DIMENSIONE_CALENDARIO_TAVOLO: Vector2 = Vector2(48.0, 27.0)
 
 var momento: Momento = Momento.NOTTE
 var tempo: Tempo = Tempo.SERENO
@@ -44,6 +47,8 @@ var _nuvole: Array[MeshInstance3D] = []
 var _materiale_nuvole: StandardMaterial3D
 var _astro: Node3D
 var _materiale_astro: ShaderMaterial
+## Il calendario stampato sul tavolo (sotto le carte) e il velo che compare al cambio del mese.
+var _calendario_tavolo: CalendarioSfondo
 var _calendario: CalendarioSfondo
 var _chiave_mese: String = ""
 var _tempo_scena: float = 0.0
@@ -61,11 +66,14 @@ func costruisci(libro: Rect2, astro: Vector3) -> void:
 	_crea_libro(libro)
 	_crea_meteo()
 	_crea_astro(astro)
-	# Il calendario è un velo trasparente sopra la scena e sotto l'interfaccia: non occupa spazio.
+	_crea_calendario_tavolo()
+	# Al cambio del mese il calendario si fa vedere anche sopra la scena (sotto l'interfaccia).
 	var livello: CanvasLayer = CanvasLayer.new()
 	livello.layer = 0
 	add_child(livello)
 	_calendario = CalendarioSfondo.new()
+	_calendario.trasparenza_riposo = 0.0
+	_calendario.solo_al_cambio = true
 	livello.add_child(_calendario)
 
 
@@ -122,6 +130,34 @@ func _crea_libro(libro: Rect2) -> void:
 	pagina.material_override = _materiale_pagina
 	pagina.position = centro + Vector3(0.0, -0.25, 0.0)
 	add_child(pagina)
+
+
+## Il calendario stampato sul tavolo, dietro la plancia: carte e figurine gli stanno sopra.
+## È lo stesso disegno del velo, fatto in una SubViewport e posato sulla pagina come inchiostro.
+func _crea_calendario_tavolo() -> void:
+	var foglio: SubViewport = SubViewport.new()
+	foglio.size = Vector2i(1920, 1080)
+	foglio.transparent_bg = true
+	foglio.disable_3d = true
+	foglio.gui_disable_input = true
+	foglio.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(foglio)
+	_calendario_tavolo = CalendarioSfondo.new()
+	_calendario_tavolo.trasparenza_riposo = 0.5
+	foglio.add_child(_calendario_tavolo)
+	var stampa: MeshInstance3D = MeshInstance3D.new()
+	var forma: QuadMesh = QuadMesh.new()
+	forma.size = DIMENSIONE_CALENDARIO_TAVOLO
+	forma.orientation = PlaneMesh.FACE_Y
+	stampa.mesh = forma
+	var materiale: StandardMaterial3D = StandardMaterial3D.new()
+	materiale.albedo_texture = foglio.get_texture()
+	materiale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	materiale.roughness = 1.0
+	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	stampa.material_override = materiale
+	stampa.position = POSIZIONE_CALENDARIO_TAVOLO
+	add_child(stampa)
 
 
 func _crea_meteo() -> void:
@@ -286,11 +322,13 @@ func _disegna_astro(luna: bool) -> ImageTexture:
 ## Le iniziali della nazione sul sigillo dei mesi.
 func imposta_iniziali(testo: String) -> void:
 	_calendario.imposta_iniziali(testo)
+	_calendario_tavolo.imposta_iniziali(testo)
 
 
 ## La fila dei mesi si nasconde durante gli scontri.
 func mostra_fila_mesi(visibile: bool) -> void:
 	_calendario.mostra_fila(visibile)
+	_calendario_tavolo.mostra_fila(visibile)
 
 
 # --- Il mese -----------------------------------------------------------------------
@@ -308,6 +346,7 @@ func imposta_mese(anno: int, stagione: int, mese: int, nome_mese: String, nome_s
 	_applica_luce(0.0 if subito else DURATA_CAMBIO)
 	_applica_meteo(stagione)
 	_calendario.vai_al_mese(anno, mese, nome_stagione, subito)
+	_calendario_tavolo.vai_al_mese(anno, mese, nome_stagione, subito)
 
 
 func _pesca(pesi: Array) -> int:

@@ -27,6 +27,11 @@ var _sigillo: Control
 var _lettere: Label
 var _mese: int = 1
 var _scorrimento: Tween
+## Quanto si vede la fila da ferma. Il velo sopra la scena ha 0: compare solo quando cambia il mese.
+var trasparenza_riposo: float = TRASPARENZA
+## Il velo sopra la scena: si fa vedere durante lo scorrimento del mese, poi sparisce.
+var solo_al_cambio: bool = false
+var _apparizione: Tween
 
 
 func _ready() -> void:
@@ -39,7 +44,7 @@ func _ready() -> void:
 ## La stagione scritta enorme, inclinata, appena visibile.
 func _crea_filigrana() -> void:
 	_filigrana = _etichetta("", 330, CREMA, 0)
-	_filigrana.modulate.a = 0.05
+	_filigrana.modulate.a = 0.05 if trasparenza_riposo > 0.0 else 0.0
 	_filigrana.rotation = deg_to_rad(-7.0)
 	_filigrana.position = Vector2(-60.0, 10.0)
 	add_child(_filigrana)
@@ -48,7 +53,7 @@ func _crea_filigrana() -> void:
 func _crea_fila() -> void:
 	_fila = Control.new()
 	_fila.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fila.modulate.a = TRASPARENZA
+	_fila.modulate.a = trasparenza_riposo
 	add_child(_fila)
 	# Linea del tempo a inchiostro, con le tacche dei mesi.
 	_linea = Line2D.new()
@@ -165,6 +170,8 @@ func vai_al_mese(anno: int, mese: int, nome_stagione: String, subito: bool) -> v
 	_anno.text = "ANNO %d · %s" % [anno, nome_stagione.to_upper()]
 	_filigrana.text = nome_stagione.to_upper()
 	var durata: float = 0.0 if subito else 0.75
+	if solo_al_cambio and not subito:
+		_appari(durata)
 	if _scorrimento != null and _scorrimento.is_valid():
 		_scorrimento.kill()
 	if durata > 0.0:
@@ -240,5 +247,18 @@ func _scuoti() -> void:
 ## La fila si nasconde durante gli scontri (resta il fondo).
 func mostra_fila(visibile: bool) -> void:
 	var t: Tween = create_tween()
-	t.tween_property(_fila, "modulate:a", TRASPARENZA if visibile else 0.0, 0.4)
-	t.parallel().tween_property(_filigrana, "modulate:a", 0.05 if visibile else 0.0, 0.4)
+	t.tween_property(_fila, "modulate:a", trasparenza_riposo if visibile else 0.0, 0.4)
+	t.parallel().tween_property(_filigrana, "modulate:a", (0.05 if trasparenza_riposo > 0.0 else 0.0) if visibile else 0.0, 0.4)
+
+
+## Il velo sopra la scena: si accende mentre i mesi scorrono e il sigillo timbra, poi si spegne
+## e restano solo le carte sopra il calendario stampato sul tavolo.
+func _appari(durata: float) -> void:
+	if _apparizione != null and _apparizione.is_valid():
+		_apparizione.kill()
+	_apparizione = create_tween()
+	_apparizione.tween_property(_fila, "modulate:a", 0.8, 0.25)
+	_apparizione.parallel().tween_property(_filigrana, "modulate:a", 0.1, 0.25)
+	_apparizione.tween_interval(durata + 0.9)
+	_apparizione.tween_property(_fila, "modulate:a", 0.0, 0.7)
+	_apparizione.parallel().tween_property(_filigrana, "modulate:a", 0.0, 0.7)
