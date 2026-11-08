@@ -113,6 +113,14 @@ var _sotto_messaggio: Label
 ## Colonna a sinistra: scheda della nazione e, sotto, il calendario dell'anno.
 var _colonna_sinistra: VBoxContainer
 var _riquadro_fase: PanelContainer
+## Dettagli a scomparsa (Davide, 8 novembre 2026): si aprono passando il mouse sul pannello o
+## restano aperti con un clic. Sempre visibili: nome della nazione, anno e mese, risorse.
+var _riquadro_nazione: PanelContainer
+var _dettagli_nazione: VBoxContainer
+var _dettagli_fase: VBoxContainer
+var _dettagli_fissati: bool = false
+## Tutti i pulsanti della partita in un'unica fila di linguette, in basso a destra.
+var _riga_linguette: HBoxContainer
 var _inclinazioni: BarreInclinazioni
 var _usanze: Label
 var _pannello_cronaca: PanelContainer
@@ -175,6 +183,52 @@ func _ancora(controllo: Control, preset: Control.LayoutPreset, spostamento: Vect
 			controllo.grow_horizontal = Control.GROW_DIRECTION_BOTH
 			controllo.grow_vertical = Control.GROW_DIRECTION_BOTH
 	controllo.position += spostamento
+
+
+## Pulsante della fila in basso: una linguetta di cartoncino più piccola.
+func _rendi_linguetta(pulsante: Button) -> void:
+	pulsante.add_theme_font_size_override("font_size", 17)
+	for stato: String in ["normal", "hover", "pressed", "focus", "disabled"]:
+		var stile: StyleBox = pulsante.get_theme_stylebox(stato)
+		if stile is StyleBoxFlat:
+			var piccolo: StyleBoxFlat = (stile as StyleBoxFlat).duplicate() as StyleBoxFlat
+			piccolo.content_margin_left = 11
+			piccolo.content_margin_right = 11
+			piccolo.content_margin_top = 6
+			piccolo.content_margin_bottom = 6
+			pulsante.add_theme_stylebox_override(stato, piccolo)
+
+
+## Pannello con i dettagli a scomparsa: un clic lo tiene aperto (o lo richiude).
+func _rendi_apribile(riquadro: PanelContainer) -> void:
+	riquadro.mouse_filter = Control.MOUSE_FILTER_PASS
+	riquadro.gui_input.connect(func(evento: InputEvent) -> void:
+		if evento is InputEventMouseButton and (evento as InputEventMouseButton).pressed and (evento as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+			mostra_dettagli(not _dettagli_fissati))
+
+
+## Apre (o richiude) i dettagli della nazione e dell'anno e li tiene così.
+func mostra_dettagli(aperti: bool) -> void:
+	_dettagli_fissati = aperti
+	_aggiorna_dettagli()
+
+
+func _process(_delta: float) -> void:
+	_aggiorna_dettagli()
+
+
+## I dettagli si vedono se fissati con un clic o se il mouse è sopra il loro pannello.
+func _aggiorna_dettagli() -> void:
+	if _riquadro_nazione == null or _riquadro_fase == null:
+		return
+	var mouse: Vector2 = get_viewport().get_mouse_position()
+	for coppia: Array in [[_riquadro_nazione, _dettagli_nazione], [_riquadro_fase, _dettagli_fase]]:
+		var riquadro: Control = coppia[0]
+		var dettagli: Control = coppia[1]
+		var sopra: bool = riquadro.is_visible_in_tree() and riquadro.get_global_rect().grow(6.0).has_point(mouse)
+		var aperto: bool = _dettagli_fissati or sopra
+		if dettagli.visible != aperto:
+			dettagli.visible = aperto
 
 
 func _pulsante(testo: String, al_clic: Callable) -> Button:
@@ -270,20 +324,26 @@ func _crea_nazione() -> void:
 	ricomincia_pulsante.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	Suggerimenti.imposta(ricomincia_pulsante, "Nuova partita con la stessa nazione.")
 	testa.add_child(ricomincia_pulsante)
+	_dettagli_nazione = VBoxContainer.new()
+	_dettagli_nazione.add_theme_constant_override("separation", 0)
+	_dettagli_nazione.visible = false
+	colonna.add_child(_dettagli_nazione)
 	# Ogni elemento dell'identità ha il suo riquadro con che cosa fa (P4).
 	_identita = HFlowContainer.new()
 	_identita.custom_minimum_size = Vector2(330, 0)
 	_identita.add_theme_constant_override("h_separation", 4)
 	_identita.add_theme_constant_override("v_separation", 0)
-	colonna.add_child(_identita)
+	_dettagli_nazione.add_child(_identita)
 	# Inclinazioni, usanze e vocazioni (GDD §9.6, v0.29).
 	_inclinazioni = BarreInclinazioni.new()
-	colonna.add_child(_inclinazioni)
+	_dettagli_nazione.add_child(_inclinazioni)
 	_usanze = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 15, StileVisivo.ORO_LUCE)
 	_usanze.custom_minimum_size = Vector2(320, 0)
 	_usanze.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_usanze.mouse_filter = Control.MOUSE_FILTER_STOP
-	colonna.add_child(_usanze)
+	_dettagli_nazione.add_child(_usanze)
+	_riquadro_nazione = riquadro
+	_rendi_apribile(riquadro)
 	_colonna_sinistra = VBoxContainer.new()
 	_colonna_sinistra.add_theme_constant_override("separation", 10)
 	_colonna_sinistra.add_child(riquadro)
@@ -301,18 +361,23 @@ func _crea_fase() -> void:
 	_fase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_fase.custom_minimum_size = Vector2(266, 0)
 	dentro.add_child(_fase)
+	_dettagli_fase = VBoxContainer.new()
+	_dettagli_fase.add_theme_constant_override("separation", 6)
+	_dettagli_fase.visible = false
+	dentro.add_child(_dettagli_fase)
 	# Il flusso dell'anno, visivo (GDD §3.2, v0.25): stagioni, mesi, scontri e mese in corso.
 	_flusso = FlussoAnno.new()
 	_flusso.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	dentro.add_child(_flusso)
+	_dettagli_fase.add_child(_flusso)
 	_sotto_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 16, StileVisivo.TESTO_TENUE)
 	_sotto_fase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sotto_fase.custom_minimum_size = Vector2(266, 0)
-	dentro.add_child(_sotto_fase)
+	_dettagli_fase.add_child(_sotto_fase)
 	# Stretto: sta a sinistra del ritratto della nazione.
 	riquadro.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_colonna_sinistra.add_child(riquadro)
 	_riquadro_fase = riquadro
+	_rendi_apribile(riquadro)
 
 	# In alto al centro: gli annunci della partita.
 	_annuncio = VBoxContainer.new()
@@ -395,6 +460,11 @@ func _crea_risorse() -> void:
 	var spinta: Control = Control.new()
 	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	riga.add_child(spinta)
+	_riga_linguette = HBoxContainer.new()
+	_riga_linguette.add_theme_constant_override("separation", 6)
+	_riga_linguette.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	riga.add_child(_riga_linguette)
+	riga = _riga_linguette
 	_pulsante_ricerca = _pulsante("Ricerca", func() -> void: _ricerca.visible = not _ricerca.visible)
 	_pulsante_ricerca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_ricerca)
@@ -693,20 +763,23 @@ func _on_vendi(tipo: int) -> void:
 
 
 func _crea_pannelli_destra() -> void:
-	var colonna: VBoxContainer = VBoxContainer.new()
-	colonna.add_theme_constant_override("separation", 8)
+	# Effetti, Annali e Legenda stanno nella stessa fila di linguette degli altri pulsanti.
+	var divisore: VSeparator = VSeparator.new()
+	_riga_linguette.add_child(divisore)
 	_pulsante_effetti = _pulsante("Effetti", func() -> void: _alterna(_effetti))
-	colonna.add_child(_pulsante_effetti)
-	colonna.add_child(_pulsante("Annali", func() -> void: _alterna(_cronaca)))
+	_riga_linguette.add_child(_pulsante_effetti)
+	_riga_linguette.add_child(_pulsante("Annali", func() -> void: _alterna(_cronaca)))
 	var pulsante_legenda: Button = _pulsante("Legenda", func() -> void: _alterna(_legenda))
 	Suggerimenti.imposta(pulsante_legenda, "Che cosa vogliono dire i simboli.", "Legenda")
-	colonna.add_child(pulsante_legenda)
-	_ancora(colonna, Control.PRESET_CENTER_RIGHT, Vector2(-24, -60))
+	_riga_linguette.add_child(pulsante_legenda)
+	for figlio: Node in _riga_linguette.get_children():
+		if figlio is Button:
+			_rendi_linguetta(figlio as Button)
 
 	_legenda = LegendaSimboli.new()
 	_legenda.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	_legenda.costruisci(GameSession.catalog())
-	_ancora(_legenda, Control.PRESET_CENTER_RIGHT, Vector2(-180, 0))
+	_ancora(_legenda, Control.PRESET_CENTER_RIGHT, Vector2(-24, 0))
 	_legenda.visible = false
 
 	_effetti = PanelContainer.new()
@@ -716,7 +789,7 @@ func _crea_pannelli_destra() -> void:
 	lista.add_child(StileVisivo.etichetta("EFFETTI ATTIVI", StileVisivo.FONT_TITOLI, 26, StileVisivo.ORO_LUCE))
 	_lista_effetti = VBoxContainer.new()
 	lista.add_child(_lista_effetti)
-	_ancora(_effetti, Control.PRESET_CENTER_RIGHT, Vector2(-180, -160))
+	_ancora(_effetti, Control.PRESET_CENTER_RIGHT, Vector2(-24, -160))
 	_effetti.visible = false
 
 	_cronaca = PanelContainer.new()
@@ -726,7 +799,7 @@ func _crea_pannelli_destra() -> void:
 	_testo_cronaca = PannelloSuggerimento.testo_colorato(17)
 	_testo_cronaca.custom_minimum_size = Vector2(480, 0)
 	colonna_cronaca.add_child(_testo_cronaca)
-	_ancora(_cronaca, Control.PRESET_CENTER_RIGHT, Vector2(-180, -220))
+	_ancora(_cronaca, Control.PRESET_CENTER_RIGHT, Vector2(-24, -220))
 	_cronaca.visible = false
 
 
