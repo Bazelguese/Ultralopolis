@@ -119,7 +119,7 @@ Regole della grafica:
 - Il **mana** resta una gemma colorata disegnata dal gioco.
 - `/` separa le alternative, `·` separa due effetti diversi della stessa scelta.
 - Uno **spazio** della plancia è il simbolo dentro una cornice tratteggiata; una tessera che **sale di livello** ha una freccia dorata.
-- Le stesse icone delle risorse compaiono nella barra delle risorse in basso e accanto al Malcontento, così il giocatore le impara.
+- Nella barra delle risorse in basso ogni risorsa è solo il suo simbolo (lo stesso delle tessere), con accanto la quantità e la produzione; il nome è nel riquadro al passaggio del mouse. Il simbolo del Malcontento sta accanto al suo nome in alto.
 - Le righe corte stanno **affiancate** sulla stessa linea, ognuna nella sua pastiglia, per non sprecare spazio (richiesta di Davide).
 - Sul consigliere il riquadro dei dettagli dice **solo ciò che si vede**: una frase per ogni riga di simboli, nello stesso ordine.
 - Con il mouse sopra, un consigliere, un'azione o un avvenimento con i simboli **si ingrandisce** (×1,7) e il testo dei dettagli va sotto o di fianco, senza coprirlo.
