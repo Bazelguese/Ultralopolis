@@ -1803,20 +1803,27 @@ func tech_block_reason(def: TechDef, ignore_tier: bool = false) -> String:
 	if def.is_exclusive() and not _has_any_identity(def.requires_any):
 		return "Esclusiva di: %s." % _identity_names(def.requires_any)
 	if not def.requires_types.is_empty() and _pieces_with(def.requires_types, EventOptionDef.PieceKind.QUALSIASI).is_empty():
-		return "Serve sulla plancia una tessera %s." % ", ".join(def.requires_types)
+		return "Serve sulla plancia una tessera di tipo %s." % " o ".join(def.requires_types)
 	var missing: PackedStringArray = PackedStringArray()
 	for needed: Resource in def.prerequisites:
 		var prerequisite: TechDef = needed as TechDef
 		if prerequisite != null and not techs_done.has(prerequisite):
 			missing.append(prerequisite.display_name)
 	if not missing.is_empty():
-		return "Richiede: %s." % ", ".join(missing)
+		var names: String = missing[0]
+		if missing.size() > 1:
+			names = "%s e %s" % [", ".join(missing.slice(0, missing.size() - 1)), missing[missing.size() - 1]]
+		return "Serve prima %s." % names
 	if def.perk != null and identity.has(def.perk):
 		return "Hai già la peculiarità %s." % def.perk.display_name
 	if not ignore_tier and def.tier > 1:
 		var needed_first: int = run_rules.tech_second_tier_needed
 		if _first_tier_done(def.era, def.branch()) < needed_first:
-			return "Si apre con %d tecnologia della prima altezza del ramo %s in quest'era." % [needed_first, TechDef.BRANCH_NAMES.get(def.branch(), "?")]
+			# Conta solo la prima altezza della stessa era della tecnologia, con l'altezza vera
+			# di tutta la partita (l'era 2 ha le altezze 3 e 4, GDD §10.5.2).
+			return "Si apre dopo %d %s dell'altezza %d del ramo %s." % [needed_first,
+					"tecnologia" if needed_first == 1 else "tecnologie", def.height() - 1,
+					TechDef.BRANCH_NAMES.get(def.branch(), "?")]
 	return ""
 
 

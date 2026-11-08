@@ -602,18 +602,38 @@ func _testo_carta(run: RunState, tecnologia: TechDef) -> String:
 		stato = "In studio · "
 	elif run.tech_status(tecnologia) == RunState.TechStatus.INIZIATA:
 		stato = "Iniziata · "
-	var testo: String = "%s\n%s%s · %s · altezza %d\n%d/%d Ricerca\n%s" % [tecnologia.display_name, stato,
-			TechDef.BRANCH_NAMES.get(tecnologia.branch(), "?"), tecnologia.sphere, tecnologia.tier,
+	var testo: String = "%s\n%s%s\n%d/%d Ricerca\n%s" % [tecnologia.display_name, stato, posto_nell_albero(tecnologia),
 			run.tech_progress_of(tecnologia), tecnologia.cost, tecnologia.description]
 	return testo + _riga_beneficiari(run, tecnologia.permanent_modifiers)
 
 
+## Dove sta la tecnologia nell'albero, es. "Ramo Blu (Fede) · altezza 3": il ramo con la sua
+## sfera fra parentesi (così non si confonde con la risorsa) e l'altezza vera, contata su tutta la
+## partita (l'era 2 ha le altezze 3 e 4, GDD §10.5.2).
+static func posto_nell_albero(tecnologia: TechDef) -> String:
+	return "Ramo %s (%s) · altezza %d" % [TechDef.BRANCH_NAMES.get(tecnologia.branch(), "?"), tecnologia.sphere, tecnologia.height()]
+
+
 ## "Ne beneficiano: Milizia, Lancieri" per un bonus legato a un tipo (GDD §6.6), vuoto se nessuna.
 static func _riga_beneficiari(run: RunState, modificatori: Array[ModifierDef]) -> String:
-	var nomi: PackedStringArray = PackedStringArray()
-	for pezzo: BoardPiece in run.pieces_boosted_by(modificatori):
-		nomi.append(pezzo.display_name())
-	return "\n▲ Ne beneficiano: %s" % ", ".join(nomi) if not nomi.is_empty() else ""
+	var pezzi: Array[BoardPiece] = run.pieces_boosted_by(modificatori)
+	return "\n▲ Ne beneficiano: %s" % nomi_raggruppati(pezzi) if not pezzi.is_empty() else ""
+
+
+## Nomi delle tessere con quelle uguali raggruppate, nell'ordine in cui compaiono:
+## "Milizia ×2, Lancieri".
+static func nomi_raggruppati(pezzi: Array[BoardPiece]) -> String:
+	var ordine: PackedStringArray = PackedStringArray()
+	var quante: Dictionary[String, int] = {}
+	for pezzo: BoardPiece in pezzi:
+		var nome: String = pezzo.display_name()
+		if not quante.has(nome):
+			ordine.append(nome)
+		quante[nome] = quante.get(nome, 0) + 1
+	var voci: PackedStringArray = PackedStringArray()
+	for nome: String in ordine:
+		voci.append(nome if quante[nome] == 1 else "%s ×%d" % [nome, quante[nome]])
+	return ", ".join(voci)
 
 
 ## Una tecnologia dell'albero: colore e parola dicono lo stato, il suggerimento il perché (P4).
@@ -636,10 +656,11 @@ func _voce_albero(run: RunState, tecnologia: TechDef) -> Label:
 			nota = " · bloccata"
 	var voce: Label = StileVisivo.etichetta("%s%s (%d)%s" % ["  " if tecnologia.tier == 2 else "", tecnologia.display_name, tecnologia.cost, nota], StileVisivo.FONT_TESTO, 16, colore)
 	voce.mouse_filter = Control.MOUSE_FILTER_PASS
-	var aiuto: String = "%s, altezza %d\n%s%s" % [tecnologia.sphere, tecnologia.tier, tecnologia.description,
+	var aiuto: String = "%s\n%s%s" % [posto_nell_albero(tecnologia), tecnologia.description,
 			_riga_beneficiari(run, tecnologia.permanent_modifiers)]
 	if stato == RunState.TechStatus.BLOCCATA:
-		aiuto += "\nBloccata: %s" % run.tech_block_reason(tecnologia)
+		var motivo: String = run.tech_block_reason(tecnologia)
+		aiuto += "\nBloccata: %s%s" % [motivo.left(1).to_lower(), motivo.substr(1)]
 	Suggerimenti.imposta(voce, aiuto, tecnologia.display_name)
 	return voce
 

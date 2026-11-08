@@ -293,3 +293,27 @@ func test_la_legenda_spiega_ogni_tipo_di_azione() -> void:
 		assert_ne(voce[1] as String, "Altre azioni", "%s ha un nome." % (voce[0] as RigaSimboli).come_testo())
 	assert_eq((tipi[0][0] as RigaSimboli).come_testo(), "[scambio]")
 	assert_eq(tipi[0][1], "Scambi di risorse")
+
+
+## La carta e l'albero delle tecnologie dicono ramo, sfera e altezza vera: l'era 2 ha le
+## altezze 3 e 4 (GDD §10.5.2; revisione n. 16 e 66).
+func test_posto_nell_albero_con_l_altezza_vera() -> void:
+	var tecnologia: TechDef = TechDef.new()
+	tecnologia.sphere = "Militare"
+	assert_eq(HudPlancia.posto_nell_albero(tecnologia), "Ramo Rosso (Militare) · altezza 1")
+	tecnologia.tier = 2
+	assert_eq(HudPlancia.posto_nell_albero(tecnologia), "Ramo Rosso (Militare) · altezza 2")
+	tecnologia.sphere = "Fede"
+	tecnologia.era = 2
+	tecnologia.tier = 1
+	assert_eq(HudPlancia.posto_nell_albero(tecnologia), "Ramo Blu (Fede) · altezza 3")
+
+
+## Le tessere uguali che beneficiano di un bonus si contano invece di ripeterle (revisione n. 67).
+func test_beneficiari_raggruppati() -> void:
+	var lancieri: TroopDef = TroopDef.new()
+	lancieri.display_name = "Lancieri"
+	var milizia: TroopDef = TroopDef.new()
+	milizia.display_name = "Milizia"
+	var pezzi: Array[BoardPiece] = [BoardPiece.of_troop(milizia, 0), BoardPiece.of_troop(lancieri, 0), BoardPiece.of_troop(milizia, 0)]
+	assert_eq(HudPlancia.nomi_raggruppati(pezzi), "Milizia ×2, Lancieri")
