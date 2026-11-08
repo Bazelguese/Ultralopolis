@@ -1,7 +1,9 @@
-# Simboli delle carte
+# Simboli del gioco
 
-Questi sono i simboli che il gioco mette sulle carte (consiglieri, azioni, eventi) e nella barra
-delle risorse. Ogni file è un concetto del gioco: il nome del file è il concetto.
+Questi sono i simboli che il gioco mette sui consiglieri, sulle azioni, sugli avvenimenti, nella barra
+delle risorse e davanti alle parole chiave dei testi. Ogni file è un concetto del gioco: il nome del
+file è il concetto. Alcuni file hanno ancora un nome tecnico vecchio (es. `perk.svg`, `proposta.svg`):
+conta il significato scritto nell'elenco, con i nomi del glossario (`docs/Glossario.md`).
 
 ## Come sostituire un simbolo
 
@@ -11,7 +13,7 @@ delle risorse. Ogni file è un concetto del gioco: il nome del file è il concet
    Se usi un PNG, cancella l'SVG con lo stesso nome.
 3. Apri il progetto in Godot: l'immagine viene importata da sola.
 
-Se un simbolo manca, la carta mostra un cerchio con l'iniziale del concetto.
+Se un simbolo manca, al suo posto compare un cerchio con l'iniziale del concetto.
 
 ## Elenco
 
@@ -32,8 +34,8 @@ Se un simbolo manca, la carta mostra un cerchio con l'iniziale del concetto.
 | `scudo.svg` | Scudo | shield |
 | `cura.svg` | Cura | health-normal |
 | `corruzione.svg` | Corruzione | poison-bottle |
-| `assedio.svg` | Attacco d'assedio | catapult |
-| `inefficienza.svg` | Inefficienza (rallenta) | snail |
+| `assedio.svg` | Danno d'assedio | catapult |
+| `inefficienza.svg` | Inefficienza | snail |
 | `sabotaggio.svg` | Sabotaggio (ferma) | cog-lock |
 | `resistenza.svg` | Resistenza | castle |
 | `edificio.svg` | Edificio | house |
@@ -41,15 +43,15 @@ Se un simbolo manca, la carta mostra un cerchio con l'iniziale del concetto.
 | `potenzia.svg` | Potenzia | upgrade |
 | `malus.svg` | Malus | armor-downgrade |
 | `anno.svg` | Durata in anni | calendar |
-| `ricarica.svg` | Ricarica, intervallo, tempo | hourglass |
+| `ricarica.svg` | Ricarica (truppe), ciclo (edifici), tempo | hourglass |
 | `rinnovo.svg` | Rinnovo, ripescare | cycle |
 | `spia.svg` | Spionaggio | spy |
 | `fantasma.svg` | Scontro con il fantasma | ghost |
 | `incanto.svg` | Incanto | sparkles |
-| `perk.svg` | Perk | laurels |
+| `perk.svg` | Peculiarità | laurels |
 | `governo.svg` | Governo | throne-king |
 | `tecnologia.svg` | Tecnologia | gears |
-| `proposta.svg` | Proposte del Consiglio | card-draw |
+| `proposta.svg` | Opportunità del Consiglio | card-draw |
 | `caso.svg` | A caso | perspective-dice-six-faces-random |
 | `bloccato.svg` | Opzione bloccata | padlock |
 | `azione.svg` | Azioni del Consiglio (la riga «azioni» del consigliere) | stamper |
