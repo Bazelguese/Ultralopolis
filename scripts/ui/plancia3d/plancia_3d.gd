@@ -671,7 +671,7 @@ func _costruisci_scelte() -> void:
 		# Evoluzione del governo entrando nell'era (GDD §9.4): l'ultima carta la rifiuta.
 		tipo = TipoScelta.GOVERNO
 		for governo: IdentityDef in run.government_choices:
-			schede.append(SchedaCarta.da_governo(governo))
+			schede.append(SchedaCarta.da_governo(governo, run))
 			origini.append(governo)
 		schede.append(SchedaCarta.da_resta(run.government(), run))
 		origini.append(run.government())

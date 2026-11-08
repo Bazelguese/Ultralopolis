@@ -235,3 +235,38 @@ func test_le_tue_truppe_dicono_le_eccezioni_delle_ascensioni() -> void:
 	assert_string_contains(con_ascensioni, "Mana unito, gli altri colori")
 	assert_string_contains(con_ascensioni, "con Esercito frugale non rallenta")
 	assert_eq(SchedaCarta.regole_di(_run()), [] as Array[int], "Una nazione senza ascensioni segue le regole normali.")
+
+
+func test_l_offerta_dice_i_valori_che_avra_da_te() -> void:
+	# Decisione di Davide (8 novembre): valori del catalogo e, se diversi, quelli con i tuoi bonus.
+	var run: RunState = _run()
+	var prova: BoardPiece = BoardPiece.of_troop(soldier, 0)
+	assert_eq(SchedaCarta.righe_da_te(run, prova), "", "Senza bonus niente riga in più.")
+	var fabbri: ModifierDef = ModifierDef.new()
+	fabbri.id = &"prova_fabbri"
+	fabbri.display_name = "Prova"
+	fabbri.effect = ModifierDef.Effect.RICARICA_TRUPPA
+	fabbri.amount = -10
+	fabbri.target_type = &"Fante"
+	fabbri.is_malus = false
+	fabbri.duration_kind = ModifierDef.Duration.PERMANENTE
+	run.modifiers.apply(fabbri, ActiveModifier.OriginKind.ALTRO, "Prova", run.year, run.board, RandomNumberGenerator.new())
+	var testo: String = SchedaCarta.righe_da_te(run, prova)
+	assert_string_contains(testo, "Da te, con i tuoi bonus:")
+	assert_string_contains(testo, "ricarica 2 s → 1,8 s")
+
+
+func test_le_esclusive_di_un_era_passata_non_si_promettono() -> void:
+	var testo: String = "Un solo uomo al comando. Tessera esclusiva: Milizia del regime (era 2). Capitale: +1 Ferro."
+	assert_eq(SchedaCarta.senza_esclusive_passate(testo, 2), testo, "Nell'era 2 la tessera può ancora arrivare.")
+	assert_eq(SchedaCarta.senza_esclusive_passate(testo, 3), "Un solo uomo al comando. Capitale: +1 Ferro.")
+
+
+func test_le_ascensioni_sono_minori_e_maggiori() -> void:
+	var minore: IdentityDef = IdentityDef.new()
+	minore.ascension_level = 1
+	var maggiore: IdentityDef = IdentityDef.new()
+	maggiore.ascension_level = 2
+	assert_eq(SchedaCarta.grado_ascensione(minore), "minore")
+	assert_eq(SchedaCarta.grado_ascensione(maggiore), "maggiore")
+	assert_eq(SchedaCarta.da_ascensione(maggiore).sopratitolo, "Ascensione maggiore")
