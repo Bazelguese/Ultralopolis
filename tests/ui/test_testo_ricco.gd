@@ -208,3 +208,11 @@ func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
 	for nome: String in ["Opportunità", "Potenzia", "Livello", "Era", "Capitale", "Spazio", "Fantasma", "Peculiarità"]:
 		assert_ne(_voce(nome).definizione, "", "%s ha una spiegazione." % nome)
 	assert_eq(_voce("Ricevi").definizione, "", "Ricevi e Paghi si colorano senza spiegazione.")
+
+
+func test_azioni_e_puo_proporre() -> void:
+	# Richiesta di Davide (8 novembre): "azioni" è una parola chiave, con il simbolo del timbro.
+	assert_eq(_tratti("Azioni possibili: scambi di risorse."), PackedStringArray(["{Azioni}", " possibili: scambi di risorse."]))
+	assert_eq(_tratti("Può proporre: edifici."), PackedStringArray(["Può ", "{proporre}", ": edifici."]))
+	assert_eq(_voce("Azione").simbolo, &"azione")
+	assert_ne(_voce("Azione").definizione, "")
