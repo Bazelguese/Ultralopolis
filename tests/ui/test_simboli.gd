@@ -273,7 +273,7 @@ func test_i_dettagli_del_consigliere_dicono_solo_cio_che_si_vede() -> void:
 	assert_eq(righe[0], "Tipi: Materie prime, Fante.")
 	assert_eq(righe[1], "Può proporre: edifici, truppe o azioni.")
 	assert_eq(righe[2], "Azioni possibili: scambi di risorse.")
-	assert_string_starts_with(righe[3], "Potenzia: fa salire di livello una tua tessera di tipo Materie prime o Fante, pagando Stabilità. Si usa una volta per round e non consuma la scelta del round.")
+	assert_string_starts_with(righe[3], "Potenzia: fa salire di livello una tua tessera dei suoi tipi, pagando Stabilità. Si usa una volta per round e non consuma la scelta del round.")
 	assert_false(scheda.dettagli.contains("Decreto fiscale"), "Niente elenco delle singole azioni: non si vedono sulla carta.")
 
 
