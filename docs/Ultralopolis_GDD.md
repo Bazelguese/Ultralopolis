@@ -228,7 +228,7 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 
 | Consigliere | Categoria | Azioni | Paga le azioni con |
 |---|---|---|---|
-| Tesoriere | Ricchezza | Esattori: Oro subito · Assemblea: +50% Oro o Ricerca per un anno (il Mercante, Ricerca in Oro, è stato tolto nella v0.26) | Influenza |
+| Tesoriere | Ricchezza | Esattori: Oro subito · Assemblea: +50% Oro o Ricerca per un anno (il Mercante, Ricerca in Oro, è stato tolto nella v0.26) | gratis (correzione dell’8 novembre 2026) |
 | Fattore | Terra | Scorte: Cibo in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno |
 | Architetto | Opera | Architetti: spazio edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | Pietra, Legno (lo spazio in Oro) |
 | Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
@@ -239,7 +239,7 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 | Clown | — | 5 elementi di mana diverso (§4.2.2) | — |
 | Anziano | — | Un perk (§9.3) | Fede e Influenza |
 
-Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Ogni risorsa di categoria (§5.3) deve pagare **almeno un’azione** del Consiglio — Confermato (v0.22). L’assegnazione attuale (Ambasciata in Stabilità, spionaggio in Documenti) è una Proposta. Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
+Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Ogni risorsa di categoria (§5.3) deve pagare **almeno un’azione** del Consiglio — Confermato (v0.22). Le azioni del Tesoriere sono gratuite, come nel gioco (correzione dell’8 novembre 2026, decisione di Davide): l’Influenza resta la risorsa di un’azione con il perk dell’Anziano, e paga anche la Riforma. L’assegnazione attuale (Ambasciata in Stabilità, spionaggio in Documenti) è una Proposta. Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
 
 Una proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
 
@@ -1356,7 +1356,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
 | Almeno 1 proposta per consigliere (prima del Consiglio: 1 alternativa per opportunità) | Provvisoria. |
-| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; Scorte 2 Legno → 3 Cibo; Razioni 2 Legno; incanti 2 Fede; spionaggi 2 Documenti (3 la Rete di sabotatori, che sabota per 8 s); Grandi esattori +6 Oro; Trattati 4 Legno → 5 Ricerca; perk dell’Anziano 2 Fede + 2 Influenza; Archivisti 2 Documenti → 3 Ricerca; Manuali tecnici 2 Documenti; Decreto fiscale 2 Stabilità → 4 Oro; Censimento 2 Stabilità (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
+| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; Scorte 2 Legno → 3 Cibo; Razioni 2 Legno; incanti 2 Fede; spionaggi 2 Documenti (3 la Rete di sabotatori, che sabota per 8 s); Esattori +3 Oro, Grandi esattori +6 Oro e Assemblea gratis; Trattati 4 Legno → 5 Ricerca; perk dell’Anziano 2 Fede + 2 Influenza; Archivisti 2 Documenti → 3 Ricerca; Manuali tecnici 2 Documenti; Decreto fiscale 2 Stabilità → 4 Oro; Censimento 2 Stabilità (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
 | Bottino dei nemici sconfitti: fantasma 3 Oro e 2 Ricerca; incontri facile 2 Oro e 1 Ricerca, media 3 e 2, difficile 4 e 3 | Placeholder (v0.21). |
 | Consiglio: le identità che favorivano i Costruttori ora favoriscono il Tesoriere, quelle che favorivano i Reclutatori il Generale (v0.22; nella v0.21 i Costruttori passavano all’Architetto) | Provvisoria. |
@@ -1602,6 +1602,9 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 ## Registro delle versioni
 
+**Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
+- Le azioni del Tesoriere (Esattori, Grandi esattori, Assemblea) sono **gratuite**, come già nel gioco: il GDD diceva che si pagavano in Influenza (§4.2.3, §16.3). Decisione di Davide: vale la versione del gioco.
+
 **v0.29 — 6 novembre 2026** (modifica del nucleo)
 - Approvata la bozza `docs/Bozza_cronache.md` (Davide: struttura sì, inclinazioni sì, vocazioni "una via di mezzo", personaggi non prima del primo fantasma, tono duro sì, "fai tutto").
 - **Cronache della nazione** (§9.6): all'inizio di ogni stagione una scena costruita sulla partita, a cui la nazione reagisce; seconda eccezione a "nessun evento arriva da solo" (§3.2, §4.2.5).
@@ -1620,7 +1623,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 **v0.26 — 5 novembre 2026** (modifica del nucleo)
 - Approvata la bozza `docs/Bozza_v0.26_ricerca_tecnologie.md`: la Ricerca serve a un **albero delle tecnologie** (§10.5).
-- La Ricerca non sta più nel Magazzino: riempie la tecnologia in corso un po’ alla volta; non si vende e non paga azioni. Tolto il Mercante; il Tesoriere paga in Influenza (§4.2.3, §5.3).
+- La Ricerca non sta più nel Magazzino: riempie la tecnologia in corso un po’ alla volta; non si vende e non paga azioni. Tolto il Mercante; il Tesoriere paga in Influenza (§4.2.3, §5.3). *(Corretto l’8 novembre 2026: le azioni del Tesoriere sono gratuite.)*
 - Albero unico a **4 rami** per colore, ognuno con due categorie; due altezze per era; mano di **3 carte** come in Stellaris, con sconto sulla carta scartata; tecnologie iniziate e carte dorate sempre nella mano (§10.5.2, §10.5.3).
 - Si ricercano linee di elementi, perk, miglioramenti del Consiglio e della nazione, dottrine sui tipi; tutte valgono per sempre (§10.5.4). Le **linee** propongono la versione dell’era corrente, o l’ultima precedente (§10.5.5).
 - Le ere si raggiungono con **N tecnologie** dell’era corrente, quando lo decide il giocatore; non si paga più l’era con la Ricerca (§10.3). Superate “la Ricerca si conserva e viene spesa” e la struttura lineare.
