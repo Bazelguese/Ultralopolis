@@ -33,7 +33,6 @@ func costruisci(p_stile: Stile) -> void:
 		Stile.ROSONE: _crea_rosone()
 		Stile.GRU: _crea_gru()
 	for mana: StringName in COLORI:
-		_valori[mana] = 0
 		imposta(mana, 0)
 
 
@@ -143,8 +142,9 @@ func _crea_lanterne() -> void:
 func _crea_rosone() -> void:
 	var disco: Node3D = Node3D.new()
 	# In piedi e un po' inclinato verso la telecamera, come un rosone di carta ritagliata.
-	disco.rotation.x = deg_to_rad(-55.0)
-	disco.position = Vector3(0.0, 0.05, 0.0)
+	disco.rotation.x = deg_to_rad(48.0)
+	disco.position = Vector3(0.0, 0.75, 0.0)
+	disco.scale = Vector3.ONE * 0.85
 	add_child(disco)
 	var fondo: MeshInstance3D = MeshInstance3D.new()
 	var cf: CylinderMesh = CylinderMesh.new()
@@ -215,15 +215,15 @@ func _crea_gru() -> void:
 		var fp: CylinderMesh = CylinderMesh.new()
 		fp.top_radius = 0.02
 		fp.bottom_radius = 0.03
-		fp.height = 0.22
+		fp.height = 0.3
 		palo.mesh = fp
 		palo.material_override = StileVisivo.materiale(Color("2a1d12"), 0.9)
-		palo.position.y = 0.11
+		palo.position.y = 0.15
 		nodo.add_child(palo)
 		var gru: Node3D = Node3D.new()
-		gru.position.y = 0.26
+		gru.position.y = 0.34
 		gru.rotation.y = PI * 0.5
-		gru.scale = Vector3.ONE * 0.75
+		gru.scale = Vector3.ONE * 1.05
 		nodo.add_child(gru)
 		var carta: StandardMaterial3D = StandardMaterial3D.new()
 		carta.albedo_color = colore
