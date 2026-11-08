@@ -16,7 +16,7 @@
 script = ExtResource("7_5el4a")
 id = &"teocrazia"
 display_name = "Teocrazia"
-description = "Governano i sacerdoti. Il Sacerdote è sempre fra i consiglieri del round; Ambasciata più frequente e Processione esclusiva. Tessera esclusiva: Guardie del tempio (era 2). Capitale: +1 Fede."
+description = "Governano i sacerdoti. Il Sacerdote è sempre fra i consiglieri del round; il Cancelliere e la sua azione Ambasciata più frequenti; azione esclusiva Processione. Tessera esclusiva: Guardie del tempio (era 2). Capitale: +1 Fede."
 dimension = 1
 identity_type = &"Teocratico"
 resistance_bonus = 4

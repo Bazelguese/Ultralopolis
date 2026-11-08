@@ -13,7 +13,7 @@
 script = ExtResource("x1")
 id = &"culto_solare"
 display_name = "Culto solare"
-description = "Adorazione del sole e della luce, che benedice i raccolti: +20% Oro prodotto. Tessera esclusiva: Altare del sole; incanto esclusivo: Mezzogiorno. Capitale: +1 Fede."
+description = "Adorazione del sole e della luce, che benedice i commerci: +20% dell'Oro prodotto. Tessera esclusiva: Altare del sole; incanto esclusivo: Mezzogiorno. Capitale: +1 Fede."
 dimension = 2
 identity_type = &"Solare"
 resistance_bonus = 2
