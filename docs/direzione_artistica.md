@@ -40,6 +40,8 @@ Alcuni colori hanno un significato e non vanno usati per altro, perché lo scont
 
 **Scelto da Davide l'8 novembre 2026:** nessun altro elemento usa colori simili al mana viola. La cornice delle azioni è passata da lilla (`#a78bfa`) ad acciaio, il nastro “Sabotato” e le scintille del sabotaggio da viola (`#8b3fc9`, `#b36bff`) a bianco ghiaccio, la Corruzione da viola (`#8b3fc9`) a magenta scuro.
 
+**Altri colori lilla tolti (Davide, 8 novembre 2026):** nel calendario il tema Azioni è acciaio chiaro `#9fb0c8`, come la cornice delle azioni; l'etichetta Era prende il colore della cornice dell'era in corso (bronzo, argento, oro); le ascensioni nel pannello delle tradizioni sono in oro e le peculiarità nella scheda della nazione in bianco pieno; l'Influenza (barra delle risorse e parole colorate) è rosa cipria `#f2b0c4`; il Prestigio nelle parole colorate è oro `#f2b632`, come nella tabella; la luce d'atmosfera della scena è blu notte `#4f6bff`. Il viola resta solo al mana.
+
 **Cornice delle tessere secondo l'era (proposta visiva, non è una regola):** bronzo per la Fondazione, argento per lo Sviluppo, oro per l'Ascesa. Le azioni (le opportunità che non sono un edificio o una truppa) hanno la cornice acciaio `#6f819b`, un quarto metallo lontano dai colori del mana; incontri e fantasmi hanno la cornice cremisi.
 
 ## 3. Le illustrazioni

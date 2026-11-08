@@ -13,7 +13,7 @@ const SPAZIO_STAGIONE: float = 10.0
 const LARGHEZZA_NOME: float = 100.0
 const INIZIALI: PackedStringArray = ["G", "F", "M", "A", "M", "G", "L", "A", "S", "O", "N", "D"]
 
-const COLORE_AZIONI: Color = Color("c7b8ff")
+const COLORE_AZIONI: Color = Color("9fb0c8")
 const COLORE_EDIFICI: Color = Color("ffd76a")
 const COLORE_TRUPPE: Color = Color("ff8a7a")
 const COLORE_INVERNO: Color = Color("bfe3ff")

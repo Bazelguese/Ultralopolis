@@ -30,7 +30,7 @@ const COLORI_RISORSE: Dictionary[int, Color] = {
 	Res.Type.PIETRA: Color("c9d0dc"),
 	Res.Type.FERRO: Color("a9bfd6"),
 	Res.Type.FEDE: Color("f5e6a8"),
-	Res.Type.INFLUENZA: Color("d6a6ff"),
+	Res.Type.INFLUENZA: Color("f2b0c4"),
 	Res.Type.STABILITA: Color("8fd6d0"),
 	Res.Type.DOCUMENTI: Color("e8b98a"),
 }
@@ -326,7 +326,7 @@ func _crea_run() -> void:
 	var vittorie: Array = _valore("Vittorie")
 	riga.add_child(vittorie[0])
 	_vittorie = vittorie[1]
-	var era: Array = _valore("Era", Color("c7b8ff"))
+	var era: Array = _valore("Era", StileVisivo.colore_cornice(1))
 	riga.add_child(era[0])
 	_era = era[1]
 	# Malcontento (GDD §5.5, v0.24): sempre visibile, con la soglia della Rivoluzione.
@@ -520,7 +520,7 @@ func _aggiorna_tradizioni(run: RunState) -> void:
 	if not prese.is_empty():
 		_lista_tradizioni.add_child(_riga_tradizioni("ASCENSIONI", StileVisivo.ORO_LUCE, 22))
 		for ascensione: IdentityDef in prese:
-			_lista_tradizioni.add_child(_riga_tradizioni("%s (livello %d) → %s" % [ascensione.display_name, ascensione.ascension_level, ascensione.description], Color("c7b8ff"), 17))
+			_lista_tradizioni.add_child(_riga_tradizioni("%s (livello %d) → %s" % [ascensione.display_name, ascensione.ascension_level, ascensione.description], StileVisivo.ORO_LUCE, 17))
 	_pulsante_tradizioni.text = "Tradizioni · %d" % fatti
 
 
@@ -964,7 +964,7 @@ func _aggiorna_identita(run: RunState) -> void:
 		var elemento: IdentityDef = elementi[i]
 		var perk: bool = elemento.dimension in [IdentityDef.Dimension.PERK, IdentityDef.Dimension.ASCENSIONE]
 		var voce: Label = StileVisivo.etichetta(elemento.display_name + (" ·" if i < elementi.size() - 1 else ""),
-				StileVisivo.FONT_TESTO, 16, Color("c7b8ff") if perk else StileVisivo.TESTO_TENUE)
+				StileVisivo.FONT_TESTO, 16, StileVisivo.TESTO if perk else StileVisivo.TESTO_TENUE)
 		voce.mouse_filter = Control.MOUSE_FILTER_STOP
 		voce.mouse_default_cursor_shape = Control.CURSOR_HELP
 		Suggerimenti.imposta(voce, "%s\n%s" % [IdentityDef.DIMENSION_NAMES[elemento.dimension], elemento.description], elemento.display_name)
@@ -1024,6 +1024,8 @@ func aggiorna_partita(run: RunState) -> void:
 	_prestigio.text = str(run.prestige)
 	_vittorie.text = "%d/%d" % [run.wins, run.run_rules.wins_needed]
 	_era.text = run.era_name()
+	# L'era ha il colore della sua cornice: bronzo, argento, oro.
+	_era.add_theme_color_override("font_color", StileVisivo.colore_cornice(run.era))
 	_ultima_possibilita.visible = run.last_chance
 	_malcontento.text = "%d/%d" % [run.malcontent, run.run_rules.malcontent_threshold]
 	var vicina: bool = run.malcontent >= run.run_rules.malcontent_warning

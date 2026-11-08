@@ -227,7 +227,7 @@ func _crea_ambiente() -> void:
 	add_child(controluce)
 
 	_luce_atmosfera = OmniLight3D.new()
-	_luce_atmosfera.light_color = Color("8a5cff")
+	_luce_atmosfera.light_color = Color("4f6bff")
 	_luce_atmosfera.light_energy = 1.6
 	_luce_atmosfera.omni_range = 22.0
 	_luce_atmosfera.position = Vector3(-15.0, 5.0, -8.0)

@@ -57,7 +57,7 @@ script = ExtResource("1_voce")
 nome = "Influenza"
 famiglia = 0
 forme = PackedStringArray("Influenza")
-colore = Color(0.8392, 0.651, 1, 1)
+colore = Color(0.949, 0.6902, 0.7686, 1)
 
 [sub_resource type="Resource" id="voce_08"]
 script = ExtResource("1_voce")
@@ -324,7 +324,7 @@ script = ExtResource("1_voce")
 nome = "Prestigio"
 famiglia = 4
 forme = PackedStringArray("prestigio")
-colore = Color(1, 0.6275, 0.9608, 1)
+colore = Color(0.949, 0.7137, 0.1961, 1)
 definizione = "Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; una sconfitta ne fa perdere quanto il numero dell'anno. Esaurito, scatta l'ultima possibilità."
 
 [sub_resource type="Resource" id="voce_46"]
