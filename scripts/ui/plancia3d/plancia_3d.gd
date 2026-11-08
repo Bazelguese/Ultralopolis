@@ -1530,6 +1530,9 @@ func _physics_process(_delta: float) -> void:
 			tessera = oggetto.get_meta("tessera") as Tessera3D
 	if tessera != null and (not is_instance_valid(tessera) or not tessera.is_visible_in_tree() or tessera.is_queued_for_deletion()):
 		tessera = null
+	# Un pannello aperto sopra le carte (es. la legenda) le copre: niente carta sotto il mouse.
+	if _hud.mouse_su_pannello():
+		tessera = null
 	if tessera != _evidenziata:
 		if _evidenziata != null and is_instance_valid(_evidenziata):
 			_evidenziata.evidenzia(false)

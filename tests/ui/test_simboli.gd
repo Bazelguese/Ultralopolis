@@ -224,3 +224,21 @@ func test_sotto_il_consigliere_si_vede_quante_carte_puoi_potenziare() -> void:
 	assert_gt(pronte, 0, "La Fattoria e i Fanti sono dei tipi del consigliere.")
 	assert_eq(SchedaCarta.da_consigliere(run, cancelliere).costo, "Ascolta · ▲ Potenzia %d" % pronte)
 	assert_true(SimboliEffetti.consigliere(run, cancelliere)[0].accesa, "La riga del Potenzia si accende.")
+
+
+# --- Legenda ----------------------------------------------------------------------
+
+func test_la_legenda_trova_gli_esempi_nel_catalogo() -> void:
+	var legenda: LegendaSimboli = LegendaSimboli.new()
+	add_child_autofree(legenda)
+	var catalogo: CatalogDef = load("res://data/catalog/catalog.tres") as CatalogDef
+	assert_eq(legenda._esempi(catalogo).size(), 10, "5 esempi dalle carte vere e 5 scritti apposta.")
+	legenda.costruisci(catalogo)
+	assert_eq(legenda.get_child_count(), 1)
+
+
+func test_ogni_simbolo_della_legenda_ha_un_nome_e_un_file() -> void:
+	for gruppo: Array in LegendaSimboli.GRUPPI:
+		for concetto: StringName in gruppo[1]:
+			assert_true(LegendaSimboli.NOMI.has(concetto), "Manca il nome di %s." % concetto)
+			assert_true(ResourceLoader.exists("res://assets/icone/%s.svg" % concetto), "Manca l'icona di %s." % concetto)

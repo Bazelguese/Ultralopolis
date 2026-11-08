@@ -69,6 +69,8 @@ var _lista_tradizioni: VBoxContainer
 var _effetti: PanelContainer
 var _lista_effetti: VBoxContainer
 var _pulsante_effetti: Button
+## Legenda dei simboli delle carte (GDD §14.4).
+var _legenda: LegendaSimboli
 var _cronaca: PanelContainer
 var _testo_cronaca: Label
 var _comandi: VBoxContainer
@@ -649,7 +651,16 @@ func _crea_pannelli_destra() -> void:
 	_pulsante_effetti = _pulsante("Effetti", func() -> void: _alterna(_effetti))
 	colonna.add_child(_pulsante_effetti)
 	colonna.add_child(_pulsante("Cronaca", func() -> void: _alterna(_cronaca)))
+	var pulsante_legenda: Button = _pulsante("Legenda", func() -> void: _alterna(_legenda))
+	pulsante_legenda.tooltip_text = "Che cosa vogliono dire i simboli sulle carte."
+	colonna.add_child(pulsante_legenda)
 	_ancora(colonna, Control.PRESET_CENTER_RIGHT, Vector2(-24, -60))
+
+	_legenda = LegendaSimboli.new()
+	_legenda.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.97), StileVisivo.ORO))
+	_legenda.costruisci(GameSession.catalog())
+	_ancora(_legenda, Control.PRESET_CENTER_RIGHT, Vector2(-180, 0))
+	_legenda.visible = false
 
 	_effetti = PanelContainer.new()
 	var lista: VBoxContainer = VBoxContainer.new()
@@ -673,11 +684,26 @@ func _crea_pannelli_destra() -> void:
 	_cronaca.visible = false
 
 
+## true se il mouse è sopra uno dei pannelli di destra aperti (Effetti, Cronaca, Legenda):
+## allora le carte sotto non devono reagire al mouse.
+func mouse_su_pannello() -> bool:
+	var mouse: Vector2 = get_viewport().get_mouse_position()
+	for pannello: Control in [_effetti, _cronaca, _legenda]:
+		if pannello.visible and pannello.get_global_rect().has_point(mouse):
+			return true
+	return false
+
+
 func _alterna(pannello: Control) -> void:
 	var visibile: bool = not pannello.visible
 	_effetti.visible = false
 	_cronaca.visible = false
+	_legenda.visible = false
 	pannello.visible = visibile
+	# Il pannello aperto sta sopra le altre scritte dell'interfaccia.
+	if visibile:
+		pannello.move_to_front()
+		_suggerimento.move_to_front()
 
 
 func _crea_comandi() -> void:
@@ -1196,6 +1222,7 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	_magazzino.visible = false
 	_effetti.visible = false
 	_cronaca.visible = false
+	_legenda.visible = false
 	nascondi_pezzo()
 	if attiva:
 		_flusso.visible = false
