@@ -40,7 +40,7 @@ gain = SubResource("RA_6")
 [sub_resource type="Resource" id="OPT_7"]
 script = ExtResource("e2")
 label = "Il giuramento dei nobili"
-description = "Per un anno le truppe Nobili ricaricano il 10% più in fretta."
+description = "Fino alla fine dell'anno le truppe Nobili hanno la ricarica più corta del 10%."
 requires_types = Array[StringName]([&"Nobile"])
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 

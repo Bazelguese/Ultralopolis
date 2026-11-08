@@ -58,7 +58,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Vittoria** | Vinci lo scontro con il fantasma: aggiungi una vittoria e ricevi un bottino. Con 10 vittorie vinci la partita. | GDD §3.4. Deciso. |
 | **Sconfitta** | Perdi lo scontro con il fantasma: perdi tanto Prestigio quanto il numero dell'anno. | GDD §3.4. Deciso. |
 | **Pareggio** | Le due nazioni cadono nello stesso istante. Conta come vittoria, ma subisci i malus del fantasma. | GDD §3.4. Deciso. |
-| **Prestigio** | Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; ogni sconfitta lo fa scendere. | GDD §3.4. È separato dalla Resistenza. Deciso. |
+| **Prestigio** | Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; ogni sconfitta contro il fantasma lo fa scendere. | GDD §3.4. È separato dalla Resistenza. Deciso. |
 | **Ultima possibilità** | Quando il Prestigio finisce per la prima volta, la partita continua; la prossima sconfitta la chiude. | GDD §3.4. Anche perdere un incontro del mondo la chiude (§3.3); un pareggio no. Deciso. |
 | **Bottino** | Oro e Ricerca che ricevi sempre quando vinci (o pareggi) uno scontro. | GDD §3.3, §3.4. Diverso dalla ricompensa. Deciso. |
 | **Ricompensa** | Dopo un incontro del mondo vinto, una tessera, una peculiarità, delle risorse o una carta dorata da scegliere; puoi anche non prendere nulla. | GDD §3.3. Deciso. |
@@ -114,7 +114,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Livelli del Consiglio** | Il Consiglio cresce con le ere: Funzionari, poi Ministri, poi Gran Consiglieri. | GDD §4.2.1. Il giocatore vede questi nomi, non un numero: “Livello” è solo delle tessere. Nomi Provvisori. |
 | **Categoria** | Il campo di un consigliere: i tipi di tessere di cui si occupa. | GDD §4.2.4. Militare, Opera, Terra, Ricchezza, Conoscenza, Fede, Stato, Ombra (Provvisori). Le tessere non hanno categoria, solo tipi. Per gli effetti di battaglia non si dice “categoria di bersaglio” ma *bersagli ammessi*. Deciso. |
 | **Opportunità** | Una delle tre cose che un consigliere ti offre: un'azione, un edificio o una truppa. Ne prendi una sola. | GDD §4.2 (*proposta*). Fino alla v0.20 era il nome del sistema di scelte prima del Consiglio. Non usare *proposta* (resta solo come stato del GDD) né *offerta*. Deciso. |
-| **Azione** | Un'opportunità che non è una tessera: un effetto subito o per un anno. Non costa Oro, ma a volte altre risorse. | GDD §4.2, §4.2.3. Non chiamarla *carta*. Deciso. |
+| **Azione** | Un'opportunità che non è una tessera: un effetto subito o per un anno. Non costa Oro (tranne gli spazi), ma a volte altre risorse. | GDD §4.2, §4.2.3. Non chiamarla *carta*. Deciso. |
 | **Potenzia** | Fa salire di livello una tua tessera che ha un tipo del consigliere. Non conta come scelta del round e si usa una volta per round. | GDD §6.5. Deciso. |
 | **Rinnovo** | Paghi per vedere tre opportunità nuove dallo stesso consigliere. Costa Oro o la risorsa del consigliere, ogni volta un po' di più. | GDD §4.2. Deciso. |
 | **Avvenimento** | Ciò che può comparire in un round al posto di un consigliere: un Evento, un Visitatore o una Fortuna. | GDD §4.2.5 (*carta speciale*, *carte del round*). Non chiamarli *carte*. Deciso. |

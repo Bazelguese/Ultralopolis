@@ -282,3 +282,31 @@ func test_percentuali_intere() -> void:
 	assert_eq(Modifiers.apply_percent(7, -50), 3, "Per difetto.")
 	assert_eq(Modifiers.apply_percent(1000, 50), 1500)
 	assert_eq(Modifiers.apply_percent(10, -150), 0, "Mai sotto zero.")
+
+
+func test_un_bonus_dura_fino_alla_fine_dell_anno_un_malus_l_anno_dopo() -> void:
+	# GDD §8.2.1 per i malus; per i bonus decisione di Davide (8 novembre 2026): "per un anno"
+	# vuol dire fino alla fine dell'anno in cui arriva.
+	var bonus: ModifierDef = _modifier(&"bonus", ModifierDef.Effect.PRODUZIONE_ORO, 50)
+	bonus.is_malus = false
+	var malus: ModifierDef = _modifier(&"malus", ModifierDef.Effect.PRODUZIONE_ORO, -50)
+	var mods: Modifiers = Modifiers.new()
+	var board: NationBoard = NationBoard.new()
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	mods.apply(bonus, ActiveModifier.OriginKind.ALTRO, "Prova", 3, board, rng)
+	mods.apply(malus, ActiveModifier.OriginKind.ALTRO, "Prova", 3, board, rng)
+	assert_eq(mods.active[0].expires_at_year, 4, "Il bonus preso nell'anno 3 finisce con l'anno 3.")
+	assert_eq(mods.active[1].expires_at_year, 5, "Il malus preso nell'anno 3 vale per tutto l'anno 4.")
+	assert_string_contains(mods.active[0].describe(), "fino alla fine dell'anno 3")
+	mods.on_new_year(4)
+	assert_eq(mods.active.size(), 1, "A inizio anno 4 il bonus è finito, il malus no.")
+
+
+func test_razioni_valgono_per_la_razione_dell_anno_dopo() -> void:
+	var razioni: ModifierDef = load("res://data/catalog/modifiers/razioni.tres") as ModifierDef
+	var mods: Modifiers = Modifiers.new()
+	mods.apply(razioni, ActiveModifier.OriginKind.ALTRO, "Prova", 2, NationBoard.new(), RandomNumberGenerator.new())
+	mods.on_new_year(3)
+	assert_eq(mods.active.size(), 1, "A inizio anno 3, quando si mangia, Razioni vale ancora.")
+	mods.on_new_year(4)
+	assert_eq(mods.active.size(), 0)

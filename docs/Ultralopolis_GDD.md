@@ -291,6 +291,7 @@ Nei round, oltre ai consiglieri, possono comparire **avvenimenti** di altre fami
 | Ogni avvenimento ha delle **radici**, con lo schema delle vie (§10.4): **richiede** (compare solo con almeno uno) e **favorita da** (+1 di peso ciascuno). Radici: elementi dell'identità, vie, era minima e massima, tipi sulla plancia, stato della nazione (risorse, malus attivo); dalla v0.25 anche le **stagioni** in cui l'avvenimento può comparire | Confermato |
 | Eventi legati alle stagioni: *Un inverno lungo* e *Il passo innevato* d'inverno, *La piena del fiume* e *Le terre di confine* in primavera, *Il torneo* d'estate, *Raccolto abbondante* d'estate o d'autunno, *La grande fiera* d'autunno; nuovi eventi invernali; d'inverno la Riforma e i Tumulti in piazza sono più frequenti (+1 di peso) | Proposta (v0.25) |
 | Le opzioni di un Evento possono avere un **requisito**: un elemento dell'identità, una tessera con un certo tipo sulla plancia, risorse. Un'opzione bloccata si vede comunque, spenta, con il requisito accanto (P4). Ogni evento ha almeno un'opzione **gratuita e senza requisiti**, così si può sempre scegliere qualcosa (v0.24) | Confermato |
+| Un'opzione che regala una tessera o uno spazio è **bloccata**, con il motivo, se il regalo non può arrivare (nessuno spazio libero, spazi già al massimo): così non si paga per niente. L'opzione gratuita dell'evento non ha regali, quindi resta sempre scegliere qualcosa | Confermato (decisione di Davide, 8 novembre 2026) |
 | Nessun evento arriva da solo senza essere scelto, con due eccezioni: la **Rivoluzione** (§9.4.2) e le **cronache** della nazione all'inizio di ogni stagione (§9.6, v0.29) | Confermato (Rivoluzione dalla v0.24, cronache dalla v0.29) |
 | Le opzioni possono anche **cambiare il governo** (Riforma, Rivoluzione) e far salire o scendere il **Malcontento** (§5.5) | Confermato (v0.24) |
 
@@ -736,6 +737,7 @@ Il campo **Origine** è **mostrato al giocatore con il nome** di chi ha inflitto
 |---|---|
 | Lo stesso sistema regge **malus e bonus** (peculiarità, ricompense durature) | Confermato |
 | La durata si conta in **anni interi a partire dall’anno successivo**: un malus di 1 anno subito alla fine dell’anno N vale per tutto l’anno N+1 e sparisce all’inizio dell’anno N+2 | Confermato |
+| Un **bonus** vale invece da subito **fino alla fine dell’anno in cui arriva** (più gli eventuali anni in più): un bonus di 1 anno preso nell’anno N sparisce all’inizio dell’anno N+1. Un bonus che agisce sulla razione di inizio anno (es. Razioni) dura un anno in più, così vale per la razione dell’anno dopo | Confermato (decisione di Davide, 8 novembre 2026) |
 | Se arriva un malus già attivo, **si allunga solo la durata**; l’effetto non si somma | Confermato |
 | Ogni fantasma ha nei dati i propri malus: li applica se il giocatore **perde o pareggia** contro di lui (§3.4, §11.1) | Confermato |
 | La sconfitta contro un incontro del mondo **dimezza solo l’Oro**: gli incontri non lasciano malus (§3.3) | Confermato |

@@ -9,7 +9,7 @@
 script = ExtResource("1_id")
 id = &"botteghe_maestre"
 display_name = "Botteghe maestre"
-description = "Potenzia costa 1 in meno (mai sotto 1)."
+description = "Potenzia costa 1 unità in meno (almeno 1)."
 dimension = 6
 ascension_level = 1
 upgrade_discount = 1

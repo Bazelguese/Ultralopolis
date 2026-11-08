@@ -6,7 +6,7 @@
 script = ExtResource("1_x7cht")
 id = &"fervore"
 display_name = "Fervore"
-description = "+15 Resistenza nel prossimo scontro con il fantasma."
+description = "+15 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 is_malus = false
 effect = 6
 amount = 15

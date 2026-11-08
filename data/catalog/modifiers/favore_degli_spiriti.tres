@@ -6,7 +6,7 @@
 script = ExtResource("1_4hn83")
 id = &"favore_degli_spiriti"
 display_name = "Favore degli spiriti"
-description = "Tutti gli edifici producono mana il 10% più in fretta."
+description = "Nello scontro tutti gli edifici hanno il ciclo più corto del 10%."
 is_malus = false
 effect = 2
 amount = -10

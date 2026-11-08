@@ -90,6 +90,7 @@ forme = PackedStringArray("danno", "danni")
 colore = Color(1, 0.4157, 0.2392, 1)
 simbolo = &"danno"
 definizione = "Toglie Resistenza al nemico, ma prima consuma il suo scudo; solo ciò che avanza arriva alla Resistenza."
+di_base = true
 
 [sub_resource type="Resource" id="voce_11"]
 script = ExtResource("1_voce")
@@ -98,6 +99,7 @@ forme = PackedStringArray("resistenza")
 colore = Color(1, 0.702, 0.6392, 1)
 simbolo = &"resistenza"
 definizione = "La vita della tua nazione nello scontro. Se arriva a zero, perdi. Si ricalcola all'inizio di ogni scontro."
+di_base = true
 
 [sub_resource type="Resource" id="voce_12"]
 script = ExtResource("1_voce")
@@ -105,7 +107,8 @@ nome = "Scudo"
 forme = PackedStringArray("scudo", "scudi")
 colore = Color(0.4863, 0.7843, 1, 1)
 simbolo = &"scudo"
-definizione = "Una riserva che assorbe il danno prima della Resistenza. Parte da zero in ogni scontro e resta finché non viene consumata; non ferma la Corruzione."
+definizione = "Una riserva che assorbe il danno prima della Resistenza. Di solito parte da zero in ogni scontro e resta finché non viene consumata; non ferma la Corruzione."
+di_base = true
 
 [sub_resource type="Resource" id="voce_13"]
 script = ExtResource("1_voce")
@@ -126,7 +129,7 @@ definizione = "Sale durante lo scontro e non scende mai. Quando raggiunge la tua
 [sub_resource type="Resource" id="voce_15"]
 script = ExtResource("1_voce")
 nome = "Danno d'assedio"
-forme = PackedStringArray("danno d'assedio", "danno d’assedio", "danni d'assedio", "assedio")
+forme = PackedStringArray("danno d'assedio", "danno d’assedio", "danni d'assedio", "danni d’assedio")
 colore = Color(1, 0.6941, 0.2902, 1)
 simbolo = &"assedio"
 definizione = "Toglie solo scudo al nemico, prima del danno normale. Ce l'hanno solo le truppe Assedio; se il nemico non ha scudo, va perso."
@@ -154,6 +157,7 @@ forme = PackedStringArray("ricarica", "ricaricano", "ricaricare", "ricariche")
 colore = Color(0.6627, 0.7608, 1, 1)
 simbolo = &"ricarica"
 definizione = "Il tempo che una truppa aspetta fra un'attivazione e la successiva. Per gli edifici si dice ciclo. Lo scontro inizia con ricariche e cicli pieni."
+di_base = true
 
 [sub_resource type="Resource" id="voce_19"]
 script = ExtResource("1_voce")
@@ -168,6 +172,7 @@ nome = "Mana"
 forme = PackedStringArray("mana")
 colore = Color(0.7255, 0.7843, 1, 1)
 definizione = "L'energia che gli edifici producono nello scontro e che le truppe spendono per attivarsi. Parte da zero e si azzera a fine scontro; se manca, la truppa pronta resta in attesa."
+di_base = true
 
 [sub_resource type="Resource" id="voce_21"]
 script = ExtResource("1_voce")
@@ -354,6 +359,7 @@ nome = "Bonus"
 famiglia = 4
 forme = PackedStringArray("bonus")
 colore = Color(0.4941, 0.8784, 0.5059, 1)
+definizione = "Un effetto positivo che dura per un certo tempo."
 
 [sub_resource type="Resource" id="voce_44"]
 script = ExtResource("1_voce")
@@ -361,6 +367,7 @@ nome = "Vittoria"
 famiglia = 4
 forme = PackedStringArray("vittoria", "vittorie")
 colore = Color(0.4941, 0.8784, 0.5059, 1)
+definizione = "Vinci lo scontro con il fantasma: aggiungi una vittoria e ricevi un bottino. Con 10 vittorie vinci la partita."
 
 [sub_resource type="Resource" id="voce_45"]
 script = ExtResource("1_voce")
@@ -368,7 +375,7 @@ nome = "Prestigio"
 famiglia = 4
 forme = PackedStringArray("prestigio")
 colore = Color(0.949, 0.7137, 0.1961, 1)
-definizione = "Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; una sconfitta ne fa perdere quanto il numero dell'anno. Esaurito, scatta l'ultima possibilità."
+definizione = "Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; una sconfitta contro il fantasma ne fa perdere quanto il numero dell'anno. Esaurito, scatta l'ultima possibilità."
 
 [sub_resource type="Resource" id="voce_46"]
 script = ExtResource("1_voce")
@@ -417,6 +424,7 @@ nome = "Sconfitta"
 famiglia = 5
 forme = PackedStringArray("sconfitta", "sconfitte")
 colore = Color(1, 0.3608, 0.4235, 1)
+definizione = "Perdi lo scontro con il fantasma: perdi tanto Prestigio quanto il numero dell'anno."
 
 [sub_resource type="Resource" id="voce_52"]
 script = ExtResource("1_voce")
@@ -425,15 +433,17 @@ forme = PackedStringArray("ciclo", "cicli")
 colore = Color(0.6627, 0.7608, 1, 1)
 simbolo = &"ricarica"
 definizione = "Ogni quanto un edificio produce nello scontro. Funziona come la ricarica di una truppa, ma un edificio non resta mai in attesa del mana."
+di_base = true
 
 [sub_resource type="Resource" id="voce_n00"]
 script = ExtResource("1_voce")
 nome = "Opportunità"
 famiglia = 6
-forme = PackedStringArray("opportunità", "propone", "propongono")
+forme = PackedStringArray("opportunità", "propone", "propongono", "proporre")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 simbolo = &"proposta"
 definizione = "Una delle tre cose che un consigliere ti offre: un'azione, un edificio o una truppa. Ne prendi una sola."
+di_base = true
 
 [sub_resource type="Resource" id="voce_n01"]
 script = ExtResource("1_voce")
@@ -460,6 +470,7 @@ famiglia = 6
 forme = PackedStringArray("Consiglio", "ascolta", "ascoltare", "ascolti")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 definizione = "I consiglieri della tua nazione. In ogni round ne compaiono tre e ne ascolti uno."
+di_base = true
 
 [sub_resource type="Resource" id="voce_n04"]
 script = ExtResource("1_voce")
@@ -468,6 +479,7 @@ famiglia = 6
 forme = PackedStringArray("consigliere", "consiglieri")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 definizione = "Un membro del Consiglio con un suo campo: propone azioni, edifici e truppe, e può potenziare le tue tessere."
+di_base = true
 
 [sub_resource type="Resource" id="voce_n05"]
 script = ExtResource("1_voce")
@@ -534,6 +546,7 @@ famiglia = 7
 forme = PackedStringArray("livello", "livelli")
 colore = Color(1, 0.8431, 0.4157, 1)
 definizione = "Una tessera va dal livello 1 al 3; ogni livello rafforza tutti i suoi effetti."
+di_base = true
 
 [sub_resource type="Resource" id="voce_n13"]
 script = ExtResource("1_voce")
@@ -633,6 +646,7 @@ famiglia = 7
 forme = PackedStringArray("tipo", "tipi")
 colore = Color(1, 1, 1, 1)
 definizione = "Una caratteristica della tessera (es. Fante, Guardiano, Spirituale). Decide quali consiglieri la propongono e la potenziano."
+di_base = true
 
 [sub_resource type="Resource" id="voce_n25"]
 script = ExtResource("1_voce")
@@ -714,7 +728,39 @@ famiglia = 9
 forme = PackedStringArray("paghi", "paga", "pagano", "pagare", "costa", "costano", "costo", "costi")
 colore = Color(0.949, 0.7137, 0.1961, 1)
 
+[sub_resource type="Resource" id="voce_azione"]
+script = ExtResource("1_voce")
+nome = "Azione"
+famiglia = 6
+forme = PackedStringArray("azione", "azioni")
+colore = Color(0.5451, 0.9137, 0.9922, 1)
+simbolo = &"azione"
+definizione = "Un'opportunità che non è una tessera: un effetto subito o per un anno. Non costa Oro (tranne gli spazi), ma a volte altre risorse."
+
+[sub_resource type="Resource" id="voce_tipo_assedio"]
+script = ExtResource("1_voce")
+nome = "Assedio"
+famiglia = 3
+forme = PackedStringArray("assedio")
+colore = Color(0.9412, 0.851, 0.6588, 1)
+
+[sub_resource type="Resource" id="voce_pareggio"]
+script = ExtResource("1_voce")
+nome = "Pareggio"
+famiglia = 8
+forme = PackedStringArray("pareggio", "pareggi")
+colore = Color(0.9412, 0.851, 0.6588, 1)
+definizione = "Le due nazioni cadono nello stesso istante. Conta come vittoria, ma subisci i malus del fantasma."
+
+[sub_resource type="Resource" id="voce_bottino"]
+script = ExtResource("1_voce")
+nome = "Bottino"
+famiglia = 4
+forme = PackedStringArray("bottino")
+colore = Color(0.4941, 0.8784, 0.5059, 1)
+definizione = "Oro e Ricerca che ricevi sempre quando vinci (o pareggi) uno scontro."
+
 [resource]
 script = ExtResource("2_lessico")
-voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51"), SubResource("voce_52"), SubResource("voce_n00"), SubResource("voce_n01"), SubResource("voce_n02"), SubResource("voce_n03"), SubResource("voce_n04"), SubResource("voce_n05"), SubResource("voce_n06"), SubResource("voce_n07"), SubResource("voce_n08"), SubResource("voce_n09"), SubResource("voce_n10"), SubResource("voce_n11"), SubResource("voce_n12"), SubResource("voce_n13"), SubResource("voce_n14"), SubResource("voce_n15"), SubResource("voce_n16"), SubResource("voce_n17"), SubResource("voce_n18"), SubResource("voce_n19"), SubResource("voce_n20"), SubResource("voce_n21"), SubResource("voce_n22"), SubResource("voce_n23"), SubResource("voce_n24"), SubResource("voce_n25"), SubResource("voce_n26"), SubResource("voce_n27"), SubResource("voce_n28"), SubResource("voce_n29"), SubResource("voce_n30"), SubResource("voce_n31"), SubResource("voce_n32"), SubResource("voce_n33"), SubResource("voce_n34")])
+voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51"), SubResource("voce_52"), SubResource("voce_n00"), SubResource("voce_n01"), SubResource("voce_n02"), SubResource("voce_n03"), SubResource("voce_n04"), SubResource("voce_n05"), SubResource("voce_n06"), SubResource("voce_n07"), SubResource("voce_n08"), SubResource("voce_n09"), SubResource("voce_n10"), SubResource("voce_n11"), SubResource("voce_n12"), SubResource("voce_n13"), SubResource("voce_n14"), SubResource("voce_n15"), SubResource("voce_n16"), SubResource("voce_n17"), SubResource("voce_n18"), SubResource("voce_n19"), SubResource("voce_n20"), SubResource("voce_n21"), SubResource("voce_n22"), SubResource("voce_n23"), SubResource("voce_n24"), SubResource("voce_n25"), SubResource("voce_n26"), SubResource("voce_n27"), SubResource("voce_n28"), SubResource("voce_n29"), SubResource("voce_n30"), SubResource("voce_n31"), SubResource("voce_n32"), SubResource("voce_n33"), SubResource("voce_n34"), SubResource("voce_azione"), SubResource("voce_tipo_assedio"), SubResource("voce_pareggio"), SubResource("voce_bottino")])
 colore_numeri = Color(1, 1, 1, 1)

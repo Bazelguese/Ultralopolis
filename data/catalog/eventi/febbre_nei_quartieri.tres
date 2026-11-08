@@ -28,7 +28,7 @@ stabilita = 4
 [sub_resource type="Resource" id="OPT_4"]
 script = ExtResource("e2")
 label = "Chiudi le porte"
-description = "Ricevi 4 Stabilità, ma per un anno la Ricerca prodotta si dimezza."
+description = "Ricevi 4 Stabilità, ma fino alla fine dell'anno prossimo la Ricerca prodotta si dimezza."
 gain = SubResource("RA_5")
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 

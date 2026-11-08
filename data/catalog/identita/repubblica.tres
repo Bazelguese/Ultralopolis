@@ -16,7 +16,7 @@
 script = ExtResource("7_jtfog")
 id = &"repubblica"
 display_name = "Repubblica"
-description = "Il potere a un consiglio eletto. In ogni round compaiono 4 consiglieri, ma le opportunità costano 1 Oro in più; rinnovare le opportunità costa 1 Oro in meno. Tessera esclusiva: Foro. Capitale: +1 Influenza."
+description = "Il potere a un consiglio eletto. In ogni round compaiono 4 consiglieri, ma edifici e truppe (e le azioni che costano Oro) costano 1 Oro in più; rinnovare le opportunità costa 1 Oro in meno; il Tesoriere e la sua azione Assemblea più frequenti. Tessera esclusiva: Foro. Capitale: +1 Influenza."
 dimension = 1
 identity_type = &"Repubblicano"
 resistance_bonus = 2

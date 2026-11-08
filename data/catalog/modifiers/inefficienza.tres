@@ -6,7 +6,7 @@
 script = ExtResource("1_mmyf0")
 id = &"inefficienza"
 display_name = "Lavori a rilento"
-description = "Un edificio danneggiato produce mana più lentamente nello scontro."
+description = "Un tuo edificio a caso ha il ciclo più lento della metà (×1,5) nello scontro."
 effect = 2
 target = 1
 amount = 50

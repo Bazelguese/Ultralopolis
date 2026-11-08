@@ -14,7 +14,7 @@ oro = 3
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Premi ricchi"
-description = "Paghi 3 Oro: per un anno una truppa a scelta fa il 25% di danno in più."
+description = "Paghi 3 Oro: fino alla fine dell'anno una truppa a tua scelta fa il 25% di danno in più."
 cost = SubResource("RA_2")
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 

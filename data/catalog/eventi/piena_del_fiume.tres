@@ -25,7 +25,7 @@ gain = SubResource("RA_3")
 [sub_resource type="Resource" id="OPT_4"]
 script = ExtResource("e2")
 label = "Lascia allagare i campi"
-description = "Per un anno gli edifici di Materie prime danno 1 Cibo in più a stagione."
+description = "Fino alla fine dell'anno gli edifici di Materie prime producono 1 Cibo in più a ogni stagione, tranne d'inverno."
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 
 [sub_resource type="Resource" id="RA_6"]

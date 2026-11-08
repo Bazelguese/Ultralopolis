@@ -39,7 +39,7 @@ story = "Il sangue fu pagato con l'oro."
 [sub_resource type="Resource" id="S6"]
 script = ExtResource("x4")
 display_name = "Bande ai confini"
-description = "−5 Resistenza nel prossimo scontro con il fantasma."
+description = "−5 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 is_malus = true
 effect = 6
 amount = -5
@@ -48,7 +48,7 @@ duration_kind = 1
 [sub_resource type="Resource" id="S7"]
 script = ExtResource("x3")
 label = "Lasciali venire"
-description = "−5 Resistenza nel prossimo scontro con il fantasma."
+description = "−5 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 modifiers = Array[ExtResource("x4")]([SubResource("S6")])
 clear_flags = Array[StringName]([&"prigioniero_giustiziato"])
 story = "Le bande bruciarono i villaggi di confine."

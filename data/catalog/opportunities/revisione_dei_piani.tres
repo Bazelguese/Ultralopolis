@@ -11,6 +11,6 @@ documenti = 2
 script = ExtResource("1_opp")
 id = &"revisione_dei_piani"
 display_name = "Revisione dei piani"
-description = "Paghi 2 Documenti e ripeschi la mano delle tecnologie."
+description = "Ripeschi la mano delle tecnologie."
 kind = 10
 cost_resources = SubResource("Resource_cost")

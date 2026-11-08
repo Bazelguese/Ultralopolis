@@ -9,7 +9,7 @@
 script = ExtResource("1_id")
 id = &"doppio_ascolto"
 display_name = "Doppio ascolto"
-description = "Una volta per stagione si prendono due opportunità dallo stesso consigliere."
+description = "La prima volta in ogni stagione che prendi un'opportunità da un consigliere (non Giullare né Anziano), puoi prenderne subito un'altra fra quelle che restano."
 dimension = 6
 ascension_level = 2
 rule = 7

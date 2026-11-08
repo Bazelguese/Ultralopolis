@@ -15,7 +15,7 @@ story = "Un capitano fu impiccato in piazza, colpevole o no."
 [sub_resource type="Resource" id="S2"]
 script = ExtResource("x3")
 display_name = "Giuramento di vendetta"
-description = "+5 Resistenza nel prossimo scontro con il fantasma."
+description = "+5 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 is_malus = false
 effect = 6
 amount = 5
@@ -24,7 +24,7 @@ duration_kind = 1
 [sub_resource type="Resource" id="S3"]
 script = ExtResource("x2")
 label = "Giura vendetta"
-description = "+5 Resistenza nel prossimo scontro con il fantasma."
+description = "+5 Resistenza in ogni scontro fino a quello con il fantasma (compreso)."
 modifiers = Array[ExtResource("x3")]([SubResource("S2")])
 inclination_shift = PackedInt32Array(1, 0, 0, 0)
 story = "Si giurò vendetta su {nemico}."

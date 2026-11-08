@@ -16,7 +16,7 @@
 script = ExtResource("8_4vamm")
 id = &"cultura_guerriera"
 display_name = "Cultura guerriera"
-description = "Ogni famiglia dà un combattente: parte con una Milizia in più; le azioni del Generale costano 1 Ferro in meno (almeno 1); Generale e Addestramento più frequenti. Tessera esclusiva: Campioni del clan (era 2). Capitale: +1 Ferro."
+description = "Ogni famiglia dà un combattente: parte con una Milizia in più; le azioni del Generale costano 1 Ferro in meno (almeno 1); il Generale e la sua azione Addestramento più frequenti. Tessera esclusiva: Campioni del clan (era 2). Capitale: +1 Ferro."
 dimension = 3
 identity_type = &"Guerriero"
 resistance_bonus = 3

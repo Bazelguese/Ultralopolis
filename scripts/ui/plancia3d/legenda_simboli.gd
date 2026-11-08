@@ -185,7 +185,7 @@ func _esempi(catalogo: CatalogDef) -> Array:
 	esempi.append([proposte, "Riga colorata, in alto sul consigliere: le sue opportunità di questo round. Edifici, truppe e azioni (il timbro) stanno alla pari: sono tutte opportunità e ne prendi una sola."])
 	var tipi_azione: RigaSimboli = RigaSimboli.new().icona(&"azione").scritta("=").icona(&"scambio").scritta("/").icona(&"anno").scritta("/").icona(&"spia")
 	tipi_azione.rilievo = RigaSimboli.Rilievo.SECONDARIA
-	esempi.append([tipi_azione, "Sotto, più sottile: quali azioni, separate da «/» (oppure). Qui scambi di risorse, oppure bonus per un tempo, oppure spionaggio. Costi ed effetti esatti li vedi sulle opportunità, dopo averlo scelto."])
+	esempi.append([tipi_azione, "Sotto, più sottile: quali azioni, separate da «/» (oppure). Qui scambi di risorse, oppure bonus temporanei, oppure spionaggio. Costi ed effetti esatti li vedi sulle opportunità, dopo averlo scelto."])
 	var potenzia: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
 	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
 	esempi.append([potenzia, "Riga con il solo bordo, in fondo al consigliere: un servizio in più, non un'opportunità. Dopo averlo scelto puoi anche potenziare una tua tessera dei suoi tipi, pagando Ferro, senza perdere la scelta del round."])
