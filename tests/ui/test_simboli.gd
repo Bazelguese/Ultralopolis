@@ -175,7 +175,7 @@ func test_consigliere_in_un_round_di_azioni() -> void:
 	run.round_theme = RunState.RoundTheme.AZIONI
 	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
 	assert_eq(righe.size(), 2, "Potenzia e l'unica azione: niente edifici o truppe in un round di Azioni.")
-	assert_eq(righe[0].come_testo(), "2[stabilita] → +4[oro]")
+	assert_eq(righe[0].come_testo(), "[azione] : [scambio]", "Una riga sola con i tipi di azione, senza numeri.")
 	assert_eq(righe[1].come_testo(), "[potenzia] : [stabilita]", "Il Potenzia va in fondo: è un extra.")
 	assert_eq(righe[1].rilievo, RigaSimboli.Rilievo.SECONDARIA)
 
@@ -190,7 +190,7 @@ func test_consigliere_in_un_round_misto_propone_anche_carte() -> void:
 	assert_eq(righe.size(), 3)
 	assert_eq(righe[0].come_testo(), "[proposta] : [edificio] / [truppa]", "Prima ciò che propone.")
 	assert_eq(righe[0].rilievo, RigaSimboli.Rilievo.PRINCIPALE)
-	assert_eq(righe[1].come_testo(), "2[stabilita] → +4[oro]")
+	assert_eq(righe[1].come_testo(), "[azione] : [scambio]")
 	assert_eq(righe[2].come_testo(), "[potenzia] : [stabilita]")
 
 
@@ -206,15 +206,24 @@ func test_consigliere_in_un_round_di_edifici_non_mostra_azioni() -> void:
 	assert_eq(righe[1].come_testo(), "[potenzia] : [stabilita]")
 
 
-func test_incanti_e_spionaggi_si_riuniscono_in_una_riga() -> void:
+func test_la_riga_azioni_mostra_ogni_tipo_una_volta() -> void:
 	var azioni: Array[Offer] = []
-	for nome: String in ["incanto_danno", "incanto_scudo", "spia_sabotaggio_veloce", "rete_di_sabotatori", "veleno_nei_pozzi", "decreto_fiscale"]:
+	for nome: String in ["incanto_danno", "incanto_scudo", "spia_sabotaggio_veloce", "veleno_nei_pozzi", "decreto_fiscale", "studiosi", "assemblea", "quartiermastro", "ordine_pubblico"]:
 		azioni.append(_offerta("res://data/catalog/opportunities/%s.tres" % nome))
-	var righe: Array[RigaSimboli] = SimboliEffetti.azioni_riunite(azioni)
-	assert_eq(righe.size(), 3, "Incanti in una riga, spionaggi in una riga, decreto da solo.")
-	assert_eq(righe[0].come_testo(), "2[fede] → [incanto] [truppa] +[danno] / [scudo] +2[gemma qualsiasi]")
-	assert_eq(righe[1].come_testo(), "2/3[documenti] → [fantasma] : [sabotaggio] / [inefficienza]")
-	assert_eq(righe[2].come_testo(), "2[stabilita] → +4[oro]")
+	var riga: RigaSimboli = SimboliEffetti.riga_azioni(azioni)
+	assert_eq(riga.come_testo(), "[azione] : [incanto] [spia] [scambio] [anno] [spazio truppa] [malcontento]")
+	assert_true(SimboliEffetti.riga_azioni([]).vuota(), "Senza azioni possibili la riga non c'è.")
+
+
+func test_ogni_azione_del_catalogo_ha_un_tipo() -> void:
+	var cartella: DirAccess = DirAccess.open("res://data/catalog/opportunities/")
+	for file: String in cartella.get_files():
+		if not file.ends_with(".tres"):
+			continue
+		var def: OpportunityDef = load("res://data/catalog/opportunities/" + file) as OpportunityDef
+		if def == null or def.kind in [OpportunityDef.Kind.COSTRUISCI_EDIFICIO, OpportunityDef.Kind.RECLUTA_TRUPPA]:
+			continue
+		assert_ne(SimboliEffetti.tipo_di_azione(def).come_testo(), "[azione]", "%s deve avere il simbolo del suo tipo." % file)
 
 
 # --- Sotto la carta del consigliere -----------------------------------------------
@@ -238,7 +247,7 @@ func test_la_legenda_trova_gli_esempi_nel_catalogo() -> void:
 	var legenda: LegendaSimboli = LegendaSimboli.new()
 	add_child_autofree(legenda)
 	var catalogo: CatalogDef = load("res://data/catalog/catalog.tres") as CatalogDef
-	assert_eq(legenda._esempi(catalogo).size(), 10, "5 esempi dalle carte vere e 5 scritti apposta.")
+	assert_eq(legenda._esempi(catalogo).size(), 11, "5 esempi dalle carte vere e 6 scritti apposta.")
 	legenda.costruisci(catalogo)
 	assert_eq(legenda.get_child_count(), 1)
 
