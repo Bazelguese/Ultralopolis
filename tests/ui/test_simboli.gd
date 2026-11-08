@@ -257,3 +257,18 @@ func test_ogni_simbolo_della_legenda_ha_un_nome_e_un_file() -> void:
 		for concetto: StringName in gruppo[1]:
 			assert_true(LegendaSimboli.NOMI.has(concetto), "Manca il nome di %s." % concetto)
 			assert_true(ResourceLoader.exists("res://assets/icone/%s.svg" % concetto), "Manca l'icona di %s." % concetto)
+
+
+func test_i_dettagli_del_consigliere_dicono_solo_cio_che_si_vede() -> void:
+	var decreto: OpportunityDef = load("res://data/catalog/opportunities/decreto_fiscale.tres") as OpportunityDef
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione", &"Fante"], [decreto], Res.Type.STABILITA)
+	catalog.advisors = [cancelliere]
+	var run: RunState = _run()
+	run.round_theme = RunState.RoundTheme.MISTO
+	var scheda: SchedaCarta = SchedaCarta.da_consigliere(run, cancelliere)
+	var righe: PackedStringArray = scheda.dettagli.split("\n")
+	assert_eq(righe.size(), scheda.simboli.size(), "Una frase per ogni riga di simboli.")
+	assert_eq(righe[0], "Propone: edifici e truppe.")
+	assert_eq(righe[1], "Azioni possibili: scambi di risorse.")
+	assert_string_starts_with(righe[2], "Potenzia: fa salire di livello una tua carta dei suoi tipi, pagando Stabilità.")
+	assert_false(scheda.dettagli.contains("Decreto fiscale"), "Niente elenco delle singole azioni: non si vedono sulla carta.")

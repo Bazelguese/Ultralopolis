@@ -117,7 +117,7 @@ func _esempi(catalogo: CatalogDef) -> Array:
 	proposte.rilievo = RigaSimboli.Rilievo.PRINCIPALE
 	esempi.append([proposte, "Riga colorata, in alto sul consigliere: che cosa ti propone in questo round (qui edifici e truppe dei suoi tipi)."])
 	var tipi_azione: RigaSimboli = RigaSimboli.new().icona(&"azione").scritta(":").icona(&"scambio").icona(&"anno").icona(&"spia")
-	esempi.append([tipi_azione, "Sotto, il timbro e i tipi di azione che può proporre: qui scambi di risorse, bonus per un tempo e spionaggio. Costi ed effetti esatti li vedi nei dettagli e sulle proposte, dopo averlo scelto."])
+	esempi.append([tipi_azione, "Sotto, il timbro e i tipi di azione che può proporre: qui scambi di risorse, bonus per un tempo e spionaggio. Costi ed effetti esatti li vedi sulle proposte, dopo averlo scelto."])
 	var potenzia: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
 	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
 	esempi.append([potenzia, "Riga con il solo bordo, in fondo al consigliere: un servizio in più, non una proposta. Dopo averlo scelto puoi anche potenziare una tua carta dei suoi tipi, pagando Ferro, senza perdere la scelta del round."])

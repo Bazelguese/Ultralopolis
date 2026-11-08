@@ -15,14 +15,14 @@ const VOCI_PER_RIGA: int = 7
 ## Il "menu" di un consigliere (GDD §4.2), in ordine di importanza (richiesta di Davide):
 ## 1. che cosa propone in questo round (riga principale, colorata): edifici, truppe;
 ## 2. una sola riga "azioni": i tipi di azione che potrebbe proporre adesso (scambi, bonus per un
-##    anno, spionaggio...), senza costi né numeri, che restano nei dettagli e sulle proposte;
+##    anno, spionaggio...), senza costi né numeri, che si vedono sulle proposte dopo averlo scelto;
 ## 3. per ultimo, in disparte, il Potenzia: è un servizio in più del consigliere, non una proposta.
 static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 	var righe: Array[RigaSimboli] = []
 	if def.special == AdvisorDef.Special.CLOWN:
 		# Un elemento per ogni colore di mana e un edificio neutro (GDD §4.2.2).
 		var colori: RigaSimboli = RigaSimboli.new()
-		colori.etichetta = "Propone un elemento per colore di mana e un edificio neutro"
+		colori.etichetta = "Propone: un elemento per ogni colore di mana (rosso, verde, blu, viola) e un edificio neutro."
 		colori.rilievo = RigaSimboli.Rilievo.PRINCIPALE
 		colori.icona(&"proposta").scritta(":")
 		for colore: StringName in [&"rosso", &"verde", &"blu", &"viola"]:
@@ -34,9 +34,9 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 	var truppe: bool = run.advisor_offers_elements(def, true)
 	if edifici or truppe:
 		var elementi: RigaSimboli = RigaSimboli.new()
-		elementi.etichetta = "Propone %s" % ("edifici e truppe" if edifici and truppe else ("edifici" if edifici else "truppe"))
+		elementi.etichetta = "Propone: %s." % ("edifici e truppe" if edifici and truppe else ("edifici" if edifici else "truppe"))
 		if def.special == AdvisorDef.Special.ANZIANO:
-			elementi.etichetta = "Propone edifici neutri"
+			elementi.etichetta = "Propone: edifici neutri."
 		elementi.rilievo = RigaSimboli.Rilievo.PRINCIPALE
 		elementi.icona(&"proposta").scritta(":")
 		if edifici:
@@ -55,18 +55,23 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
 	match def.special:
 		AdvisorDef.Special.ANZIANO:
-			potenzia.etichetta = "Potenzia un edificio neutro, una volta all'anno, in Oro"
+			potenzia.etichetta = "Potenzia: fa salire di livello un tuo edificio neutro, pagando Oro, una volta all'anno."
 			potenzia.icona(&"potenzia").icona(&"edificio").scritta(":").icona(&"oro", "", RigaSimboli.Tono.COSTO).scritta("1×").icona(&"anno")
 		AdvisorDef.Special.VISITATORE:
 			pass  # I visitatori non potenziano (GDD §4.2.5).
 		_:
-			potenzia.etichetta = "Potenzia con %s" % run.advisor_resource_text(def)
+			potenzia.etichetta = "Potenzia: fa salire di livello una tua carta dei suoi tipi, pagando %s. Non consuma la scelta del round." % run.advisor_resource_text(def)
 			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
 			if def.random_resource:
 				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)
 	if not potenzia.vuota():
 		# Con questo consigliere puoi già potenziare qualche tua carta (P4).
-		potenzia.accesa = not run.affordable_upgrades(def).is_empty()
+		var pronte: PackedStringArray = PackedStringArray()
+		for pezzo: BoardPiece in run.affordable_upgrades(def):
+			pronte.append(pezzo.display_name())
+		potenzia.accesa = not pronte.is_empty()
+		if potenzia.accesa:
+			potenzia.etichetta += " Puoi già potenziare: %s." % ", ".join(pronte)
 		righe.append(potenzia)
 	return righe
 
@@ -82,14 +87,30 @@ static func riga_azioni(azioni: Array[Offer]) -> RigaSimboli:
 	var tipi: Array[String] = []
 	riga.icona(&"azione").scritta(":")
 	for offerta: Offer in azioni:
-		nomi.append(offerta.describe())
 		var tipo: RigaSimboli = tipo_di_azione(offerta.opportunity)
 		if tipi.has(tipo.come_testo()):
 			continue
 		tipi.append(tipo.come_testo())
+		nomi.append(nome_tipo_di_azione(offerta.opportunity))
 		riga.accoda(tipo)
-	riga.etichetta = "Azioni possibili: %s" % ", ".join(nomi)
+	riga.etichetta = "Azioni possibili: %s." % ", ".join(nomi)
 	return riga
+
+
+## Nome del tipo di un'azione, per il riquadro dei dettagli: dice a parole ciò che il simbolo mostra.
+static func nome_tipo_di_azione(def: OpportunityDef) -> String:
+	match tipo_di_azione(def).come_testo():
+		"[scambio]": return "scambi di risorse"
+		"[malcontento]": return "calmare il Malcontento"
+		"[anno]": return "bonus per un tempo"
+		"[spazio edificio]": return "uno spazio edificio"
+		"[spazio truppa]": return "uno spazio truppa"
+		"[malus]": return "accorciare un malus"
+		"[spia]": return "spionaggio sul fantasma"
+		"[incanto]": return "incanti sulle truppe"
+		"[perk]": return "un perk"
+		"[tecnologia]": return "ripescare le tecnologie"
+	return "altre azioni"
 
 
 ## Il simbolo del tipo di un'azione: scambio di risorse, bonus per un tempo (calendario),
