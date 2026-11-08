@@ -228,11 +228,19 @@ static func ritaglia_busto(illustrazione: Texture2D) -> Texture2D:
 	return trama
 
 
+## L'immagine dentro un quadrato, con le sue proporzioni (2:3 in verticale, 3:2 in orizzontale):
+## il margine è nero e il ritaglio lo toglie insieme al fondo.
 static func _quadrata(img: Image, lato: int) -> Image:
-	var minimo: int = mini(img.get_width(), img.get_height())
-	var ritaglio: Image = img.get_region(Rect2i((img.get_width() - minimo) / 2, (img.get_height() - minimo) / 2, minimo, minimo))
-	ritaglio.resize(lato, lato, Image.INTERPOLATE_BILINEAR)
-	return ritaglio
+	var massimo: int = maxi(img.get_width(), img.get_height())
+	var w: int = maxi(1, int(round(float(img.get_width()) / float(massimo) * lato)))
+	var h: int = maxi(1, int(round(float(img.get_height()) / float(massimo) * lato)))
+	var ridotta: Image = img.duplicate() as Image
+	ridotta.resize(w, h, Image.INTERPOLATE_BILINEAR)
+	var quadrato: Image = Image.create(lato, lato, false, Image.FORMAT_RGBA8)
+	quadrato.fill(Color.BLACK)
+	# Le figure stanno in piedi: in un quadrato più largo che alto la figura poggia sul fondo.
+	quadrato.blit_rect(ridotta, Rect2i(0, 0, w, h), Vector2i((lato - w) / 2, lato - h))
+	return quadrato
 
 
 ## Celle "libere" (valore 1) raggiungibili dai bordi dell'immagine passando solo per celle libere.

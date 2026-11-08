@@ -9,29 +9,31 @@ enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
 enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE, GOVERNO, ASCENSIONE }
 
-const PASSO_TRUPPE: float = 1.75
-const PASSO_EDIFICI: float = 2.1
-const MISURA_TRUPPA: Vector2 = Vector2(1.58, 1.95)
-const MISURA_EDIFICIO: Vector2 = Vector2(1.9, 1.6)
-const MISURA_AZIONE: Vector2 = Vector2(1.7, 1.95)
+## Misure delle tessere (Davide, 8 novembre 2026): edifici orizzontali 3:2, tutto il resto
+## verticale 2:3. Le illustrazioni hanno le stesse proporzioni (768 × 512 e 512 × 768).
+const PASSO_TRUPPE: float = 1.62
+const PASSO_EDIFICI: float = 2.3
+const MISURA_TRUPPA: Vector2 = Vector2(1.44, 2.16)
+const MISURA_EDIFICIO: Vector2 = Vector2(2.13, 1.42)
+const MISURA_AZIONE: Vector2 = Vector2(1.44, 2.16)
 const SCALA_SCELTA: float = 1.45
 ## Le scelte con le righe di simboli si ingrandiscono così tanto al passaggio del mouse.
 const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
 ## Teatro di carta: fra truppe ed edifici c'è posto per le figurine, che non coprono le carte dietro.
-const Z_EDIFICI: float = 4.6
+const Z_EDIFICI: float = 4.85
 ## Bordo sinistro del primo spazio: gli spazi si allineano a destra dello stemma.
 const X_INIZIO_SPAZI: float = -10.15
 ## Bordo sinistro della lastra (fisso: stemma e riserva stanno qui).
 const BORDO_SINISTRO_LASTRA: float = -12.605
 const MARGINE_DESTRO_LASTRA: float = 0.35
-const PROFONDITA_LASTRA: float = 5.25
+const PROFONDITA_LASTRA: float = 6.2
 ## Quanto il doppio filetto a inchiostro rientra dal bordo della lastra.
 const RIENTRO_FILETTO: float = 0.32
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
 ## Con gli spazi vuoti stretti la plancia è più corta e le carte si ingrandiscono di più.
-const SCALA_MASSIMA: float = 1.28
+const SCALA_MASSIMA: float = 1.15
 ## Larghezza di uno spazio vuoto (LIBERO o DA CONQUISTARE): una sagoma stretta, non una carta.
 const PASSO_SPAZIO_VUOTO: float = 0.85
 const SCALA_MASSIMA_SCONTRO: float = 1.3
@@ -47,8 +49,8 @@ const MASSIMO_GEMME_IN_VOLO: int = 24
 const ALTEZZA_STENDARDO: float = 1.9
 ## Altezza delle figurine rispetto alla larghezza della carta: gli edifici più bassi, così le file
 ## stanno vicine senza che le loro figurine coprano i numeri delle truppe.
-const ALTEZZA_FIGURINA_TRUPPA: float = 0.95
-const ALTEZZA_FIGURINA_EDIFICIO: float = 0.72
+const ALTEZZA_FIGURINA_TRUPPA: float = 1.1
+const ALTEZZA_FIGURINA_EDIFICIO: float = 0.7
 ## Larghezza del telo dello stendardo e altezza da cui parte (più in basso: Davide, 8 novembre 2026).
 const LARGHEZZA_STENDARDO: float = 1.5
 const BASE_TELO: float = 0.45
@@ -84,7 +86,6 @@ var _radici: Array[Node3D] = [null, null]
 var _lastre: Array[MeshInstance3D] = [null, null]
 var _bordi_lastre: Array[Array] = [[], []]
 var _larghezze: Array[float] = [LARGHEZZA_LASTRA_PIENA, LARGHEZZA_LASTRA_PIENA]
-var _nota_ordine: Label3D
 var _animazione_plancia: Tween
 ## All'inizio di una partita la plancia compare già della misura giusta, senza animazione.
 var _disponi_subito: bool = true
@@ -323,12 +324,6 @@ func _crea_lato(lato: int) -> void:
 	_crea_riserva(radice, lato, z_centro)
 	_pezzi[lato] = Node3D.new()
 	radice.add_child(_pezzi[lato])
-	if lato == Lato.GIOCATORE:
-		# Fra la fila delle truppe e quella degli edifici, allineata a destra.
-		_nota_ordine = StileVisivo.scritta("LE TRUPPE AGISCONO DA DESTRA VERSO SINISTRA  ←", StileVisivo.FONT_TESTO_FORTE, 42, StileVisivo.TESTO_TENUE)
-		_nota_ordine.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		_nota_ordine.position = Vector3(0.0, 0.02, (Z_TRUPPE + MISURA_TRUPPA.y * 0.5 + Z_EDIFICI - MISURA_EDIFICIO.y * 0.5) * 0.5)
-		radice.add_child(_nota_ordine)
 	_imposta_larghezza_lastra(lato, LARGHEZZA_LASTRA_PIENA)
 
 
@@ -383,8 +378,6 @@ func _imposta_larghezza_lastra(lato: int, larghezza: float) -> void:
 	(bordi[3] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + larghezza
 	(bordi[6] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + RIENTRO_FILETTO
 	(bordi[7] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + larghezza - RIENTRO_FILETTO
-	if lato == Lato.GIOCATORE and _nota_ordine != null:
-		_nota_ordine.position.x = BORDO_SINISTRO_LASTRA + larghezza - MARGINE_DESTRO_LASTRA
 
 
 ## Larghezza della lastra che contiene tanti spazi (almeno due edifici, per non farla troppo corta).
@@ -409,7 +402,7 @@ func _scala_per(larghezza: float, massima: float) -> float:
 ## simmetrici rispetto al centro del tavolo.
 func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: float) -> void:
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
-	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0 + 0.45
+	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0 - 0.15
 	# Un po' a destra: a sinistra c'è la colonna con la nazione e il calendario.
 	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
 	if _animazione_plancia != null and _animazione_plancia.is_valid():
@@ -586,7 +579,8 @@ func _stendi_stendardo(lato: int, steso: bool, animato: bool) -> void:
 	var angolo: float = -PI * 0.5 if steso else 0.0
 	var posizione: Vector3 = Vector3(0.0, 0.05, POSIZIONE_STESO_Z + BASE_TELO) if steso else Vector3.ZERO
 	var scala: Vector3 = Vector3.ONE * (0.9 if steso else 1.0)
-	_dati_scontro[lato].visible = not steso
+	# La Resistenza sta solo sullo stendardo (Davide, 8 novembre 2026): niente nome e barra ripetuti.
+	_dati_scontro[lato].visible = false
 	for segmento: MeshInstance3D in _anelli[lato]:
 		segmento.visible = not steso
 	_braci_miccia[lato].visible = false
@@ -677,7 +671,7 @@ func _aggiorna_anello(lato: int, millisecondi: int) -> void:
 		else:
 			segmento.material_override = _materiale_anello_acceso if i < stato else _materiale_anello_spento
 	var brace: MeshInstance3D = _braci_miccia[lato]
-	var in_corso: bool = stato >= 0 and stato < _anelli[lato].size() and _dati_scontro[lato].visible
+	var in_corso: bool = stato >= 0 and stato < _anelli[lato].size() and (_anelli[lato][0] as MeshInstance3D).visible
 	brace.visible = in_corso
 	if in_corso:
 		brace.position = (_anelli[lato][stato] as MeshInstance3D).position + Vector3(0.0, 0.05, 0.0)
@@ -919,7 +913,7 @@ func _costruisci_scelte() -> void:
 		var busto: bool = scheda.genere == SchedaCarta.Genere.CONSIGLIERE and scheda.illustrazione != null
 		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6, busto)
 		tessera.aggiungi_busto()
-		var sotto_tipi: float = LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA if busto and not scheda.tipi.is_empty() else 0.0
+		var sotto_tipi: float = LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA if not scheda.tipi.is_empty() else 0.0
 		tessera.rotation_degrees = Vector3(38.0, 0.0, 0.0)
 		tessera.scale = Vector3.ONE * SCALA_SCELTA
 		if not scheda.simboli.is_empty():
@@ -927,9 +921,6 @@ func _costruisci_scelte() -> void:
 		if scheda.sopratitolo != "":
 			var sopra: Label3D = StileVisivo.scritta(scheda.sopratitolo.to_upper(), StileVisivo.FONT_TITOLI, 42, StileVisivo.TESTO, 0.0, 10)
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
-			# Sopra la carta c'è la linguetta dei tipi: la scritta sale sopra la linguetta.
-			if not scheda.tipi.is_empty() and not busto:
-				sopra.position.z -= LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA
 			# Con il mezzo busto sopra, la scritta passa sotto la carta, dopo i tipi e il verbo.
 			if busto:
 				sopra.position.z = misura.y * 0.5 + sotto_tipi + 0.62

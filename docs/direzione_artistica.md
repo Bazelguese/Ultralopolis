@@ -57,7 +57,14 @@ Il gioco cerca da solo le immagini con il nome dell'identificativo dell'elemento
 | Azioni (opportunità che non sono un edificio o una truppa) | `assets/illustrazioni/azioni/<id>.png` (es. `studiosi.png`) |
 | Incontri del mondo | `assets/illustrazioni/incontri/<nome del file dell'incontro>.png` |
 
-Formato: **PNG quadrato, 512 × 512 pixel**. Il gioco ritaglia l'immagine per riempire il riquadro dell'illustrazione, quindi il soggetto deve stare **al centro** con un po' di margine.
+Formato (Davide, 8 novembre 2026): gli **edifici** sono orizzontali, tutto il resto verticale.
+
+| Elemento | Proporzione | Misura |
+|---|---|---|
+| Edifici | 3:2 orizzontale | **768 × 512** pixel |
+| Truppe, consiglieri, azioni, avvenimenti, incontri | 2:3 verticale | **512 × 768** pixel |
+
+PNG o JPG. Il soggetto su **fondo nero**, intero e con un po' di margine: sulla plancia il gioco toglie il fondo nero e ne fa una figurina di carta che si alza dalla tessera; per consiglieri e avvenimenti usa la parte alta (il mezzo busto), che esce dal bordo alto della carta. Per questo truppe e personaggi devono stare **in piedi, con i piedi in basso**, e la testa nella parte alta.
 
 ### 3.2 Come devono essere
 
@@ -71,7 +78,7 @@ Formato: **PNG quadrato, 512 × 512 pixel**. Il gioco ritaglia l'immagine per ri
 
 Struttura: `Game card illustration: <soggetto>. ` seguito sempre dallo stesso blocco di stile:
 
-> Stylized painterly fantasy illustration for a game card, bold readable silhouette, centered subject, vibrant saturated colors, strong warm key light and cool rim light, soft painted background with simple atmospheric gradient, slight vignette, clean shapes, high detail on the subject, no text, no letters, no logos, no frame, no border, square composition.
+> Stylized painterly fantasy illustration for a game card, bold readable silhouette, centered subject, vibrant saturated colors, strong warm key light and cool rim light, soft painted background with simple atmospheric gradient, slight vignette, clean shapes, high detail on the subject, no text, no letters, no logos, no frame, no border, solid black background, full figure with margin. Aspect 2:3 portrait (buildings: 3:2 landscape).
 
 Soggetti già preparati per il primo gruppo (gli elementi della prima era):
 

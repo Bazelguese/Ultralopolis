@@ -78,8 +78,8 @@ func _crea_faccia(nitidezza: float) -> void:
 	_corpo.add_child(carta)
 
 
-## La linguetta dei tipi sopra la carta (GDD §14.4): un pezzo attaccato alla carta, che si
-## solleva e si ingrandisce con lei. Allineata a sinistra se c'è posto, altrimenti centrata.
+## La linguetta dei tipi sotto la carta (GDD §14.4, Davide 8 novembre 2026): un pezzo attaccato alla
+## carta, che si solleva e si ingrandisce con lei. Allineata a sinistra se c'è posto, altrimenti centrata.
 func _crea_linguetta(nitidezza: float) -> void:
 	if scheda.tipi.is_empty():
 		return
@@ -94,7 +94,7 @@ func _crea_linguetta(nitidezza: float) -> void:
 	add_child(viewport)
 	var linguetta: LinguettaTipi = LinguettaTipi.new()
 	viewport.add_child(linguetta)
-	linguetta.imposta(scheda.tipi, scheda.colore_cornice(), scala, con_busto())
+	linguetta.imposta(scheda.tipi, scheda.colore_cornice(), scala, true)
 	var piano: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
 	forma.size = misura
@@ -108,10 +108,8 @@ func _crea_linguetta(nitidezza: float) -> void:
 	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
 	piano.material_override = materiale
 	var rientro: float = minf(larghezza * 0.08, maxf(0.0, (larghezza - misura.x) * 0.5))
-	var z_linguetta: float = -profondita * 0.5 - misura.y * 0.5 + LinguettaTipi.SOTTO_LA_CARTA
-	# Con il mezzo busto che esce dall'alto, i tipi stanno sotto la carta.
-	if con_busto():
-		z_linguetta = profondita * 0.5 + misura.y * 0.5 - LinguettaTipi.SOTTO_LA_CARTA
+	# I tipi stanno sotto la carta (Davide, 8 novembre 2026): sopra c'è la figura.
+	var z_linguetta: float = profondita * 0.5 + misura.y * 0.5 - LinguettaTipi.SOTTO_LA_CARTA
 	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, SPESSORE * 0.6, z_linguetta)
 	_corpo.add_child(piano)
 
@@ -209,7 +207,8 @@ func imposta_segnale(testo: String, colore: Color = StileVisivo.ORO_LUCE) -> voi
 	if _segnale == null:
 		_segnale = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, 44, colore, 0.0, 14)
 		# Sotto la carta: sopra ci sono già i prezzi delle offerte.
-		_segnale.position = Vector3(0.0, SPESSORE + 0.03, profondita * 0.5 + 0.3)
+		var sotto_tipi: float = 0.0 if scheda.tipi.is_empty() else LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA
+		_segnale.position = Vector3(0.0, SPESSORE + 0.03, profondita * 0.5 + 0.3 + sotto_tipi)
 		_corpo.add_child(_segnale)
 	_segnale.text = testo
 	_segnale.modulate = colore
