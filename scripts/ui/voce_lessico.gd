@@ -23,5 +23,8 @@ enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO, CONSIGLIO, C
 @export var simbolo: StringName = &""
 ## I simboli sono bianchi come sulle carte; solo le gemme del mana prendono il colore della parola.
 @export var simbolo_colorato: bool = false
+## Parola di base (Mana, Danno, Scudo…): la sua spiegazione compare solo se resta posto,
+## dopo quelle delle parole più rare (Corruzione, Sabotaggio…). Le spiegazioni sono al massimo 4.
+@export var di_base: bool = false
 ## Spiegazione breve, presa dal GDD. Vuota: la parola si colora ma non si spiega.
 @export_multiline var definizione: String = ""

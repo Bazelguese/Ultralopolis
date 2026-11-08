@@ -90,20 +90,26 @@ static func colora(testo: String, dimensione: int = 18) -> String:
 	return "".join(parti)
 
 
-## Le parole chiave con una spiegazione che compaiono nel testo, nell'ordine in cui compaiono,
-## senza ripetizioni e al massimo quante ne prevede il lessico.
+## Le parole chiave con una spiegazione che compaiono nel testo, senza ripetizioni e al massimo
+## quante ne prevede il lessico: prima le parole più rare, nell'ordine in cui compaiono, poi
+## quelle di base se resta posto (così Corruzione o Sabotaggio non restano mai senza spiegazione).
 static func voci_da_spiegare(testo: String) -> Array[VoceLessico]:
 	var risultato: Array[VoceLessico] = []
 	var lessico_attuale: Lessico = lessico()
 	if lessico_attuale == null:
 		return risultato
+	var di_base: Array[VoceLessico] = []
 	for pezzo: Pezzo in scomponi(testo):
-		if pezzo.voce == null or pezzo.voce.definizione.strip_edges().is_empty() or risultato.has(pezzo.voce):
+		if pezzo.voce == null or pezzo.voce.definizione.strip_edges().is_empty():
 			continue
-		risultato.append(pezzo.voce)
-		if risultato.size() >= lessico_attuale.massimo_spiegazioni:
-			break
-	return risultato
+		if risultato.has(pezzo.voce) or di_base.has(pezzo.voce):
+			continue
+		if pezzo.voce.di_base:
+			di_base.append(pezzo.voce)
+		else:
+			risultato.append(pezzo.voce)
+	risultato.append_array(di_base)
+	return risultato.slice(0, lessico_attuale.massimo_spiegazioni)
 
 
 ## Divide il testo in tratti semplici, parole chiave e numeri.
