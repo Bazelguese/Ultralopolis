@@ -15,7 +15,7 @@
 script = ExtResource("x1")
 id = &"monarchia_costituzionale"
 display_name = "Monarchia costituzionale"
-description = "Il sovrano giura sulla carta. Cancelliere più frequente; l'Ambasciata costa 1 Stabilità in meno (almeno 1). Tessera esclusiva: Camera dei pari (era 2). Capitale: +1 Influenza."
+description = "Il sovrano giura sulla costituzione. Cancelliere più frequente; l'Ambasciata costa 1 Stabilità in meno (almeno 1). Tessera esclusiva: Camera dei pari (era 2). Capitale: +1 Influenza."
 dimension = 1
 identity_type = &"Costituzionale"
 resistance_bonus = 5
