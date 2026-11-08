@@ -6,10 +6,13 @@ extends Control
 var riga: RigaSimboli
 ## Senza pastiglia si disegnano solo i simboli, senza il fondo scuro.
 var con_pastiglia: bool = true
+## Colore delle righe principali (come la cornice di una carta).
+var accento: Color = StileVisivo.CORNICE_AZIONE
 
 
-static func crea(p_riga: RigaSimboli, altezza: float, p_con_pastiglia: bool = true) -> VistaRigaSimboli:
+static func crea(p_riga: RigaSimboli, altezza: float, p_con_pastiglia: bool = true, p_accento: Color = StileVisivo.CORNICE_AZIONE) -> VistaRigaSimboli:
 	var vista: VistaRigaSimboli = VistaRigaSimboli.new()
+	vista.accento = p_accento
 	vista.riga = p_riga
 	vista.con_pastiglia = p_con_pastiglia
 	vista.custom_minimum_size = Vector2(DisegnoSimboli.larghezza_pastiglia(p_riga, altezza), altezza)
@@ -22,6 +25,6 @@ static func crea(p_riga: RigaSimboli, altezza: float, p_con_pastiglia: bool = tr
 func _draw() -> void:
 	var area: Rect2 = Rect2(Vector2.ZERO, size)
 	if con_pastiglia:
-		DisegnoSimboli.pastiglia(self, riga, area)
+		DisegnoSimboli.pastiglia(self, riga, area, accento)
 	else:
 		DisegnoSimboli.disegna_riga(self, riga, area)

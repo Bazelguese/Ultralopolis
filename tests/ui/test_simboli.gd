@@ -175,8 +175,9 @@ func test_consigliere_in_un_round_di_azioni() -> void:
 	run.round_theme = RunState.RoundTheme.AZIONI
 	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
 	assert_eq(righe.size(), 2, "Potenzia e l'unica azione: niente edifici o truppe in un round di Azioni.")
-	assert_eq(righe[0].come_testo(), "[potenzia] : [stabilita]")
-	assert_eq(righe[1].come_testo(), "2[stabilita] → +4[oro]")
+	assert_eq(righe[0].come_testo(), "2[stabilita] → +4[oro]")
+	assert_eq(righe[1].come_testo(), "[potenzia] : [stabilita]", "Il Potenzia va in fondo: è un extra.")
+	assert_eq(righe[1].rilievo, RigaSimboli.Rilievo.SECONDARIA)
 
 
 func test_consigliere_in_un_round_misto_propone_anche_carte() -> void:
@@ -187,7 +188,10 @@ func test_consigliere_in_un_round_misto_propone_anche_carte() -> void:
 	run.round_theme = RunState.RoundTheme.MISTO
 	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
 	assert_eq(righe.size(), 3)
-	assert_eq(righe[1].come_testo(), "[edificio] / [truppa]")
+	assert_eq(righe[0].come_testo(), "[proposta] : [edificio] / [truppa]", "Prima ciò che propone.")
+	assert_eq(righe[0].rilievo, RigaSimboli.Rilievo.PRINCIPALE)
+	assert_eq(righe[1].come_testo(), "2[stabilita] → +4[oro]")
+	assert_eq(righe[2].come_testo(), "[potenzia] : [stabilita]")
 
 
 func test_consigliere_in_un_round_di_edifici_non_mostra_azioni() -> void:
@@ -198,7 +202,8 @@ func test_consigliere_in_un_round_di_edifici_non_mostra_azioni() -> void:
 	run.round_theme = RunState.RoundTheme.EDIFICI
 	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
 	assert_eq(righe.size(), 2)
-	assert_eq(righe[1].come_testo(), "[edificio]")
+	assert_eq(righe[0].come_testo(), "[proposta] : [edificio]")
+	assert_eq(righe[1].come_testo(), "[potenzia] : [stabilita]")
 
 
 func test_incanti_e_spionaggi_si_riuniscono_in_una_riga() -> void:
@@ -223,7 +228,8 @@ func test_sotto_il_consigliere_si_vede_quante_carte_puoi_potenziare() -> void:
 	var pronte: int = run.affordable_upgrades(cancelliere).size()
 	assert_gt(pronte, 0, "La Fattoria e i Fanti sono dei tipi del consigliere.")
 	assert_eq(SchedaCarta.da_consigliere(run, cancelliere).costo, "Ascolta · ▲ Potenzia %d" % pronte)
-	assert_true(SimboliEffetti.consigliere(run, cancelliere)[0].accesa, "La riga del Potenzia si accende.")
+	var righe: Array[RigaSimboli] = SimboliEffetti.consigliere(run, cancelliere)
+	assert_true(righe[righe.size() - 1].accesa, "La riga del Potenzia si accende.")
 
 
 # --- Legenda ----------------------------------------------------------------------

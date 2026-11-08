@@ -12,36 +12,23 @@ const VOCI_PER_RIGA: int = 7
 
 # --- Consiglieri ---------------------------------------------------------------
 
-## Il "menu" di un consigliere (GDD §4.2): con che cosa potenzia, se propone edifici o truppe
-## in questo round e, una per riga, le azioni che potrebbe proporre adesso.
+## Il "menu" di un consigliere (GDD §4.2), in ordine di importanza (richiesta di Davide):
+## 1. che cosa propone in questo round (riga principale, colorata): edifici, truppe;
+## 2. le azioni che potrebbe proporre adesso, una per riga;
+## 3. per ultimo, in disparte, il Potenzia: è un servizio in più del consigliere, non una proposta.
 static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 	var righe: Array[RigaSimboli] = []
-	match def.special:
-		AdvisorDef.Special.CLOWN:
-			# Un elemento per ogni colore di mana e un edificio neutro (GDD §4.2.2).
-			var colori: RigaSimboli = RigaSimboli.new()
-			colori.etichetta = "Un elemento per colore di mana e un edificio neutro"
-			for colore: StringName in [&"rosso", &"verde", &"blu", &"viola"]:
-				colori.gemma(colore)
-			colori.icona(&"edificio")
-			righe.append(colori)
-			return righe
-		AdvisorDef.Special.ANZIANO:
-			var potenzia: RigaSimboli = RigaSimboli.new()
-			potenzia.etichetta = "Potenzia un edificio neutro, una volta all'anno, in Oro"
-			potenzia.icona(&"potenzia").icona(&"edificio").scritta(":").icona(&"oro", "", RigaSimboli.Tono.COSTO).scritta("1×").icona(&"anno")
-			righe.append(potenzia)
-		AdvisorDef.Special.VISITATORE:
-			pass
-		_:
-			var potenzia: RigaSimboli = RigaSimboli.new()
-			potenzia.etichetta = "Potenzia con %s" % run.advisor_resource_text(def)
-			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
-			if def.random_resource:
-				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)
-			# Con questo consigliere puoi già potenziare qualche tua carta (P4).
-			potenzia.accesa = not run.affordable_upgrades(def).is_empty()
-			righe.append(potenzia)
+	if def.special == AdvisorDef.Special.CLOWN:
+		# Un elemento per ogni colore di mana e un edificio neutro (GDD §4.2.2).
+		var colori: RigaSimboli = RigaSimboli.new()
+		colori.etichetta = "Propone un elemento per colore di mana e un edificio neutro"
+		colori.rilievo = RigaSimboli.Rilievo.PRINCIPALE
+		colori.icona(&"proposta").scritta(":")
+		for colore: StringName in [&"rosso", &"verde", &"blu", &"viola"]:
+			colori.gemma(colore)
+		colori.icona(&"edificio")
+		righe.append(colori)
+		return righe
 	var edifici: bool = run.advisor_offers_elements(def, false)
 	var truppe: bool = run.advisor_offers_elements(def, true)
 	if edifici or truppe:
@@ -49,6 +36,8 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 		elementi.etichetta = "Propone %s" % ("edifici e truppe" if edifici and truppe else ("edifici" if edifici else "truppe"))
 		if def.special == AdvisorDef.Special.ANZIANO:
 			elementi.etichetta = "Propone edifici neutri"
+		elementi.rilievo = RigaSimboli.Rilievo.PRINCIPALE
+		elementi.icona(&"proposta").scritta(":")
 		if edifici:
 			elementi.icona(&"edificio")
 		if edifici and truppe:
@@ -59,6 +48,23 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 			_prezzo_visitatore(elementi, def)
 		righe.append(elementi)
 	righe.append_array(azioni_riunite(run.advisor_action_preview(def)))
+	var potenzia: RigaSimboli = RigaSimboli.new()
+	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
+	match def.special:
+		AdvisorDef.Special.ANZIANO:
+			potenzia.etichetta = "Potenzia un edificio neutro, una volta all'anno, in Oro"
+			potenzia.icona(&"potenzia").icona(&"edificio").scritta(":").icona(&"oro", "", RigaSimboli.Tono.COSTO).scritta("1×").icona(&"anno")
+		AdvisorDef.Special.VISITATORE:
+			pass  # I visitatori non potenziano (GDD §4.2.5).
+		_:
+			potenzia.etichetta = "Potenzia con %s" % run.advisor_resource_text(def)
+			potenzia.icona(&"potenzia").scritta(":").icona(Simboli.di_risorsa(def.upgrade_resource), "", RigaSimboli.Tono.COSTO)
+			if def.random_resource:
+				potenzia.scritta("+").icona(Simboli.di_risorsa(run.shadow_resource), "", RigaSimboli.Tono.COSTO)
+	if not potenzia.vuota():
+		# Con questo consigliere puoi già potenziare qualche tua carta (P4).
+		potenzia.accesa = not run.affordable_upgrades(def).is_empty()
+		righe.append(potenzia)
 	return righe
 
 

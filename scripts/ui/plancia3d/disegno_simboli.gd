@@ -5,18 +5,34 @@ extends RefCounted
 ## Solo presentazione.
 
 
-## Una riga nella sua pastiglia scura (dorata se la riga è "accesa", tenue se è spenta).
-static func pastiglia(tela: CanvasItem, riga: RigaSimboli, area: Rect2) -> void:
+## Una riga nella sua pastiglia. Il fondo dice quanto conta (RigaSimboli.Rilievo):
+## principale = colore della carta ("accento"), normale = scuro, secondaria = solo un bordo
+## sottile e un po' più bassa. Dorata se la riga è "accesa", tenue se è spenta.
+static func pastiglia(tela: CanvasItem, riga: RigaSimboli, area: Rect2, accento: Color = StileVisivo.CORNICE_AZIONE) -> void:
+	var dove: Rect2 = area
 	var fondo: StyleBoxFlat = StyleBoxFlat.new()
 	fondo.bg_color = Color(0.0, 0.0, 0.0, 0.18 if riga.spenta else 0.32)
+	var bordo: int = maxi(2, int(area.size.y * 0.05))
+	match riga.rilievo:
+		RigaSimboli.Rilievo.PRINCIPALE:
+			fondo.bg_color = Color(accento.darkened(0.45), 0.95)
+			fondo.border_color = accento.lightened(0.1)
+			fondo.set_border_width_all(bordo)
+		RigaSimboli.Rilievo.SECONDARIA:
+			dove = area.grow_individual(-area.size.y * 0.08, -area.size.y * 0.12, -area.size.y * 0.08, -area.size.y * 0.12)
+			fondo.bg_color = Color(0.0, 0.0, 0.0, 0.12)
+			fondo.border_color = Color(StileVisivo.TESTO_TENUE, 0.55)
+			fondo.set_border_width_all(maxi(1, bordo - 1))
 	if riga.accesa:
-		fondo.bg_color = Color(StileVisivo.ORO.darkened(0.35), 0.85)
+		# Una riga secondaria accesa resta più sobria della principale: bordo dorato, fondo appena dorato.
+		var secondaria: bool = riga.rilievo == RigaSimboli.Rilievo.SECONDARIA
+		fondo.bg_color = Color(StileVisivo.ORO.darkened(0.6), 0.55) if secondaria else Color(StileVisivo.ORO.darkened(0.35), 0.85)
 		fondo.border_color = StileVisivo.ORO_LUCE
-		fondo.set_border_width_all(maxi(2, int(area.size.y * 0.05)))
-	fondo.set_corner_radius_all(int(area.size.y * 0.3))
+		fondo.set_border_width_all(maxi(1, bordo - 1) if secondaria else bordo)
+	fondo.set_corner_radius_all(int(dove.size.y * 0.3))
 	fondo.anti_aliasing = true
-	tela.draw_style_box(fondo, area)
-	disegna_riga(tela, riga, area)
+	tela.draw_style_box(fondo, dove)
+	disegna_riga(tela, riga, dove)
 
 
 ## Larghezza che serve a una riga, con il margine della sua pastiglia, se è alta "altezza".
