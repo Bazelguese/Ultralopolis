@@ -29,7 +29,7 @@ const PROFONDITA_LASTRA: float = 5.6
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
 const SCALA_MASSIMA: float = 1.25
-const SCALA_MASSIMA_SCONTRO: float = 1.4
+const SCALA_MASSIMA_SCONTRO: float = 1.3
 const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
 const SPAZI_TRUPPE: int = 12
@@ -47,8 +47,8 @@ const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, 0.9)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 1.2
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 21.0, 22.5)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 2.6)
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 22.0, 22.0)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.6)
 
 var run: RunState
 
