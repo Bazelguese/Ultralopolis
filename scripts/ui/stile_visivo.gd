@@ -80,9 +80,17 @@ static func mana_da_nome(nome: StringName) -> int:
 	return Mana.NESSUNO
 
 
-## Cornici che non dipendono dall'era: azioni (offerte senza edificio o truppa) e minacce.
-const CORNICE_AZIONE: Color = Color("a78bfa")
+## Cornici che non dipendono dall'era: azioni (opportunità che non sono un edificio o una truppa) e minacce.
+## Acciaio: un quarto metallo accanto a bronzo, argento e oro, lontano dai colori del mana
+## (scelta di Davide, 8 novembre 2026).
+const CORNICE_AZIONE: Color = Color("6f819b")
 const CORNICE_MINACCIA: Color = Color("ff4d6d")
+
+## Sabotaggio nello scontro (nastro “Sabotato” sulla tessera e scintille): bianco ghiaccio, “fermo”.
+const COLORE_SABOTATO: Color = Color("e3ecf7")
+## Corruzione (simbolo sulle tessere, segnalino accanto alla Resistenza, scritte nello scontro):
+## magenta scuro, diverso dal mana viola e dal cremisi dei nemici.
+const COLORE_CORRUZIONE: Color = Color("c2378a")
 
 
 # --- Materiali ------------------------------------------------------------------

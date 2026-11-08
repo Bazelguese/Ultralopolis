@@ -7,7 +7,7 @@
 script = ExtResource("1_tech")
 id = &"ingegneria_d_assedio"
 display_name = "Ingegneria d'assedio"
-description = "Perk Genio militare: le truppe Assedio fanno il 25% di danno agli scudi in più."
+description = "Peculiarità Genio militare: le truppe Assedio fanno il 25% di danno d'assedio in più."
 sphere = "Opera"
 era = 2
 cost = 5

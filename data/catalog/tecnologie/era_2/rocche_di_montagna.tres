@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_rocche_di_montagna"
 display_name = "Rocche di montagna"
-description = "Gli elementi Guardiani che producono scudo ne producono 1 in più."
+description = "Le tessere Guardiani che producono scudo ne producono 1 in più."
 is_malus = false
 effect = 11
 target_type = &"Guardiano"
@@ -21,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"rocche_di_montagna"
 display_name = "Rocche di montagna"
-description = "Gli elementi Guardiani che producono scudo ne producono 1 in più."
+description = "Le tessere Guardiani che producono scudo ne producono 1 in più."
 sphere = "Militare"
 era = 2
 cost = 5

@@ -6,7 +6,7 @@
 script = ExtResource("1_w6wc7")
 id = &"capitale_cinerali_ferro"
 display_name = "Capitale: +1 Ferro"
-description = "La Capitale produce 1 Legno in più a ogni fase."
+description = "La Capitale produce 1 Legno in più a ogni stagione."
 is_malus = false
 effect = 8
 target_type = &"Capitale"

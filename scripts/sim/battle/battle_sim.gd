@@ -316,7 +316,7 @@ func _make_side(setup: BattleSideSetup) -> SideState:
 	state.corruption = setup.start_corruption
 	for building: BuildingDef in state.buildings:
 		if building.mana_interval_ms <= 0:
-			push_error("Edificio '%s': intervallo di produzione non valido (%d ms)." % [building.id, building.mana_interval_ms])
+			push_error("Edificio '%s': ciclo non valido (%d ms)." % [building.id, building.mana_interval_ms])
 		# Gli edifici partono con l'intervallo pieno (GDD §7.4).
 		state.production_left_ms.append(building.mana_interval_ms)
 		state.building_slow_ms.append(0)

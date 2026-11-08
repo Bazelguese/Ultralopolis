@@ -7,7 +7,7 @@
 script = ExtResource("1_tech")
 id = &"rotazione_dei_campi"
 display_name = "Rotazione dei campi"
-description = "Linea degli Orti: edifici di Produzione verdi."
+description = "Linea degli Orti: edifici di Materie prime verdi."
 sphere = "Terra"
 cost = 3
 line = ExtResource("2_x")

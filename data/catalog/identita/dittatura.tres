@@ -12,7 +12,7 @@
 script = ExtResource("x1")
 id = &"dittatura"
 display_name = "Dittatura"
-description = "Un solo uomo al comando. Compaiono 2 consiglieri, ma quello scelto offre una proposta in più. Carta esclusiva: Milizia del regime (era 2). Capitale: +1 Ferro."
+description = "Un solo uomo al comando. Compaiono 2 consiglieri, ma quello scelto offre un'opportunità in più. Tessera esclusiva: Milizia del regime (era 2). Capitale: +1 Ferro."
 dimension = 1
 identity_type = &"Dittatoriale"
 resistance_bonus = 6

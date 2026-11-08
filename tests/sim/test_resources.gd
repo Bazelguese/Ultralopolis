@@ -27,7 +27,7 @@ func before_each() -> void:
 	farm = BuildingDef.new()
 	farm.id = &"fattoria"
 	farm.display_name = "Fattoria"
-	farm.types = [&"Produzione"]
+	farm.types = [&"Materie prime"]
 	farm.food_per_phase = 2
 	farm.cost_gold = 3
 	slow = TroopDef.new()
@@ -52,7 +52,7 @@ func before_each() -> void:
 	run_rules = RunRules.new()
 	Aiuti.consiglio_semplice(catalog, run_rules, [opportunity])
 	soldier = Aiuti.consigliere(&"soldato", [&"Fauna"], [opportunity], Res.Type.FERRO)
-	farmer = Aiuti.consigliere(&"contadino", [&"Produzione"], [opportunity], Res.Type.LEGNO)
+	farmer = Aiuti.consigliere(&"contadino", [&"Materie prime"], [opportunity], Res.Type.LEGNO)
 	catalog.advisors = [soldier]
 	run_rules.starting_gold = 0
 	run_rules.prototype_years = 0

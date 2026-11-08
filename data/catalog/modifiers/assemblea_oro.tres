@@ -6,7 +6,7 @@
 script = ExtResource("1_gt6ti")
 id = &"assemblea_oro"
 display_name = "Assemblea: commerci"
-description = "L'Oro prodotto a ogni fase aumenta del 50%."
+description = "L'Oro prodotto a ogni stagione aumenta del 50%."
 is_malus = false
 effect = 0
 amount = 50

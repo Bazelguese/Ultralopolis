@@ -88,9 +88,9 @@ static func da_edificio(def: BuildingDef, p_livello: int = 1, p_malus: String = 
 		if quanto != 0:
 			produzione.append("+%d %s" % [quanto, Res.NAMES[tipo]])
 	scheda.riga = " · ".join(produzione.slice(0, 2))
-	righe.append("A ogni fase: %s." % (", ".join(produzione) if not produzione.is_empty() else "nessuna risorsa"))
+	righe.append("A ogni stagione: %s." % (", ".join(produzione) if not produzione.is_empty() else "nessuna risorsa"))
 	if def.mana_amount > 0:
-		righe.append("In battaglia: %d %s ogni %s." % [def.mana_amount, def.mana_type, secondi(def.mana_interval_ms)])
+		righe.append("Nello scontro: %d %s ogni ciclo di %s." % [def.mana_amount, def.mana_type, secondi(def.mana_interval_ms)])
 	else:
 		righe.append("Edificio neutro: non produce mana.")
 	righe.append_array(_righe_effetti(def.shield, def.heal, def.corruption, 0, def.inefficiency_ms, def.inefficiency_target, def.sabotage_ms, def.sabotage_target, "ogni %s" % secondi(def.mana_interval_ms)))
@@ -181,10 +181,10 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda.genere = Genere.AZIONE
 			scheda.id = offerta.perk.id
 			scheda.titolo = offerta.perk.display_name
-			scheda.riga = "Perk"
+			scheda.riga = "Peculiarità"
 			scheda.dettagli = "%s\n%s" % [offerta.perk.description, offerta.opportunity.description]
 			scheda.illustrazione = _carica("perk/%s.png" % offerta.perk.id)
-			scheda.sopratitolo = "Perk"
+			scheda.sopratitolo = "Peculiarità"
 			scheda.simboli.append(SimboliEffetti.azione(offerta))
 		_:
 			scheda = SchedaCarta.new()
@@ -201,7 +201,7 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 		var prova: BoardPiece = BoardPiece.of_building(offerta.building, 0) if offerta.building != null else BoardPiece.of_troop(offerta.troop, 0)
 		var costo_mantenimento: ResourceAmounts = run.upkeep_of(prova)
 		if costo_mantenimento != null:
-			scheda.dettagli += "\nCarta speciale: mantenimento %s prima di ogni scontro (di più se la potenzi)." % costo_mantenimento.describe()
+			scheda.dettagli += "\nTessera speciale: mantenimento %s prima di ogni scontro (di più se la potenzi)." % costo_mantenimento.describe()
 	# Bonus già attivi che la carta riceverebbe per i suoi tipi (GDD §6.6): si vedono prima di comprarla.
 	if offerta.is_element():
 		var tipi: Array[StringName] = offerta.building.types if offerta.building != null else offerta.troop.types
@@ -213,7 +213,7 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 	scheda.prezzo = true
 	scheda.disponibile = run.can_afford(offerta)
 	if run.offer_needs_replacement(offerta):
-		scheda.dettagli += "\nPlancia piena: sceglierai quale elemento sostituire (ti torna metà del prezzo)."
+		scheda.dettagli += "\nPlancia piena: sceglierai quale tessera sostituire (ti torna metà del prezzo)."
 	elif not run.offer_choices(offerta).is_empty():
 		scheda.dettagli += "\nDopo averla presa scegli una voce."
 	return scheda
@@ -225,7 +225,7 @@ static func _riga_mantenimento(run: RunState, pezzo: BoardPiece) -> String:
 	var costo: ResourceAmounts = run.upkeep_of(pezzo)
 	var testo: String = ""
 	if costo != null:
-		testo = "\nMantenimento: %s prima di ogni scontro%s." % [costo.describe(), " (carta speciale)" if run.is_special_card(pezzo.building if pezzo.building != null else pezzo.troop) else ""]
+		testo = "\nMantenimento: %s prima di ogni scontro%s." % [costo.describe(), " (tessera speciale)" if run.is_special_card(pezzo.building if pezzo.building != null else pezzo.troop) else ""]
 	if pezzo.neglected:
 		testo += "\nTrascurata all'ultimo scontro: non pagata, ha lavorato più piano."
 	return testo
@@ -353,7 +353,7 @@ static func da_via(via: IdentityDef) -> SchedaCarta:
 	scheda.titolo = via.display_name
 	scheda.sopratitolo = "Via"
 	scheda.riga = "Scegli questa via"
-	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: offerte, elementi esclusivi, un tratto permanente e un bonus immediato."
+	scheda.dettagli = via.description + "\nLa via diventa parte dell'identità: opportunità, tessere esclusive, un tratto permanente e un bonus immediato."
 	if not via.traditions.is_empty():
 		# Le imprese si vedono prima di scegliere la via (GDD §10.4.1, v0.27).
 		scheda.dettagli += "\nTradizioni (completale tutte per un'ascensione):"
@@ -383,10 +383,10 @@ static func da_governo(governo: IdentityDef) -> SchedaCarta:
 	scheda.genere = Genere.VIA
 	scheda.id = governo.id
 	scheda.titolo = governo.display_name
-	scheda.sopratitolo = "Governo · tier %d" % governo.tier
+	scheda.sopratitolo = "Governo · rango %d" % governo.tier
 	scheda.riga = "Evolvi verso questo governo"
 	scheda.costo = "Evolvi"
-	scheda.dettagli = governo.description + "\nIl tratto del governo attuale finisce e vale questo; le carte sulla plancia restano."
+	scheda.dettagli = governo.description + "\nIl tratto del governo attuale finisce e vale questo; le tessere sulla plancia restano."
 	scheda.illustrazione = _carica("identita/%s.png" % governo.id)
 	return scheda
 
@@ -447,13 +447,13 @@ static func _righe_effetti(scudo_v: int, cura_v: int, corruzione_v: int, assedio
 	if cura_v > 0:
 		righe.append("Cura %d Resistenza %s." % [cura_v, quando])
 	if corruzione_v > 0:
-		righe.append("%d Corruzione all'avversario %s." % [corruzione_v, quando])
+		righe.append("%d Corruzione al nemico %s." % [corruzione_v, quando])
 	if assedio_v > 0:
-		righe.append("Assedio: toglie %d scudo all'avversario." % assedio_v)
+		righe.append("Danno d'assedio: toglie %d scudo al nemico." % assedio_v)
 	if inefficienza_ms > 0:
-		righe.append("Rallenta %s avversari di %s." % [TimerTarget.NAMES[bersaglio_inefficienza], secondi(inefficienza_ms)])
+		righe.append("Inefficienza ai nemici (%s) per %s." % [TimerTarget.NAMES[bersaglio_inefficienza], secondi(inefficienza_ms)])
 	if sabotaggio_ms > 0:
-		righe.append("Sabota %s avversari per %s." % [TimerTarget.NAMES[bersaglio_sabotaggio], secondi(sabotaggio_ms)])
+		righe.append("Sabotaggio ai nemici (%s) per %s." % [TimerTarget.NAMES[bersaglio_sabotaggio], secondi(sabotaggio_ms)])
 	return righe
 
 
@@ -498,7 +498,7 @@ static func _riassunto_azione(opportunita: OpportunityDef) -> String:
 		OpportunityDef.Kind.ACCORCIA_MALUS:
 			return "−%d anno a un malus" % opportunita.shorten_years
 		OpportunityDef.Kind.SPIONAGGIO:
-			return "Sabota il fantasma" if opportunita.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else "Rallenta il fantasma"
+			return "Sabota il fantasma" if opportunita.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else "Inefficienza sul fantasma"
 		OpportunityDef.Kind.INCANTO:
 			return "Incanta una truppa"
 	return ""

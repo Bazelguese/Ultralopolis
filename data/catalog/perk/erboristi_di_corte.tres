@@ -11,6 +11,6 @@
 script = ExtResource("6_mrpdi")
 id = &"erboristi_di_corte"
 display_name = "Erboristi di corte"
-description = "Gli elementi che curano curano 1 in più."
+description = "Le tessere che curano curano 1 in più."
 dimension = 4
 permanent_modifiers = Array[ExtResource("4_mljvl")]([ExtResource("5_mn3tu")])

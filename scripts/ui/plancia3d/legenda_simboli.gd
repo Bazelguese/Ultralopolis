@@ -13,7 +13,7 @@ const LARGHEZZA_TESTO: float = 330.0
 const GRUPPI: Array = [
 	["Risorse", [&"oro", &"ricerca", &"cibo", &"legno", &"pietra", &"ferro", &"fede", &"influenza", &"stabilita", &"documenti", &"malcontento"]],
 	["Battaglia", [&"danno", &"scudo", &"cura", &"corruzione", &"assedio", &"inefficienza", &"sabotaggio", &"resistenza", &"ricarica"]],
-	["Carte e plancia", [&"edificio", &"truppa", &"potenzia", &"malus", &"perk", &"incanto", &"governo", &"tecnologia", &"proposta", &"azione", &"scambio"]],
+	["Tessere e plancia", [&"edificio", &"truppa", &"potenzia", &"malus", &"perk", &"incanto", &"governo", &"tecnologia", &"proposta", &"azione", &"scambio"]],
 	["Tempo e altro", [&"anno", &"fantasma", &"rinnovo", &"caso", &"spia", &"bloccato"]],
 ]
 
@@ -23,11 +23,11 @@ const NOMI: Dictionary[StringName, String] = {
 	&"ferro": "Ferro", &"fede": "Fede", &"influenza": "Influenza", &"stabilita": "Stabilità",
 	&"documenti": "Documenti", &"malcontento": "Malcontento",
 	&"danno": "Danno", &"scudo": "Scudo", &"cura": "Cura", &"corruzione": "Corruzione",
-	&"assedio": "Attacco d'assedio", &"inefficienza": "Inefficienza (rallenta)",
+	&"assedio": "Danno d'assedio", &"inefficienza": "Inefficienza",
 	&"sabotaggio": "Sabotaggio (ferma)", &"resistenza": "Resistenza", &"ricarica": "Ricarica, tempo",
 	&"edificio": "Edificio", &"truppa": "Truppa", &"potenzia": "Potenzia", &"malus": "Malus",
-	&"perk": "Perk", &"incanto": "Incanto", &"governo": "Governo", &"tecnologia": "Tecnologia",
-	&"proposta": "Proposte del Consiglio",
+	&"perk": "Peculiarità", &"incanto": "Incanto", &"governo": "Governo", &"tecnologia": "Tecnologia",
+	&"proposta": "Opportunità del Consiglio",
 	&"azione": "Azioni del Consiglio", &"scambio": "Scambio di risorse",
 	&"anno": "Durata in anni", &"fantasma": "Prossimo scontro con il fantasma",
 	&"rinnovo": "Rinnovo, ripescare", &"caso": "A caso", &"spia": "Spionaggio",
@@ -51,9 +51,9 @@ func costruisci(catalogo: CatalogDef) -> void:
 	colonna.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scorrimento.add_child(colonna)
 	colonna.add_child(StileVisivo.etichetta("LEGENDA DEI SIMBOLI", StileVisivo.FONT_TITOLI, 26, StileVisivo.ORO_LUCE))
-	colonna.add_child(_testo("Sulle proposte e sugli eventi ogni riga è una cosa che puoi fare, e si legge da sinistra a destra: prima della freccia quello che paghi, dopo quello che ottieni. Sul consigliere, invece, le righe riassumono che cosa può offrirti, senza numeri. Passa il mouse su una carta per ingrandirla e leggere i dettagli.", StileVisivo.TESTO_TENUE, 0.0))
+	colonna.add_child(_testo("Sulle opportunità e sugli avvenimenti ogni riga è una cosa che puoi fare, e si legge da sinistra a destra: prima della freccia quello che paghi, dopo quello che ottieni. Sul consigliere, invece, le righe riassumono che cosa può offrirti, senza numeri. Passa il mouse su un consigliere, un'azione o un avvenimento per ingrandirlo e leggere i dettagli.", StileVisivo.TESTO_TENUE, 0.0))
 
-	colonna.add_child(_titolo("Come si legge una carta"))
+	colonna.add_child(_titolo("Come si legge una riga di simboli"))
 	for esempio: Array in _esempi(catalogo):
 		var riga: HBoxContainer = HBoxContainer.new()
 		riga.add_theme_constant_override("separation", 14)
@@ -68,9 +68,9 @@ func costruisci(catalogo: CatalogDef) -> void:
 		var griglia: GridContainer = _griglia()
 		for concetto: StringName in gruppo[1]:
 			griglia.add_child(_voce(RigaSimboli.new().icona(concetto), NOMI.get(concetto, String(concetto))))
-		if gruppo[0] == "Carte e plancia":
+		if gruppo[0] == "Tessere e plancia":
 			griglia.add_child(_voce(RigaSimboli.new().spazio(&"edificio"), "Spazio vuoto della plancia"))
-			griglia.add_child(_voce(RigaSimboli.new().potenziata(&"truppa"), "Carta che sale di livello"))
+			griglia.add_child(_voce(RigaSimboli.new().potenziata(&"truppa"), "Tessera che sale di livello"))
 		colonna.add_child(griglia)
 
 	# Sulla riga del timbro del consigliere i simboli dicono il tipo di azione: stesse parole
@@ -159,19 +159,19 @@ func _esempi(catalogo: CatalogDef) -> Array:
 	proposte.rilievo = RigaSimboli.Rilievo.PRINCIPALE
 	esempi.append([proposte, "Riga colorata, in alto sul consigliere: che cosa ti propone in questo round (qui edifici e truppe dei suoi tipi)."])
 	var tipi_azione: RigaSimboli = RigaSimboli.new().icona(&"azione").scritta(":").icona(&"scambio").icona(&"anno").icona(&"spia")
-	esempi.append([tipi_azione, "Sotto, il timbro e i tipi di azione che può proporre: qui scambi di risorse, bonus per un tempo e spionaggio. Costi ed effetti esatti li vedi sulle proposte, dopo averlo scelto."])
+	esempi.append([tipi_azione, "Sotto, il timbro e i tipi di azione che può proporre: qui scambi di risorse, bonus per un tempo e spionaggio. Costi ed effetti esatti li vedi sulle opportunità, dopo averlo scelto."])
 	var potenzia: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
 	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
-	esempi.append([potenzia, "Riga con il solo bordo, in fondo al consigliere: un servizio in più, non una proposta. Dopo averlo scelto puoi anche potenziare una tua carta dei suoi tipi, pagando Ferro, senza perdere la scelta del round."])
+	esempi.append([potenzia, "Riga con il solo bordo, in fondo al consigliere: un servizio in più, non un'opportunità. Dopo averlo scelto puoi anche potenziare una tua tessera dei suoi tipi, pagando Ferro, senza perdere la scelta del round."])
 	var pronto: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
 	pronto.rilievo = RigaSimboli.Rilievo.SECONDARIA
 	pronto.accesa = true
-	esempi.append([pronto, "Potenzia dorato: puoi già potenziare qualche carta. Sotto la carta leggi quante: «Ascolta · ▲ Potenzia 2»."])
+	esempi.append([pronto, "Potenzia dorato: puoi già potenziare qualche tessera. Sotto il consigliere leggi quante: «Ascolta · ▲ Potenzia 2»."])
 	var due_effetti: RigaSimboli = RigaSimboli.new().icona(&"ricerca", "+2").scritta("·").icona(&"tecnologia", "+1")
 	esempi.append([due_effetti, "Il punto «·» separa due effetti della stessa scelta: li ottieni tutti e due."])
 	var bloccata: RigaSimboli = RigaSimboli.new().icona(&"bloccato").icona(&"documenti", "2", RigaSimboli.Tono.COSTO).scritta("→").icona(&"influenza", "+3")
 	bloccata.spenta = true
-	esempi.append([bloccata, "Lucchetto e riga spenta: adesso non puoi sceglierla (ti manca un requisito o una risorsa). Il motivo è nei dettagli della carta."])
+	esempi.append([bloccata, "Lucchetto e riga spenta: adesso non puoi sceglierla (ti manca un requisito o una risorsa). Il motivo è nei dettagli."])
 	return esempi
 
 

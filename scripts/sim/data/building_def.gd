@@ -11,7 +11,7 @@ extends Resource
 @export_range(1, 10) var era: int = 1
 ## Prezzo in Oro.
 @export var cost_gold: int = 0
-## Tipi (GDD §6.6, v0.22), es. &"Produzione", &"Spirituale". Decidono quali consiglieri
+## Tipi (GDD §6.6, v0.22), es. &"Materie prime", &"Spirituale". Decidono quali consiglieri
 ## propongono e potenziano l'edificio e a quali perk e modificatori risponde.
 @export var types: Array[StringName] = []
 ## La Capitale non si può vendere né sostituire (GDD §6.2).
@@ -30,7 +30,7 @@ extends Resource
 @export var stability_per_phase: int = 0
 @export var documents_per_phase: int = 0
 
-@export_group("In battaglia")
+@export_group("Nello scontro")
 ## Colore del mana prodotto: rosso, verde, blu, viola o energetico (GDD §5.3).
 ## Il colore non dipende dai tipi (GDD v0.22).
 @export var mana_type: StringName = &"energetico"

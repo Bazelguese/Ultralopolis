@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_miracoli"
 display_name = "Miracoli"
-description = "Gli elementi Spirituali che producono scudo ne producono 2 in più."
+description = "Le tessere Spirituali che producono scudo ne producono 2 in più."
 is_malus = false
 effect = 11
 target_type = &"Spirituale"
@@ -21,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"miracoli"
 display_name = "Miracoli"
-description = "Gli elementi Spirituali che producono scudo ne producono 2 in più."
+description = "Le tessere Spirituali che producono scudo ne producono 2 in più."
 sphere = "Fede"
 era = 3
 cost = 7

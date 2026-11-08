@@ -7,7 +7,7 @@
 script = ExtResource("1_tech")
 id = &"alchimia_dei_veleni"
 display_name = "Alchimia dei veleni"
-description = "Perk Veleni sottili: gli elementi che infliggono Corruzione ne infliggono 1 in più."
+description = "Peculiarità Veleni sottili: le tessere che infliggono Corruzione ne infliggono 1 in più."
 sphere = "Ombra"
 era = 2
 cost = 5

@@ -68,7 +68,7 @@ func describe() -> String:
 				return "Completa %d tecnologie" % amount
 			return "Completa %d tecnologie di %s" % [amount, " o ".join(spheres)]
 		Kind.PROPOSTE:
-			return "Prendi %d proposte da: %s" % [amount, advisor_name if advisor_name != "" else String(advisor_id)]
+			return "Prendi %d opportunità da: %s" % [amount, advisor_name if advisor_name != "" else String(advisor_id)]
 		Kind.EVENTI:
 			return "Scegli %d Eventi di %s" % [amount, " o ".join(spheres)] if not spheres.is_empty() else "Scegli %d Eventi" % amount
 		Kind.CARTE:
@@ -88,7 +88,7 @@ func _pieces_word() -> String:
 			return "edifici"
 		Pieces.TRUPPE:
 			return "truppe"
-	return "carte"
+	return "tessere"
 
 
 func _types_text() -> String:

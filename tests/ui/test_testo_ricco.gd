@@ -37,7 +37,7 @@ func test_il_lessico_si_carica_dai_dati() -> void:
 	var lessico: Lessico = TestoRicco.lessico()
 	assert_not_null(lessico, "data/ui/lessico.tres esiste e si carica.")
 	assert_gt(lessico.voci.size(), 20)
-	for nome: String in ["Oro", "Scudo", "Cura", "Corruzione", "Resistenza", "Attacco d'assedio", "Malcontento", "Energetico"]:
+	for nome: String in ["Oro", "Scudo", "Cura", "Corruzione", "Resistenza", "Danno d'assedio", "Malcontento", "Energetico"]:
 		assert_not_null(_voce(nome), "C'è la voce %s." % nome)
 
 
@@ -80,7 +80,7 @@ func test_solo_parole_intere() -> void:
 
 func test_la_forma_piu_lunga_vince() -> void:
 	assert_eq(_tratti("Tipi: Infrastruttura Bellica"), PackedStringArray(["{Tipi}", ": ", "{Infrastruttura Bellica}"]))
-	assert_eq(_tratti("un attacco d'assedio"), PackedStringArray(["un ", "{attacco d'assedio}"]))
+	assert_eq(_tratti("un danno d'assedio"), PackedStringArray(["un ", "{danno d'assedio}"]))
 
 
 func test_numeri_secondi_e_percentuali() -> void:
@@ -115,13 +115,13 @@ func test_spiegazioni_al_massimo_quante_previste() -> void:
 func test_il_riquadro_mostra_testo_e_spiegazioni() -> void:
 	var pannello: PannelloSuggerimento = PannelloSuggerimento.new()
 	add_child_autofree(pannello)
-	pannello.mostra("Arieti", "10 danni allo scudo · attacco d'assedio.", Rect2(400, 400, 100, 120))
+	pannello.mostra("Arieti", "10 danni allo scudo · danno d'assedio.", Rect2(400, 400, 100, 120))
 	assert_true(pannello.visible)
 	assert_eq(pannello.titolo_mostrato(), "Arieti")
 	var spiegazioni: PackedStringArray = pannello.spiegazioni_mostrate()
 	assert_true(spiegazioni.has("Danno"))
 	assert_true(spiegazioni.has("Scudo"))
-	assert_true(spiegazioni.has("Attacco d'assedio"))
+	assert_true(spiegazioni.has("Danno d'assedio"))
 	pannello.mostra("Granaio", "Ricevi 2 Cibo.", Rect2(400, 400, 100, 120))
 	assert_true(pannello.spiegazioni_mostrate().is_empty(), "Senza parole da spiegare, niente riquadro accanto.")
 	pannello.mostra("Malcontento", "Sale con le sconfitte e i malus.", Rect2(400, 400, 100, 120))
@@ -205,6 +205,6 @@ func test_parole_del_consiglio_della_crescita_e_della_plancia() -> void:
 	assert_eq(_tratti("c'era una volta"), PackedStringArray(["c'era una volta"]), "Il verbo \"era\" non è l'era.")
 	assert_eq(_tratti("la via del porto"), PackedStringArray(["la via del porto"]), "\"via\" minuscola non è la Via.")
 	assert_eq(_tratti("Ricevi 2 Oro, paghi 1 Fede."), PackedStringArray(["{Ricevi}", " ", "<2>", " ", "{Oro}", ", ", "{paghi}", " ", "<1>", " ", "{Fede}", "."]))
-	for nome: String in ["Proposta", "Potenzia", "Livello", "Era", "Capitale", "Spazio", "Fantasma"]:
+	for nome: String in ["Opportunità", "Potenzia", "Livello", "Era", "Capitale", "Spazio", "Fantasma", "Peculiarità"]:
 		assert_ne(_voce(nome).definizione, "", "%s ha una spiegazione." % nome)
 	assert_eq(_voce("Ricevi").definizione, "", "Ricevi e Paghi si colorano senza spiegazione.")

@@ -7,7 +7,7 @@ extends Resource
 ## Famiglie di parole (scelte di Davide, 8 novembre): ognuna ha una tinta di base,
 ## ma ogni parola può avere un colore proprio. Le nuove famiglie vanno in fondo,
 ## così i numeri già scritti nei dati non cambiano.
-enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO, CONSIGLIO, CRESCITA, PLANCIA }
+enum Famiglia { RISORSA, BATTAGLIA, MANA, TIPO, POSITIVO, NEGATIVO, CONSIGLIO, CRESCITA, PLANCIA, COSTO }
 
 ## Nome mostrato nel riquadro delle spiegazioni (es. "Scudo").
 @export var nome: String = ""

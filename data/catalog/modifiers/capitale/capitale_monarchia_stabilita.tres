@@ -6,7 +6,7 @@
 script = ExtResource("1_ptn3m")
 id = &"capitale_monarchia_stabilita"
 display_name = "Capitale: +1 Stabilità"
-description = "La Capitale produce 1 Stabilità in più a ogni fase."
+description = "La Capitale produce 1 Stabilità in più a ogni stagione."
 is_malus = false
 effect = 8
 target_type = &"Capitale"

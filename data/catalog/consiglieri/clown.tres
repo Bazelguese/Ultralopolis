@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_advdf")
 id = &"clown"
-display_name = "Clown"
+display_name = "Giullare"
 category_name = ""
-description = "Propone un elemento per ogni colore di mana e un edificio neutro."
+description = "Propone una tessera per ogni colore di mana e un edificio neutro."
 special = 1

@@ -14,7 +14,7 @@ oro = 3
 [sub_resource type="Resource" id="OPT_1"]
 script = ExtResource("e2")
 label = "Campagna generosa"
-description = "Paghi 3 Oro: per un anno ogni consigliere mostra una proposta in più."
+description = "Paghi 3 Oro: per un anno ogni consigliere mostra un'opportunità in più."
 cost = SubResource("RA_2")
 modifiers = Array[ExtResource("e4")]([ExtResource("e5")])
 

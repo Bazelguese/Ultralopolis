@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_concilio"
 display_name = "Concilio"
-description = "Gli elementi Spirituali che curano curano 1 in più."
+description = "Le tessere Spirituali che curano curano 1 in più."
 is_malus = false
 effect = 11
 target_type = &"Spirituale"
@@ -21,7 +21,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"concilio"
 display_name = "Concilio"
-description = "Gli elementi Spirituali che curano curano 1 in più."
+description = "Le tessere Spirituali che curano curano 1 in più."
 sphere = "Fede"
 era = 3
 cost = 7

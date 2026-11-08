@@ -12,7 +12,7 @@
 script = ExtResource("x1")
 id = &"plutocrazia"
 display_name = "Plutocrazia"
-description = "Governa chi paga. Le proposte costano 1 Oro in meno, i Visitatori compaiono molto più spesso, Tesoriere più frequente. Carta esclusiva: Mercenari dei magnati (era 3). Capitale: +1 Oro."
+description = "Governa chi paga. Le opportunità costano 1 Oro in meno, i Visitatori compaiono molto più spesso, Tesoriere più frequente. Tessera esclusiva: Mercenari dei magnati (era 3). Capitale: +1 Oro."
 dimension = 1
 identity_type = &"Plutocratico"
 resistance_bonus = 3

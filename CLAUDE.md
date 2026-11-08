@@ -28,6 +28,14 @@ Se una richiesta tocca il **nucleo** (Parte I del GDD), o richiede una nuova ris
 
 Non modificare il GDD di tua iniziativa. Se una decisione presa con Davide cambia il design, proponi l'aggiornamento del documento.
 
+## Nomi: il glossario
+
+I nomi ufficiali di gioco sono in `docs/Glossario.md`. Usali sempre: nei testi del gioco, nei dati, nel GDD, nel Catalogo e quando parli con Davide.
+
+- Non usare i nomi elencati fra i "Nomi ritirati" del glossario (es. *cooldown*, *Perk*, *Clown*, *Proposta* per ciò che offre un consigliere).
+- Nel codice gli identificatori tecnici interni (nomi di variabili, classi, cartelle come `opportunities/`) possono restare come sono; conta ciò che leggono il giocatore e chi lavora sul design.
+- Se un contenuto nuovo introduce un nome che ha un doppione, o un nome già usato per un'altra cosa, non sceglierlo da solo: aggiungilo alla Parte 1 del glossario con una proposta e chiedi a Davide.
+
 ## Motore e linguaggio
 
 - **Godot 4.7, GDScript 2.0.** Esportazione nativa per PC. Non progettare per il web.

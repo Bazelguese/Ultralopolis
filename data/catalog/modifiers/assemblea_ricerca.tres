@@ -6,6 +6,6 @@
 script = ExtResource("1_aysrn")
 id = &"assemblea_ricerca"
 display_name = "Assemblea: sapere"
-description = "La Ricerca prodotta a ogni fase aumenta del 50%."
+description = "La Ricerca prodotta a ogni stagione aumenta del 50%."
 is_malus = false
 amount = 50

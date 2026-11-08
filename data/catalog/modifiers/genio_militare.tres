@@ -6,7 +6,7 @@
 script = ExtResource("1_wa8ai")
 id = &"genio_militare"
 display_name = "Genio militare"
-description = "Danno agli scudi +25% per le truppe Assedio."
+description = "Danno d'assedio +25% per le truppe Assedio."
 is_malus = false
 effect = 10
 target_type = &"Assedio"

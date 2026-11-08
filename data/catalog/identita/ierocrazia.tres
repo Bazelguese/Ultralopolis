@@ -12,7 +12,7 @@
 script = ExtResource("x1")
 id = &"ierocrazia"
 display_name = "Ierocrazia"
-description = "I sacerdoti sono lo Stato. Il Sacerdote è sempre fra i consiglieri e le sue azioni costano 1 Fede in meno (almeno 1). Carta esclusiva: Collegio dei sacerdoti (era 2). Capitale: +1 Fede."
+description = "I sacerdoti sono lo Stato. Il Sacerdote è sempre fra i consiglieri e le sue azioni costano 1 Fede in meno (almeno 1). Tessera esclusiva: Collegio dei sacerdoti (era 2). Capitale: +1 Fede."
 dimension = 1
 identity_type = &"Ierocratico"
 resistance_bonus = 6

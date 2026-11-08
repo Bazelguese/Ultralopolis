@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_reliquie"
 display_name = "Reliquie"
-description = "+1 Fede per fase da ogni edificio Spirituale."
+description = "+1 Fede per stagione da ogni edificio Spirituale."
 is_malus = false
 effect = 8
 target_type = &"Spirituale"
@@ -20,7 +20,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"reliquie"
 display_name = "Reliquie"
-description = "+1 Fede per fase da ogni edificio Spirituale."
+description = "+1 Fede per stagione da ogni edificio Spirituale."
 sphere = "Fede"
 era = 2
 tier = 2

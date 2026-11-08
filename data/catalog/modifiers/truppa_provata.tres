@@ -6,7 +6,7 @@
 script = ExtResource("1_eb5jy")
 id = &"truppa_provata"
 display_name = "Truppa provata"
-description = "Una truppa stremata ha la ricarica più lunga in battaglia."
+description = "Una truppa stremata ha la ricarica più lunga nello scontro."
 effect = 3
 target = 2
 amount = 50

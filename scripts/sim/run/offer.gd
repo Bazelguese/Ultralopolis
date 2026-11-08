@@ -27,7 +27,7 @@ func is_element() -> bool:
 	return kind == OpportunityDef.Kind.COSTRUISCI_EDIFICIO or kind == OpportunityDef.Kind.RECLUTA_TRUPPA
 
 
-## Titolo breve, es. "Fattoria", "Esattori", "Perk: Mulini".
+## Titolo breve, es. "Fattoria", "Esattori", "Peculiarità: Mulini".
 func describe() -> String:
 	match kind:
 		OpportunityDef.Kind.COSTRUISCI_EDIFICIO:
@@ -37,7 +37,7 @@ func describe() -> String:
 		OpportunityDef.Kind.PERK:
 			# Nell'anteprima del consigliere il perk non è ancora stato pescato.
 			if perk != null:
-				return "Perk: %s" % perk.display_name
+				return "Peculiarità: %s" % perk.display_name
 	return opportunity.display_name
 
 

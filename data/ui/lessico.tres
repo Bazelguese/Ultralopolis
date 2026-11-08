@@ -64,7 +64,7 @@ script = ExtResource("1_voce")
 nome = "Influenza"
 famiglia = 0
 forme = PackedStringArray("Influenza")
-colore = Color(0.8392, 0.651, 1, 1)
+colore = Color(0.949, 0.6902, 0.7686, 1)
 simbolo = &"influenza"
 
 [sub_resource type="Resource" id="voce_08"]
@@ -87,87 +87,87 @@ simbolo = &"documenti"
 script = ExtResource("1_voce")
 nome = "Danno"
 forme = PackedStringArray("danno", "danni")
-colore = Color(0.8824, 0.502, 0.4941, 1)
+colore = Color(1, 0.4157, 0.2392, 1)
 simbolo = &"danno"
-definizione = "Colpisce prima lo scudo; solo ciò che avanza arriva alla Resistenza."
+definizione = "Toglie Resistenza al nemico, ma prima consuma il suo scudo; solo ciò che avanza arriva alla Resistenza."
 
 [sub_resource type="Resource" id="voce_11"]
 script = ExtResource("1_voce")
 nome = "Resistenza"
 forme = PackedStringArray("resistenza")
-colore = Color(0.5608, 0.8902, 0.6902, 1)
+colore = Color(1, 0.702, 0.6392, 1)
 simbolo = &"resistenza"
-definizione = "Capacità della nazione di sopravvivere al singolo scontro. Chi arriva a zero perde."
+definizione = "La vita della tua nazione nello scontro. Se arriva a zero, perdi. Si ricalcola all'inizio di ogni scontro."
 
 [sub_resource type="Resource" id="voce_12"]
 script = ExtResource("1_voce")
 nome = "Scudo"
 forme = PackedStringArray("scudo", "scudi")
-colore = Color(0.3882, 0.5765, 0.8627, 1)
+colore = Color(0.4863, 0.7843, 1, 1)
 simbolo = &"scudo"
-definizione = "Riserva di battaglia che assorbe il danno prima della Resistenza. Parte da zero in ogni scontro, non ha tetto e non ferma la Corruzione."
+definizione = "Una riserva che assorbe il danno prima della Resistenza. Parte da zero in ogni scontro e resta finché non viene consumata; non ferma la Corruzione."
 
 [sub_resource type="Resource" id="voce_13"]
 script = ExtResource("1_voce")
 nome = "Cura"
 forme = PackedStringArray("cura", "cure")
-colore = Color(0.3882, 0.7137, 0.5059, 1)
+colore = Color(0.3569, 0.8902, 0.4902, 1)
 simbolo = &"cura"
-definizione = "Ridà Resistenza persa, mai oltre la Resistenza massima. Così allontana anche la soglia della Corruzione."
+definizione = "Ridà Resistenza persa, mai oltre il massimo. Così allontana anche la soglia della Corruzione."
 
 [sub_resource type="Resource" id="voce_14"]
 script = ExtResource("1_voce")
 nome = "Corruzione"
 forme = PackedStringArray("corruzione")
-colore = Color(0.7059, 0.5098, 0.8627, 1)
+colore = Color(0.7608, 0.2157, 0.5412, 1)
 simbolo = &"corruzione"
-definizione = "Contatore di battaglia che parte da zero e si accumula: quando raggiunge la Resistenza attuale, la nazione perde. Non tocca lo scudo e non scende mai; l'unica risposta è la cura."
+definizione = "Sale durante lo scontro e non scende mai. Quando raggiunge la tua Resistenza, perdi. Lo scudo non la ferma: l'unica risposta è la cura."
 
 [sub_resource type="Resource" id="voce_15"]
 script = ExtResource("1_voce")
-nome = "Attacco d'assedio"
-forme = PackedStringArray("attacco d'assedio", "attacco d’assedio", "attacchi d'assedio", "assedio")
-colore = Color(0.6078, 0.5608, 0.502, 1)
+nome = "Danno d'assedio"
+forme = PackedStringArray("danno d'assedio", "danno d’assedio", "danni d'assedio", "assedio")
+colore = Color(1, 0.6941, 0.2902, 1)
 simbolo = &"assedio"
-definizione = "Danno che colpisce solo lo scudo, prima del danno normale; proprio delle truppe Assedio. Se l'avversario non ha scudo, va perso."
+definizione = "Toglie solo scudo al nemico, prima del danno normale. Ce l'hanno solo le truppe Assedio; se il nemico non ha scudo, va perso."
 
 [sub_resource type="Resource" id="voce_16"]
 script = ExtResource("1_voce")
-nome = "Inefficienza (rallenta)"
-forme = PackedStringArray("inefficienza", "rallenta", "rallentano", "rallentato", "rallentata", "rallentati", "rallentate", "rallentamento")
+nome = "Inefficienza"
+forme = PackedStringArray("inefficienza", "inefficiente", "inefficienti")
 colore = Color(0.3725, 0.8902, 0.8235, 1)
 simbolo = &"inefficienza"
-definizione = "Per una durata in secondi il timer del bersaglio (ricarica di una truppa, intervallo di un edificio) avanza più piano. Se colpisce di nuovo, le durate si sommano."
+definizione = "Per qualche secondo il timer della tessera colpita (ricarica di una truppa, ciclo di un edificio) va a metà velocità. Se colpisce di nuovo, le durate si sommano."
 
 [sub_resource type="Resource" id="voce_17"]
 script = ExtResource("1_voce")
-nome = "Sabotaggio (blocca)"
+nome = "Sabotaggio"
 forme = PackedStringArray("sabotaggio", "sabota", "sabotano", "sabotato", "sabotata", "sabotati", "sabotate")
 colore = Color(1, 0.4784, 0.7216, 1)
 simbolo = &"sabotaggio"
-definizione = "Per una durata in secondi il timer del bersaglio è fermo e il bersaglio non può attivarsi, nemmeno se è pronto e il mana c'è. Se colpisce di nuovo, le durate si sommano."
+definizione = "Per qualche secondo la tessera colpita è ferma e non può attivarsi, nemmeno se è pronta e il mana c'è. Se colpisce di nuovo, le durate si sommano."
 
 [sub_resource type="Resource" id="voce_18"]
 script = ExtResource("1_voce")
 nome = "Ricarica"
 forme = PackedStringArray("ricarica", "ricaricano", "ricaricare", "ricariche")
-colore = Color(0.5608, 0.5882, 0.651, 1)
+colore = Color(0.6627, 0.7608, 1, 1)
 simbolo = &"ricarica"
-definizione = "Tempo di attesa fra due attivazioni di una truppa. Truppe ed edifici iniziano la battaglia con ricarica e intervallo pieni."
+definizione = "Il tempo che una truppa aspetta fra un'attivazione e la successiva. Per gli edifici si dice ciclo. Lo scontro inizia con ricariche e cicli pieni."
 
 [sub_resource type="Resource" id="voce_19"]
 script = ExtResource("1_voce")
 nome = "Logoramento"
 forme = PackedStringArray("logoramento")
 colore = Color(0.851, 0.549, 0.4157, 1)
-definizione = "Contro gli stalli: dopo un po' di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo. Lo scudo lo assorbe e le cure lo compensano."
+definizione = "Dopo 45 secondi entrambe le nazioni perdono Resistenza, sempre di più, finché lo scontro finisce. Lo scudo lo assorbe e le cure lo compensano."
 
 [sub_resource type="Resource" id="voce_20"]
 script = ExtResource("1_voce")
 nome = "Mana"
 forme = PackedStringArray("mana")
 colore = Color(0.7255, 0.7843, 1, 1)
-definizione = "Prodotto in battaglia dagli edifici e speso per attivare le truppe. Parte da zero in ogni scontro e si azzera alla fine. Se manca, la truppa pronta resta in attesa."
+definizione = "L'energia che gli edifici producono nello scontro e che le truppe spendono per attivarsi. Parte da zero e si azzera a fine scontro; se manca, la truppa pronta resta in attesa."
 
 [sub_resource type="Resource" id="voce_21"]
 script = ExtResource("1_voce")
@@ -238,9 +238,9 @@ colore = Color(0.9412, 0.851, 0.6588, 1)
 
 [sub_resource type="Resource" id="voce_29"]
 script = ExtResource("1_voce")
-nome = "Produzione"
+nome = "Materie prime"
 famiglia = 3
-forme = PackedStringArray("Produzione")
+forme = PackedStringArray("Materie prime")
 colore = Color(0.9412, 0.851, 0.6588, 1)
 
 [sub_resource type="Resource" id="voce_30"]
@@ -353,8 +353,8 @@ script = ExtResource("1_voce")
 nome = "Prestigio"
 famiglia = 4
 forme = PackedStringArray("prestigio")
-colore = Color(1, 0.6275, 0.9608, 1)
-definizione = "Decide la sopravvivenza della run dopo le sconfitte: una sconfitta ne fa perdere quanto il numero dell'anno. Esaurito, scatta l'ultima possibilità."
+colore = Color(0.949, 0.7137, 0.1961, 1)
+definizione = "Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; una sconfitta ne fa perdere quanto il numero dell'anno. Esaurito, scatta l'ultima possibilità."
 
 [sub_resource type="Resource" id="voce_46"]
 script = ExtResource("1_voce")
@@ -363,7 +363,7 @@ famiglia = 5
 forme = PackedStringArray("malus")
 colore = Color(1, 0.3608, 0.4235, 1)
 simbolo = &"malus"
-definizione = "Effetto negativo con una durata in anni. Se arriva un malus già attivo si allunga solo la durata. Lo infliggono i fantasmi quando perdi o pareggi."
+definizione = "Un effetto negativo che dura per un certo numero di anni. Non ti rovina: ti spinge a giocare in modo diverso. Se arriva un malus già attivo si allunga solo la durata."
 
 [sub_resource type="Resource" id="voce_47"]
 script = ExtResource("1_voce")
@@ -372,7 +372,7 @@ famiglia = 5
 forme = PackedStringArray("malcontento")
 colore = Color(1, 0.3608, 0.4235, 1)
 simbolo = &"malcontento"
-definizione = "Contatore della nazione: sale con sconfitte, carestie, malus subiti ed eventi; scende spendendo Stabilità (anche Fede o Cibo). Alla soglia scoppia la Rivoluzione."
+definizione = "La pressione del popolo. Sale con sconfitte, carestie, malus e tessere trascurate; scende soprattutto spendendo Stabilità. Se raggiunge la soglia, scoppia la Rivoluzione."
 
 [sub_resource type="Resource" id="voce_48"]
 script = ExtResource("1_voce")
@@ -380,15 +380,15 @@ nome = "Rivoluzione"
 famiglia = 5
 forme = PackedStringArray("rivoluzione")
 colore = Color(1, 0.3608, 0.4235, 1)
-definizione = "Arriva da sola quando il Malcontento raggiunge la soglia: la nazione cambia governo, anche di tier più basso. Poi il Malcontento si azzera."
+definizione = "Quando il Malcontento raggiunge la soglia arriva da sola: il popolo cambia governo, anche verso un rango più basso. Poi il Malcontento si azzera."
 
 [sub_resource type="Resource" id="voce_49"]
 script = ExtResource("1_voce")
 nome = "Affamata"
 famiglia = 5
 forme = PackedStringArray("affamata", "affamate", "affamato", "affamati")
-colore = Color(0.8784, 0.5412, 0.1804, 1)
-definizione = "Truppa rimasta senza Cibo all'inizio dell'anno: ricarica più lenta (×1,5) fino al pasto dell'anno dopo."
+colore = Color(1, 0.3608, 0.4235, 1)
+definizione = "Una truppa rimasta senza razione all'inizio dell'anno: ricarica più lenta (×1,5) fino al pasto dell'anno dopo."
 
 [sub_resource type="Resource" id="voce_50"]
 script = ExtResource("1_voce")
@@ -406,284 +406,300 @@ colore = Color(1, 0.3608, 0.4235, 1)
 
 [sub_resource type="Resource" id="voce_52"]
 script = ExtResource("1_voce")
-nome = "Proposta"
+nome = "Ciclo"
+forme = PackedStringArray("ciclo", "cicli")
+colore = Color(0.6627, 0.7608, 1, 1)
+simbolo = &"ricarica"
+definizione = "Ogni quanto un edificio produce nello scontro. Funziona come la ricarica di una truppa, ma un edificio non resta mai in attesa del mana."
+
+[sub_resource type="Resource" id="voce_n00"]
+script = ExtResource("1_voce")
+nome = "Opportunità"
 famiglia = 6
-forme = PackedStringArray("proposta", "proposte", "propone", "propongono")
+forme = PackedStringArray("opportunità", "propone", "propongono")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 simbolo = &"proposta"
-definizione = "Ciò che un consigliere offre nel round: ne mostra 3 e se ne prende una sola. Azioni, edifici e truppe della sua categoria, secondo il tema del round."
+definizione = "Una delle tre cose che un consigliere ti offre: un'azione, un edificio o una truppa. Ne prendi una sola."
 
-[sub_resource type="Resource" id="voce_53"]
+[sub_resource type="Resource" id="voce_n01"]
 script = ExtResource("1_voce")
 nome = "Potenzia"
 famiglia = 6
 forme = PackedStringArray("potenzia", "potenziare", "potenziata", "potenziate", "potenziato", "potenziati", "potenziamento", "potenziamenti")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 simbolo = &"potenzia"
-definizione = "Opzione dei consiglieri: porta di livello una carta con almeno un tipo della loro categoria, pagando la risorsa della categoria. Non consuma la scelta del round e si usa una volta per round."
+definizione = "Fa salire di livello una tua tessera che ha un tipo del consigliere. Non conta come scelta del round e si usa una volta per round."
 
-[sub_resource type="Resource" id="voce_54"]
+[sub_resource type="Resource" id="voce_n02"]
 script = ExtResource("1_voce")
 nome = "Rinnovo"
 famiglia = 6
 forme = PackedStringArray("rinnova", "rinnovare", "rinnovano", "rinnovo", "rinnovi")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 simbolo = &"rinnovo"
-definizione = "Ripesca le proposte del consigliere scelto. Si paga in Oro o con la risorsa della sua categoria; il costo sale a ogni rinnovo."
+definizione = "Paghi per vedere tre opportunità nuove dallo stesso consigliere. Costa Oro o la risorsa del consigliere, ogni volta un po' di più."
 
-[sub_resource type="Resource" id="voce_55"]
+[sub_resource type="Resource" id="voce_n03"]
 script = ExtResource("1_voce")
-nome = "Ascolta"
+nome = "Consiglio"
 famiglia = 6
-forme = PackedStringArray("ascolta", "ascoltare")
+forme = PackedStringArray("Consiglio", "ascolta", "ascoltare", "ascolti")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
-definizione = "Sceglie il consigliere del round: la scelta è definitiva per quel round. Poi si prende una delle sue proposte, oppure si passa."
+definizione = "I consiglieri della tua nazione. In ogni round ne compaiono tre e ne ascolti uno."
 
-[sub_resource type="Resource" id="voce_56"]
+[sub_resource type="Resource" id="voce_n04"]
 script = ExtResource("1_voce")
 nome = "Consigliere"
 famiglia = 6
-forme = PackedStringArray("consigliere", "consiglieri", "Consiglio")
+forme = PackedStringArray("consigliere", "consiglieri")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
-definizione = "Membro del Consiglio: in ogni round ne compaiono 3 e se ne ascolta uno. Propone azioni, edifici e truppe della sua categoria e offre Potenzia."
+definizione = "Un membro del Consiglio con un suo campo: propone azioni, edifici e truppe, e può potenziare le tue tessere."
 
-[sub_resource type="Resource" id="voce_57"]
+[sub_resource type="Resource" id="voce_n05"]
 script = ExtResource("1_voce")
-nome = "Visitatore"
+nome = "Avvenimento"
 famiglia = 6
-forme = PackedStringArray("visitatore", "visitatori")
+forme = PackedStringArray("avvenimento", "avvenimenti")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
-definizione = "Consigliere di passaggio con proposte e prezzi propri."
+definizione = "Ciò che può comparire in un round al posto di un consigliere: un Evento, un Visitatore o una Fortuna."
 
-[sub_resource type="Resource" id="voce_58"]
+[sub_resource type="Resource" id="voce_n06"]
 script = ExtResource("1_voce")
 nome = "Evento"
 famiglia = 6
 forme = PackedStringArray("evento", "eventi")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
-definizione = "Carta del round con un testo e 2-3 opzioni, alcune sbloccate dalla nazione. Almeno un'opzione è sempre gratuita e senza requisiti."
+definizione = "Una situazione con un testo e 2-3 opzioni. Alcune opzioni si sbloccano solo con certe caratteristiche della tua nazione."
 
-[sub_resource type="Resource" id="voce_59"]
+[sub_resource type="Resource" id="voce_n07"]
+script = ExtResource("1_voce")
+nome = "Visitatore"
+famiglia = 6
+forme = PackedStringArray("visitatore", "visitatori")
+colore = Color(0.5451, 0.9137, 0.9922, 1)
+definizione = "Un personaggio di passaggio con le sue opportunità e i suoi prezzi."
+
+[sub_resource type="Resource" id="voce_n08"]
 script = ExtResource("1_voce")
 nome = "Fortuna"
 famiglia = 6
 forme = PackedStringArray("Fortuna", "Fortune")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
-definizione = "Carta del round con un dono semplice."
+definizione = "Un dono semplice."
 
-[sub_resource type="Resource" id="voce_60"]
+[sub_resource type="Resource" id="voce_n09"]
 script = ExtResource("1_voce")
 nome = "Incanto"
 famiglia = 6
 forme = PackedStringArray("incanto", "incanti", "incanta", "incantare", "incantata", "incantato")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 simbolo = &"incanto"
-definizione = "Il Sacerdote aggiunge a una truppa un effetto in battaglia e un costo di mana in più. Una truppa si incanta una sola volta; l'incanto resta per tutta la run."
+definizione = "Il Sacerdote aggiunge a una truppa un effetto in più nello scontro, con un costo di mana in più. Ogni truppa si incanta una volta sola."
 
-[sub_resource type="Resource" id="voce_61"]
+[sub_resource type="Resource" id="voce_n10"]
 script = ExtResource("1_voce")
 nome = "Spionaggio"
 famiglia = 6
 forme = PackedStringArray("spionaggio")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
 simbolo = &"spia"
-definizione = "Proposta del Maestro delle spie: lo scontro con il fantasma dell'anno parte con un suo elemento sabotato o rallentato per alcuni secondi."
+definizione = "Le opportunità del Maestro delle spie: lo scontro con il fantasma dell'anno inizia con un suo edificio o una sua truppa già sabotati o inefficienti."
 
-[sub_resource type="Resource" id="voce_62"]
+[sub_resource type="Resource" id="voce_n11"]
 script = ExtResource("1_voce")
 nome = "Mercato"
 famiglia = 6
 forme = PackedStringArray("mercato")
 colore = Color(0.5451, 0.9137, 0.9922, 1)
-definizione = "In ogni round si possono vendere risorse in cambio di Oro, a tasso fisso, senza consumare il round. Solo in vendita; la Ricerca non si vende."
+definizione = "Vendi risorse in cambio di Oro, quando vuoi fuori dallo scontro. Non si possono comprare risorse."
 
-[sub_resource type="Resource" id="voce_63"]
+[sub_resource type="Resource" id="voce_n12"]
 script = ExtResource("1_voce")
 nome = "Livello"
 famiglia = 7
 forme = PackedStringArray("livello", "livelli")
 colore = Color(1, 0.8431, 0.4157, 1)
-definizione = "Ogni edificio e ogni truppa ha 3 livelli; si sale con Potenzia. Ogni livello aumenta tutti i valori d'effetto e gli edifici producono più risorse."
+definizione = "Una tessera va dal livello 1 al 3; ogni livello rafforza tutti i suoi effetti."
 
-[sub_resource type="Resource" id="voce_64"]
+[sub_resource type="Resource" id="voce_n13"]
 script = ExtResource("1_voce")
 nome = "Era"
 famiglia = 7
 forme = PackedStringArray("Era", "ere", "era 1", "era 2", "era 3", "era 4", "era attuale", "era corrente", "era successiva", "nuova era", "prossima era")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Livello di sviluppo raggiunto completando un certo numero di tecnologie. Entrando in un'era nuova le offerte dell'era precedente spariscono."
+colore = Color(1, 1, 1, 1)
+definizione = "Un'epoca della tua nazione. Ci entri quando vuoi, dopo aver completato abbastanza tecnologie dell'era in corso: porta tessere nuove, spazi in più e più Resistenza."
 
-[sub_resource type="Resource" id="voce_65"]
+[sub_resource type="Resource" id="voce_n14"]
 script = ExtResource("1_voce")
 nome = "Tecnologia"
 famiglia = 7
 forme = PackedStringArray("tecnologia", "tecnologie")
-colore = Color(0.7804, 0.7216, 1, 1)
+colore = Color(1, 1, 1, 1)
 simbolo = &"tecnologia"
-definizione = "Carta dell'albero che si completa con la Ricerca e dà un effetto permanente."
+definizione = "Una scoperta che studi con la Ricerca. Completata, vale per sempre: tessere nuove, peculiarità, aiuti del Consiglio, spazi o bonus sui tipi."
 
-[sub_resource type="Resource" id="voce_66"]
+[sub_resource type="Resource" id="voce_n15"]
 script = ExtResource("1_voce")
 nome = "Via"
 famiglia = 7
 forme = PackedStringArray("Via", "Vie")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Direzione di sviluppo scelta fra 3 entrando in un'era, dalla seconda in poi. Diventa parte dell'identità ed è un albero di tradizioni."
+colore = Color(1, 1, 1, 1)
+definizione = "Dalla seconda era, entrando in un'era scegli fra tre direzioni di sviluppo. La via diventa parte della tua identità."
 
-[sub_resource type="Resource" id="voce_67"]
+[sub_resource type="Resource" id="voce_n16"]
 script = ExtResource("1_voce")
 nome = "Tradizione"
 famiglia = 7
 forme = PackedStringArray("tradizione", "tradizioni")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Uno dei 4 passi dell'albero di una via; si completa con un'impresa."
+colore = Color(1, 1, 1, 1)
+definizione = "Una delle 4 tappe dell'albero di una via. Si completa da sola appena riesci nella sua impresa, e dà un effetto permanente."
 
-[sub_resource type="Resource" id="voce_68"]
+[sub_resource type="Resource" id="voce_n17"]
 script = ExtResource("1_voce")
 nome = "Impresa"
 famiglia = 7
 forme = PackedStringArray("impresa", "imprese")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Obiettivo che completa una tradizione: un traguardo o uno stato della nazione."
+colore = Color(1, 1, 1, 1)
+definizione = "L'obiettivo che completa una tradizione: un traguardo (es. vincere 3 scontri) o uno stato della nazione (es. 4 tessere Fante sulla plancia)."
 
-[sub_resource type="Resource" id="voce_69"]
+[sub_resource type="Resource" id="voce_n18"]
 script = ExtResource("1_voce")
 nome = "Ascensione"
 famiglia = 7
 forme = PackedStringArray("ascensione", "ascensioni")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Effetto permanente scelto completando l'albero di una via; il livello 2 cambia una regola."
+colore = Color(1, 1, 1, 1)
+definizione = "Completate le 4 tradizioni di una via, scegli un'ascensione fra 3: un effetto permanente forte. Quelle di livello 2 cambiano una regola del gioco."
 
-[sub_resource type="Resource" id="voce_70"]
+[sub_resource type="Resource" id="voce_n19"]
 script = ExtResource("1_voce")
-nome = "Perk"
+nome = "Peculiarità"
 famiglia = 7
-forme = PackedStringArray("perk")
-colore = Color(0.7804, 0.7216, 1, 1)
+forme = PackedStringArray("peculiarità")
+colore = Color(1, 1, 1, 1)
 simbolo = &"perk"
-definizione = "Bonus passivo, come le abilità di The Bazaar: alcuni si scelgono alla creazione della nazione, altri arrivano durante la run."
+definizione = "Un bonus passivo. Alcune si scelgono creando la nazione, altre si ottengono durante la partita."
 
-[sub_resource type="Resource" id="voce_71"]
+[sub_resource type="Resource" id="voce_n20"]
 script = ExtResource("1_voce")
 nome = "Governo"
 famiglia = 7
 forme = PackedStringArray("governo", "governi")
-colore = Color(0.7804, 0.7216, 1, 1)
+colore = Color(1, 1, 1, 1)
 simbolo = &"governo"
-definizione = "Forma di governo della nazione, a tier. Evolve entrando in una nuova era o con la Riforma; la Rivoluzione può portare a qualsiasi governo."
+definizione = "Come decidi: cambia il modo in cui funziona il Consiglio. Può evolvere o cambiare con una rivoluzione."
 
-[sub_resource type="Resource" id="voce_72"]
+[sub_resource type="Resource" id="voce_n21"]
 script = ExtResource("1_voce")
 nome = "Usanza"
 famiglia = 7
 forme = PackedStringArray("usanza", "usanze")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Tratto permanente preso quando un'inclinazione arriva a un estremo."
+colore = Color(1, 1, 1, 1)
+definizione = "Quando un'inclinazione arriva a un estremo, la nazione prende un'usanza: un tratto permanente con un nome e una storia."
 
-[sub_resource type="Resource" id="voce_73"]
+[sub_resource type="Resource" id="voce_n22"]
 script = ExtResource("1_voce")
 nome = "Vocazione"
 famiglia = 7
 forme = PackedStringArray("vocazione", "vocazioni")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Modo di giocare aperto da due usanze, accettato in una cronaca."
+colore = Color(1, 1, 1, 1)
+definizione = "Un modo di giocare speciale, aperto da due usanze compatibili. Arriva come una cronaca: la accetti o la rifiuti."
 
-[sub_resource type="Resource" id="voce_74"]
+[sub_resource type="Resource" id="voce_n23"]
 script = ExtResource("1_voce")
 nome = "Inclinazione"
 famiglia = 7
 forme = PackedStringArray("inclinazione", "inclinazioni")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Una delle quattro tendenze della nazione fra due poli opposti (Spada, Porta, Altare, Legge)."
+colore = Color(1, 1, 1, 1)
+definizione = "Una delle quattro tendenze della nazione fra due poli: Spada, Porta, Altare, Legge. Le reazioni delle cronache le spostano."
 
-[sub_resource type="Resource" id="voce_75"]
+[sub_resource type="Resource" id="voce_n24"]
 script = ExtResource("1_voce")
 nome = "Tipo"
 famiglia = 7
 forme = PackedStringArray("tipo", "tipi")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Caratteristica di un edificio o di una truppa che decide quali consiglieri lo propongono e lo potenziano e a quali perk risponde."
+colore = Color(1, 1, 1, 1)
+definizione = "Una caratteristica della tessera (es. Fante, Guardiano, Spirituale). Decide quali consiglieri la propongono e la potenziano."
 
-[sub_resource type="Resource" id="voce_76"]
+[sub_resource type="Resource" id="voce_n25"]
 script = ExtResource("1_voce")
 nome = "Categoria"
 famiglia = 7
 forme = PackedStringArray("categoria", "categorie")
-colore = Color(0.7804, 0.7216, 1, 1)
-definizione = "Insieme di tipi che forma il campo di un consigliere."
+colore = Color(1, 1, 1, 1)
+definizione = "Il campo di un consigliere: i tipi di tessere di cui si occupa."
 
-[sub_resource type="Resource" id="voce_77"]
+[sub_resource type="Resource" id="voce_n26"]
 script = ExtResource("1_voce")
 nome = "Capitale"
 famiglia = 8
 forme = PackedStringArray("Capitale")
 colore = Color(0.9412, 0.851, 0.6588, 1)
-definizione = "Il primo edificio della nazione: in battaglia produce 1 mana energetico; a ogni fase Oro, Cibo e Ricerca, più una risorsa per ogni elemento dell'identità. Non si vende né si sostituisce."
+definizione = "Il cuore della nazione. Produce Oro, Cibo, Ricerca e una risorsa per ogni elemento dell'identità; nello scontro dà mana energetico. Non si vende e non si sostituisce."
 
-[sub_resource type="Resource" id="voce_78"]
+[sub_resource type="Resource" id="voce_n27"]
 script = ExtResource("1_voce")
 nome = "Spazio"
 famiglia = 8
 forme = PackedStringArray("spazio", "spazi")
 colore = Color(0.9412, 0.851, 0.6588, 1)
-definizione = "Posto sulla plancia per un edificio o una truppa. Gli spazi arrivano entrando nelle ere, da edifici che li concedono e comprandoli con l'Oro."
+definizione = "Un posto per una tessera. Se ne ottengono altri con le ere, con certi edifici e con l'Oro."
 
-[sub_resource type="Resource" id="voce_79"]
+[sub_resource type="Resource" id="voce_n28"]
 script = ExtResource("1_voce")
 nome = "Mantenimento"
 famiglia = 8
 forme = PackedStringArray("mantenimento")
 colore = Color(0.9412, 0.851, 0.6588, 1)
-definizione = "Prima di ogni scontro le carte potenziate e quelle speciali pagano la risorsa della categoria del loro primo tipo. Una carta non pagata è trascurata (ricarica ×1,5) e dà +1 Malcontento."
+definizione = "Prima di ogni scontro le tessere potenziate e quelle speciali costano un po' della risorsa del consigliere legato al loro primo tipo."
 
-[sub_resource type="Resource" id="voce_80"]
+[sub_resource type="Resource" id="voce_n29"]
 script = ExtResource("1_voce")
-nome = "Esclusiva"
+nome = "Tessera esclusiva"
 famiglia = 8
-forme = PackedStringArray("esclusiva", "esclusivo", "esclusive", "esclusivi")
+forme = PackedStringArray("tessera esclusiva", "tessere esclusive", "esclusiva", "esclusivo", "esclusive", "esclusivi")
 colore = Color(0.9412, 0.851, 0.6588, 1)
-definizione = "Carta concessa da un elemento dell'identità o da una via: compare solo per quella nazione. È una carta speciale, quindi paga il mantenimento."
+definizione = "Una tessera che ti viene proposta solo grazie al tuo popolo, governo, credo, cultura o a una via."
 
-[sub_resource type="Resource" id="voce_81"]
+[sub_resource type="Resource" id="voce_n30"]
 script = ExtResource("1_voce")
 nome = "Fantasma"
 famiglia = 8
 forme = PackedStringArray("fantasma", "fantasmi")
 colore = Color(0.9412, 0.851, 0.6588, 1)
 simbolo = &"fantasma"
-definizione = "Copia di una nazione avversaria usata per uno scontro asincrono. Si affronta a fine anno; perdere costa Prestigio."
+definizione = "La copia registrata della nazione di un altro giocatore: è il nemico di fine anno."
 
-[sub_resource type="Resource" id="voce_82"]
+[sub_resource type="Resource" id="voce_n31"]
 script = ExtResource("1_voce")
 nome = "Incontro del mondo"
 famiglia = 8
 forme = PackedStringArray("incontro del mondo", "incontri del mondo", "incontro", "incontri")
 colore = Color(0.9412, 0.851, 0.6588, 1)
-definizione = "Minaccia dell'anno (es. barbari, pirati): due per anno, a fine primavera e a fine estate, scegliendone uno fra 3. Perdere dimezza l'Oro, senza perdere Prestigio."
+definizione = "Una minaccia alla fine della primavera e dell'estate, come barbari o pirati. Ne scegli uno fra tre e affronti la sua plancia. Se perdi, il tuo Oro si dimezza."
 
-[sub_resource type="Resource" id="voce_83"]
+[sub_resource type="Resource" id="voce_n32"]
 script = ExtResource("1_voce")
 nome = "Ricompensa"
 famiglia = 8
 forme = PackedStringArray("ricompensa", "ricompense")
 colore = Color(0.9412, 0.851, 0.6588, 1)
-definizione = "Ciò che si sceglie dopo un incontro vinto: edifici, truppe, perk, risorse o tecnologie già iniziate. Si decide se e che cosa prendere."
+definizione = "Dopo un incontro del mondo vinto, una tessera, una peculiarità, delle risorse o una carta dorata da scegliere; puoi anche non prendere nulla."
 
-[sub_resource type="Resource" id="voce_84"]
+[sub_resource type="Resource" id="voce_n33"]
 script = ExtResource("1_voce")
 nome = "Ricevi"
 famiglia = 4
 forme = PackedStringArray("ricevi", "riceve", "ricevono", "ottieni", "ottiene", "ottengono")
 colore = Color(0.4941, 0.8784, 0.5059, 1)
 
-[sub_resource type="Resource" id="voce_85"]
+[sub_resource type="Resource" id="voce_n34"]
 script = ExtResource("1_voce")
 nome = "Paghi"
-famiglia = 5
+famiglia = 9
 forme = PackedStringArray("paghi", "paga", "pagano", "pagare", "costa", "costano", "costo", "costi")
-colore = Color(1, 0.3608, 0.4235, 1)
+colore = Color(0.949, 0.7137, 0.1961, 1)
 
 [resource]
 script = ExtResource("2_lessico")
-voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51"), SubResource("voce_52"), SubResource("voce_53"), SubResource("voce_54"), SubResource("voce_55"), SubResource("voce_56"), SubResource("voce_57"), SubResource("voce_58"), SubResource("voce_59"), SubResource("voce_60"), SubResource("voce_61"), SubResource("voce_62"), SubResource("voce_63"), SubResource("voce_64"), SubResource("voce_65"), SubResource("voce_66"), SubResource("voce_67"), SubResource("voce_68"), SubResource("voce_69"), SubResource("voce_70"), SubResource("voce_71"), SubResource("voce_72"), SubResource("voce_73"), SubResource("voce_74"), SubResource("voce_75"), SubResource("voce_76"), SubResource("voce_77"), SubResource("voce_78"), SubResource("voce_79"), SubResource("voce_80"), SubResource("voce_81"), SubResource("voce_82"), SubResource("voce_83"), SubResource("voce_84"), SubResource("voce_85")])
+voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51"), SubResource("voce_52"), SubResource("voce_n00"), SubResource("voce_n01"), SubResource("voce_n02"), SubResource("voce_n03"), SubResource("voce_n04"), SubResource("voce_n05"), SubResource("voce_n06"), SubResource("voce_n07"), SubResource("voce_n08"), SubResource("voce_n09"), SubResource("voce_n10"), SubResource("voce_n11"), SubResource("voce_n12"), SubResource("voce_n13"), SubResource("voce_n14"), SubResource("voce_n15"), SubResource("voce_n16"), SubResource("voce_n17"), SubResource("voce_n18"), SubResource("voce_n19"), SubResource("voce_n20"), SubResource("voce_n21"), SubResource("voce_n22"), SubResource("voce_n23"), SubResource("voce_n24"), SubResource("voce_n25"), SubResource("voce_n26"), SubResource("voce_n27"), SubResource("voce_n28"), SubResource("voce_n29"), SubResource("voce_n30"), SubResource("voce_n31"), SubResource("voce_n32"), SubResource("voce_n33"), SubResource("voce_n34")])
 colore_numeri = Color(1, 1, 1, 1)

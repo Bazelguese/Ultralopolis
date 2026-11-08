@@ -83,7 +83,7 @@ static func building_details(def: BuildingDef, produced: Array[int] = []) -> Str
 		var amount: int = produced[type] if not produced.is_empty() else def.production(type) * Res.scale(type)
 		if amount > 0:
 			parts.append("+%s %s" % [Res.format(type, amount), Res.NAMES[type]])
-	var economy: String = ", ".join(parts) + " a fase" if not parts.is_empty() else "Nessuna risorsa"
+	var economy: String = ", ".join(parts) + " a stagione" if not parts.is_empty() else "Nessuna risorsa"
 	var battle: String = "Mana %s: +%d" % [def.mana_type, def.mana_amount] if def.mana_amount > 0 else "Neutro (nessun mana)"
 	var effects: String = building_effects(def)
 	if effects != "":
@@ -134,7 +134,7 @@ static func _effect_parts(damage: int, shield: int, heal: int, corruption: int, 
 	if corruption > 0:
 		parts.append("Corruzione %d" % corruption)
 	if slow_ms > 0:
-		parts.append("Rallenta %s (%s)" % [seconds(slow_ms), TimerTarget.NAMES[slow_target]])
+		parts.append("Inefficienza %s (%s)" % [seconds(slow_ms), TimerTarget.NAMES[slow_target]])
 	if sabotage_ms > 0:
 		parts.append("Sabota %s (%s)" % [seconds(sabotage_ms), TimerTarget.NAMES[sabotage_target]])
 	return parts

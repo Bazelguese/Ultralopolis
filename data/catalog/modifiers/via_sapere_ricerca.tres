@@ -6,7 +6,7 @@
 script = ExtResource("1_ld2t0")
 id = &"via_sapere_ricerca"
 display_name = "Via del Sapere"
-description = "+1 Ricerca per fase da ogni edificio Accademico."
+description = "+1 Ricerca per stagione da ogni edificio Accademico."
 is_malus = false
 effect = 8
 target_type = &"Accademico"

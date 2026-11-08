@@ -13,7 +13,7 @@
 script = ExtResource("x1")
 id = &"spiriti_dei_luoghi"
 display_name = "Spiriti dei luoghi"
-description = "Ogni bosco e fiume ha uno spirito che aiuta gli edifici: mana prodotto il 10% più in fretta. Carta esclusiva: Bosco sacro (era 2); incanto esclusivo: Linfa degli spiriti. Capitale: +1 Legno."
+description = "Ogni bosco e fiume ha uno spirito che aiuta gli edifici: mana prodotto il 10% più in fretta. Tessera esclusiva: Bosco sacro (era 2); incanto esclusivo: Linfa degli spiriti. Capitale: +1 Legno."
 dimension = 2
 identity_type = &"Animista"
 resistance_bonus = 2
