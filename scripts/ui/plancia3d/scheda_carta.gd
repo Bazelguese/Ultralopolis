@@ -33,8 +33,12 @@ var malus: String = ""
 var affamata: bool = false
 ## Testo breve stampato sulla carta quando non ci sono numeri da mostrare.
 var riga: String = ""
-## Costo dell'offerta, scritto sotto la carta.
+## Scritta sotto la carta: il prezzo di un'offerta ("3 Oro") oppure, per le carte che non si
+## comprano, il verbo della scelta ("Ascolta", "Scegli", "Evolvi").
 var costo: String = ""
+## true solo se la scritta sotto la carta è un prezzo vero: solo allora il riquadro dice
+## "Costo: …" (decisione di Davide, 8 novembre: "Costo: Ascolta" non ha senso).
+var prezzo: bool = false
 ## Testo completo del riquadro che compare passando il mouse.
 var dettagli: String = ""
 var illustrazione: Texture2D
@@ -201,6 +205,7 @@ static func da_offerta(run: RunState, offerta: Offer) -> SchedaCarta:
 			scheda.sopratitolo += " · ▲ %d bonus" % bonus.size()
 			scheda.dettagli += "\nNe beneficia: " + "; ".join(bonus) + "."
 	scheda.costo = offerta.cost_text()
+	scheda.prezzo = true
 	scheda.disponibile = run.can_afford(offerta)
 	if run.offer_needs_replacement(offerta):
 		scheda.dettagli += "\nPlancia piena: sceglierai quale elemento sostituire (ti torna metà del prezzo)."
@@ -299,6 +304,7 @@ static func da_opzione(run: RunState, opzione: EventOptionDef) -> SchedaCarta:
 	scheda.sopratitolo = requisito if requisito != "" else "Opzione"
 	scheda.riga = opzione.description
 	scheda.costo = opzione.cost.describe() if opzione.cost != null and not opzione.cost.is_empty() else "gratis"
+	scheda.prezzo = true
 	var motivo: String = run.option_block_reason(opzione)
 	scheda.disponibile = motivo == ""
 	scheda.dettagli = opzione.description if motivo == "" else "%s\nNon disponibile: %s" % [opzione.description, motivo]

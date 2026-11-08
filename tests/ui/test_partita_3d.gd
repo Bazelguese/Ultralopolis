@@ -473,3 +473,21 @@ func test_esito_e_cronaca_con_le_parole_colorate() -> void:
 	run.chronicle.append("Anno 1: ricevi 2 Oro.")
 	_scena.call("_aggiorna_tutto")
 	assert_string_contains((hud.get("_testo_cronaca") as RichTextLabel).text, "Oro[/color]")
+
+
+func test_costo_solo_per_i_prezzi_veri() -> void:
+	# Decisione di Davide (8 novembre): "Costo: Ascolta" non ha senso; il costo è solo un prezzo.
+	var run: RunState = _run()
+	var scelte: Array = _scena.get("_scelte")
+	for tessera: Variant in scelte:
+		var testo: String = _scena.call("_testo_riquadro", tessera)
+		assert_false(testo.contains("Costo:"), "Un consigliere o un evento non ha un costo.")
+	_scena.call("_clic_scelta", scelte[0])
+	assert_gt(run.offers.size(), 0, "Il consigliere ha delle proposte.")
+	scelte = _scena.get("_scelte")
+	var con_prezzo: int = 0
+	for tessera: Variant in scelte:
+		if (tessera as Tessera3D).scheda.prezzo:
+			con_prezzo += 1
+			assert_string_contains(_scena.call("_testo_riquadro", tessera), "Costo:", "Un'offerta dice quanto costa.")
+	assert_gt(con_prezzo, 0, "Le proposte hanno un prezzo.")
