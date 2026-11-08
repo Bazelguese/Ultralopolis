@@ -73,9 +73,16 @@ func costruisci(catalogo: CatalogDef) -> void:
 			griglia.add_child(_voce(RigaSimboli.new().potenziata(&"truppa"), "Tessera che sale di livello"))
 		colonna.add_child(griglia)
 
+	# I tipi delle tessere: medaglioni sulla linguetta sopra tessere e consiglieri.
+	colonna.add_child(_titolo("Tipi (linguetta sopra tessere e consiglieri)"))
+	var medaglioni: GridContainer = _griglia()
+	for voce: Array in tipi_delle_tessere(catalogo):
+		medaglioni.add_child(_voce(voce[0] as RigaSimboli, voce[1] as String))
+	colonna.add_child(medaglioni)
+
 	# Sulla riga del timbro del consigliere i simboli dicono il tipo di azione: stesse parole
 	# del riquadro dei dettagli, prese da SimboliEffetti.
-	colonna.add_child(_titolo("Tipi di azione (riga del timbro sul consigliere)"))
+	colonna.add_child(_titolo("Tipi di azione (riga «timbro =» sul consigliere)"))
 	var tipi: GridContainer = _griglia()
 	for voce: Array in tipi_di_azione():
 		tipi.add_child(_voce(voce[0] as RigaSimboli, voce[1] as String))
@@ -93,6 +100,24 @@ func costruisci(catalogo: CatalogDef) -> void:
 	numeri.add_child(_voce(RigaSimboli.new().icona(&"oro", "+3"), "Bianco: quello che ottieni"))
 	numeri.add_child(_voce(RigaSimboli.new().icona(&"oro", "−50%", RigaSimboli.Tono.MALUS), "Rosso: un peggioramento"))
 	colonna.add_child(numeri)
+
+
+## I tipi da spiegare: quelli delle categorie dei consiglieri (dai dati), la Capitale e lo
+## stendardo dei tipi d'identità. [medaglione, nome].
+static func tipi_delle_tessere(catalogo: CatalogDef) -> Array:
+	var tipi: Array = []
+	var visti: Array[StringName] = []
+	for consigliere: AdvisorDef in catalogo.advisors:
+		for tipo: StringName in consigliere.types:
+			if not visti.has(tipo):
+				visti.append(tipo)
+				tipi.append([RigaSimboli.new().tipo(tipo), String(tipo)])
+	tipi.append([RigaSimboli.new().tipo(&"Capitale"), "Capitale"])
+	var stendardo: RigaSimboli = RigaSimboli.new()
+	stendardo.icona(Simboli.TIPO_IDENTITA)
+	stendardo.simboli[0].tipo = true
+	tipi.append([stendardo, "Tipo d'identità (es. Pietrosangue, Monarchico)"])
+	return tipi
 
 
 ## Un esempio per ogni tipo di azione: [simbolo, nome], come sulla riga del timbro del consigliere.
@@ -155,11 +180,12 @@ func _esempi(catalogo: CatalogDef) -> Array:
 		offerta.research_price = def.cost_research
 		offerta.other_cost = def.cost_resources
 		esempi.append([SimboliEffetti.azione(offerta), "%s: %s" % [def.display_name, voce[1]]])
-	var proposte: RigaSimboli = RigaSimboli.new().icona(&"proposta").scritta(":").icona(&"edificio").scritta("/").icona(&"truppa")
+	var proposte: RigaSimboli = RigaSimboli.new().icona(&"proposta").scritta(":").icona(&"edificio").scritta("/").icona(&"truppa").scritta("/").icona(&"azione")
 	proposte.rilievo = RigaSimboli.Rilievo.PRINCIPALE
-	esempi.append([proposte, "Riga colorata, in alto sul consigliere: che cosa ti propone in questo round (qui edifici e truppe dei suoi tipi)."])
-	var tipi_azione: RigaSimboli = RigaSimboli.new().icona(&"azione").scritta(":").icona(&"scambio").icona(&"anno").icona(&"spia")
-	esempi.append([tipi_azione, "Sotto, il timbro e i tipi di azione che può proporre: qui scambi di risorse, bonus temporanei e spionaggio. Costi ed effetti esatti li vedi sulle opportunità, dopo averlo scelto."])
+	esempi.append([proposte, "Riga colorata, in alto sul consigliere: le sue opportunità di questo round. Edifici, truppe e azioni (il timbro) stanno alla pari: sono tutte opportunità e ne prendi una sola."])
+	var tipi_azione: RigaSimboli = RigaSimboli.new().icona(&"azione").scritta("=").icona(&"scambio").scritta("/").icona(&"anno").scritta("/").icona(&"spia")
+	tipi_azione.rilievo = RigaSimboli.Rilievo.SECONDARIA
+	esempi.append([tipi_azione, "Sotto, più sottile: quali azioni, separate da «/» (oppure). Qui scambi di risorse, oppure bonus temporanei, oppure spionaggio. Costi ed effetti esatti li vedi sulle opportunità, dopo averlo scelto."])
 	var potenzia: RigaSimboli = RigaSimboli.new().icona(&"potenzia").scritta(":").icona(&"ferro", "", RigaSimboli.Tono.COSTO)
 	potenzia.rilievo = RigaSimboli.Rilievo.SECONDARIA
 	esempi.append([potenzia, "Riga con il solo bordo, in fondo al consigliere: un servizio in più, non un'opportunità. Dopo averlo scelto puoi anche potenziare una tua tessera dei suoi tipi, pagando Ferro, senza perdere la scelta del round."])

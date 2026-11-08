@@ -49,6 +49,8 @@ var colore_consigliere: StringName = &""
 ## Righe di simboli stampate sulla carta, come nei giochi da tavolo (consiglieri, azioni, eventi).
 ## Se ci sono, prendono il posto della riga di testo.
 var simboli: Array[RigaSimboli] = []
+## Tipi della tessera, o del consigliere (i tipi della sua categoria): medaglioni sulla linguetta sopra la carta.
+var tipi: Array[StringName] = []
 
 
 func colore_cornice() -> Color:
@@ -91,6 +93,7 @@ static func _edificio(def: BuildingDef, p_livello: int, p_malus: String, produzi
 	scheda.scudo = def.shield
 	scheda.cura = def.heal
 	scheda.corruzione = def.corruption
+	scheda.tipi = def.types.duplicate()
 	scheda.illustrazione = _carica("edifici/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
 	var sulla_carta: PackedStringArray = PackedStringArray()
@@ -142,6 +145,7 @@ static func _truppa(def: TroopDef, p_livello: int, p_malus: String, p_affamata: 
 	scheda.livello = p_livello
 	scheda.malus = p_malus
 	scheda.affamata = p_affamata
+	scheda.tipi = def.types.duplicate()
 	scheda.illustrazione = _carica("truppe/%s.png" % def.id)
 	var righe: PackedStringArray = PackedStringArray()
 	if def.mana_cost > 0:
@@ -297,6 +301,7 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	scheda.sopratitolo = consigliere.category_name if consigliere.category_name != "" else "Consigliere speciale"
 	scheda.sopratitolo += " · %s" % run.council_level_name()
 	scheda.illustrazione = _carica("consiglieri/%s.png" % consigliere.id)
+	scheda.tipi = consigliere.types.duplicate()
 	# Sotto la carta: "Ascolta" (scegli questo consigliere); se con lui puoi già potenziare
 	# qualche tua carta, anche quante.
 	scheda.costo = "Ascolta"
@@ -312,6 +317,9 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	# una frase per ogni riga di simboli, nello stesso ordine.
 	scheda.simboli = SimboliEffetti.consigliere(run, consigliere)
 	var righe: PackedStringArray = PackedStringArray()
+	# La linguetta sopra mostra i tipi della sua categoria: la prima frase li nomina.
+	if not scheda.tipi.is_empty():
+		righe.append("Tipi: %s." % ", ".join(PackedStringArray(scheda.tipi)))
 	# Il Visitatore dice anche chi è, che tessere porta e a che prezzi: è scritto nei suoi dati.
 	if visitatore:
 		righe.append("Di passaggio. %s" % consigliere.description if consigliere.description != "" else "Di passaggio.")
