@@ -1432,7 +1432,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Spionaggio: il bersaglio si sceglie quando si compra, sul fantasma dell’anno; “estremità” = la truppa più a destra; con “più lento” o “più veloce” per le truppe conta la ricarica, per gli edifici il ciclo; a parità vince la posizione più a destra e le truppe stanno a destra degli edifici (v0.21) | Provvisoria. |
 | Incanti: Furia (danno), Egida (scudo), Grazia (cura) 2/4/6 secondo l’era della truppa; Maledizione (Corruzione) 1/3/4; Torpore (Inefficienza su truppe) 2/4/6 s; colori rosso, blu, blu, viola, viola | Placeholder (v0.22). |
 | Risorsa della Capitale per elemento dell’identità e produzioni di Stabilità e Documenti: vedi `docs/Catalogo.md` | Placeholder (v0.22). |
-| Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto; gli edifici anche +1 a ogni risorsa che producono per stagione. Il mana prodotto non cambia | Placeholder. |
+| Potenziamenti: +50% a tutti i valori d’effetto per livello (durate comprese), arrotondato per difetto, ma **almeno +1 per livello**, così anche un valore piccolo sale davvero (danno 1 → 2 → 3; 10 → 15 → 20); gli edifici anche +1 a ogni risorsa che producono per stagione. Il mana prodotto non cambia. Minimo nelle regole (`min_value_gain_per_level`) | Placeholder; il minimo per livello è una decisione di Davide (8 novembre 2026). |
 | I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
