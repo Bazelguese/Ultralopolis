@@ -1261,7 +1261,7 @@ Come nei giochi da tavolo, le carte dicono **che cosa fanno con dei simboli**: o
 
 | Carta | Righe |
 |---|---|
-| Consigliere | Con che cosa potenzia (riga dorata se puoi già potenziare qualche carta; sotto la carta "Ascolta · ▲ Potenzia N"); se nel round propone edifici e truppe; le azioni che può proporre nel round. Gli incanti e gli spionaggi di un consigliere si riuniscono in una riga |
+| Consigliere | In ordine di importanza: **che cosa propone** nel round (riga principale, del colore della carta: `[proposte]: [edificio] / [truppa]`); **le azioni** che può proporre (righe scure; incanti e spionaggi riuniti in una riga); in fondo, **in disparte**, il **Potenzia** (riga con il solo bordo, mai affiancata: è un servizio in più, non una proposta; bordo dorato se puoi già potenziare qualche carta, e sotto la carta "Ascolta · ▲ Potenzia N") |
 | Azione o perk proposti | Costo → effetto |
 | Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
 | Opzione dell’evento scelto | Costo → effetti, su una o più righe |
@@ -1641,6 +1641,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 - **Simboli sulle carte** (§14.4): consiglieri, azioni, eventi, fortune e visitatori mostrano costi ed effetti con simboli, come nei giochi da tavolo ("paghi → ottieni"); simboli monocromatici, colore solo nei numeri; righe corte affiancate. Prima fase approvata da Davide; edifici, truppe, ricompense e cronache restano da definire.
 - Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
 - **Legenda dei simboli** nel gioco (§14.4), con esempi presi dalle carte vere.
+- **Gerarchia sulla carta del consigliere** (§14.4): prima ciò che propone (riga colorata), poi le azioni, il Potenzia in fondo e in disparte (Davide: la carta del Tesoriere sembrava offrire solo Potenzia).
 
 **Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
 - Le azioni del Tesoriere (Esattori, Grandi esattori, Assemblea) sono **gratuite**, come già nel gioco: il GDD diceva che si pagavano in Influenza (§4.2.3, §16.3). Decisione di Davide: vale la versione del gioco.
