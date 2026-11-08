@@ -88,7 +88,7 @@ Truppe: arcieri, arieti, balestrieri, bombarde, catapulte, cavalieri, esplorator
 
 ## 4. Simboli sulle carte
 
-Come nei giochi da tavolo, consiglieri, azioni ed eventi mostrano **che cosa fanno con dei simboli** invece che con il testo. Il testo completo resta nel riquadro che compare passando il mouse. Idea e scelte di Davide (8 novembre 2026); i simboli attuali sono provvisori.
+Come nei giochi da tavolo, consiglieri, azioni ed eventi mostrano **che cosa fanno con dei simboli** invece che con il testo. Il testo completo resta nel riquadro che compare passando il mouse. Idea e scelte di Davide (8 novembre 2026), approvate nel GDD (§14.4, v0.30); i simboli attuali sono provvisori.
 
 ### 4.1 Come si leggono
 
@@ -141,4 +141,4 @@ Da proporre per il GDD (§16.3) se Davide le approva:
 | Illustrazioni cercate per identificativo nelle cartelle di `assets/illustrazioni/` | Convenzione tecnica |
 | La partita si gioca solo sulla plancia 3D; l'interfaccia provvisoria è stata tolta (decisione di Davide) | Da riportare nel GDD (§14.3, §16.3) |
 | La plancia mostra gli spazi ancora da conquistare fino al massimo (12 truppe, 10 edifici) | Proposta visiva |
-| Simboli sulle carte (§4 di questo documento) al posto del testo, con il testo completo al passaggio del mouse | Da riportare nel GDD (§14.3) se Davide approva |
+| Simboli sulle carte (§4 di questo documento) al posto del testo, con il testo completo al passaggio del mouse | Riportato nel GDD (§14.4, v0.30) |

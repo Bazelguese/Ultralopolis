@@ -1,7 +1,7 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.29
+## Game Design Document — v0.30
 
-**Data:** 6 novembre 2026
+**Data:** 8 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
@@ -1219,7 +1219,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Run | Anno, fase, era, vittorie, Prestigio, ultima possibilità. |
 | Economia | Risorse nel Magazzino; produzione prevista per fase. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
-| Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
+| Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente; sulle carte con i simboli di §14.4 (v0.30). |
 | Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.26). |
 | Tradizioni | Per ogni via adottata: i 4 passi, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.27). |
 | Nazione | Le quattro inclinazioni come barre fra due poli, le usanze, la vocazione e i personaggi con la loro fiducia (v0.29). |
@@ -1240,6 +1240,38 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Gioca | Se esistono nazioni create, si sceglie con quale giocare; altrimenti si va alla creazione. |
 | Crea nazione | Schermata a parte (§9.1). Creata dal menu, si torna al menu principale. |
 | Partita | Si gioca sulla **plancia 3D** (§14.2): plancia, opportunità, incontri e battaglie; si può tornare al menu o ricominciare con la stessa nazione. |
+
+### 14.4 Simboli sulle carte — Confermato (v0.30)
+
+Come nei giochi da tavolo, le carte dicono **che cosa fanno con dei simboli**: ogni concetto del nucleo (risorse, effetti di battaglia, edificio, truppa, spazio, durata, Potenzia…) ha un simbolo, e le carte li combinano. Il testo completo resta nel riquadro dei dettagli, al passaggio del mouse. Serve al principio P4: si capisce a colpo d’occhio che cosa costa una scelta e che cosa dà. Idea di Davide (8 novembre 2026).
+
+| Regola | Stato |
+|---|---|
+| Ogni riga è una cosa che la carta può fare e si legge da sinistra a destra: **quello che paghi → quello che ottieni** (es. Decreto fiscale: `2[Stabilità] → +4[Oro]`) | Confermato |
+| `/` separa le alternative (es. Assemblea: `1[anno] +50%[Oro] / +50%[Ricerca]`); `·` separa due effetti della stessa scelta | Confermato |
+| **Simboli monocromatici**: si riconoscono dalla forma, non dal colore, per non confonderli con il mana. Il colore sta nei numeri: oro per i costi, rosso per i malus. Il mana resta una gemma colorata | Confermato (scelta di Davide) |
+| Uno **spazio** della plancia è il simbolo in una cornice tratteggiata; una carta che **sale di livello** ha una freccia dorata | Confermato |
+| Le righe si costruiscono **dai dati** del catalogo (costi, guadagni, modificatori di §8): cambiando un valore nei dati, la carta si aggiorna da sola | Confermato |
+| Le righe corte si **affiancano** sulla stessa linea, per non sprecare spazio | Confermato (richiesta di Davide) |
+| Gli stessi simboli delle risorse compaiono nella barra delle risorse e accanto al Malcontento, così il giocatore li impara | Confermato |
+| Con il mouse sopra, una carta con i simboli si ingrandisce e il riquadro dei dettagli non la copre | Confermato |
+
+**Che cosa mostrano le carte — Confermato (prima fase):**
+
+| Carta | Righe |
+|---|---|
+| Consigliere | Con che cosa potenzia (riga dorata se puoi già potenziare qualche carta; sotto la carta "Ascolta · ▲ Potenzia N"); se nel round propone edifici e truppe; le azioni che può proporre nel round. Gli incanti e gli spionaggi di un consigliere si riuniscono in una riga |
+| Azione o perk proposti | Costo → effetto |
+| Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
+| Opzione dell’evento scelto | Costo → effetti, su una o più righe |
+
+| Questione | Stato |
+|---|---|
+| Simboli su edifici e truppe (produzione, mana, effetti di battaglia), ricompense degli incontri e cronache | Da definire (seconda fase, dopo la prova della prima) |
+| Gli otto poli delle inclinazioni delle cronache: per ora in parole | Da definire |
+| Disegni definitivi dei simboli | Da definire; per ora icone provvisorie (§16.3) |
+
+Dettagli grafici ed elenco dei simboli: `docs/direzione_artistica.md` (§4) e `assets/icone/LEGGIMI.md`.
 
 ---
 
@@ -1343,6 +1375,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
 | Tre ere e relativo catalogo | Base di prova; nomi, costi e statistiche placeholder. |
 | Tick di 100 ms | Convenzione della simulazione. |
+| Simboli delle carte (§14.4) presi da game-icons.net (licenza CC BY 3.0), un file per concetto in `assets/icone/`; prima di pubblicare il gioco servono i crediti degli autori | Provvisori, sostituibili file per file (v0.30). |
+| Carte con i simboli: illustrazione più bassa, ingrandimento ×1,7 al passaggio del mouse, faccia opaca (senza riflesso) | Proposta visiva (v0.30). |
 | Danno del logoramento: a partire da 45 secondi, danno a entrambe le nazioni che cresce a ogni secondo (1, 2, 3…) | Placeholder. |
 | Valori della Resistenza (era, anni, edifici, truppe) e Resistenza fissa delle plance generate | Placeholder. |
 | Quota degli anni nella Resistenza: l’anno N vale N volte X (l’anno 1 dà già X) | Convenzione. |
@@ -1601,6 +1635,10 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 ---
 
 ## Registro delle versioni
+
+**v0.30 — 8 novembre 2026**
+- **Simboli sulle carte** (§14.4): consiglieri, azioni, eventi, fortune e visitatori mostrano costi ed effetti con simboli, come nei giochi da tavolo ("paghi → ottieni"); simboli monocromatici, colore solo nei numeri; righe corte affiancate. Prima fase approvata da Davide; edifici, truppe, ricompense e cronache restano da definire.
+- Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
 
 **Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
 - Le azioni del Tesoriere (Esattori, Grandi esattori, Assemblea) sono **gratuite**, come già nel gioco: il GDD diceva che si pagavano in Influenza (§4.2.3, §16.3). Decisione di Davide: vale la versione del gioco.
