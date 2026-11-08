@@ -261,7 +261,7 @@ func test_ogni_simbolo_della_legenda_ha_un_nome_e_un_file() -> void:
 
 func test_i_dettagli_del_consigliere_dicono_solo_cio_che_si_vede() -> void:
 	var decreto: OpportunityDef = load("res://data/catalog/opportunities/decreto_fiscale.tres") as OpportunityDef
-	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione", &"Fante"], [decreto], Res.Type.STABILITA)
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Materie prime", &"Fante"], [decreto], Res.Type.STABILITA)
 	catalog.advisors = [cancelliere]
 	var run: RunState = _run()
 	run.round_theme = RunState.RoundTheme.MISTO
