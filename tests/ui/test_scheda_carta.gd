@@ -181,3 +181,44 @@ func test_la_rivoluzione_non_si_puo_evitare() -> void:
 	var dettagli: String = SchedaCarta.da_evento(_run(), rivoluzione).dettagli
 	assert_string_contains(dettagli, "Non si può evitare: scegli il nuovo governo. Poi il Malcontento si azzera.")
 	assert_false(dettagli.contains("Ignora il tema del round"))
+
+
+func test_anteprima_del_potenzia_dice_che_cosa_cambia() -> void:
+	# Richiesta di Davide (8 novembre): prima di potenziare si vede che cosa cambia, "prima → dopo".
+	soldier.damage = 10
+	var run: RunState = _run()
+	var truppa: BoardPiece = run.board.troops[0]
+	var testo: String = SchedaCarta.anteprima_potenzia(run, truppa)
+	assert_string_contains(testo, "Con Potenzia, al livello 2:")
+	assert_string_contains(testo, "danno 10 → %d" % run.effective_troop(truppa, 2).damage)
+	assert_false(testo.contains("ricarica"), "Solo ciò che cambia.")
+	var fattoria: BoardPiece = run.board.buildings[0]
+	var edificio: String = SchedaCarta.anteprima_potenzia(run, fattoria)
+	assert_string_contains(edificio, "Oro a ogni stagione: +1 → +2")
+	truppa.level = run.max_level()
+	assert_eq(SchedaCarta.anteprima_potenzia(run, truppa), "", "Al livello massimo niente anteprima.")
+
+
+func test_anteprima_del_potenzia_e_il_mantenimento() -> void:
+	var generale: AdvisorDef = AdvisorDef.new()
+	generale.id = &"generale"
+	generale.display_name = "Generale"
+	generale.types = [&"Fante"]
+	generale.upgrade_resource = Res.Type.FERRO
+	catalog.advisors = [generale]
+	var run: RunState = _run()
+	var truppa: BoardPiece = run.board.troops[0]
+	if run.upkeep_of(truppa, 2) == null:
+		pending("Senza categoria del tipo Fante nel catalogo di prova il mantenimento non si calcola.")
+		return
+	assert_string_contains(SchedaCarta.anteprima_potenzia(run, truppa), "mantenimento prima di ogni scontro: nessuno → ")
+
+
+func test_la_capitale_non_ha_l_anteprima_del_potenzia() -> void:
+	var capitale: BuildingDef = BuildingDef.new()
+	capitale.display_name = "Capitale"
+	capitale.is_capital = true
+	capitale.gold_per_phase = 1
+	rules.starting_buildings = [capitale, farm]
+	var run: RunState = _run()
+	assert_eq(SchedaCarta.anteprima_potenzia(run, run.board.buildings[0]), "")

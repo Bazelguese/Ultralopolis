@@ -566,6 +566,61 @@ static func da_fantasma(run: RunState, fantasma: GhostDef) -> SchedaCarta:
 
 # --- Aiuti ---------------------------------------------------------------------
 
+## Che cosa cambierebbe con il Potenzia (richiesta di Davide, 8 novembre): solo i valori che
+## cambiano, "prima → dopo", compreso il mantenimento. Vuoto se la tessera è al livello massimo.
+## Legge i valori dalle regole (RunState): qui non si calcola nulla.
+static func anteprima_potenzia(run: RunState, pezzo: BoardPiece) -> String:
+	# La Capitale non si potenzia: nessun consigliere ha il suo tipo.
+	if pezzo.level >= run.max_level() or (pezzo.building != null and pezzo.building.is_capital):
+		return ""
+	var dopo: int = pezzo.level + 1
+	var righe: PackedStringArray = PackedStringArray()
+	if pezzo.building != null:
+		var ora_e: BuildingDef = run.effective_building(pezzo)
+		var poi_e: BuildingDef = run.effective_building(pezzo, dopo)
+		var produzione_ora: Array[int] = run.building_production(pezzo)
+		var produzione_poi: Array[int] = run.building_production(pezzo, dopo)
+		for tipo: Res.Type in Res.NAMES:
+			if produzione_ora[tipo] != produzione_poi[tipo]:
+				righe.append("%s a ogni stagione: +%s → +%s" % [Res.NAMES[tipo], Res.format(tipo, produzione_ora[tipo]), Res.format(tipo, produzione_poi[tipo])])
+		_confronta(righe, "scudo", ora_e.shield, poi_e.shield)
+		_confronta(righe, "cura", ora_e.heal, poi_e.heal)
+		_confronta(righe, "Corruzione", ora_e.corruption, poi_e.corruption)
+		_confronta_secondi(righe, "Inefficienza", ora_e.inefficiency_ms, poi_e.inefficiency_ms)
+		_confronta_secondi(righe, "Sabotaggio", ora_e.sabotage_ms, poi_e.sabotage_ms)
+		_confronta_secondi(righe, "ciclo", ora_e.mana_interval_ms, poi_e.mana_interval_ms)
+	else:
+		var ora_t: TroopDef = run.effective_troop(pezzo)
+		var poi_t: TroopDef = run.effective_troop(pezzo, dopo)
+		_confronta(righe, "danno", ora_t.damage, poi_t.damage)
+		_confronta(righe, "scudo", ora_t.shield, poi_t.shield)
+		_confronta(righe, "cura", ora_t.heal, poi_t.heal)
+		_confronta(righe, "Corruzione", ora_t.corruption, poi_t.corruption)
+		_confronta(righe, "danno d'assedio", ora_t.siege_damage, poi_t.siege_damage)
+		_confronta_secondi(righe, "Inefficienza", ora_t.inefficiency_ms, poi_t.inefficiency_ms)
+		_confronta_secondi(righe, "Sabotaggio", ora_t.sabotage_ms, poi_t.sabotage_ms)
+		_confronta_secondi(righe, "ricarica", ora_t.cooldown_ms, poi_t.cooldown_ms)
+	var mantenimento_ora: ResourceAmounts = run.upkeep_of(pezzo)
+	var mantenimento_poi: ResourceAmounts = run.upkeep_of(pezzo, dopo)
+	var testo_ora: String = mantenimento_ora.describe() if mantenimento_ora != null else "nessuno"
+	var testo_poi: String = mantenimento_poi.describe() if mantenimento_poi != null else "nessuno"
+	if testo_ora != testo_poi:
+		righe.append("mantenimento prima di ogni scontro: %s → %s" % [testo_ora, testo_poi])
+	if righe.is_empty():
+		return "Con Potenzia sale al livello %d." % dopo
+	return "Con Potenzia, al livello %d:\n• %s" % [dopo, "\n• ".join(righe)]
+
+
+static func _confronta(righe: PackedStringArray, nome: String, ora: int, poi: int) -> void:
+	if ora != poi:
+		righe.append("%s %d → %d" % [nome, ora, poi])
+
+
+static func _confronta_secondi(righe: PackedStringArray, nome: String, ora: int, poi: int) -> void:
+	if ora != poi:
+		righe.append("%s %s → %s" % [nome, secondi(ora), secondi(poi)])
+
+
 static func secondi(millisecondi: int) -> String:
 	var testo: String = ("%.1f" % (millisecondi / 1000.0)).replace(".", ",")
 	return testo.trim_suffix(",0") + " s"
