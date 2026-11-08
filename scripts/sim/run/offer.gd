@@ -35,7 +35,9 @@ func describe() -> String:
 		OpportunityDef.Kind.RECLUTA_TRUPPA:
 			return troop.display_name
 		OpportunityDef.Kind.PERK:
-			return "Perk: %s" % perk.display_name
+			# Nell'anteprima del consigliere il perk non è ancora stato pescato.
+			if perk != null:
+				return "Perk: %s" % perk.display_name
 	return opportunity.display_name
 
 

@@ -1,7 +1,7 @@
 # ULTRALOPOLIS
-## Game Design Document — v0.29
+## Game Design Document — v0.30
 
-**Data:** 6 novembre 2026
+**Data:** 8 novembre 2026
 **Stato:** base di design (nucleo) per il primo prototipo — v0.17 approvata dal creatore
 **Motore scelto:** Godot 4.7 (GDScript, esportazione nativa per PC)
 **Repository:** https://github.com/Bazelguese/Ultralopolis
@@ -228,7 +228,7 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 
 | Consigliere | Categoria | Azioni | Paga le azioni con |
 |---|---|---|---|
-| Tesoriere | Ricchezza | Esattori: Oro subito · Assemblea: +50% Oro o Ricerca per un anno (il Mercante, Ricerca in Oro, è stato tolto nella v0.26) | Influenza |
+| Tesoriere | Ricchezza | Esattori: Oro subito · Assemblea: +50% Oro o Ricerca per un anno (il Mercante, Ricerca in Oro, è stato tolto nella v0.26) | gratis (correzione dell’8 novembre 2026) |
 | Fattore | Terra | Scorte: Cibo in cambio di Legno · Razioni: per un anno le truppe mangiano meno | Legno |
 | Architetto | Opera | Architetti: spazio edificio · Fortificazioni: Resistenza nel prossimo scontro con il fantasma | Pietra, Legno (lo spazio in Oro) |
 | Generale | Militare | Quartiermastro: spazio truppa · Addestramento: ricarica più corta per un anno | Ferro (lo spazio in Oro) |
@@ -239,7 +239,7 @@ Nomi, azioni e costi placeholder. Le azioni riprendono le opportunità del proto
 | Clown | — | 5 elementi di mana diverso (§4.2.2) | — |
 | Anziano | — | Un perk (§9.3) | Fede e Influenza |
 
-Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Ogni risorsa di categoria (§5.3) deve pagare **almeno un’azione** del Consiglio — Confermato (v0.22). L’assegnazione attuale (Ambasciata in Stabilità, spionaggio in Documenti) è una Proposta. Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
+Le azioni **non** seguono la risorsa della categoria (§4.2.4): si pagano con le risorse indicate in questa tabella, placeholder — Confermato (v0.22). Ogni risorsa di categoria (§5.3) deve pagare **almeno un’azione** del Consiglio — Confermato (v0.22). Le azioni del Tesoriere sono gratuite, come nel gioco (correzione dell’8 novembre 2026, decisione di Davide): l’Influenza resta la risorsa di un’azione con il perk dell’Anziano, e paga anche la Riforma. L’assegnazione attuale (Ambasciata in Stabilità, spionaggio in Documenti) è una Proposta. Dalla v0.22 la Fauna non esiste più come risorsa: Scorte non la produce più e il Fattore non la chiede.
 
 Una proposta che in quel momento non ha senso non compare (es. Ambasciata senza malus attivi, spazi oltre il massimo).
 
@@ -1219,7 +1219,7 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Run | Anno, fase, era, vittorie, Prestigio, ultima possibilità. |
 | Economia | Risorse nel Magazzino; produzione prevista per fase. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
-| Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente. |
+| Offerte | Costo, requisiti, effetto, disponibilità nell’era corrente; sulle carte con i simboli di §14.4 (v0.30). |
 | Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.26). |
 | Tradizioni | Per ogni via adottata: i 4 passi, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.27). |
 | Nazione | Le quattro inclinazioni come barre fra due poli, le usanze, la vocazione e i personaggi con la loro fiducia (v0.29). |
@@ -1240,6 +1240,39 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 | Gioca | Se esistono nazioni create, si sceglie con quale giocare; altrimenti si va alla creazione. |
 | Crea nazione | Schermata a parte (§9.1). Creata dal menu, si torna al menu principale. |
 | Partita | Si gioca sulla **plancia 3D** (§14.2): plancia, opportunità, incontri e battaglie; si può tornare al menu o ricominciare con la stessa nazione. |
+
+### 14.4 Simboli sulle carte — Confermato (v0.30)
+
+Come nei giochi da tavolo, le carte dicono **che cosa fanno con dei simboli**: ogni concetto del nucleo (risorse, effetti di battaglia, edificio, truppa, spazio, durata, Potenzia…) ha un simbolo, e le carte li combinano. Il testo completo resta nel riquadro dei dettagli, al passaggio del mouse. Serve al principio P4: si capisce a colpo d’occhio che cosa costa una scelta e che cosa dà. Idea di Davide (8 novembre 2026).
+
+| Regola | Stato |
+|---|---|
+| Ogni riga è una cosa che la carta può fare e si legge da sinistra a destra: **quello che paghi → quello che ottieni** (es. Decreto fiscale: `2[Stabilità] → +4[Oro]`) | Confermato |
+| `/` separa le alternative (es. Assemblea: `1[anno] +50%[Oro] / +50%[Ricerca]`); `·` separa due effetti della stessa scelta | Confermato |
+| **Simboli monocromatici**: si riconoscono dalla forma, non dal colore, per non confonderli con il mana. Il colore sta nei numeri: oro per i costi, rosso per i malus. Il mana resta una gemma colorata | Confermato (scelta di Davide) |
+| Uno **spazio** della plancia è il simbolo in una cornice tratteggiata; una carta che **sale di livello** ha una freccia dorata | Confermato |
+| Le righe si costruiscono **dai dati** del catalogo (costi, guadagni, modificatori di §8): cambiando un valore nei dati, la carta si aggiorna da sola | Confermato |
+| Le righe corte si **affiancano** sulla stessa linea, per non sprecare spazio | Confermato (richiesta di Davide) |
+| Gli stessi simboli delle risorse compaiono nella barra delle risorse e accanto al Malcontento, così il giocatore li impara | Confermato |
+| Con il mouse sopra, una carta con i simboli si ingrandisce e il riquadro dei dettagli non la copre | Confermato |
+| Una **legenda** nel gioco (pulsante «Legenda» a destra) spiega come si legge una carta, con esempi presi dalle carte vere, e che cosa vuol dire ogni simbolo, gemma di mana e colore dei numeri | Confermato (richiesta di Davide) |
+
+**Che cosa mostrano le carte — Confermato (prima fase):**
+
+| Carta | Righe |
+|---|---|
+| Consigliere | Con che cosa potenzia (riga dorata se puoi già potenziare qualche carta; sotto la carta "Ascolta · ▲ Potenzia N"); se nel round propone edifici e truppe; le azioni che può proporre nel round. Gli incanti e gli spionaggi di un consigliere si riuniscono in una riga |
+| Azione o perk proposti | Costo → effetto |
+| Evento, Fortuna, Visitatore | Una riga per opzione; un’opzione che adesso non si può scegliere è spenta e ha il lucchetto (P4), il motivo è nei dettagli |
+| Opzione dell’evento scelto | Costo → effetti, su una o più righe |
+
+| Questione | Stato |
+|---|---|
+| Simboli su edifici e truppe (produzione, mana, effetti di battaglia), ricompense degli incontri e cronache | Da definire (seconda fase, dopo la prova della prima) |
+| Gli otto poli delle inclinazioni delle cronache: per ora in parole | Da definire |
+| Disegni definitivi dei simboli | Da definire; per ora icone provvisorie (§16.3) |
+
+Dettagli grafici ed elenco dei simboli: `docs/direzione_artistica.md` (§4) e `assets/icone/LEGGIMI.md`.
 
 ---
 
@@ -1343,6 +1376,8 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Pescate delle offerte con seme casuale registrato | Convenzione tecnica, per poter riprodurre una run nei test. |
 | Tre ere e relativo catalogo | Base di prova; nomi, costi e statistiche placeholder. |
 | Tick di 100 ms | Convenzione della simulazione. |
+| Simboli delle carte (§14.4) presi da game-icons.net (licenza CC BY 3.0), un file per concetto in `assets/icone/`; prima di pubblicare il gioco servono i crediti degli autori | Provvisori, sostituibili file per file (v0.30). |
+| Carte con i simboli: illustrazione più bassa, ingrandimento ×1,7 al passaggio del mouse, faccia opaca (senza riflesso) | Proposta visiva (v0.30). |
 | Danno del logoramento: a partire da 45 secondi, danno a entrambe le nazioni che cresce a ogni secondo (1, 2, 3…) | Placeholder. |
 | Valori della Resistenza (era, anni, edifici, truppe) e Resistenza fissa delle plance generate | Placeholder. |
 | Quota degli anni nella Resistenza: l’anno N vale N volte X (l’anno 1 dà già X) | Convenzione. |
@@ -1356,7 +1391,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | Se non c’è un bersaglio da colpire, il malus non ha effetto | Provvisoria. |
 | Malus diversi sullo stesso valore si sommano (es. due −50% azzerano) | Provvisoria. |
 | Almeno 1 proposta per consigliere (prima del Consiglio: 1 alternativa per opportunità) | Provvisoria. |
-| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; Scorte 2 Legno → 3 Cibo; Razioni 2 Legno; incanti 2 Fede; spionaggi 2 Documenti (3 la Rete di sabotatori, che sabota per 8 s); Grandi esattori +6 Oro; Trattati 4 Legno → 5 Ricerca; perk dell’Anziano 2 Fede + 2 Influenza; Archivisti 2 Documenti → 3 Ricerca; Manuali tecnici 2 Documenti; Decreto fiscale 2 Stabilità → 4 Oro; Censimento 2 Stabilità (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
+| Costi delle azioni: Studiosi 3 Legno → 3 Ricerca; Addestramento 2 Ferro; Fortificazioni 2 Pietra; Ambasciata 2 Stabilità; Processione 2 Fede; Scorte 2 Legno → 3 Cibo; Razioni 2 Legno; incanti 2 Fede; spionaggi 2 Documenti (3 la Rete di sabotatori, che sabota per 8 s); Esattori +3 Oro, Grandi esattori +6 Oro e Assemblea gratis; Trattati 4 Legno → 5 Ricerca; perk dell’Anziano 2 Fede + 2 Influenza; Archivisti 2 Documenti → 3 Ricerca; Manuali tecnici 2 Documenti; Decreto fiscale 2 Stabilità → 4 Oro; Censimento 2 Stabilità (v0.22). Architetti e Quartiermastro restano in Oro (gli spazi si comprano con l’Oro, §6.3) | Placeholder. |
 | Perk scelti alla creazione: 2 | Placeholder. |
 | Bottino dei nemici sconfitti: fantasma 3 Oro e 2 Ricerca; incontri facile 2 Oro e 1 Ricerca, media 3 e 2, difficile 4 e 3 | Placeholder (v0.21). |
 | Consiglio: le identità che favorivano i Costruttori ora favoriscono il Tesoriere, quelle che favorivano i Reclutatori il Generale (v0.22; nella v0.21 i Costruttori passavano all’Architetto) | Provvisoria. |
@@ -1603,6 +1638,14 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 ## Registro delle versioni
 
+**v0.30 — 8 novembre 2026**
+- **Simboli sulle carte** (§14.4): consiglieri, azioni, eventi, fortune e visitatori mostrano costi ed effetti con simboli, come nei giochi da tavolo ("paghi → ottieni"); simboli monocromatici, colore solo nei numeri; righe corte affiancate. Prima fase approvata da Davide; edifici, truppe, ricompense e cronache restano da definire.
+- Aggiornati §14.3 (offerte) e §16.3 (icone provvisorie, aspetto delle carte con i simboli).
+- **Legenda dei simboli** nel gioco (§14.4), con esempi presi dalle carte vere.
+
+**Correzione dell’8 novembre 2026** (v0.29, nessuna modifica del nucleo)
+- Le azioni del Tesoriere (Esattori, Grandi esattori, Assemblea) sono **gratuite**, come già nel gioco: il GDD diceva che si pagavano in Influenza (§4.2.3, §16.3). Decisione di Davide: vale la versione del gioco.
+
 **v0.29 — 6 novembre 2026** (modifica del nucleo)
 - Approvata la bozza `docs/Bozza_cronache.md` (Davide: struttura sì, inclinazioni sì, vocazioni "una via di mezzo", personaggi non prima del primo fantasma, tono duro sì, "fai tutto").
 - **Cronache della nazione** (§9.6): all'inizio di ogni stagione una scena costruita sulla partita, a cui la nazione reagisce; seconda eccezione a "nessun evento arriva da solo" (§3.2, §4.2.5).
@@ -1621,7 +1664,7 @@ Non occorre risolvere tutto prima di provare la base. Le convenzioni indispensab
 
 **v0.26 — 5 novembre 2026** (modifica del nucleo)
 - Approvata la bozza `docs/Bozza_v0.26_ricerca_tecnologie.md`: la Ricerca serve a un **albero delle tecnologie** (§10.5).
-- La Ricerca non sta più nel Magazzino: riempie la tecnologia in corso un po’ alla volta; non si vende e non paga azioni. Tolto il Mercante; il Tesoriere paga in Influenza (§4.2.3, §5.3).
+- La Ricerca non sta più nel Magazzino: riempie la tecnologia in corso un po’ alla volta; non si vende e non paga azioni. Tolto il Mercante; il Tesoriere paga in Influenza (§4.2.3, §5.3). *(Corretto l’8 novembre 2026: le azioni del Tesoriere sono gratuite.)*
 - Albero unico a **4 rami** per colore, ognuno con due categorie; due altezze per era; mano di **3 carte** come in Stellaris, con sconto sulla carta scartata; tecnologie iniziate e carte dorate sempre nella mano (§10.5.2, §10.5.3).
 - Si ricercano linee di elementi, perk, miglioramenti del Consiglio e della nazione, dottrine sui tipi; tutte valgono per sempre (§10.5.4). Le **linee** propongono la versione dell’era corrente, o l’ultima precedente (§10.5.5).
 - Le ere si raggiungono con **N tecnologie** dell’era corrente, quando lo decide il giocatore; non si paga più l’era con la Ricerca (§10.3). Superate “la Ricerca si conserva e viene spesa” e la struttura lineare.

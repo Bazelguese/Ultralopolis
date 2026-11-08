@@ -437,6 +437,32 @@ func advisor_resource_text(advisor: AdvisorDef) -> String:
 	return Res.NAMES[advisor.upgrade_resource]
 
 
+## Anteprima per la carta di un consigliere, prima di sceglierlo (solo lettura, non cambia nulla):
+## le sue azioni che potrebbero comparire fra le proposte di questo round, una per azione,
+## con il costo già scontato. Segue le stesse regole delle proposte vere (tema, livello, identità).
+func advisor_action_preview(advisor: AdvisorDef) -> Array[Offer]:
+	var preview: Array[Offer] = []
+	if advisor.special == AdvisorDef.Special.CLOWN:
+		return preview
+	if advisor.special == AdvisorDef.Special.NESSUNO and round_theme != RoundTheme.AZIONI and round_theme != RoundTheme.MISTO:
+		return preview
+	for opportunity: OpportunityDef in advisor.actions:
+		if _action_available(opportunity):
+			preview.append(_action_offer(advisor, opportunity))
+	return preview
+
+
+## Anteprima (solo lettura): true se in questo round il consigliere può proporre edifici
+## (con troops = false) o truppe (con troops = true).
+func advisor_offers_elements(advisor: AdvisorDef, troops: bool) -> bool:
+	if advisor.special == AdvisorDef.Special.CLOWN:
+		return true
+	for offer: Offer in _advisor_candidates(advisor):
+		if offer.is_element() and (offer.troop != null) == troops:
+			return true
+	return false
+
+
 ## Resistenza con cui la nazione del giocatore inizia uno scontro (GDD §7.1.1).
 func player_resistance() -> int:
 	var base: int = ResistanceCalc.compute(resistance_rules, era, year, board.buildings.size(),
