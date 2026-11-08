@@ -1276,8 +1276,8 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 | Ogni **tipo** (§6.6) ha un simbolo in un **medaglione tondo**: la forma tonda lo distingue dalle risorse; come i tipi, i medaglioni non hanno colore | Confermato |
 | I medaglioni stanno su una **linguetta sopra la tessera**, del colore della sua cornice, allineata a sinistra: su edifici e truppe i loro tipi, sul consigliere i tipi della sua categoria | Confermato |
 | Sopra e non di lato: sulla plancia le tessere della stessa fila sono troppo vicine per una linguetta laterale | Confermato |
-| I **tipi d'identità** hanno tutti lo stesso simbolo, uno **stendardo**; il nome è nei dettagli. La **Capitale** ha il suo | Confermato |
-| Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg`: un tipo nuovo prende un simbolo aggiungendo il file, senza toccare il codice; senza file prende lo stendardo | Confermato |
+| I **tipi d'identità** hanno tutti lo stesso simbolo, un **vessillo**; il nome è nei dettagli. La **Capitale** ha il suo | Confermato |
+| Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg`: un tipo nuovo prende un simbolo aggiungendo il file, senza toccare il codice; senza file prende il vessillo | Confermato |
 | Lo stesso simbolo compare accanto al nome del tipo nei testi colorati (§16.3) e nella legenda | Confermato |
 
 | Questione | Stato |
@@ -1605,7 +1605,7 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 ## Registro delle versioni
 
 **v0.32 — 8 novembre 2026**
-- **Tipi sulla linguetta** (§14.4): ogni tipo ha un simbolo in un medaglione, su una linguetta sopra tessere e consiglieri; i tipi d'identità hanno tutti lo stendardo. Idea e scelte di Davide (linguetta sopra, medaglioni grandi, stendardo unico, anche sul consigliere).
+- **Tipi sulla linguetta** (§14.4): ogni tipo ha un simbolo in un medaglione, su una linguetta sopra tessere e consiglieri; i tipi d'identità hanno tutti il vessillo (prima chiamato stendardo). Idea e scelte di Davide (linguetta sopra, medaglioni grandi, vessillo unico, anche sul consigliere).
 
 **v0.31 — 8 novembre 2026** (solo nomi: nessuna regola cambia)
 - Nuovo glossario in un documento a parte (`docs/Glossario.md`), approvato da Davide; la §19 rimanda a quello, e da lì vengono le spiegazioni delle parole chiave (§16.3).

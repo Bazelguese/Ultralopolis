@@ -328,7 +328,7 @@ func test_ogni_tipo_ha_il_suo_simbolo_o_lo_stendardo() -> void:
 	assert_eq(Simboli.di_tipo(&"Infrastruttura Bellica"), &"tipo_infrastruttura_bellica")
 	assert_eq(Simboli.di_tipo(&"Materie prime"), &"tipo_materie_prime")
 	assert_eq(Simboli.di_tipo(&"Capitale"), &"tipo_capitale")
-	assert_eq(Simboli.di_tipo(&"Pietrosangue"), Simboli.TIPO_IDENTITA, "I tipi d'identità hanno lo stendardo.")
+	assert_eq(Simboli.di_tipo(&"Pietrosangue"), Simboli.TIPO_IDENTITA, "I tipi d'identità hanno il vessillo.")
 	for consigliere: AdvisorDef in (load("res://data/catalog/catalog.tres") as CatalogDef).advisors:
 		for tipo: StringName in consigliere.types:
 			assert_ne(Simboli.di_tipo(tipo), Simboli.TIPO_IDENTITA, "Il tipo %s del %s deve avere un simbolo suo." % [tipo, consigliere.display_name])
@@ -344,5 +344,5 @@ func test_tessere_e_consiglieri_mostrano_i_loro_tipi() -> void:
 func test_la_legenda_spiega_ogni_tipo() -> void:
 	var catalogo: CatalogDef = load("res://data/catalog/catalog.tres") as CatalogDef
 	var tipi: Array = LegendaSimboli.tipi_delle_tessere(catalogo)
-	assert_eq(tipi.size(), 17, "15 tipi delle categorie, la Capitale e lo stendardo dei tipi d'identità.")
+	assert_eq(tipi.size(), 17, "15 tipi delle categorie, la Capitale e il vessillo dei tipi d'identità.")
 	assert_eq((tipi[tipi.size() - 1][0] as RigaSimboli).come_testo(), "[tipo tipo_identita]")

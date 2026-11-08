@@ -46,7 +46,7 @@ static func di_valore(valore: ModifierDef.BattleValue) -> StringName:
 ## Il concetto del simbolo di un tipo di tessera (GDD §6.6), es. "Infrastruttura Bellica" →
 ## &"tipo_infrastruttura_bellica". Il simbolo è il file assets/icone/tipo_<nome>.svg: per dare un
 ## simbolo a un tipo nuovo basta aggiungere il file. I tipi senza file, come i tipi d'identità
-## (Pietrosangue, Monarchico...), hanno tutti lo stesso stendardo (scelta di Davide).
+## (Pietrosangue, Monarchico...), hanno tutti lo stesso vessillo (scelta di Davide).
 static func di_tipo(tipo: StringName) -> StringName:
 	var nome: String = String(tipo).to_lower().strip_edges()
 	for coppia: Array in [["à", "a"], ["è", "e"], ["é", "e"], ["ì", "i"], ["ò", "o"], ["ù", "u"], ["'", ""], [" ", "_"]]:
@@ -55,7 +55,7 @@ static func di_tipo(tipo: StringName) -> StringName:
 	return concetto if esiste(concetto) else TIPO_IDENTITA
 
 
-## Lo stendardo dei tipi d'identità.
+## Il vessillo dei tipi d'identità.
 const TIPO_IDENTITA: StringName = &"tipo_identita"
 
 
