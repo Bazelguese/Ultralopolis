@@ -258,6 +258,9 @@ static func da_consigliere(run: RunState, consigliere: AdvisorDef) -> SchedaCart
 	# una frase per ogni riga di simboli, nello stesso ordine.
 	scheda.simboli = SimboliEffetti.consigliere(run, consigliere)
 	var righe: PackedStringArray = PackedStringArray()
+	# La linguetta sopra mostra i tipi della sua categoria: la prima frase li nomina.
+	if not scheda.tipi.is_empty():
+		righe.append("Tipi: %s." % ", ".join(PackedStringArray(scheda.tipi)))
 	for riga: RigaSimboli in scheda.simboli:
 		if riga.etichetta != "":
 			righe.append(riga.etichetta)
