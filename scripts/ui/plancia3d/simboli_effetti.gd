@@ -21,7 +21,7 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 	if def.special == AdvisorDef.Special.CLOWN:
 		# Un elemento per ogni colore di mana e un edificio neutro (GDD §4.2.2).
 		var colori: RigaSimboli = RigaSimboli.new()
-		colori.etichetta = "Propone un elemento per colore di mana e un edificio neutro"
+		colori.etichetta = "Propone una tessera per colore di mana e un edificio neutro"
 		colori.rilievo = RigaSimboli.Rilievo.PRINCIPALE
 		colori.icona(&"proposta").scritta(":")
 		for colore: StringName in [&"rosso", &"verde", &"blu", &"viola"]:

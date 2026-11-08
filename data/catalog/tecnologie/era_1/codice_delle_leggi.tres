@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_codice_delle_leggi"
 display_name = "Codice delle leggi"
-description = "+1 Stabilità per fase dalla Capitale."
+description = "+1 Stabilità per stagione dalla Capitale."
 is_malus = false
 effect = 8
 target_type = &"Capitale"
@@ -20,7 +20,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"codice_delle_leggi"
 display_name = "Codice delle leggi"
-description = "+1 Stabilità per fase dalla Capitale."
+description = "+1 Stabilità per stagione dalla Capitale."
 sphere = "Stato"
 cost = 3
 permanent_modifiers = Array[ExtResource("2_x")]([SubResource("mod_1")])

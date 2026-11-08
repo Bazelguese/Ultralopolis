@@ -7,7 +7,7 @@
 script = ExtResource("2_x")
 id = &"tec_archivi_di_stato"
 display_name = "Archivi di Stato"
-description = "+1 Documenti per fase dalla Capitale."
+description = "+1 Documenti per stagione dalla Capitale."
 is_malus = false
 effect = 8
 target_type = &"Capitale"
@@ -20,7 +20,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"archivi_di_stato"
 display_name = "Archivi di Stato"
-description = "+1 Documenti per fase dalla Capitale."
+description = "+1 Documenti per stagione dalla Capitale."
 sphere = "Conoscenza"
 era = 2
 cost = 5

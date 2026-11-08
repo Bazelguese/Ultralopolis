@@ -12,6 +12,6 @@ display_name = "Architetto"
 color = &"rosso"
 category_name = "Opera"
 description = "Costruisce e scava: propone edifici di produzione, infrastrutture strategiche e assedio."
-types = Array[StringName]([&"Infrastruttura Strategica", &"Produzione", &"Assedio"])
+types = Array[StringName]([&"Infrastruttura Strategica", &"Materie prime", &"Assedio"])
 upgrade_resource = 4
 actions = Array[ExtResource("2_opp")]([ExtResource("act_0"), ExtResource("act_1")])

@@ -41,7 +41,7 @@ func describe() -> String:
 		text += " (su %s)" % target_piece.display_name()
 	text += " — da %s" % origin_name
 	if def.duration_kind == ModifierDef.Duration.PERMANENTE:
-		text += " — per tutta la run"
+		text += " — per tutta la partita"
 	elif def.duration_kind == ModifierDef.Duration.PROSSIMO_SCONTRO_FANTASMA:
 		text += " — fino al prossimo scontro con il fantasma"
 	else:

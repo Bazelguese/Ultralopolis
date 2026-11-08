@@ -9,7 +9,7 @@
 script = ExtResource("1_id")
 id = &"doppio_ascolto"
 display_name = "Doppio ascolto"
-description = "Una volta per metà anno si prendono due proposte dallo stesso consigliere."
+description = "Una volta per stagione si prendono due opportunità dallo stesso consigliere."
 dimension = 6
 ascension_level = 2
 rule = 7

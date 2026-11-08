@@ -189,7 +189,7 @@ func test_tratto_permanente_dura_tutta_la_run() -> void:
 		run.fight_ghost()
 	assert_eq(run.year, 4)
 	assert_eq(run.production_preview().x, 6, "Ancora attivo dopo tre anni.")
-	assert_string_contains(run.modifiers.active[0].describe(), "per tutta la run")
+	assert_string_contains(run.modifiers.active[0].describe(), "per tutta la partita")
 
 
 func test_tratto_in_battaglia() -> void:

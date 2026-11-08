@@ -6,7 +6,7 @@
 script = ExtResource("1_mod")
 id = &"censimento"
 display_name = "Censimento"
-description = "Ogni consigliere mostra una proposta in più."
+description = "Ogni consigliere mostra un'opportunità in più."
 is_malus = false
 effect = 5
 amount = 1

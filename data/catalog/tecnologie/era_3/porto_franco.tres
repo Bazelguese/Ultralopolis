@@ -8,7 +8,7 @@
 script = ExtResource("2_x")
 id = &"tec_porto_franco"
 display_name = "Porto franco"
-description = "Rinnovare le proposte costa 1 Oro in meno."
+description = "Rinnovare le opportunità costa 1 Oro in meno."
 is_malus = false
 effect = 4
 amount = -1
@@ -19,7 +19,7 @@ stacking = 1
 script = ExtResource("1_tech")
 id = &"porto_franco"
 display_name = "Porto franco"
-description = "Rinnovare le proposte costa 1 Oro in meno."
+description = "Rinnovare le opportunità costa 1 Oro in meno."
 sphere = "Ricchezza"
 era = 3
 cost = 7

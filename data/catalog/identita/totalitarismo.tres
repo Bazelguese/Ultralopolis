@@ -14,7 +14,7 @@
 script = ExtResource("x1")
 id = &"totalitarismo"
 display_name = "Totalitarismo"
-description = "Lo Stato è tutto. Compaiono 2 consiglieri, ma quello scelto offre una proposta in più; Maestro delle spie più frequente, spionaggi più lunghi di 1 s, il Clown non compare mai. Carta esclusiva: Polizia segreta (era 3). Capitale: +1 Documenti."
+description = "Lo Stato è tutto. Compaiono 2 consiglieri, ma quello scelto offre un'opportunità in più; Maestro delle spie più frequente, spionaggi più lunghi di 1 s, il Giullare non compare mai. Tessera esclusiva: Polizia segreta (era 3). Capitale: +1 Documenti."
 dimension = 1
 identity_type = &"Totalitario"
 resistance_bonus = 8

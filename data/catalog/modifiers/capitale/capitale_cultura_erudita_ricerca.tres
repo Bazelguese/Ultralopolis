@@ -6,7 +6,7 @@
 script = ExtResource("1_qhkah")
 id = &"capitale_cultura_erudita_ricerca"
 display_name = "Capitale: +1 Ricerca"
-description = "La Capitale produce 1 Ricerca in più a ogni fase."
+description = "La Capitale produce 1 Ricerca in più a ogni stagione."
 is_malus = false
 effect = 8
 target_type = &"Capitale"

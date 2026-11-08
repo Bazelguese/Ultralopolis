@@ -37,7 +37,7 @@ func apply(def: ModifierDef, origin_kind: ActiveModifier.OriginKind, origin_name
 			modifier.target_piece = board.troops[rng.randi_range(0, board.troops.size() - 1)]
 		ModifierDef.Target.EDIFICIO_SCELTO, ModifierDef.Target.TRUPPA_SCELTA:
 			if chosen_piece == null:
-				return "%s non ha effetto: nessun elemento scelto." % def.display_name
+				return "%s non ha effetto: nessuna tessera scelta." % def.display_name
 			modifier.target_piece = chosen_piece
 	active.append(modifier)
 	return "Nuovo effetto. %s" % modifier.describe()

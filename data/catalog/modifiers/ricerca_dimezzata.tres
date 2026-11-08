@@ -6,5 +6,5 @@
 script = ExtResource("1_i6i26")
 id = &"ricerca_dimezzata"
 display_name = "Ricerca dimezzata"
-description = "Gli studiosi sono dispersi: la Ricerca prodotta a ogni fase è dimezzata."
+description = "Gli studiosi sono dispersi: la Ricerca prodotta a ogni stagione è dimezzata."
 amount = -50

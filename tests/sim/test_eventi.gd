@@ -44,7 +44,7 @@ func before_each() -> void:
 	farm = BuildingDef.new()
 	farm.id = &"fattoria"
 	farm.display_name = "Fattoria"
-	farm.types = [&"Produzione"]
+	farm.types = [&"Materie prime"]
 	farm.mana_interval_ms = 1000
 	monk = TroopDef.new()
 	monk.id = &"monaci"
@@ -72,8 +72,8 @@ func before_each() -> void:
 	rules.starting_buildings = [farm]
 	rules.starting_troops = [soldier_troop]
 	advisor = Aiuti.consiglio_semplice(catalog, rules, [], 3)
-	var second: AdvisorDef = Aiuti.consigliere(&"secondo", [Aiuti.TIPO_PROVA, &"Produzione", &"Fante", &"Spirituale"])
-	var third: AdvisorDef = Aiuti.consigliere(&"terzo", [Aiuti.TIPO_PROVA, &"Produzione", &"Fante", &"Spirituale"])
+	var second: AdvisorDef = Aiuti.consigliere(&"secondo", [Aiuti.TIPO_PROVA, &"Materie prime", &"Fante", &"Spirituale"])
+	var third: AdvisorDef = Aiuti.consigliere(&"terzo", [Aiuti.TIPO_PROVA, &"Materie prime", &"Fante", &"Spirituale"])
 	catalog.advisors = [advisor, second, third]
 	rules.advisors_per_round = 3
 	rules.special_card_chance_percent = 100
@@ -265,7 +265,7 @@ func test_il_visitatore_propone_carte_straniere_e_dell_era_successiva() -> void:
 	var foreign: BuildingDef = BuildingDef.new()
 	foreign.id = &"porto"
 	foreign.display_name = "Porto"
-	foreign.types = [&"Produzione"]
+	foreign.types = [&"Materie prime"]
 	foreign.cost_gold = 4
 	foreign.mana_interval_ms = 1000
 	# Esclusivo di una via che la nazione non ha: per lei è una carta "straniera".
@@ -278,11 +278,11 @@ func test_il_visitatore_propone_carte_straniere_e_dell_era_successiva() -> void:
 	future.id = &"futuro"
 	future.display_name = "Futuro"
 	future.era = 2
-	future.types = [&"Produzione"]
+	future.types = [&"Materie prime"]
 	future.cost_gold = 7
 	future.mana_interval_ms = 1000
 	catalog.buildings = [farm, future]
-	var merchant: AdvisorDef = Aiuti.consigliere(&"mercante", [&"Produzione"])
+	var merchant: AdvisorDef = Aiuti.consigliere(&"mercante", [&"Materie prime"])
 	merchant.special = AdvisorDef.Special.VISITATORE
 	merchant.offers_troops = false
 	merchant.foreign_exclusives = AdvisorDef.Foreign.PER_TIPO
@@ -351,7 +351,7 @@ func test_un_evento_di_stagione_compare_solo_in_quella_stagione() -> void:
 
 func test_le_stagioni_cambiano_il_peso_dei_consiglieri() -> void:
 	# GDD §4.2 (Proposta v0.25): d'inverno più Cancelliere, meno Generale.
-	var chancellor: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione"])
+	var chancellor: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Materie prime"])
 	chancellor.favored_seasons = PackedInt32Array([RunState.Season.INVERNO])
 	var general: AdvisorDef = Aiuti.consigliere(&"generale", [&"Fante"])
 	general.disfavored_seasons = PackedInt32Array([RunState.Season.INVERNO])

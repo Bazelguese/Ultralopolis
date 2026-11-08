@@ -8,7 +8,7 @@
 script = ExtResource("x1")
 id = &"popolo_errante"
 display_name = "Popolo errante"
-description = "Nel primo round di ogni stagione c'è sempre un Visitatore fra le carte del Consiglio."
+description = "Nel primo round di ogni stagione c'è sempre un Visitatore fra i consiglieri del round."
 dimension = 8
 rule = 11
 story = "Da allora la nazione è una strada: tutti passano, tutti lasciano qualcosa."

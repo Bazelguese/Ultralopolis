@@ -8,7 +8,7 @@
 script = ExtResource("1_id")
 id = &"prima_scintilla"
 display_name = "Prima scintilla"
-description = "Gli edifici iniziano lo scontro con l'intervallo a metà."
+description = "Gli edifici iniziano lo scontro con il ciclo a metà."
 dimension = 6
 ascension_level = 2
 rule = 3

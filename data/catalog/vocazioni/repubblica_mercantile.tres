@@ -8,7 +8,7 @@
 script = ExtResource("x1")
 id = &"repubblica_mercantile"
 display_name = "Repubblica mercantile"
-description = "Le proposte costano 1 Oro in meno, i Visitatori compaiono molto più spesso e al mercato basta 1 unità in meno per 1 Oro."
+description = "Le opportunità costano 1 Oro in meno, i Visitatori compaiono molto più spesso e al mercato basta 1 unità in meno per 1 Oro."
 dimension = 8
 proposal_gold_change = -1
 visitor_weight_change = 3

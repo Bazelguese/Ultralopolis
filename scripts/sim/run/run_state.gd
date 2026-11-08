@@ -81,7 +81,7 @@ const PHASE_NAMES: Dictionary[Phase, String] = {
 	Phase.SCELTA_INCONTRO: "Incontro del mondo",
 	Phase.RICOMPENSA_INCONTRO: "Ricompensa",
 	Phase.SCONTRO_FANTASMA: "Scontro con il fantasma",
-	Phase.FINE_RUN: "Fine della run",
+	Phase.FINE_RUN: "Fine della partita",
 	Phase.CREAZIONE_NAZIONE: "Creazione della nazione",
 	Phase.CRONACA: "Cronaca",
 }
@@ -427,7 +427,7 @@ func reroll_resource_cost() -> ResourceAmounts:
 func advisor_resource_text(advisor: AdvisorDef) -> String:
 	match advisor.special:
 		AdvisorDef.Special.CLOWN:
-			return "nessuna: il Clown non potenzia"
+			return "nessuna: il Giullare non potenzia"
 		AdvisorDef.Special.ANZIANO:
 			return "Oro"
 		AdvisorDef.Special.VISITATORE:
@@ -758,7 +758,7 @@ func _pay_upkeep() -> void:
 	if not paid.is_empty():
 		_log("Mantenimento pagato: %s." % paid.describe())
 	if not neglected_names.is_empty():
-		_log("Mantenimento non pagato, carte trascurate in questo scontro: %s." % ", ".join(neglected_names))
+		_log("Mantenimento non pagato, tessere trascurate in questo scontro: %s." % ", ".join(neglected_names))
 		_change_malcontent(neglected_names.size() * run_rules.malcontent_per_neglected, IdentityDef.Grievance.CARESTIE, "Mantenimento non pagato")
 
 
@@ -931,7 +931,7 @@ func _advisor_upgrade_reason(advisor: AdvisorDef, piece: BoardPiece) -> String:
 		return "Già al livello massimo."
 	match advisor.special:
 		AdvisorDef.Special.CLOWN:
-			return "Il Clown non potenzia."
+			return "Il Giullare non potenzia."
 		AdvisorDef.Special.VISITATORE:
 			return "I visitatori non potenziano."
 		AdvisorDef.Special.ANZIANO:
@@ -941,7 +941,7 @@ func _advisor_upgrade_reason(advisor: AdvisorDef, piece: BoardPiece) -> String:
 				return "L'Anziano ha già potenziato quest'anno."
 		_:
 			if not advisor.covers(piece_types(piece)):
-				return "%s potenzia solo carte con tipo %s." % [advisor.display_name, ", ".join(advisor.types)]
+				return "%s potenzia solo tessere con tipo %s." % [advisor.display_name, ", ".join(advisor.types)]
 	return ""
 
 
@@ -1256,7 +1256,7 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 	if chosen_advisor == null:
 		return _fail("Scegli prima un consigliere.")
 	if offer_index < 0 or offer_index >= offers.size():
-		return _fail("Proposta non valida.")
+		return _fail("Opportunità non valida.")
 	var offer: Offer = offers[offer_index]
 	var source: String = offer.opportunity.display_name if offer.opportunity != null else chosen_advisor.display_name
 	# Un visitatore può chiedere, oltre all'Oro, un'altra risorsa per le sue carte (GDD §4.2.5).
@@ -1329,7 +1329,7 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			var effect: int = BattleSim.EFFECT_SABOTAGE if spy.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else BattleSim.EFFECT_SLOW
 			spy_effects.append([effect, target, spy_duration(spy)])
 			_log("%s: %s parte %s per %d s nello scontro con il fantasma." % [source, _ghost_element_name(target),
-					"sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato", _whole_seconds(spy_duration(spy))])
+					"sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "inefficiente", _whole_seconds(spy_duration(spy))])
 		OpportunityDef.Kind.INCANTO:
 			var troops: Array[BoardPiece] = _enchantable_troops()
 			if troops.is_empty():
@@ -1355,7 +1355,7 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			_log("%s: %s è incantata (%s)." % [source, enchanted.display_name(), spell.description])
 		OpportunityDef.Kind.PERK:
 			if identity.has(offer.perk):
-				return _fail("Hai già questo perk.")
+				return _fail("Hai già questa peculiarità.")
 			if not _pay(offer):
 				return false
 			_adopt_identity(offer.perk)
@@ -1381,7 +1381,7 @@ func buy_offer(offer_index: int, choice: int = -1) -> bool:
 			and chosen_advisor.special == AdvisorDef.Special.NESSUNO and offers.size() > 1 and offer_index < offers.size():
 		double_pick_used = true
 		offers.remove_at(offer_index)
-		_log("Doppio ascolto: puoi prendere un'altra proposta da %s." % chosen_advisor.display_name)
+		_log("Doppio ascolto: puoi prendere un'altra opportunità da %s." % chosen_advisor.display_name)
 		return true
 	_next_round()
 	return true
@@ -1433,7 +1433,7 @@ func _special_options(event: EventDef) -> Array[EventOptionDef]:
 		for target: IdentityDef in revolution_targets():
 			var choice: EventOptionDef = EventOptionDef.new()
 			choice.label = "Verso: %s" % target.display_name
-			choice.description = "Il popolo porta al governo %s (tier %d). %s" % [target.display_name, target.tier, target.description]
+			choice.description = "Il popolo porta al governo %s (rango %d). %s" % [target.display_name, target.tier, target.description]
 			choice.change_government = target
 			built.append(choice)
 		return built
@@ -1442,7 +1442,7 @@ func _special_options(event: EventDef) -> Array[EventOptionDef]:
 	for target: IdentityDef in evolution_targets():
 		var option: EventOptionDef = EventOptionDef.new()
 		option.label = "Verso: %s" % target.display_name
-		option.description = "Il governo diventa %s (tier %d). %s" % [target.display_name, target.tier, target.description]
+		option.description = "Il governo diventa %s (rango %d). %s" % [target.display_name, target.tier, target.description]
 		option.cost = ResourceAmounts.new()
 		option.cost.add(Res.Type.INFLUENZA, run_rules.reform_influence_per_tier * target.tier)
 		option.requires_types = target.reform_requires_types
@@ -1473,11 +1473,11 @@ func option_block_reason(option: EventOptionDef) -> String:
 		if not found:
 			return "Richiede: %s." % option_requirement(option)
 	if not option.requires_types.is_empty() and _pieces_with(option.requires_types, option.requires_kind).is_empty():
-		return "Serve una carta %s sulla plancia." % option_requirement(option)
+		return "Serve una tessera %s sulla plancia." % option_requirement(option)
 	if option.cost != null and not can_pay(option.cost):
 		return "Risorse insufficienti (servono %s)." % option.cost.describe()
 	if option.upgrade and _option_upgrade_candidates(option).is_empty():
-		return "Nessuna carta da potenziare."
+		return "Nessuna tessera da potenziare."
 	if _option_troop_modifier(option) and board.troops.is_empty():
 		return "Nessuna truppa a cui applicarlo."
 	if option.spy != null and _spy_candidates(option.spy).is_empty():
@@ -1512,7 +1512,7 @@ func take_event_option(index: int, choice: int = -1) -> bool:
 	if pieces.size() == 1:
 		choice = 0
 	if not pieces.is_empty() and (choice < 0 or choice >= pieces.size()):
-		return _fail("Scegli su quale carta applicarla.")
+		return _fail("Scegli su quale tessera applicarla.")
 	var chosen_piece: BoardPiece = pieces[choice] if not pieces.is_empty() else null
 	var source: String = chosen_event.display_name
 	_apply_option_effects(option, source, chosen_piece, era if chosen_event.scale_with_era else 1)
@@ -1558,7 +1558,7 @@ func _apply_option_effects(option: EventOptionDef, source: String, chosen_piece:
 		var effect: int = BattleSim.EFFECT_SABOTAGE if option.spy.spy_effect == OpportunityDef.SpyEffect.SABOTAGGIO else BattleSim.EFFECT_SLOW
 		var spy_target: int = _spy_pick(option.spy)
 		spy_effects.append([effect, spy_target, spy_duration(option.spy)])
-		_log("%s: %s partirà %s nello scontro con il fantasma." % [source, _ghost_element_name(spy_target), "sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "rallentato"])
+		_log("%s: %s partirà %s nello scontro con il fantasma." % [source, _ghost_element_name(spy_target), "sabotato" if effect == BattleSim.EFFECT_SABOTAGE else "inefficiente"])
 	if option.give_tech != null:
 		_give_golden(option.give_tech)
 	elif option.give_random_tech:
@@ -1670,12 +1670,12 @@ func reroll_offers(with_resource: bool = false) -> bool:
 			return _fail("Risorse insufficienti per rinnovare (servono %s)." % amounts.describe())
 		for type: Res.Type in Res.NAMES:
 			stock[type] -= amounts.internal(type)
-		_log("Proposte rinnovate per %s." % amounts.describe())
+		_log("Opportunità rinnovate per %s." % amounts.describe())
 	else:
 		if gold < cost:
 			return _fail("Oro insufficiente per rinnovare (servono %d)." % cost)
 		gold -= cost
-		_log("Proposte rinnovate per %d Oro." % cost)
+		_log("Opportunità rinnovate per %d Oro." % cost)
 	reroll_extra += run_rules.reroll_cost_increase
 	_draw_offers()
 	return true
@@ -1786,7 +1786,7 @@ func tech_block_reason(def: TechDef, ignore_tier: bool = false) -> String:
 	if def.is_exclusive() and not _has_any_identity(def.requires_any):
 		return "Esclusiva di: %s." % _identity_names(def.requires_any)
 	if not def.requires_types.is_empty() and _pieces_with(def.requires_types, EventOptionDef.PieceKind.QUALSIASI).is_empty():
-		return "Serve sulla plancia una carta %s." % ", ".join(def.requires_types)
+		return "Serve sulla plancia una tessera %s." % ", ".join(def.requires_types)
 	var missing: PackedStringArray = PackedStringArray()
 	for needed: Resource in def.prerequisites:
 		var prerequisite: TechDef = needed as TechDef
@@ -1795,7 +1795,7 @@ func tech_block_reason(def: TechDef, ignore_tier: bool = false) -> String:
 	if not missing.is_empty():
 		return "Richiede: %s." % ", ".join(missing)
 	if def.perk != null and identity.has(def.perk):
-		return "Hai già il perk %s." % def.perk.display_name
+		return "Hai già la peculiarità %s." % def.perk.display_name
 	if not ignore_tier and def.tier > 1:
 		var needed_first: int = run_rules.tech_second_tier_needed
 		if _first_tier_done(def.era, def.branch()) < needed_first:
@@ -1857,7 +1857,7 @@ func _complete_tech(def: TechDef) -> void:
 	if def.extra_troop_slots > 0:
 		board.base_troop_slots += mini(def.extra_troop_slots, maxi(0, board.max_troop_slots - board.troop_capacity()))
 	if def.line != null:
-		_log("Nuova linea fra le proposte del Consiglio: %s." % def.line.display_name)
+		_log("Nuova linea fra le opportunità del Consiglio: %s." % def.line.display_name)
 	_note_deed(DeedDef.Kind.TECNOLOGIE, StringName(def.sphere))
 	_draw_tech_hand()
 	_check_traditions()
@@ -2312,7 +2312,7 @@ func take_reward(index: int, replace_index: int = -1) -> bool:
 				return false
 		RewardDef.Kind.PERK:
 			if identity.has(reward.perk):
-				return _fail("Hai già questo perk.")
+				return _fail("Hai già questa peculiarità.")
 			_adopt_identity(reward.perk)
 		RewardDef.Kind.TECNOLOGIA:
 			_give_golden(reward.tech if reward.tech != null else _random_golden(""))
@@ -2595,7 +2595,7 @@ func choose_chronicle_option(index: int, choice: int = -1) -> bool:
 	if pieces.size() == 1:
 		choice = 0
 	if not pieces.is_empty() and (choice < 0 or choice >= pieces.size()):
-		return _fail("Scegli su quale carta applicarla.")
+		return _fail("Scegli su quale tessera applicarla.")
 	var chosen_piece: BoardPiece = pieces[choice] if not pieces.is_empty() else null
 	var source: String = current_chronicle.display_name
 	var who: NationCharacter = character_of(current_chronicle.requires_character) if current_chronicle.requires_character != null else null
@@ -3586,7 +3586,7 @@ func _place_building(def: BuildingDef, price: int, value: int, replace_index: in
 	if replace_index < board.buildings.size() and board.buildings[replace_index].building.is_capital:
 		return _fail("La Capitale non si può sostituire.")
 	if not board.can_replace_building(replace_index, def):
-		return _fail("Sostituzione non possibile: lascerebbe elementi senza spazio.")
+		return _fail("Sostituzione non possibile: lascerebbe tessere senza spazio.")
 	var old_piece: BoardPiece = board.buildings[replace_index]
 	var refund: int = half_down(old_piece.paid)
 	if gold + refund < price:
@@ -3742,11 +3742,11 @@ func _end_run(result: RunEnd) -> void:
 	offers = []
 	match result:
 		RunEnd.VITTORIA:
-			_log("La nazione ha raggiunto %d vittorie: run vinta!" % wins)
+			_log("La nazione ha raggiunto %d vittorie: partita vinta!" % wins)
 		RunEnd.SCONFITTA:
-			_log("La run è finita con una sconfitta.")
+			_log("La partita è finita con una sconfitta.")
 		RunEnd.FINE_PROVA:
-			_log("Fine della run di prova dopo %d anni." % year)
+			_log("Fine della partita di prova dopo %d anni." % year)
 
 
 func _require_shopping() -> bool:
@@ -3938,7 +3938,7 @@ func _draw_ways(era_def: EraDef) -> Array[IdentityDef]:
 
 func _require_not_over() -> bool:
 	if is_over():
-		return _fail("La run è finita.")
+		return _fail("La partita è finita.")
 	if phase == Phase.CREAZIONE_NAZIONE:
 		return _fail("Prima crea la nazione.")
 	return true

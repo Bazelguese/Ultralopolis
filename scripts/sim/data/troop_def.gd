@@ -17,7 +17,7 @@ extends Resource
 ## Cibo consumato a inizio anno, in decimi (5 = 0,5 Cibo, GDD §5.4).
 @export var food_tenths: int = 5
 
-@export_group("In battaglia")
+@export_group("Nello scontro")
 ## Colore del mana richiesto: rosso, verde, blu o viola (GDD §5.3). Ignorato se mana_cost è 0.
 @export var mana_type: StringName = &"rosso"
 ## Mana consumato a ogni attivazione. Zero = truppa senza richiesta di mana.

@@ -6,7 +6,7 @@
 script = ExtResource("1_pxl2s")
 id = &"archivi"
 display_name = "Archivi"
-description = "+25% Ricerca prodotta a ogni fase."
+description = "+25% Ricerca prodotta a ogni stagione."
 is_malus = false
 amount = 25
 duration_kind = 2

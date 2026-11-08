@@ -78,77 +78,77 @@ script = ExtResource("1_voce")
 nome = "Danno"
 forme = PackedStringArray("danno", "danni")
 colore = Color(1, 0.4157, 0.2392, 1)
-definizione = "Colpisce prima lo scudo; solo ciò che avanza arriva alla Resistenza."
+definizione = "Toglie Resistenza al nemico, ma prima consuma il suo scudo; solo ciò che avanza arriva alla Resistenza."
 
 [sub_resource type="Resource" id="voce_11"]
 script = ExtResource("1_voce")
 nome = "Resistenza"
 forme = PackedStringArray("resistenza")
 colore = Color(1, 0.702, 0.6392, 1)
-definizione = "Capacità della nazione di sopravvivere al singolo scontro. Chi arriva a zero perde."
+definizione = "La vita della tua nazione nello scontro. Se arriva a zero, perdi. Si ricalcola all'inizio di ogni scontro."
 
 [sub_resource type="Resource" id="voce_12"]
 script = ExtResource("1_voce")
 nome = "Scudo"
 forme = PackedStringArray("scudo", "scudi")
 colore = Color(0.4863, 0.7843, 1, 1)
-definizione = "Riserva di battaglia che assorbe il danno prima della Resistenza. Parte da zero in ogni scontro, non ha tetto e non ferma la Corruzione."
+definizione = "Una riserva che assorbe il danno prima della Resistenza. Parte da zero in ogni scontro e resta finché non viene consumata; non ferma la Corruzione."
 
 [sub_resource type="Resource" id="voce_13"]
 script = ExtResource("1_voce")
 nome = "Cura"
 forme = PackedStringArray("cura", "cure")
 colore = Color(0.3569, 0.8902, 0.4902, 1)
-definizione = "Ridà Resistenza persa, mai oltre la Resistenza massima. Così allontana anche la soglia della Corruzione."
+definizione = "Ridà Resistenza persa, mai oltre il massimo. Così allontana anche la soglia della Corruzione."
 
 [sub_resource type="Resource" id="voce_14"]
 script = ExtResource("1_voce")
 nome = "Corruzione"
 forme = PackedStringArray("corruzione")
-colore = Color(0.7804, 0.4902, 1, 1)
-definizione = "Contatore di battaglia che parte da zero e si accumula: quando raggiunge la Resistenza attuale, la nazione perde. Non tocca lo scudo e non scende mai; l'unica risposta è la cura."
+colore = Color(0.7608, 0.2157, 0.5412, 1)
+definizione = "Sale durante lo scontro e non scende mai. Quando raggiunge la tua Resistenza, perdi. Lo scudo non la ferma: l'unica risposta è la cura."
 
 [sub_resource type="Resource" id="voce_15"]
 script = ExtResource("1_voce")
-nome = "Attacco d'assedio"
-forme = PackedStringArray("attacco d'assedio", "attacco d’assedio", "attacchi d'assedio", "assedio")
+nome = "Danno d'assedio"
+forme = PackedStringArray("danno d'assedio", "danno d’assedio", "danni d'assedio", "assedio")
 colore = Color(1, 0.6941, 0.2902, 1)
-definizione = "Danno che colpisce solo lo scudo, prima del danno normale; proprio delle truppe Assedio. Se l'avversario non ha scudo, va perso."
+definizione = "Toglie solo scudo al nemico, prima del danno normale. Ce l'hanno solo le truppe Assedio; se il nemico non ha scudo, va perso."
 
 [sub_resource type="Resource" id="voce_16"]
 script = ExtResource("1_voce")
-nome = "Inefficienza (rallenta)"
-forme = PackedStringArray("inefficienza", "rallenta", "rallentano", "rallentato", "rallentata", "rallentati", "rallentate", "rallentamento")
+nome = "Inefficienza"
+forme = PackedStringArray("inefficienza", "inefficiente", "inefficienti")
 colore = Color(0.3725, 0.8902, 0.8235, 1)
-definizione = "Per una durata in secondi il timer del bersaglio (ricarica di una truppa, intervallo di un edificio) avanza più piano. Se colpisce di nuovo, le durate si sommano."
+definizione = "Per qualche secondo il timer della tessera colpita (ricarica di una truppa, ciclo di un edificio) va a metà velocità. Se colpisce di nuovo, le durate si sommano."
 
 [sub_resource type="Resource" id="voce_17"]
 script = ExtResource("1_voce")
-nome = "Sabotaggio (blocca)"
+nome = "Sabotaggio"
 forme = PackedStringArray("sabotaggio", "sabota", "sabotano", "sabotato", "sabotata", "sabotati", "sabotate")
 colore = Color(1, 0.4784, 0.7216, 1)
-definizione = "Per una durata in secondi il timer del bersaglio è fermo e il bersaglio non può attivarsi, nemmeno se è pronto e il mana c'è. Se colpisce di nuovo, le durate si sommano."
+definizione = "Per qualche secondo la tessera colpita è ferma e non può attivarsi, nemmeno se è pronta e il mana c'è. Se colpisce di nuovo, le durate si sommano."
 
 [sub_resource type="Resource" id="voce_18"]
 script = ExtResource("1_voce")
 nome = "Ricarica"
 forme = PackedStringArray("ricarica", "ricaricano", "ricaricare", "ricariche")
 colore = Color(0.6627, 0.7608, 1, 1)
-definizione = "Tempo di attesa fra due attivazioni di una truppa. Truppe ed edifici iniziano la battaglia con ricarica e intervallo pieni."
+definizione = "Il tempo che una truppa aspetta fra un'attivazione e la successiva. Per gli edifici si dice ciclo. Lo scontro inizia con ricariche e cicli pieni."
 
 [sub_resource type="Resource" id="voce_19"]
 script = ExtResource("1_voce")
 nome = "Logoramento"
 forme = PackedStringArray("logoramento")
 colore = Color(0.851, 0.549, 0.4157, 1)
-definizione = "Contro gli stalli: dopo un po' di battaglia entrambe le nazioni perdono Resistenza con un danno che cresce nel tempo. Lo scudo lo assorbe e le cure lo compensano."
+definizione = "Dopo 45 secondi entrambe le nazioni perdono Resistenza, sempre di più, finché lo scontro finisce. Lo scudo lo assorbe e le cure lo compensano."
 
 [sub_resource type="Resource" id="voce_20"]
 script = ExtResource("1_voce")
 nome = "Mana"
 forme = PackedStringArray("mana")
 colore = Color(0.7255, 0.7843, 1, 1)
-definizione = "Prodotto in battaglia dagli edifici e speso per attivare le truppe. Parte da zero in ogni scontro e si azzera alla fine. Se manca, la truppa pronta resta in attesa."
+definizione = "L'energia che gli edifici producono nello scontro e che le truppe spendono per attivarsi. Parte da zero e si azzera a fine scontro; se manca, la truppa pronta resta in attesa."
 
 [sub_resource type="Resource" id="voce_21"]
 script = ExtResource("1_voce")
@@ -209,9 +209,9 @@ colore = Color(0.9412, 0.851, 0.6588, 1)
 
 [sub_resource type="Resource" id="voce_29"]
 script = ExtResource("1_voce")
-nome = "Produzione"
+nome = "Materie prime"
 famiglia = 3
-forme = PackedStringArray("Produzione")
+forme = PackedStringArray("Materie prime")
 colore = Color(0.9412, 0.851, 0.6588, 1)
 
 [sub_resource type="Resource" id="voce_30"]
@@ -325,7 +325,7 @@ nome = "Prestigio"
 famiglia = 4
 forme = PackedStringArray("prestigio")
 colore = Color(1, 0.6275, 0.9608, 1)
-definizione = "Decide la sopravvivenza della run dopo le sconfitte: una sconfitta ne fa perdere quanto il numero dell'anno. Esaurito, scatta l'ultima possibilità."
+definizione = "Quanto la tua nazione può ancora permettersi di perdere. Si parte da 20; una sconfitta ne fa perdere quanto il numero dell'anno. Esaurito, scatta l'ultima possibilità."
 
 [sub_resource type="Resource" id="voce_46"]
 script = ExtResource("1_voce")
@@ -333,7 +333,7 @@ nome = "Malus"
 famiglia = 5
 forme = PackedStringArray("malus")
 colore = Color(1, 0.3608, 0.4235, 1)
-definizione = "Effetto negativo con una durata in anni. Se arriva un malus già attivo si allunga solo la durata. Lo infliggono i fantasmi quando perdi o pareggi."
+definizione = "Un effetto negativo che dura per un certo numero di anni. Non ti rovina: ti spinge a giocare in modo diverso. Se arriva un malus già attivo si allunga solo la durata."
 
 [sub_resource type="Resource" id="voce_47"]
 script = ExtResource("1_voce")
@@ -341,7 +341,7 @@ nome = "Malcontento"
 famiglia = 5
 forme = PackedStringArray("malcontento")
 colore = Color(1, 0.3608, 0.4235, 1)
-definizione = "Contatore della nazione: sale con sconfitte, carestie, malus subiti ed eventi; scende spendendo Stabilità (anche Fede o Cibo). Alla soglia scoppia la Rivoluzione."
+definizione = "La pressione del popolo. Sale con sconfitte, carestie, malus e tessere trascurate; scende soprattutto spendendo Stabilità. Se raggiunge la soglia, scoppia la Rivoluzione."
 
 [sub_resource type="Resource" id="voce_48"]
 script = ExtResource("1_voce")
@@ -349,7 +349,7 @@ nome = "Rivoluzione"
 famiglia = 5
 forme = PackedStringArray("rivoluzione")
 colore = Color(1, 0.3608, 0.4235, 1)
-definizione = "Arriva da sola quando il Malcontento raggiunge la soglia: la nazione cambia governo, anche di tier più basso. Poi il Malcontento si azzera."
+definizione = "Quando il Malcontento raggiunge la soglia arriva da sola: il popolo cambia governo, anche verso un rango più basso. Poi il Malcontento si azzera."
 
 [sub_resource type="Resource" id="voce_49"]
 script = ExtResource("1_voce")
@@ -357,7 +357,7 @@ nome = "Affamata"
 famiglia = 5
 forme = PackedStringArray("affamata", "affamate", "affamato", "affamati")
 colore = Color(1, 0.3608, 0.4235, 1)
-definizione = "Truppa rimasta senza Cibo all'inizio dell'anno: ricarica più lenta (×1,5) fino al pasto dell'anno dopo."
+definizione = "Una truppa rimasta senza razione all'inizio dell'anno: ricarica più lenta (×1,5) fino al pasto dell'anno dopo."
 
 [sub_resource type="Resource" id="voce_50"]
 script = ExtResource("1_voce")
@@ -373,7 +373,14 @@ famiglia = 5
 forme = PackedStringArray("sconfitta", "sconfitte")
 colore = Color(1, 0.3608, 0.4235, 1)
 
+[sub_resource type="Resource" id="voce_52"]
+script = ExtResource("1_voce")
+nome = "Ciclo"
+forme = PackedStringArray("ciclo", "cicli")
+colore = Color(0.6627, 0.7608, 1, 1)
+definizione = "Ogni quanto un edificio produce nello scontro. Funziona come la ricarica di una truppa, ma un edificio non resta mai in attesa del mana."
+
 [resource]
 script = ExtResource("2_lessico")
-voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51")])
+voci = Array[ExtResource("1_voce")]([SubResource("voce_00"), SubResource("voce_01"), SubResource("voce_02"), SubResource("voce_03"), SubResource("voce_04"), SubResource("voce_05"), SubResource("voce_06"), SubResource("voce_07"), SubResource("voce_08"), SubResource("voce_09"), SubResource("voce_10"), SubResource("voce_11"), SubResource("voce_12"), SubResource("voce_13"), SubResource("voce_14"), SubResource("voce_15"), SubResource("voce_16"), SubResource("voce_17"), SubResource("voce_18"), SubResource("voce_19"), SubResource("voce_20"), SubResource("voce_21"), SubResource("voce_22"), SubResource("voce_23"), SubResource("voce_24"), SubResource("voce_25"), SubResource("voce_26"), SubResource("voce_27"), SubResource("voce_28"), SubResource("voce_29"), SubResource("voce_30"), SubResource("voce_31"), SubResource("voce_32"), SubResource("voce_33"), SubResource("voce_34"), SubResource("voce_35"), SubResource("voce_36"), SubResource("voce_37"), SubResource("voce_38"), SubResource("voce_39"), SubResource("voce_40"), SubResource("voce_41"), SubResource("voce_42"), SubResource("voce_43"), SubResource("voce_44"), SubResource("voce_45"), SubResource("voce_46"), SubResource("voce_47"), SubResource("voce_48"), SubResource("voce_49"), SubResource("voce_50"), SubResource("voce_51"), SubResource("voce_52")])
 colore_numeri = Color(1, 1, 1, 1)

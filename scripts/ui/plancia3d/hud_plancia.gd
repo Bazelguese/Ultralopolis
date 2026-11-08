@@ -653,9 +653,9 @@ func _crea_pannelli_destra() -> void:
 	colonna.add_theme_constant_override("separation", 8)
 	_pulsante_effetti = _pulsante("Effetti", func() -> void: _alterna(_effetti))
 	colonna.add_child(_pulsante_effetti)
-	colonna.add_child(_pulsante("Cronaca", func() -> void: _alterna(_cronaca)))
+	colonna.add_child(_pulsante("Annali", func() -> void: _alterna(_cronaca)))
 	var pulsante_legenda: Button = _pulsante("Legenda", func() -> void: _alterna(_legenda))
-	Suggerimenti.imposta(pulsante_legenda, "Che cosa vogliono dire i simboli sulle carte.", "Legenda")
+	Suggerimenti.imposta(pulsante_legenda, "Che cosa vogliono dire i simboli.", "Legenda")
 	colonna.add_child(pulsante_legenda)
 	_ancora(colonna, Control.PRESET_CENTER_RIGHT, Vector2(-24, -60))
 
@@ -678,7 +678,7 @@ func _crea_pannelli_destra() -> void:
 	_cronaca = PanelContainer.new()
 	var colonna_cronaca: VBoxContainer = VBoxContainer.new()
 	_cronaca.add_child(colonna_cronaca)
-	colonna_cronaca.add_child(StileVisivo.etichetta("CRONACA", StileVisivo.FONT_TITOLI, 26, StileVisivo.ORO_LUCE))
+	colonna_cronaca.add_child(StileVisivo.etichetta("ANNALI", StileVisivo.FONT_TITOLI, 26, StileVisivo.ORO_LUCE))
 	_testo_cronaca = PannelloSuggerimento.testo_colorato(17)
 	_testo_cronaca.custom_minimum_size = Vector2(480, 0)
 	colonna_cronaca.add_child(_testo_cronaca)
@@ -1059,7 +1059,7 @@ func aggiorna_partita(run: RunState) -> void:
 		_pulsante_era.text = "Entra in %s · %d/%d tecnologie" % [run.era_name(run.era + 1), fatte, tecnologie_era]
 		_pulsante_era.visible = true
 		_pulsante_era.disabled = not comprando or run.era_block_reason() != ""
-		Suggerimenti.imposta(_pulsante_era, run.era_block_reason() if run.era_block_reason() != "" else "Entri quando vuoi: le offerte dell'era attuale spariscono.")
+		Suggerimenti.imposta(_pulsante_era, run.era_block_reason() if run.era_block_reason() != "" else "Entri quando vuoi: le tessere dell'era attuale spariscono dalle opportunità.")
 	else:
 		_pulsante_era.visible = false
 	_aggiorna_ricerca(run)
@@ -1142,19 +1142,19 @@ func _testo_consiglio(run: RunState) -> String:
 		return "%s: scegli un'opzione, oppure passa. Le opzioni spente dicono che cosa serve." % run.chosen_event.display_name
 	if consigliere == null:
 		if run.advisor_choices.is_empty() and run.event_choice == null:
-			return "Nessun consigliere ha proposte per questo tema: passa il round."
+			return "Nessun consigliere ha opportunità per questo tema: passa il round."
 		var speciale: bool = run.event_choice != null
 		for scelta: AdvisorDef in run.advisor_choices:
 			if scelta.special == AdvisorDef.Special.VISITATORE:
 				speciale = true
 		if speciale:
-			return "Scegli una carta (tema: %s): un consigliere, oppure chi è arrivato in questo round." % run.theme_name()
-		return "Scegli quale consigliere ascoltare (tema: %s). Passa il mouse sulle carte per i dettagli." % run.theme_name()
-	var testo: String = "%s: prendi una proposta, oppure passa." % consigliere.display_name
+			return "Scegli chi ascoltare (tema: %s): un consigliere, oppure l'avvenimento di questo round." % run.theme_name()
+		return "Scegli quale consigliere ascoltare (tema: %s). Passa il mouse sui consiglieri per i dettagli." % run.theme_name()
+	var testo: String = "%s: prendi un'opportunità, oppure passa." % consigliere.display_name
 	if run.upgrade_used:
 		testo += " Potenzia già usato in questo round."
 	elif consigliere.special == AdvisorDef.Special.NESSUNO:
-		testo += " Potenzia: clicca una tua carta con tipo %s." % ", ".join(consigliere.types)
+		testo += " Potenzia: clicca una tua tessera con tipo %s." % ", ".join(consigliere.types)
 	elif consigliere.special == AdvisorDef.Special.ANZIANO and run.elder_upgrades_used < run.run_rules.elder_upgrades_per_year:
 		testo += " Potenzia: clicca un tuo edificio neutro."
 	return testo
@@ -1202,7 +1202,7 @@ static func _testo_mantenimento(run: RunState) -> String:
 		return ""
 	var testo: String = "\nMantenimento prima dello scontro: %s." % totale.describe()
 	if not run.can_pay(totale):
-		testo += " Non basta: alcune carte saranno trascurate (+1 Malcontento ciascuna)."
+		testo += " Non basta: alcune tessere saranno trascurate (+1 Malcontento ciascuna)."
 	return testo
 
 

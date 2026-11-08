@@ -6,6 +6,6 @@
 script = ExtResource("1_3lgsx")
 id = &"mercati_diffidenti"
 display_name = "Mercati diffidenti"
-description = "Rinnovare le offerte costa 2 Oro in più."
+description = "Rinnovare le opportunità costa 2 Oro in più."
 effect = 4
 amount = 2

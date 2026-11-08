@@ -7,7 +7,7 @@
 script = ExtResource("1_tech")
 id = &"metodo_scientifico"
 display_name = "Metodo scientifico"
-description = "Perk Biblioteca reale: +25% Ricerca prodotta."
+description = "Peculiarità Biblioteca reale: +25% Ricerca prodotta."
 sphere = "Conoscenza"
 era = 3
 tier = 2

@@ -6,7 +6,7 @@
 script = ExtResource("1_j0ha0")
 id = &"capitale_pietrosangue_pietra"
 display_name = "Capitale: +1 Pietra"
-description = "La Capitale produce 1 Pietra in più a ogni fase."
+description = "La Capitale produce 1 Pietra in più a ogni stagione."
 is_malus = false
 effect = 8
 target_type = &"Capitale"

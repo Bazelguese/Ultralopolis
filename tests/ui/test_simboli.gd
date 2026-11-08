@@ -14,7 +14,7 @@ func before_each() -> void:
 	farm = BuildingDef.new()
 	farm.id = &"fattoria"
 	farm.display_name = "Fattoria"
-	farm.types = [&"Produzione"]
+	farm.types = [&"Materie prime"]
 	farm.mana_interval_ms = 1000
 	soldier = TroopDef.new()
 	soldier.id = &"fanti"
@@ -25,7 +25,7 @@ func before_each() -> void:
 	catalog.buildings = [farm]
 	catalog.troops = [soldier]
 	catalog.eras = [EraDef.new(), EraDef.new()]
-	catalog.advisors = [Aiuti.consigliere(&"base", [&"Produzione"])]
+	catalog.advisors = [Aiuti.consigliere(&"base", [&"Materie prime"])]
 	rules = RunRules.new()
 	rules.starting_gold = 20
 	rules.prototype_years = 0
@@ -169,7 +169,7 @@ func test_opzione_bloccata_sulla_carta_dell_evento() -> void:
 
 func test_consigliere_in_un_round_di_azioni() -> void:
 	var decreto: OpportunityDef = load("res://data/catalog/opportunities/decreto_fiscale.tres") as OpportunityDef
-	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione", &"Fante"], [decreto], Res.Type.STABILITA)
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Materie prime", &"Fante"], [decreto], Res.Type.STABILITA)
 	catalog.advisors = [cancelliere]
 	var run: RunState = _run()
 	run.round_theme = RunState.RoundTheme.AZIONI
@@ -182,7 +182,7 @@ func test_consigliere_in_un_round_di_azioni() -> void:
 
 func test_consigliere_in_un_round_misto_propone_anche_carte() -> void:
 	var decreto: OpportunityDef = load("res://data/catalog/opportunities/decreto_fiscale.tres") as OpportunityDef
-	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione", &"Fante"], [decreto], Res.Type.STABILITA)
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Materie prime", &"Fante"], [decreto], Res.Type.STABILITA)
 	catalog.advisors = [cancelliere]
 	var run: RunState = _run()
 	run.round_theme = RunState.RoundTheme.MISTO
@@ -196,7 +196,7 @@ func test_consigliere_in_un_round_misto_propone_anche_carte() -> void:
 
 func test_consigliere_in_un_round_di_edifici_non_mostra_azioni() -> void:
 	var decreto: OpportunityDef = load("res://data/catalog/opportunities/decreto_fiscale.tres") as OpportunityDef
-	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione", &"Fante"], [decreto], Res.Type.STABILITA)
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Materie prime", &"Fante"], [decreto], Res.Type.STABILITA)
 	catalog.advisors = [cancelliere]
 	var run: RunState = _run()
 	run.round_theme = RunState.RoundTheme.EDIFICI
@@ -220,7 +220,7 @@ func test_incanti_e_spionaggi_si_riuniscono_in_una_riga() -> void:
 # --- Sotto la carta del consigliere -----------------------------------------------
 
 func test_sotto_il_consigliere_si_vede_quante_carte_puoi_potenziare() -> void:
-	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Produzione", &"Fante"], [], Res.Type.STABILITA)
+	var cancelliere: AdvisorDef = Aiuti.consigliere(&"cancelliere", [&"Materie prime", &"Fante"], [], Res.Type.STABILITA)
 	catalog.advisors = [cancelliere]
 	var run: RunState = _run()
 	assert_eq(SchedaCarta.da_consigliere(run, cancelliere).costo, "Ascolta", "Senza Stabilità non si può potenziare nulla.")

@@ -29,7 +29,7 @@ malcontent_change = 1
 script = ExtResource("x3")
 label = "Fattorie nuove"
 description = "Ricevi 1 spazio edificio."
-requires_types = Array[StringName]([&"Produzione"])
+requires_types = Array[StringName]([&"Materie prime"])
 requires_kind = 1
 extra_building_slots = 1
 

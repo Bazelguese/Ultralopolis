@@ -11,6 +11,6 @@
 script = ExtResource("6_cf3y8")
 id = &"genio_militare"
 display_name = "Genio militare"
-description = "Le truppe Assedio fanno il 25% di danno agli scudi in più."
+description = "Le truppe Assedio fanno il 25% di danno d'assedio in più."
 dimension = 4
 permanent_modifiers = Array[ExtResource("4_b3o6a")]([ExtResource("5_y661w")])

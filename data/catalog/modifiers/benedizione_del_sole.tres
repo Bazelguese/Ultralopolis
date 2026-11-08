@@ -6,7 +6,7 @@
 script = ExtResource("1_xg0na")
 id = &"benedizione_del_sole"
 display_name = "Benedizione del Sole"
-description = "+20% Oro prodotto a ogni fase."
+description = "+20% Oro prodotto a ogni stagione."
 is_malus = false
 effect = 0
 amount = 20

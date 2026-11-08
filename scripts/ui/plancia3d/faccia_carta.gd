@@ -124,7 +124,7 @@ func _colore_effetto(effetto: String) -> Color:
 	match effetto:
 		"scudo": return Color("2f6fd0")
 		"cura": return Color("2f9e57")
-		"corruzione": return Color("8b3fc9")
+		"corruzione": return StileVisivo.COLORE_CORRUZIONE
 		"assedio": return Color("7a6a55")
 	return StileVisivo.PERICOLO.darkened(0.1)
 

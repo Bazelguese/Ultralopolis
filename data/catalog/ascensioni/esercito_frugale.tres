@@ -9,7 +9,7 @@
 script = ExtResource("1_id")
 id = &"esercito_frugale"
 display_name = "Esercito frugale"
-description = "Le truppe senza Cibo non rallentano."
+description = "Le truppe affamate non hanno la ricarica più lenta."
 dimension = 6
 ascension_level = 2
 rule = 8

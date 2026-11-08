@@ -139,8 +139,8 @@ func _ready() -> void:
 
 func _collega_hud() -> void:
 	_hud.azione_principale.connect(_on_azione_principale)
-	_hud.rinnova.connect(func() -> void: _esegui(run.reroll_offers(), "Proposte rinnovate"))
-	_hud.rinnova_risorsa.connect(func() -> void: _esegui(run.reroll_offers(true), "Proposte rinnovate"))
+	_hud.rinnova.connect(func() -> void: _esegui(run.reroll_offers(), "Opportunità rinnovate"))
+	_hud.rinnova_risorsa.connect(func() -> void: _esegui(run.reroll_offers(true), "Opportunità rinnovate"))
 	_hud.passa.connect(func() -> void: _esegui(run.pass_round(), "Round passato"))
 	_hud.nessuna_ricompensa.connect(func() -> void: _esegui(run.skip_reward()))
 	_hud.avanza_era.connect(_on_avanza_era)
@@ -435,7 +435,7 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	var scudo: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, -0.55), Color("2f6fd0"))
 	_segnalini_scudo[lato] = scudo[0]
 	_scritte_scudo[lato] = scudo[1]
-	var corruzione: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, 0.55), Color("8b3fc9"))
+	var corruzione: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, 0.55), StileVisivo.COLORE_CORRUZIONE)
 	_segnalini_corruzione[lato] = corruzione[0]
 	_scritte_corruzione[lato] = corruzione[1]
 
@@ -919,7 +919,7 @@ func _aggiorna_stato_consiglieri() -> void:
 		if not tessera.scheda.simboli.is_empty():
 			tessera.imposta_stato("", StileVisivo.NOTTE)
 		elif quante > 0:
-			tessera.imposta_stato("▲ Potenzia pronto · %d %s" % [quante, "carta" if quante == 1 else "carte"], StileVisivo.ORO_LUCE)
+			tessera.imposta_stato("▲ Potenzia pronto · %d %s" % [quante, "tessera" if quante == 1 else "tessere"], StileVisivo.ORO_LUCE)
 		else:
 			tessera.imposta_stato("", StileVisivo.NOTTE)
 
@@ -1276,7 +1276,7 @@ func _mostra_eventi() -> void:
 			BattleEvent.Kind.CURA:
 				_scritta_volante(evento.side, "+%d" % evento.amount, Color("2f9e57"))
 			BattleEvent.Kind.CORRUZIONE:
-				_scritta_volante(evento.side, "+%d Corruzione" % evento.amount, Color("8b3fc9"))
+				_scritta_volante(evento.side, "+%d Corruzione" % evento.amount, StileVisivo.COLORE_CORRUZIONE)
 			BattleEvent.Kind.ASSEDIO:
 				_scritta_volante(evento.side, "−%d scudo" % evento.amount, Color("7a6a55"))
 			BattleEvent.Kind.ULTIMA_TRINCEA:
@@ -1284,7 +1284,7 @@ func _mostra_eventi() -> void:
 			BattleEvent.Kind.RALLENTATO, BattleEvent.Kind.SABOTATO:
 				var colpita: Tessera3D = _elemento_da_indice(evento.side, evento.index)
 				if colpita != null:
-					colpita.scintille(Color("ff9a3d") if evento.kind == BattleEvent.Kind.RALLENTATO else Color("b36bff"), Vector3(0.0, 0.3, 0.0), 14)
+					colpita.scintille(Color("ff9a3d") if evento.kind == BattleEvent.Kind.RALLENTATO else StileVisivo.COLORE_SABOTATO, Vector3(0.0, 0.3, 0.0), 14)
 
 
 ## Negli eventi di rallentamento e sabotaggio l'indice vale 0+ per gli edifici, 1000+ per le truppe.
@@ -1311,9 +1311,9 @@ func _aggiorna_visuale_scontro() -> void:
 		for i: int in range(_edifici[lato].size()):
 			var edificio: Tessera3D = _edifici[lato][i]
 			if _sim.get_building_sabotage_ms(lato, i) > 0:
-				edificio.imposta_stato("Sabotato", Color("8b3fc9"))
+				edificio.imposta_stato("Sabotato", StileVisivo.COLORE_SABOTATO)
 			elif _sim.get_building_slow_ms(lato, i) > 0:
-				edificio.imposta_stato("Rallentato", Color("e08a2e"))
+				edificio.imposta_stato("Inefficiente", Color("e08a2e"))
 			elif _trascurata(lato, false, i):
 				edificio.imposta_stato("Trascurato: mantenimento non pagato", Color("e08a2e"))
 			else:
@@ -1328,7 +1328,7 @@ func _aggiorna_visuale_scontro() -> void:
 			var stato: BattleSim.TroopState = _sim.get_troop_state(lato, i)
 			if stato == BattleSim.TroopState.SABOTATA:
 				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
-				tessera.imposta_stato("Sabotata: non può attivarsi", Color("8b3fc9"))
+				tessera.imposta_stato("Sabotata: non può attivarsi", StileVisivo.COLORE_SABOTATO)
 			elif stato == BattleSim.TroopState.MANA_PRENOTATO:
 				tessera.imposta_ricarica(1.0)
 				tessera.imposta_stato("Aspetta: il mana è prenotato dalla truppa più a destra", Color("e08a2e"))
@@ -1341,7 +1341,7 @@ func _aggiorna_visuale_scontro() -> void:
 				if float(_lampi[lato][i]) > 0.0:
 					tessera.imposta_stato("Si attiva!", StileVisivo.ORO_LUCE)
 				elif _sim.get_troop_slow_ms(lato, i) > 0:
-					tessera.imposta_stato("Rallentata", Color("e08a2e"))
+					tessera.imposta_stato("Inefficiente", Color("e08a2e"))
 				elif _trascurata(lato, true, i):
 					tessera.imposta_stato("Trascurata: mantenimento non pagato", Color("e08a2e"))
 				else:

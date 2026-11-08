@@ -6,7 +6,7 @@
 script = ExtResource("1_mod")
 id = &"manuali_tecnici"
 display_name = "Manuali tecnici"
-description = "La truppa scelta fa il 25% di danno in più in battaglia."
+description = "La truppa scelta fa il 25% di danno in più nello scontro."
 is_malus = false
 effect = 9
 target = 4

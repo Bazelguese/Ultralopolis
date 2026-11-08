@@ -6,7 +6,7 @@
 script = ExtResource("1_yaqip")
 id = &"capitale_teocrazia_fede"
 display_name = "Capitale: +1 Fede"
-description = "La Capitale produce 1 Fede in più a ogni fase."
+description = "La Capitale produce 1 Fede in più a ogni stagione."
 is_malus = false
 effect = 8
 target_type = &"Capitale"

@@ -46,7 +46,7 @@ func before_each() -> void:
 	farm = BuildingDef.new()
 	farm.id = &"fattoria"
 	farm.display_name = "Fattoria"
-	farm.types = [&"Produzione"]
+	farm.types = [&"Materie prime"]
 	farm.mana_interval_ms = 1000
 	farm.gold_per_phase = 1
 	soldiers = TroopDef.new()
@@ -352,7 +352,7 @@ func test_stato_di_polizia_ferma_il_malcontento_e_raddoppia_la_stabilita() -> vo
 
 
 func test_popolo_errante_e_profezia() -> void:
-	var visitor: AdvisorDef = Aiuti.consigliere(&"viandante", [&"Produzione"])
+	var visitor: AdvisorDef = Aiuti.consigliere(&"viandante", [&"Materie prime"])
 	visitor.special = AdvisorDef.Special.VISITATORE
 	catalog.visitors = [visitor]
 	rules.special_card_chance_percent = 0

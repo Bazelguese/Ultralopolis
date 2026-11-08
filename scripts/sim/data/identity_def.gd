@@ -55,7 +55,7 @@ const DIMENSION_NAMES: Dictionary[Dimension, String] = {
 	Dimension.GOVERNO: "Governo",
 	Dimension.CREDO: "Credo",
 	Dimension.CULTURA: "Cultura",
-	Dimension.PERK: "Perk",
+	Dimension.PERK: "Peculiarità",
 	Dimension.VIA: "Via",
 	Dimension.ASCENSIONE: "Ascensione",
 	Dimension.USANZA: "Usanza",
@@ -106,7 +106,7 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 ## Consiglieri che compaiono più spesso nei round (peso +1 ciascuno, GDD §4.2).
 @export var favored_advisors: Array[AdvisorDef] = []
 
-@export_group("Governo a tier")
+@export_group("Governo a ranghi")
 ## Tier del governo (GDD §9.4, v0.24): alla creazione si sceglie solo il tier 1.
 @export var tier: int = 1
 ## Governi del tier successivo a cui può evolvere (IdentityDef). Dichiarato come Resource
@@ -147,7 +147,7 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 ## Millisecondi in più (o in meno) per gli effetti dello spionaggio (GDD §4.2.3).
 @export var spy_ms_change: int = 0
 
-@export_group("Elementi esclusivi")
+@export_group("Tessere esclusive")
 ## Edifici offerti dai Costruttori solo a questa nazione (nella loro era).
 @export var exclusive_buildings: Array[BuildingDef] = []
 ## Truppe offerte dai Reclutatori solo a questa nazione (nella loro era).

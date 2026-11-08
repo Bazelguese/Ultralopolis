@@ -6,7 +6,7 @@
 script = ExtResource("1_yu07x")
 id = &"metodo"
 display_name = "Metodo"
-description = "+25% Ricerca prodotta a ogni fase."
+description = "+25% Ricerca prodotta a ogni stagione."
 is_malus = false
 amount = 25
 duration_kind = 2

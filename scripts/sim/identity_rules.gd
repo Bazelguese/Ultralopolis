@@ -27,7 +27,7 @@ static func validate(catalog: CatalogDef, rules: RunRules, choices: Array[Identi
 		if choices.count(def) > 1:
 			return "Ogni elemento si sceglie una volta sola."
 		if def.dimension == IdentityDef.Dimension.GOVERNO and def.tier > 1:
-			return "%s non si sceglie alla creazione: si raggiunge durante la run." % def.display_name
+			return "%s non si sceglie alla creazione: si raggiunge durante la partita." % def.display_name
 	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
 		var wanted: int = 1
 		if dimension == IdentityDef.Dimension.PERK:
@@ -40,7 +40,7 @@ static func validate(catalog: CatalogDef, rules: RunRules, choices: Array[Identi
 				chosen += 1
 		if chosen != wanted:
 			if dimension == IdentityDef.Dimension.PERK:
-				return "Scegli %d perk." % wanted
+				return "Scegli %d peculiarità." % wanted
 			return "Scegli un elemento per: %s." % IdentityDef.DIMENSION_NAMES[dimension]
 	return ""
 

@@ -6,7 +6,7 @@
 script = ExtResource("1_yb33b")
 id = &"mura_di_pietra"
 display_name = "Mura di pietra"
-description = "Scudo +1 per gli elementi Guardiani che producono scudo."
+description = "Scudo +1 per le tessere Guardiani che producono scudo."
 is_malus = false
 effect = 11
 target_type = &"Guardiano"

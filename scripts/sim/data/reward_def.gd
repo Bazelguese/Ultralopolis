@@ -43,7 +43,7 @@ func describe() -> String:
 				return "Assimila: %s" % (troop.display_name if troop != null else "?")
 			return "Truppa: %s" % (troop.display_name if troop != null else "?")
 		Kind.PERK:
-			return "Perk: %s" % (perk.display_name if perk != null else "?")
+			return "Peculiarità: %s" % (perk.display_name if perk != null else "?")
 		Kind.RISORSA:
 			return "%d %s" % [amount, Res.NAMES[resource]]
 		Kind.TECNOLOGIA:
