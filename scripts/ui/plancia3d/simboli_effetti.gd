@@ -34,9 +34,11 @@ static func consigliere(run: RunState, def: AdvisorDef) -> Array[RigaSimboli]:
 	var truppe: bool = run.advisor_offers_elements(def, true)
 	if edifici or truppe:
 		var elementi: RigaSimboli = RigaSimboli.new()
-		elementi.etichetta = "Propone: %s." % ("edifici e truppe" if edifici and truppe else ("edifici" if edifici else "truppe"))
+		# "Può proporre": delle tre opportunità pescate nessuna è garantita (richiesta di Davide,
+		# 8 novembre). Solo il Giullare propone sempre le sue tessere (GDD §4.2.2).
+		elementi.etichetta = "Può proporre: %s." % ("edifici e truppe" if edifici and truppe else ("edifici" if edifici else "truppe"))
 		if def.special == AdvisorDef.Special.ANZIANO:
-			elementi.etichetta = "Propone: edifici neutri."
+			elementi.etichetta = "Può proporre: edifici neutri."
 		elementi.rilievo = RigaSimboli.Rilievo.PRINCIPALE
 		elementi.icona(&"proposta").scritta(":")
 		if edifici:
