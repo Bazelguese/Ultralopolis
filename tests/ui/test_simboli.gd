@@ -272,3 +272,12 @@ func test_i_dettagli_del_consigliere_dicono_solo_cio_che_si_vede() -> void:
 	assert_eq(righe[1], "Azioni possibili: scambi di risorse.")
 	assert_string_starts_with(righe[2], "Potenzia: fa salire di livello una tua carta dei suoi tipi, pagando Stabilità.")
 	assert_false(scheda.dettagli.contains("Decreto fiscale"), "Niente elenco delle singole azioni: non si vedono sulla carta.")
+
+
+func test_la_legenda_spiega_ogni_tipo_di_azione() -> void:
+	var tipi: Array = LegendaSimboli.tipi_di_azione()
+	assert_eq(tipi.size(), 10, "Scambio, calmare il Malcontento, bonus, due spazi, malus, spionaggio, incanto, perk, tecnologie.")
+	for voce: Array in tipi:
+		assert_ne(voce[1] as String, "Altre azioni", "%s ha un nome." % (voce[0] as RigaSimboli).come_testo())
+	assert_eq((tipi[0][0] as RigaSimboli).come_testo(), "[scambio]")
+	assert_eq(tipi[0][1], "Scambi di risorse")
