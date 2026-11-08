@@ -781,6 +781,8 @@ func _togli_scelte() -> void:
 # --- Aggiornamento ---------------------------------------------------------------
 
 func _aggiorna_tutto() -> void:
+	# Le spiegazioni delle parole chiave dicono le eccezioni delle ascensioni della nazione.
+	TestoRicco.imposta_regole(SchedaCarta.regole_di(run))
 	_annulla()
 	_costruisci_plancia_giocatore()
 	_costruisci_scelte()
@@ -1191,7 +1193,7 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	for i: int in range(_setups[0].buildings.size()):
 		edifici.append(SchedaCarta.da_edificio(_setups[0].buildings[i], run.board.buildings[i].level if stessi_edifici else 1, "", run.max_level()))
 	for i: int in range(_setups[0].troops.size()):
-		truppe.append(SchedaCarta.da_truppa(_setups[0].troops[i], run.board.troops[i].level if stesse_truppe else 1, "", false, run.max_level()))
+		truppe.append(SchedaCarta.da_truppa(_setups[0].troops[i], run.board.troops[i].level if stesse_truppe else 1, "", false, run.max_level(), SchedaCarta.regole_di(run)))
 	var edifici_avversari: Array[SchedaCarta] = []
 	for def: BuildingDef in _setups[1].buildings:
 		edifici_avversari.append(SchedaCarta.da_edificio(def))

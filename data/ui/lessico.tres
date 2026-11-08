@@ -100,6 +100,7 @@ colore = Color(1, 0.702, 0.6392, 1)
 simbolo = &"resistenza"
 definizione = "La vita della tua nazione nello scontro. Se arriva a zero, perdi. Si ricalcola all'inizio di ogni scontro."
 di_base = true
+eccezioni = Dictionary[int, String]({2: "Con Ultima trincea, la prima volta in ogni scontro che arriva a zero torna a 1 (non salva dalla Corruzione)."})
 
 [sub_resource type="Resource" id="voce_12"]
 script = ExtResource("1_voce")
@@ -158,6 +159,7 @@ colore = Color(0.6627, 0.7608, 1, 1)
 simbolo = &"ricarica"
 definizione = "Il tempo che una truppa aspetta fra un'attivazione e la successiva. Per gli edifici si dice ciclo. Lo scontro inizia con ricariche e cicli pieni."
 di_base = true
+eccezioni = Dictionary[int, String]({3: "Con Prima scintilla i tuoi edifici iniziano lo scontro con il ciclo a metà."})
 
 [sub_resource type="Resource" id="voce_19"]
 script = ExtResource("1_voce")
@@ -173,6 +175,7 @@ forme = PackedStringArray("mana")
 colore = Color(0.7255, 0.7843, 1, 1)
 definizione = "L'energia che gli edifici producono nello scontro e che le truppe spendono per attivarsi. Parte da zero e si azzera a fine scontro; se manca, la truppa pronta resta in attesa."
 di_base = true
+eccezioni = Dictionary[int, String]({4: "Con Disciplina ferrea, se la tua truppa più a destra è pronta e aspetta il mana, le altre non lo spendono (quelle senza mana si attivano comunque).", 5: "Con Mana unito le tue truppe pagano anche con gli altri colori."})
 
 [sub_resource type="Resource" id="voce_21"]
 script = ExtResource("1_voce")
@@ -219,6 +222,7 @@ colore = Color(1, 0.8, 0.2, 1)
 simbolo = &"gemma"
 simbolo_colorato = true
 definizione = "Mana che vale come qualsiasi colore; è quello della Capitale. Una truppa paga prima con il proprio colore, poi con l'energetico."
+eccezioni = Dictionary[int, String]({5: "Con Mana unito le tue truppe, dopo il proprio colore e l'energetico, pagano anche con gli altri colori."})
 
 [sub_resource type="Resource" id="voce_26"]
 script = ExtResource("1_voce")
@@ -410,6 +414,7 @@ famiglia = 5
 forme = PackedStringArray("affamata", "affamate", "affamato", "affamati")
 colore = Color(1, 0.3608, 0.4235, 1)
 definizione = "Una truppa rimasta senza razione all'inizio dell'anno: ricarica più lenta (×1,5) fino al pasto dell'anno dopo."
+eccezioni = Dictionary[int, String]({8: "Con la tua ascensione Esercito frugale le tue truppe affamate non rallentano."})
 
 [sub_resource type="Resource" id="voce_50"]
 script = ExtResource("1_voce")
@@ -434,6 +439,7 @@ colore = Color(0.6627, 0.7608, 1, 1)
 simbolo = &"ricarica"
 definizione = "Ogni quanto un edificio produce nello scontro. Funziona come la ricarica di una truppa, ma un edificio non resta mai in attesa del mana."
 di_base = true
+eccezioni = Dictionary[int, String]({3: "Con Prima scintilla i tuoi edifici iniziano lo scontro con il ciclo a metà."})
 
 [sub_resource type="Resource" id="voce_n00"]
 script = ExtResource("1_voce")
@@ -444,6 +450,7 @@ colore = Color(0.5451, 0.9137, 0.9922, 1)
 simbolo = &"proposta"
 definizione = "Una delle tre cose che un consigliere ti offre: un'azione, un edificio o una truppa. Ne prendi una sola."
 di_base = true
+eccezioni = Dictionary[int, String]({7: "Con Doppio ascolto, la prima volta in ogni stagione puoi prenderne subito un'altra (non con Giullare e Anziano)."})
 
 [sub_resource type="Resource" id="voce_n01"]
 script = ExtResource("1_voce")

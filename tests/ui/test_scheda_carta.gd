@@ -222,3 +222,16 @@ func test_la_capitale_non_ha_l_anteprima_del_potenzia() -> void:
 	rules.starting_buildings = [capitale, farm]
 	var run: RunState = _run()
 	assert_eq(SchedaCarta.anteprima_potenzia(run, run.board.buildings[0]), "")
+
+
+func test_le_tue_truppe_dicono_le_eccezioni_delle_ascensioni() -> void:
+	soldier.mana_cost = 2
+	soldier.mana_type = &"rosso"
+	var normale: String = SchedaCarta.da_truppa(soldier, 1, "", true).dettagli
+	assert_string_contains(normale, "(se manca, usa l'energetico).")
+	assert_string_contains(normale, "Affamata: ricarica più lenta")
+	var regole: Array[int] = [IdentityDef.Rule.MANA_UNITO, IdentityDef.Rule.ESERCITO_FRUGALE]
+	var con_ascensioni: String = SchedaCarta.da_truppa(soldier, 1, "", true, 0, regole).dettagli
+	assert_string_contains(con_ascensioni, "Mana unito, gli altri colori")
+	assert_string_contains(con_ascensioni, "con Esercito frugale non rallenta")
+	assert_eq(SchedaCarta.regole_di(_run()), [] as Array[int], "Una nazione senza ascensioni segue le regole normali.")

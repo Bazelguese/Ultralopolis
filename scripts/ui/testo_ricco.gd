@@ -30,6 +30,9 @@ static var _lessico: Lessico = null
 ## così "Infrastruttura Bellica" vince su un'eventuale "Infrastruttura".
 static var _forme_per_iniziale: Dictionary[String, Array] = {}
 static var _caricato: bool = false
+## Regole cambiate dalle ascensioni della nazione in gioco (SchedaCarta.regole_di): le
+## spiegazioni aggiungono le loro eccezioni.
+static var _regole_attive: Array[int] = []
 ## Nome dato a ogni simbolo rimpicciolito, per grandezza (es. "danno@16").
 static var _percorsi_simboli: Dictionary[String, String] = {}
 
@@ -88,6 +91,20 @@ static func colora(testo: String, dimensione: int = 18) -> String:
 		else:
 			parti.append(sicuro)
 	return "".join(parti)
+
+
+## Le regole che le ascensioni della nazione in gioco hanno cambiato (le imposta la partita).
+static func imposta_regole(regole: Array[int]) -> void:
+	_regole_attive = regole.duplicate()
+
+
+## La spiegazione di una parola chiave, con le eccezioni delle ascensioni che la nazione ha.
+static func definizione_di(voce: VoceLessico) -> String:
+	var testo: String = voce.definizione
+	for regola: int in voce.eccezioni:
+		if _regole_attive.has(regola):
+			testo += " " + voce.eccezioni[regola]
+	return testo
 
 
 ## Le parole chiave con una spiegazione che compaiono nel testo, senza ripetizioni e al massimo
