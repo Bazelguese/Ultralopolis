@@ -15,8 +15,9 @@ const PASSO_TRUPPE: float = 1.62
 const PASSO_EDIFICI: float = 2.3
 const MISURA_TRUPPA: Vector2 = Vector2(1.44, 2.16)
 const MISURA_EDIFICIO: Vector2 = Vector2(2.13, 1.42)
-const MISURA_AZIONE: Vector2 = Vector2(1.44, 2.16)
-const SCALA_SCELTA: float = 1.45
+## Le proposte del Consiglio sono più larghe, così la linguetta dei tipi sta dentro la carta (Davide).
+const MISURA_AZIONE: Vector2 = Vector2(1.8, 2.7)
+const SCALA_SCELTA: float = 1.3
 ## Le scelte con le righe di simboli si ingrandiscono così tanto al passaggio del mouse.
 const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
@@ -126,7 +127,6 @@ var _segnalini_corruzione: Array[Node3D] = [null, null]
 var _scritte_corruzione: Array[Label3D] = [null, null]
 var _nomi_lato: Array[Label3D] = [null, null]
 var _riserve: Array[Node3D] = [null, null]  # RiservaMana
-var _gemme_riserva: Array[Dictionary] = [{}, {}]
 
 var _scelte: Array[Tessera3D] = []
 ## Che cosa rappresenta ogni carta sul tavolo (offerta, via, opzione, ricompensa…), stesso ordine di _scelte.
@@ -528,15 +528,13 @@ func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color) -> Arr
 	return [nodo, scritta]
 
 
-## La riserva di mana sotto lo stendardo (stile scelto in RiservaMana).
+## La riserva di mana sotto lo stendardo: una sfera per colore (Davide, 9 novembre 2026).
 func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
 	var riserva: RiservaMana = RiservaMana.new()
 	riserva.position = Vector3(X_MEDAGLIONE, 0.0, z_centro + 1.05)
 	radice.add_child(riserva)
-	riserva.costruisci(RiservaMana.stile_predefinito)
+	riserva.costruisci()
 	_riserve[lato] = riserva
-	for mana: StringName in COLORI_RISERVA:
-		_gemme_riserva[lato][mana] = riserva.arrivo(mana)
 	riserva.visible = false
 
 
@@ -1449,6 +1447,7 @@ func _mostra_eventi() -> void:
 					var truppa: Tessera3D = _truppe[evento.side][evento.index]
 					truppa.attiva(-1.0 if evento.side == Lato.GIOCATORE else 1.0)
 					_lampi[evento.side][evento.index] = 0.5
+					_consuma_mana(evento.side, evento.index)
 				_colpo(1 - evento.side, evento.amount, "")
 			BattleEvent.Kind.LOGORAMENTO:
 				_colpo(evento.side, evento.amount, "logoramento")
@@ -1538,54 +1537,67 @@ func _trascurata(lato: int, truppa: bool, i: int) -> bool:
 	return i >= 0 and i < fila.size() and fila[i].neglected
 
 
-## Una gemma vola dall'edificio alla riserva di mana del suo lato, lasciando una scia.
+## Il mana vola dall'edificio alla sua sfera nella riserva, lasciando una scia; all'arrivo la sfera
+## si illumina e mostra "+1".
 func _lancia_mana(lato: int, edificio: Tessera3D, mana: StringName) -> void:
-	if _gemme_in_volo >= MASSIMO_GEMME_IN_VOLO or not _gemme_riserva[lato].has(mana):
+	var riserva: RiservaMana = _riserve[lato] as RiservaMana
+	if _gemme_in_volo >= MASSIMO_GEMME_IN_VOLO or not riserva.ha(mana):
 		return
 	_gemme_in_volo += 1
+	_vola_mana(edificio.punto_gemma(), riserva.arrivo(mana).global_position, mana, 2.2, func() -> void:
+		_gemme_in_volo -= 1
+		riserva.pulsa(mana))
+
+
+## Una truppa spende il mana: dalla sua sfera parte una scia verso la truppa.
+func _consuma_mana(lato: int, indice: int) -> void:
+	if indice < 0 or indice >= _setups[lato].troops.size() or indice >= _truppe[lato].size():
+		return
+	var def: TroopDef = _setups[lato].troops[indice]
+	var riserva: RiservaMana = _riserve[lato] as RiservaMana
+	if def.mana_cost <= 0 or not riserva.ha(def.mana_type) or _gemme_in_volo >= MASSIMO_GEMME_IN_VOLO:
+		return
+	var truppa: Tessera3D = _truppe[lato][indice]
+	for k: int in range(mini(def.mana_cost, 3)):
+		_gemme_in_volo += 1
+		var ritardo: Tween = create_tween()
+		ritardo.tween_interval(0.06 * k)
+		ritardo.tween_callback(func() -> void:
+			_vola_mana(riserva.arrivo(def.mana_type).global_position, truppa.punto_gemma(), def.mana_type, 1.0, func() -> void: _gemme_in_volo -= 1))
+
+
+func _vola_mana(da: Vector3, a: Vector3, mana: StringName, arco: float, al_termine: Callable) -> void:
 	var colore: Color = StileVisivo.colore_mana_nome(mana)
-	var gemma: MeshInstance3D = MeshInstance3D.new()
+	var goccia_volante: MeshInstance3D = MeshInstance3D.new()
 	var forma: SphereMesh = SphereMesh.new()
-	forma.radius = 0.16
-	forma.height = 0.32
-	gemma.mesh = forma
-	gemma.material_override = StileVisivo.materiale_luminoso(colore, 2.0)
-	add_child(gemma)
+	forma.radius = 0.09
+	forma.height = 0.18
+	goccia_volante.mesh = forma
+	goccia_volante.material_override = StileVisivo.materiale_luminoso(colore.lightened(0.3), 4.0)
+	add_child(goccia_volante)
 	var scia: CPUParticles3D = CPUParticles3D.new()
 	var goccia: SphereMesh = SphereMesh.new()
-	goccia.radius = 0.06
-	goccia.height = 0.12
-	goccia.material = StileVisivo.materiale_luminoso(colore, 2.5)
+	goccia.radius = 0.04
+	goccia.height = 0.08
+	goccia.material = StileVisivo.materiale_luminoso(colore, 3.0)
 	scia.mesh = goccia
-	scia.amount = 24
-	scia.lifetime = 0.35
+	scia.amount = 30
+	scia.lifetime = 0.4
 	scia.local_coords = false
 	scia.spread = 180.0
 	scia.initial_velocity_min = 0.0
-	scia.initial_velocity_max = 0.3
+	scia.initial_velocity_max = 0.25
 	scia.gravity = Vector3.ZERO
 	scia.scale_amount_min = 0.4
 	scia.scale_amount_max = 1.0
-	gemma.add_child(scia)
-	var partenza: Vector3 = edificio.punto_gemma()
-	var destinazione: Node3D = _gemme_riserva[lato][mana]
-	var arrivo: Vector3 = destinazione.global_position + Vector3(0.0, 0.2, 0.0)
-	gemma.global_position = partenza
+	goccia_volante.add_child(scia)
+	goccia_volante.global_position = da
 	var volo: Tween = create_tween()
-	volo.tween_method(_muovi_gemma.bind(gemma, partenza, arrivo), 0.0, 1.0, 0.6 / maxf(_velocita, 1.0)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	volo.tween_callback(_gemma_arrivata.bind(gemma, destinazione))
-
-
-func _muovi_gemma(t: float, gemma: MeshInstance3D, da: Vector3, a: Vector3) -> void:
-	gemma.global_position = da.lerp(a, t) + Vector3(0.0, sin(t * PI) * 2.2, 0.0)
-
-
-func _gemma_arrivata(gemma: MeshInstance3D, destinazione: Node3D) -> void:
-	_gemme_in_volo -= 1
-	gemma.queue_free()
-	var animazione: Tween = create_tween()
-	animazione.tween_property(destinazione, "scale", Vector3.ONE * 1.35, 0.06)
-	animazione.tween_property(destinazione, "scale", Vector3.ONE, 0.12)
+	volo.tween_method(func(t: float) -> void:
+		goccia_volante.global_position = da.lerp(a, t) + Vector3(0.0, sin(t * PI) * arco, 0.0), 0.0, 1.0, 0.6 / maxf(_velocita, 1.0)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	volo.tween_callback(func() -> void:
+		goccia_volante.queue_free()
+		al_termine.call())
 
 
 ## Colpo sulla Resistenza di un lato: numero che salta fuori e stemma che trema.
