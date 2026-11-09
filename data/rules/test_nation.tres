@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TestNationDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/sim/data/resource_amounts.gd" id="1_risorse"]
+[ext_resource type="Script" path="res://scripts/sim/data/test_nation_def.gd" id="2_nazione"]
+
+[sub_resource type="Resource" id="Resource_dotazione"]
+script = ExtResource("1_risorse")
+oro = 99
+cibo = 99
+legno = 99
+pietra = 99
+ferro = 99
+fede = 99
+influenza = 99
+stabilita = 99
+documenti = 99
+
+[resource]
+script = ExtResource("2_nazione")
+nation_name = "Nazione di test"
+starting_resources = SubResource("Resource_dotazione")
+open_all_slots = true

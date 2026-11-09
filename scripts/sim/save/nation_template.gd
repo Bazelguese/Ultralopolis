@@ -8,6 +8,20 @@ var id: String = ""
 var nation_name: String = ""
 ## Identificativi degli elementi dell'identità (popolo, governo, credo, cultura, perk).
 var identity_ids: Array[StringName] = []
+## Nazione di test (TestNationDef): sempre nella lista, non si salva nel file delle nazioni.
+var is_test: bool = false
+
+
+## Un'identità completa senza scegliere: il primo elemento di ogni colonna della creazione
+## e le prime peculiarità.
+static func first_choices(catalog: CatalogDef, rules: RunRules) -> Array[IdentityDef]:
+	var choices: Array[IdentityDef] = []
+	for dimension: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
+		var options: Array[IdentityDef] = IdentityRules.options(catalog, dimension)
+		var count: int = IdentityRules.starting_perk_count(catalog, rules) if dimension == IdentityDef.Dimension.PERK else 1
+		for i: int in range(mini(count, options.size())):
+			choices.append(options[i])
+	return choices
 
 
 static func from_choices(p_id: String, p_name: String, choices: Array[IdentityDef]) -> NationTemplate:
