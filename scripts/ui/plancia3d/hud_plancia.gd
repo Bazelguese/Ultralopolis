@@ -22,6 +22,8 @@ signal scegli_cronaca(indice: int)
 
 ## Distanza dal fondo dello schermo dei comandi che stanno sopra la barra delle risorse.
 const SOPRA_BARRA: float = -112.0
+## Distanza minima del pannello della tessera dai bordi dello schermo.
+const MARGINE_PEZZO: float = 20.0
 ## Che cosa succede entrando nella prossima era (GDD §10.2, §10.3).
 const TESTO_ERA: String = "Entri quando vuoi, senza consumare il round: scegli una via, ottieni spazi e Resistenza, il Consiglio sale di livello e puoi far evolvere il governo; si aprono le tecnologie della nuova era. Le tessere dell'era attuale spariscono dalle opportunità; quelle sulla plancia restano."
 const COLORI_RISORSE: Dictionary[int, Color] = {
@@ -1421,7 +1423,25 @@ func mostra_pezzo(titolo: String, testo: String, azioni: Array[Dictionary]) -> v
 	_azioni_pezzo.add_child(_pulsante("Chiudi", func() -> void: annulla.emit()))
 	_pezzo.visible = true
 	_pezzo.reset_size()
-	_ridimensiona_dopo_impaginazione(_pezzo)
+	_piazza_pezzo()
+
+
+## Il pannello della tessera sta in basso a destra, sopra la barra delle risorse e sempre dentro lo
+## schermo (Davide, 9 novembre 2026: finiva in alto, fuori schermo). Dopo l'impaginazione del testo
+## la sua altezza cambia: lo si rimette a posto tenendo fermo il bordo in basso.
+func _piazza_pezzo() -> void:
+	for _giro: int in range(2):
+		await get_tree().process_frame
+		if not is_instance_valid(_pezzo) or not _pezzo.visible:
+			return
+		_pezzo.reset_size()
+		var schermo: Vector2 = get_viewport_rect().size
+		var misura: Vector2 = _pezzo.get_combined_minimum_size()
+		var fondo: float = schermo.y + SOPRA_BARRA - 12.0
+		var alto: float = maxf(MARGINE_PEZZO, fondo - misura.y)
+		_pezzo.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_pezzo.position = Vector2(maxf(MARGINE_PEZZO, schermo.x - 24.0 - misura.x), alto)
+		_pezzo.size = misura
 
 
 func nascondi_pezzo() -> void:
