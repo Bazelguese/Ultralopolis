@@ -32,14 +32,14 @@ const LATO_FIGURA: int = 512
 ## Maschere già calcolate, ricordate fra una partita e l'altra (si possono cancellare: si rifanno).
 const CARTELLA_MEMORIA: String = "user://figurine"
 ## Da cambiare se cambia il modo di calcolare la maschera, così le vecchie non si usano più.
-const VERSIONE_MASCHERA: int = 2
+const VERSIONE_MASCHERA: int = 3
 ## Quanta parte (dall'alto) della figura fa il mezzo busto.
 const QUOTA_BUSTO: float = 0.72
 
 const SHADER: String = """
 shader_type spatial;
 render_mode cull_disabled, depth_draw_opaque;
-uniform sampler2D tex : source_color, filter_linear_mipmap;
+uniform sampler2D tex : source_color, filter_linear_mipmap_anisotropic;
 uniform sampler2D maschera : filter_linear;
 uniform sampler2D rumore;
 uniform bool con_maschera = false;
@@ -409,7 +409,7 @@ static func _quadrata(img: Image, lato: int, colore_margine: Color = Color.BLACK
 	var w: int = maxi(1, int(round(float(img.get_width()) / float(massimo) * lato)))
 	var h: int = maxi(1, int(round(float(img.get_height()) / float(massimo) * lato)))
 	var ridotta: Image = img.duplicate() as Image
-	ridotta.resize(w, h, Image.INTERPOLATE_BILINEAR)
+	ridotta.resize(w, h, Image.INTERPOLATE_LANCZOS)
 	var quadrato: Image = Image.create(lato, lato, false, Image.FORMAT_RGBA8)
 	quadrato.fill(colore_margine)
 	# Le figure stanno in piedi: in un quadrato più largo che alto la figura poggia sul fondo.
