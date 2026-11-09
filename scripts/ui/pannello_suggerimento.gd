@@ -37,7 +37,7 @@ func _init() -> void:
 	visible = false
 	_principale = PanelContainer.new()
 	_principale.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var stile: StyleBoxFlat = StileVisivo.riquadro(Color(0.035, 0.055, 0.1, 0.97), StileVisivo.ORO.darkened(0.25))
+	var stile: StyleBoxFlat = StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO.darkened(0.25))
 	stile.set_corner_radius_all(10)
 	_principale.add_theme_stylebox_override("panel", stile)
 	add_child(_principale)
@@ -213,7 +213,7 @@ func _riquadro_spiegazione(voce: VoceLessico) -> PanelContainer:
 	var riquadro: PanelContainer = PanelContainer.new()
 	riquadro.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	riquadro.set_meta(&"voce", voce.nome)
-	var stile: StyleBoxFlat = StileVisivo.riquadro(Color(0.05, 0.075, 0.13, 0.96), Color(voce.colore, 0.55))
+	var stile: StyleBoxFlat = StileVisivo.riquadro(Color(StileVisivo.CARTONCINO_CHIARO, 0.96), Color(voce.colore, 0.55))
 	stile.set_corner_radius_all(8)
 	stile.set_content_margin_all(10)
 	stile.border_width_left = 4

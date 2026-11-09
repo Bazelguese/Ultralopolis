@@ -113,6 +113,16 @@ var _sotto_messaggio: Label
 ## Colonna a sinistra: scheda della nazione e, sotto, il calendario dell'anno.
 var _colonna_sinistra: VBoxContainer
 var _riquadro_fase: PanelContainer
+## Dettagli a scomparsa (Davide, 8 novembre 2026): si aprono passando il mouse sul pannello o
+## restano aperti con un clic. Sempre visibili: nome della nazione, anno e mese, risorse.
+var _riquadro_nazione: PanelContainer
+var _dettagli_nazione: VBoxContainer
+var _dettagli_fase: VBoxContainer
+var _dettagli_fissati: bool = false
+## Tutti i pulsanti della partita in un'unica fila di linguette, in basso a destra.
+var _riga_linguette: HBoxContainer
+var _riquadro_run: PanelContainer
+var _dettagli_run: HBoxContainer
 var _inclinazioni: BarreInclinazioni
 var _usanze: Label
 var _pannello_cronaca: PanelContainer
@@ -177,6 +187,52 @@ func _ancora(controllo: Control, preset: Control.LayoutPreset, spostamento: Vect
 	controllo.position += spostamento
 
 
+## Pulsante della fila in basso: una linguetta di cartoncino più piccola.
+func _rendi_linguetta(pulsante: Button) -> void:
+	pulsante.add_theme_font_size_override("font_size", 17)
+	for stato: String in ["normal", "hover", "pressed", "focus", "disabled"]:
+		var stile: StyleBox = pulsante.get_theme_stylebox(stato)
+		if stile is StyleBoxFlat:
+			var piccolo: StyleBoxFlat = (stile as StyleBoxFlat).duplicate() as StyleBoxFlat
+			piccolo.content_margin_left = 11
+			piccolo.content_margin_right = 11
+			piccolo.content_margin_top = 6
+			piccolo.content_margin_bottom = 6
+			pulsante.add_theme_stylebox_override(stato, piccolo)
+
+
+## Pannello con i dettagli a scomparsa: un clic lo tiene aperto (o lo richiude).
+func _rendi_apribile(riquadro: PanelContainer) -> void:
+	riquadro.mouse_filter = Control.MOUSE_FILTER_PASS
+	riquadro.gui_input.connect(func(evento: InputEvent) -> void:
+		if evento is InputEventMouseButton and (evento as InputEventMouseButton).pressed and (evento as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+			mostra_dettagli(not _dettagli_fissati))
+
+
+## Apre (o richiude) i dettagli della nazione e dell'anno e li tiene così.
+func mostra_dettagli(aperti: bool) -> void:
+	_dettagli_fissati = aperti
+	_aggiorna_dettagli()
+
+
+func _process(_delta: float) -> void:
+	_aggiorna_dettagli()
+
+
+## I dettagli si vedono se fissati con un clic o se il mouse è sopra il loro pannello.
+func _aggiorna_dettagli() -> void:
+	if _riquadro_nazione == null or _riquadro_fase == null or _riquadro_run == null:
+		return
+	var mouse: Vector2 = get_viewport().get_mouse_position()
+	for coppia: Array in [[_riquadro_nazione, _dettagli_nazione], [_riquadro_fase, _dettagli_fase], [_riquadro_run, _dettagli_run]]:
+		var riquadro: Control = coppia[0]
+		var dettagli: Control = coppia[1]
+		var sopra: bool = riquadro.is_visible_in_tree() and riquadro.get_global_rect().grow(6.0).has_point(mouse)
+		var aperto: bool = _dettagli_fissati or sopra
+		if dettagli.visible != aperto:
+			dettagli.visible = aperto
+
+
 func _pulsante(testo: String, al_clic: Callable) -> Button:
 	var pulsante: Button = Button.new()
 	pulsante.text = testo
@@ -237,7 +293,7 @@ func _simbolo_risorsa(tipo: Res.Type) -> Control:
 func _crea_vignetta() -> void:
 	var sfumatura: Gradient = Gradient.new()
 	sfumatura.set_color(0, Color(0.0, 0.0, 0.0, 0.0))
-	sfumatura.set_color(1, Color(0.0, 0.02, 0.06, 0.7))
+	sfumatura.set_color(1, Color(0.0, 0.0, 0.0, 0.3))
 	sfumatura.set_offset(0, 0.55)
 	var trama: GradientTexture2D = GradientTexture2D.new()
 	trama.gradient = sfumatura
@@ -258,32 +314,33 @@ func _crea_nazione() -> void:
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 0)
 	riquadro.add_child(colonna)
-	# Nome della nazione e, accanto, Ricomincia (con la stessa nazione).
+	# Nome della nazione (Ricomincia tolto su richiesta di Davide, 8 novembre 2026).
 	var testa: HBoxContainer = HBoxContainer.new()
 	testa.add_theme_constant_override("separation", 12)
 	colonna.add_child(testa)
 	_nazione = StileVisivo.etichetta("", StileVisivo.FONT_TITOLI, 34)
 	_nazione.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	testa.add_child(_nazione)
-	var ricomincia_pulsante: Button = _pulsante("Ricomincia", func() -> void: ricomincia.emit())
-	ricomincia_pulsante.add_theme_font_size_override("font_size", 16)
-	ricomincia_pulsante.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	Suggerimenti.imposta(ricomincia_pulsante, "Nuova partita con la stessa nazione.")
-	testa.add_child(ricomincia_pulsante)
+	_dettagli_nazione = VBoxContainer.new()
+	_dettagli_nazione.add_theme_constant_override("separation", 0)
+	_dettagli_nazione.visible = false
+	colonna.add_child(_dettagli_nazione)
 	# Ogni elemento dell'identità ha il suo riquadro con che cosa fa (P4).
 	_identita = HFlowContainer.new()
 	_identita.custom_minimum_size = Vector2(330, 0)
 	_identita.add_theme_constant_override("h_separation", 4)
 	_identita.add_theme_constant_override("v_separation", 0)
-	colonna.add_child(_identita)
+	_dettagli_nazione.add_child(_identita)
 	# Inclinazioni, usanze e vocazioni (GDD §9.6, v0.29).
 	_inclinazioni = BarreInclinazioni.new()
-	colonna.add_child(_inclinazioni)
+	_dettagli_nazione.add_child(_inclinazioni)
 	_usanze = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 15, StileVisivo.ORO_LUCE)
 	_usanze.custom_minimum_size = Vector2(320, 0)
 	_usanze.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_usanze.mouse_filter = Control.MOUSE_FILTER_STOP
-	colonna.add_child(_usanze)
+	_dettagli_nazione.add_child(_usanze)
+	_riquadro_nazione = riquadro
+	_rendi_apribile(riquadro)
 	_colonna_sinistra = VBoxContainer.new()
 	_colonna_sinistra.add_theme_constant_override("separation", 10)
 	_colonna_sinistra.add_child(riquadro)
@@ -301,18 +358,23 @@ func _crea_fase() -> void:
 	_fase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_fase.custom_minimum_size = Vector2(266, 0)
 	dentro.add_child(_fase)
+	_dettagli_fase = VBoxContainer.new()
+	_dettagli_fase.add_theme_constant_override("separation", 6)
+	_dettagli_fase.visible = false
+	dentro.add_child(_dettagli_fase)
 	# Il flusso dell'anno, visivo (GDD §3.2, v0.25): stagioni, mesi, scontri e mese in corso.
 	_flusso = FlussoAnno.new()
 	_flusso.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	dentro.add_child(_flusso)
+	_dettagli_fase.add_child(_flusso)
 	_sotto_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 16, StileVisivo.TESTO_TENUE)
 	_sotto_fase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sotto_fase.custom_minimum_size = Vector2(266, 0)
-	dentro.add_child(_sotto_fase)
+	_dettagli_fase.add_child(_sotto_fase)
 	# Stretto: sta a sinistra del ritratto della nazione.
 	riquadro.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_colonna_sinistra.add_child(riquadro)
 	_riquadro_fase = riquadro
+	_rendi_apribile(riquadro)
 
 	# In alto al centro: gli annunci della partita.
 	_annuncio = VBoxContainer.new()
@@ -335,11 +397,21 @@ func _crea_fase() -> void:
 	_annuncio.modulate.a = 0.0
 
 
+## In alto a destra (Davide, 8 novembre 2026): una linguetta «Partita» con Menu; Prestigio,
+## Vittorie, Era e Malcontento si aprono passando il mouse o con un clic.
 func _crea_run() -> void:
 	var riquadro: PanelContainer = PanelContainer.new()
+	var esterna: HBoxContainer = HBoxContainer.new()
+	esterna.add_theme_constant_override("separation", 18)
+	riquadro.add_child(esterna)
 	var riga: HBoxContainer = HBoxContainer.new()
 	riga.add_theme_constant_override("separation", 24)
-	riquadro.add_child(riga)
+	riga.visible = false
+	esterna.add_child(riga)
+	_dettagli_run = riga
+	var titolo: Label = StileVisivo.etichetta("Partita", StileVisivo.FONT_TITOLI, 22, StileVisivo.TESTO_TENUE)
+	titolo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	esterna.add_child(titolo)
 	var prestigio: Array = _valore("Prestigio", StileVisivo.ORO_LUCE)
 	riga.add_child(prestigio[0])
 	_prestigio = prestigio[1]
@@ -355,7 +427,11 @@ func _crea_run() -> void:
 	_malcontento = malcontento[1]
 	_malcontento_cella = malcontento[0]
 	_malcontento_cella.mouse_filter = Control.MOUSE_FILTER_PASS
-	riga.add_child(_pulsante("Menu", func() -> void: menu.emit()))
+	var pulsante_menu: Button = _pulsante("Menu", func() -> void: menu.emit())
+	_rendi_linguetta(pulsante_menu)
+	esterna.add_child(pulsante_menu)
+	_riquadro_run = riquadro
+	_rendi_apribile(riquadro)
 	_ancora(riquadro, Control.PRESET_TOP_RIGHT, Vector2(-24, 20))
 	_ultima_possibilita = StileVisivo.etichetta("ULTIMA POSSIBILITÀ", StileVisivo.FONT_TITOLI, 22, StileVisivo.PERICOLO)
 	_ancora(_ultima_possibilita, Control.PRESET_TOP_RIGHT, Vector2(-30, 124))
@@ -395,6 +471,11 @@ func _crea_risorse() -> void:
 	var spinta: Control = Control.new()
 	spinta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	riga.add_child(spinta)
+	_riga_linguette = HBoxContainer.new()
+	_riga_linguette.add_theme_constant_override("separation", 6)
+	_riga_linguette.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	riga.add_child(_riga_linguette)
+	riga = _riga_linguette
 	_pulsante_ricerca = _pulsante("Ricerca", func() -> void: _ricerca.visible = not _ricerca.visible)
 	_pulsante_ricerca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_ricerca)
@@ -457,7 +538,7 @@ func _crea_magazzino() -> void:
 ## Pannello della Ricerca (GDD §10.5, §14.3): tecnologia in studio, mano di carte e albero.
 func _crea_ricerca() -> void:
 	_ricerca = PanelContainer.new()
-	_ricerca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.96), StileVisivo.ORO))
+	_ricerca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	_ricerca.add_child(colonna)
@@ -499,7 +580,7 @@ func _crea_ricerca() -> void:
 ## l'impresa con quanto manca e l'effetto; poi le ascensioni prese.
 func _crea_tradizioni() -> void:
 	_tradizioni = PanelContainer.new()
-	_tradizioni.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.96), StileVisivo.ORO))
+	_tradizioni.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	_tradizioni.add_child(colonna)
@@ -693,20 +774,23 @@ func _on_vendi(tipo: int) -> void:
 
 
 func _crea_pannelli_destra() -> void:
-	var colonna: VBoxContainer = VBoxContainer.new()
-	colonna.add_theme_constant_override("separation", 8)
+	# Effetti, Annali e Legenda stanno nella stessa fila di linguette degli altri pulsanti.
+	var divisore: VSeparator = VSeparator.new()
+	_riga_linguette.add_child(divisore)
 	_pulsante_effetti = _pulsante("Effetti", func() -> void: _alterna(_effetti))
-	colonna.add_child(_pulsante_effetti)
-	colonna.add_child(_pulsante("Annali", func() -> void: _alterna(_cronaca)))
+	_riga_linguette.add_child(_pulsante_effetti)
+	_riga_linguette.add_child(_pulsante("Annali", func() -> void: _alterna(_cronaca)))
 	var pulsante_legenda: Button = _pulsante("Legenda", func() -> void: _alterna(_legenda))
 	Suggerimenti.imposta(pulsante_legenda, "Che cosa vogliono dire i simboli.", "Legenda")
-	colonna.add_child(pulsante_legenda)
-	_ancora(colonna, Control.PRESET_CENTER_RIGHT, Vector2(-24, -60))
+	_riga_linguette.add_child(pulsante_legenda)
+	for figlio: Node in _riga_linguette.get_children():
+		if figlio is Button:
+			_rendi_linguetta(figlio as Button)
 
 	_legenda = LegendaSimboli.new()
-	_legenda.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.97), StileVisivo.ORO))
+	_legenda.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	_legenda.costruisci(GameSession.catalog())
-	_ancora(_legenda, Control.PRESET_CENTER_RIGHT, Vector2(-180, 0))
+	_ancora(_legenda, Control.PRESET_CENTER_RIGHT, Vector2(-24, 0))
 	_legenda.visible = false
 
 	_effetti = PanelContainer.new()
@@ -716,7 +800,7 @@ func _crea_pannelli_destra() -> void:
 	lista.add_child(StileVisivo.etichetta("EFFETTI ATTIVI", StileVisivo.FONT_TITOLI, 26, StileVisivo.ORO_LUCE))
 	_lista_effetti = VBoxContainer.new()
 	lista.add_child(_lista_effetti)
-	_ancora(_effetti, Control.PRESET_CENTER_RIGHT, Vector2(-180, -160))
+	_ancora(_effetti, Control.PRESET_CENTER_RIGHT, Vector2(-24, -160))
 	_effetti.visible = false
 
 	_cronaca = PanelContainer.new()
@@ -726,7 +810,7 @@ func _crea_pannelli_destra() -> void:
 	_testo_cronaca = PannelloSuggerimento.testo_colorato(17)
 	_testo_cronaca.custom_minimum_size = Vector2(480, 0)
 	colonna_cronaca.add_child(_testo_cronaca)
-	_ancora(_cronaca, Control.PRESET_CENTER_RIGHT, Vector2(-180, -220))
+	_ancora(_cronaca, Control.PRESET_CENTER_RIGHT, Vector2(-24, -220))
 	_cronaca.visible = false
 
 
@@ -756,7 +840,7 @@ func _crea_comandi() -> void:
 	_comandi = VBoxContainer.new()
 	_comandi.alignment = BoxContainer.ALIGNMENT_CENTER
 	_comandi.add_theme_constant_override("separation", 8)
-	_suggerimento_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 19, StileVisivo.TESTO)
+	_suggerimento_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 16, Color(StileVisivo.TESTO, 0.85))
 	_suggerimento_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_suggerimento_fase.add_theme_constant_override("outline_size", 8)
 	_suggerimento_fase.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
@@ -862,7 +946,7 @@ func _crea_scelte() -> void:
 
 func _crea_esito() -> void:
 	_esito = PanelContainer.new()
-	_esito.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.04, 0.06, 0.11, 0.95), StileVisivo.ORO))
+	_esito.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	colonna.custom_minimum_size = Vector2(640, 0)
@@ -887,7 +971,7 @@ func _crea_esito() -> void:
 ## Pannello della cronaca: il momento, la scena e le reazioni possibili della nazione.
 func _crea_pannello_cronaca() -> void:
 	_pannello_cronaca = PanelContainer.new()
-	_pannello_cronaca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(0.09, 0.07, 0.05, 0.96), StileVisivo.ORO))
+	_pannello_cronaca.add_theme_stylebox_override("panel", StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), StileVisivo.ORO))
 	var colonna: VBoxContainer = VBoxContainer.new()
 	colonna.add_theme_constant_override("separation", 10)
 	colonna.custom_minimum_size = Vector2(700, 0)

@@ -13,6 +13,8 @@ var tipi: Array[StringName] = []
 var colore: Color = StileVisivo.ORO
 ## Pixel per unità della plancia.
 var scala: float = 150.0
+## Linguetta sotto la carta (consiglieri e avvenimenti con il mezzo busto: Davide, 8 novembre 2026).
+var sotto: bool = false
 
 
 ## Misura della linguetta in unità della plancia, per un certo numero di tipi.
@@ -21,7 +23,8 @@ static func misura(quanti: int) -> Vector2:
 	return Vector2(lunghezza, DIAMETRO + BORDO * 2.2 + SOTTO_LA_CARTA)
 
 
-func imposta(p_tipi: Array[StringName], p_colore: Color, p_scala: float) -> void:
+func imposta(p_tipi: Array[StringName], p_colore: Color, p_scala: float, p_sotto: bool = false) -> void:
+	sotto = p_sotto
 	tipi = p_tipi
 	colore = p_colore
 	scala = p_scala
@@ -37,15 +40,27 @@ func _draw() -> void:
 	var fondo: StyleBoxFlat = StyleBoxFlat.new()
 	fondo.bg_color = colore
 	fondo.anti_aliasing = true
-	fondo.corner_radius_top_left = raggio
-	fondo.corner_radius_top_right = raggio
+	if sotto:
+		fondo.corner_radius_bottom_left = raggio
+		fondo.corner_radius_bottom_right = raggio
+	else:
+		fondo.corner_radius_top_left = raggio
+		fondo.corner_radius_top_right = raggio
 	draw_style_box(fondo, Rect2(Vector2.ZERO, size))
 	var interno: StyleBoxFlat = fondo.duplicate() as StyleBoxFlat
 	interno.bg_color = StileVisivo.FACCIA_CARTA
-	interno.corner_radius_top_left = maxi(1, raggio - int(bordo))
-	interno.corner_radius_top_right = maxi(1, raggio - int(bordo))
-	draw_style_box(interno, Rect2(Vector2(bordo, bordo), size - Vector2(bordo * 2.0, bordo)))
+	var raggio_interno: int = maxi(1, raggio - int(bordo))
+	if sotto:
+		interno.corner_radius_bottom_left = raggio_interno
+		interno.corner_radius_bottom_right = raggio_interno
+		draw_style_box(interno, Rect2(Vector2(bordo, 0.0), size - Vector2(bordo * 2.0, bordo)))
+	else:
+		interno.corner_radius_top_left = raggio_interno
+		interno.corner_radius_top_right = raggio_interno
+		draw_style_box(interno, Rect2(Vector2(bordo, bordo), size - Vector2(bordo * 2.0, bordo)))
 	var centro_y: float = bordo + (size.y - SOTTO_LA_CARTA * scala - bordo) * 0.5 + bordo * 0.3
+	if sotto:
+		centro_y = SOTTO_LA_CARTA * scala + (size.y - SOTTO_LA_CARTA * scala - bordo) * 0.5 - bordo * 0.3
 	for i: int in range(tipi.size()):
 		var centro: Vector2 = Vector2(bordo + diametro * 0.62 + i * diametro * 1.12, centro_y)
 		DisegnoSimboli.medaglione(self, Simboli.di_tipo(tipi[i]), centro, diametro)

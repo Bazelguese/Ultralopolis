@@ -286,7 +286,9 @@ func test_le_risorse_sono_tutte_sempre_visibili() -> void:
 func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	var run: RunState = _run()
 	var larghezze: Array = _scena.get("_larghezze")
-	var attesa: float = _scena.call("_larghezza_per", run.board.troop_capacity() + 1, run.board.building_capacity() + 1)
+	# Gli spazi vuoti sono sagome strette (Davide, 8 novembre 2026): contano anche i pezzi occupati.
+	var attesa: float = _scena.call("_larghezza_per", run.board.troop_capacity() + 1, run.board.building_capacity() + 1,
+			run.board.troops.size(), run.board.buildings.size())
 	assert_almost_eq(float(larghezze[0]), attesa, 0.001)
 	var plancia: Node3D = _scena.get("_plancia")
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
@@ -420,8 +422,8 @@ func test_annunci_in_alto_e_calendario_a_sinistra() -> void:
 	assert_string_contains((hud.get("_sotto_messaggio") as Label).text, run.month_name())
 
 
-func test_scheda_della_nazione_con_ricomincia_e_spiegazioni() -> void:
-	# Richiesta di Davide (6 novembre): Ricomincia accanto al nome; ogni caratteristica si spiega.
+func test_scheda_della_nazione_spiega_le_caratteristiche() -> void:
+	# Richiesta di Davide (6 novembre): ogni caratteristica si spiega. Dall'8 novembre Ricomincia non c'è più.
 	var run: RunState = _run()
 	var hud: HudPlancia = _scena.get("_hud")
 	var voci: HFlowContainer = hud.get("_identita")
