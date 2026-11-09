@@ -34,3 +34,11 @@ func test_la_forma_viene_dal_popolo_e_non_dagli_altri_elementi() -> void:
 	var identita: Array[IdentityDef] = [governo, popolo]
 	assert_eq(RunState.board_shape_of(identita), &"mura")
 	assert_eq(RunState.board_shape_of([governo] as Array[IdentityDef]), &"", "Senza popolo nessuna forma.")
+
+
+func test_ogni_incontro_ha_la_plancia_della_sua_famiglia() -> void:
+	# Mare = nave, terra selvaggia = pelli, fuorilegge = barricata (Davide, 9 novembre 2026).
+	var catalogo: CatalogDef = load(CATALOG_PATH) as CatalogDef
+	assert_gt(catalogo.encounters.size(), 0, "Il catalogo ha degli incontri.")
+	for incontro: EncounterDef in catalogo.encounters:
+		assert_true([&"nave", &"pelli", &"barricata"].has(incontro.board_shape), "%s ha la plancia della sua famiglia." % incontro.display_name)

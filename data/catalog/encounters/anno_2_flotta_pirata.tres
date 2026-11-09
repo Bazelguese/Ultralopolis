@@ -40,6 +40,7 @@ difficulty_label = "Difficile"
 loot_gold = 4
 loot_research = 3
 resistance = 45
+board_shape = &"nave"
 buildings = Array[ExtResource("1_k82ka")]([ExtResource("2_w1bow"), ExtResource("3_rons2"), ExtResource("3_rons2")])
 troops = Array[ExtResource("7_j7mqk")]([ExtResource("8_tbrpc"), ExtResource("9_b6532"), ExtResource("10_4dlmj")])
 rewards = Array[ExtResource("4_8ycop")]([SubResource("Resource_teere"), SubResource("Resource_uxv6n"), SubResource("Resource_r4s61"), SubResource("Resource_rons2")])

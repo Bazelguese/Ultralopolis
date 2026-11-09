@@ -34,6 +34,7 @@ difficulty_label = "Media"
 loot_gold = 3
 loot_research = 2
 resistance = 35
+board_shape = &"pelli"
 buildings = Array[ExtResource("1_0rm6a")]([ExtResource("2_7h1at"), ExtResource("3_10mf2")])
 troops = Array[ExtResource("8_e8q4i")]([ExtResource("9_owdlo"), ExtResource("10_0rw48")])
 rewards = Array[ExtResource("4_05v6i")]([SubResource("Resource_xf4fr"), SubResource("Resource_wd220"), SubResource("Resource_emf6g")])
