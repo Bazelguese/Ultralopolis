@@ -72,6 +72,9 @@ var _estensioni: Vector4 = Vector4.ZERO
 var _foto: String = ""
 ## Pali, punte e corde delle plance dei nemici, ricreati quando la forma cambia.
 var _decori: Node3D
+## Le plance dei nemici si guardano come nello scontro: di fronte a te, con la fila delle truppe
+## dalla tua parte. La telecamera sta dall'altro lato e carte e scritte si girano verso di lei.
+var _di_fronte: bool = false
 
 
 func _ready() -> void:
@@ -154,14 +157,18 @@ void fragment() {
 	_camera = Camera3D.new()
 	_camera.fov = 34.0
 	add_child(_camera)
-	_camera.look_at_from_position(Vector3(0.0, 14.0, 12.0), Vector3(0.0, 0.0, -0.4), Vector3.UP)
+	_di_fronte = variante >= 3
+	if _di_fronte:
+		_camera.look_at_from_position(Vector3(0.0, 14.0, -14.5), Vector3(0.0, 0.0, -0.2), Vector3.UP)
+	else:
+		_camera.look_at_from_position(Vector3(0.0, 14.0, 12.0), Vector3(0.0, 0.0, -0.4), Vector3.UP)
 	_lanterna = OmniLight3D.new()
 	_lanterna.light_color = Color("ffb877")
 	_lanterna.light_energy = 3.4
 	_lanterna.omni_range = 40.0
 	_lanterna.omni_attenuation = 1.1
 	_lanterna.shadow_enabled = true
-	_lanterna.position = Vector3(0.0, 10.0, 5.0)
+	_lanterna.position = Vector3(0.0, 10.0, -5.0 if variante >= 3 else 5.0)
 	add_child(_lanterna)
 	var riempi: DirectionalLight3D = DirectionalLight3D.new()
 	riempi.light_color = Color("ffe6c8")
@@ -319,14 +326,16 @@ func _crea_cuore() -> void:
 			img.set_pixel(xx, yy, Color(0, 0, 0, 0))
 	img.generate_mipmaps()
 	var telo: MeshInstance3D = _quadro(Vector2(1.3, 1.62), ImageTexture.create_from_image(img), Vector3(0.0, 0.2, Z_T), cuore)
-	telo.rotation.x = -PI * 0.5
-	var iniziali: Label3D = scritta("NP", 60, Color("1a1410"), Color(0, 0, 0, 0), 0)
-	iniziali.rotation.x = -PI * 0.5
-	iniziali.position = Vector3(0.0, 0.205, Z_T - 0.35)
+	var giro: float = PI if _di_fronte else 0.0
+	var verso: float = -1.0 if _di_fronte else 1.0
+	telo.rotation = Vector3(-PI * 0.5, giro, 0.0)
+	var iniziali: Label3D = scritta("BR" if _di_fronte else "NP", 60, Color("1a1410"), Color(0, 0, 0, 0), 0)
+	iniziali.rotation = Vector3(-PI * 0.5, giro, 0.0)
+	iniziali.position = Vector3(0.0, 0.205, Z_T - 0.35 * verso)
 	cuore.add_child(iniziali)
 	var numero: Label3D = scritta("58", 120, Color("1a1410"), Color(0, 0, 0, 0), 0)
-	numero.rotation.x = -PI * 0.5
-	numero.position = Vector3(0.0, 0.205, Z_T + 0.2)
+	numero.rotation = Vector3(-PI * 0.5, giro, 0.0)
+	numero.position = Vector3(0.0, 0.205, Z_T + 0.2 * verso)
 	cuore.add_child(numero)
 	# Le sfere del mana come nel gioco: la gialla al centro, le altre a croce.
 	var sfera_shader: Shader = Shader.new()
@@ -421,7 +430,7 @@ func _disponi(durata: float) -> void:
 
 func _muovi(n: Node3D, dove: Array, durata: float) -> void:
 	var pos: Vector3 = dove[0]
-	var angolo: float = float(dove[1])
+	var angolo: float = float(dove[1]) + (PI if _di_fronte else 0.0)
 	if durata <= 0.0:
 		n.position = pos
 		n.rotation.y = angolo
@@ -572,52 +581,58 @@ func _contorno(e: Vector4) -> PackedVector2Array:
 	return _contorno_arco(e)
 
 
-## Nave: lo scafo visto dall'alto. Fianchi appena bombati, poppa dritta a sinistra, prua a punta
-## a destra; dentro, il ponte in assi.
+## Nave: il ponte di una nave che ti viene addosso. La prua a punta sta al centro, sul lato
+## verso di te (quello delle truppe); i fianchi finiscono tondi, la poppa è dritta.
 func _contorno_nave(e: Vector4) -> PackedVector2Array:
 	var sinistra: float = maxf(e.x, e.z)
 	var destra: float = maxf(e.y, e.w)
-	var dietro: float = Z_T - FASCIA_T - 0.25
-	var davanti: float = Z_E + FASCIA_E + 0.25
-	var mezzo: float = (dietro + davanti) * 0.5
+	var fronte: float = Z_T - FASCIA_T - 0.2
+	var poppa: float = Z_E + FASCIA_E + 0.25
+	var mezzo: float = (fronte + poppa) * 0.5
+	var mezza: float = (poppa - fronte) * 0.5
 	var p: PackedVector2Array = PackedVector2Array()
-	var passi: int = 30
-	for k: int in range(passi + 1):
-		var t: float = float(k) / float(passi)
-		p.append(Vector2(lerpf(-sinistra, destra, t), dietro - 0.35 * sin(PI * t)))
-	# La prua: due curve che si chiudono in punta.
-	var punta: float = 2.6
-	for k: int in range(1, 13):
-		var t: float = float(k) / 12.0
-		p.append(Vector2(destra + punta * sin(t * PI * 0.5), lerpf(dietro, mezzo, t * t)))
-	for k: int in range(1, 13):
-		var t: float = 1.0 - float(k) / 12.0
-		p.append(Vector2(destra + punta * sin(t * PI * 0.5), lerpf(davanti, mezzo, t * t)))
-	for k: int in range(passi + 1):
-		var t: float = 1.0 - float(k) / float(passi)
-		p.append(Vector2(lerpf(-sinistra, destra, t), davanti + 0.35 * sin(PI * t)))
+	# Fianco sinistro tondo, dalla poppa al fronte.
+	for k: int in range(13):
+		var a: float = PI * 0.5 + PI * float(k) / 12.0
+		p.append(Vector2(-sinistra + cos(a) * 0.9, mezzo + sin(a) * mezza))
+	# Il fronte con la prua al centro: due curve che si chiudono in punta verso di te.
+	var largo: float = 2.7
+	var lungo: float = 2.4
+	p.append(Vector2(-largo, fronte))
+	for k: int in range(1, 16):
+		var t: float = float(k) / 16.0
+		var x: float = lerpf(-largo, largo, t)
+		p.append(Vector2(x, fronte - lungo * (1.0 - pow(absf(x) / largo, 1.5))))
+	p.append(Vector2(largo, fronte))
+	# Fianco destro tondo, dal fronte alla poppa.
+	for k: int in range(13):
+		var a: float = -PI * 0.5 + PI * float(k) / 12.0
+		p.append(Vector2(destra + cos(a) * 0.9, mezzo + sin(a) * mezza))
 	return p
 
 
-## Pelli: una pelle tesa, dal bordo irregolare, attorno alle file.
+## Pelli: una pelle tesa fra i pali, dal bordo irregolare. Il lato verso di te è tirato a punte
+## dai pali con le zanne; il lato di dietro è più morbido.
 func _contorno_pelli(e: Vector4) -> PackedVector2Array:
-	var centro: Vector2 = Vector2(0.0, (Z_T + Z_E) * 0.5)
-	var mezza_z: float = (Z_E + FASCIA_E - Z_T + FASCIA_T) * 0.5 + 0.45
+	var centro: float = (Z_T + Z_E) * 0.5
+	var mezza_z: float = (Z_E + FASCIA_E - Z_T + FASCIA_T) * 0.5 + 0.35
 	var p: PackedVector2Array = PackedVector2Array()
-	var passi: int = 96
+	var passi: int = 120
 	for k: int in range(passi):
 		var a: float = TAU * float(k) / float(passi)
 		var c: float = cos(a)
 		var sn: float = sin(a)
-		# Lato sinistro o destro e fila (davanti gli edifici, dietro le truppe).
-		var rx: float = (maxf(e.x, e.z) if c < 0.0 else maxf(e.y, e.w)) + 0.55
-		# Superellisse: quasi un rettangolo dagli angoli molto tondi.
-		var potenza: float = 0.28
-		var x: float = signf(c) * pow(absf(c), potenza) * rx
-		var z: float = signf(sn) * pow(absf(sn), potenza) * mezza_z
-		# Il bordo irregolare della pelle, con le punte dove è tirata dai pali.
-		var irregolare: float = 1.0 + 0.035 * sin(a * 7.0 + 1.3) + 0.025 * sin(a * 13.0) + 0.06 * pow(absf(sin(a * 2.0)), 8.0)
-		p.append(centro + Vector2(x, z - centro.y + centro.y) * Vector2(irregolare, irregolare) - Vector2(0.0, centro.y * (irregolare - 1.0)))
+		var rx: float = (maxf(e.x, e.z) if c < 0.0 else maxf(e.y, e.w)) + 0.45
+		var x: float = signf(c) * pow(absf(c), 0.28) * rx
+		var z: float = signf(sn) * pow(absf(sn), 0.28) * mezza_z
+		# Davanti (z verso il fronte, cioè negativo) la pelle è tirata a punte dai pali.
+		if sn < 0.0:
+			var tirata: float = pow(absf(sin(x * PI / 1.6)), 6.0) * 0.55 * pow(absf(sn), 2.0)
+			z -= tirata
+		else:
+			z += 0.08 * sin(x * 2.3) * sn
+		x += 0.12 * sin(a * 9.0) * absf(c)
+		p.append(Vector2(x, centro + z))
 	return p
 
 
@@ -658,33 +673,69 @@ func _crea_decori(contorno: PackedVector2Array, e: Vector4) -> void:
 			vuoto.position.z = 0.1
 			murata.add_child(vuoto)
 			_decori.add_child(murata)
-			# Le bitte d'ormeggio lungo i fianchi.
+			# Il bompresso: l'asta che esce dalla punta della prua, puntata verso di te.
+			var punta: Vector3 = Vector3(0.0, 0.3, Z_T - FASCIA_T - 0.2 - 2.4)
+			var bompresso: Node3D = _palo(punta + Vector3(0.0, 0.0, 0.6), 0.07, 2.2, Color("3a2414"), true)
+			bompresso.rotation.x = deg_to_rad(-62.0)
+			# Lo scudo della polena sulla prua e due cannoni ai lati, rivolti verso di te.
+			var polena: MeshInstance3D = MeshInstance3D.new()
+			var disco: CylinderMesh = CylinderMesh.new()
+			disco.top_radius = 0.32
+			disco.bottom_radius = 0.32
+			disco.height = 0.08
+			polena.mesh = disco
+			polena.material_override = _materiale(OTTONE, null, 0.3, 0.85)
+			polena.position = punta + Vector3(0.0, -0.05, 0.75)
+			_decori.add_child(polena)
+			for x: float in [-1.7, 1.7]:
+				var cannone: Node3D = _palo(Vector3(x, 0.32, Z_T - FASCIA_T + 0.25), 0.11, 0.9, Color("1c1a1a"), false)
+				cannone.rotation.x = deg_to_rad(-90.0)
+			# Le bitte d'ormeggio lungo la poppa.
 			var destra: float = maxf(e.y, e.w)
 			var sinistra: float = maxf(e.x, e.z)
 			var x: float = -sinistra + 0.8
 			while x < destra:
-				for z: float in [Z_T - FASCIA_T + 0.05, Z_E + FASCIA_E - 0.05]:
-					_palo(Vector3(x, 0.05, z), 0.07, 0.35, Color("2a1a10"), false)
+				_palo(Vector3(x, 0.05, Z_E + FASCIA_E + 0.05), 0.07, 0.35, Color("2a1a10"), false)
 				x += 2.4
 		4:
-			# I pali che tengono tesa la pelle, con le corde.
-			var punti: Array[int] = []
-			var n: int = contorno.size()
-			for k: int in range(8):
-				punti.append(int(float(n) * (float(k) + 0.5) / 8.0))
-			for k: int in punti:
-				var v: Vector2 = contorno[k]
-				var verso: Vector2 = (v - Vector2(0.0, (Z_T + Z_E) * 0.5)).normalized()
-				var fuori: Vector2 = v + verso * 0.55
-				_palo(Vector3(fuori.x, 0.0, fuori.y), 0.07, 0.7, Color("3a2414"), true)
-				_corda(Vector3(v.x, 0.06, v.y), Vector3(fuori.x, 0.5, fuori.y))
+			# I pali che tirano la pelle verso di te, con le zanne d'osso puntate in avanti,
+			# e due pali per lato sul retro.
+			var fronte: float = Z_T - FASCIA_T - 0.35
+			# I pali stanno nelle punte della pelle (dove sin(x·π/1.6) vale ±1).
+			var x: float = -0.8 - 1.6 * floorf((minf(e.x, e.z) - 0.8) / 1.6)
+			while x <= minf(e.y, e.w):
+				var dove: Vector3 = Vector3(x, 0.0, fronte - 0.6)
+				_palo(dove, 0.09, 0.75, Color("3a2414"), true)
+				_corda(Vector3(x, 0.06, fronte - 0.2), dove + Vector3(0.0, 0.5, 0.0))
+				# Due zanne d'osso incrociate, puntate verso di te.
+				for piega: float in [-22.0, 22.0]:
+					var zanna: Node3D = _palo(dove + Vector3(0.0, 0.3, 0.0), 0.065, 0.7, Color("efe4c8"), true)
+					zanna.rotation = Vector3(deg_to_rad(-62.0), 0.0, deg_to_rad(piega))
+				x += 1.6
+			for angolo: Vector2 in [Vector2(-maxf(e.x, e.z) - 0.9, Z_E + 0.4), Vector2(maxf(e.y, e.w) + 0.9, Z_E + 0.4)]:
+				_palo(Vector3(angolo.x, 0.0, angolo.y), 0.07, 0.7, Color("3a2414"), true)
+				_corda(Vector3(angolo.x * 0.93, 0.06, angolo.y), Vector3(angolo.x, 0.5, angolo.y))
 		5:
 			# I pali appuntiti dietro la fila delle truppe, inclinati verso il nemico.
-			var x: float = -e.x + 0.3
-			while x < e.y - 0.2:
-				var palo: Node3D = _palo(Vector3(x, 0.0, Z_T - FASCIA_T - 0.05), 0.08, 0.9, Color("5a5046"), true)
-				palo.rotation.x = deg_to_rad(-35.0)
-				x += 0.75
+			# Un cavallo di Frisia: pali appuntiti incrociati a X, puntati verso di te.
+			var x: float = -e.x + 0.4
+			var k: int = 0
+			while x < e.y - 0.3:
+				var palo: Node3D = _palo(Vector3(x, 0.0, Z_T - FASCIA_T + 0.1), 0.1, 1.5, Color("8a7e70"), true)
+				palo.rotation = Vector3(deg_to_rad(-48.0), 0.0, deg_to_rad(25.0 if k % 2 == 0 else -25.0))
+				x += 0.55
+				k += 1
+			# La trave che li tiene insieme.
+			var trave: MeshInstance3D = MeshInstance3D.new()
+			var cb: CylinderMesh = CylinderMesh.new()
+			cb.top_radius = 0.1
+			cb.bottom_radius = 0.1
+			cb.height = e.x + e.y
+			trave.mesh = cb
+			trave.material_override = _materiale(Color("4a4038"), _venatura, 0.8)
+			trave.rotation.z = PI * 0.5
+			trave.position = Vector3((e.y - e.x) * 0.5, 0.5, Z_T - FASCIA_T - 0.35)
+			_decori.add_child(trave)
 
 
 func _girato(p: PackedVector2Array) -> PackedVector2Array:
@@ -825,7 +876,7 @@ func _aggiungi(fila: Array[Node3D], nuova: Node3D, passo: float, truppa: bool) -
 	var s: Array[float] = _posizioni(fila.size(), passo)
 	var dove: Array = _punto(truppa, s[s.size() - 1])
 	nuova.position = dove[0]
-	nuova.rotation.y = float(dove[1])
+	nuova.rotation.y = float(dove[1]) + (PI if _di_fronte else 0.0)
 	nuova.scale = Vector3(0.01, 1.0, 0.01)
 	var t: Tween = create_tween()
 	t.tween_interval(0.25)
