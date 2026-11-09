@@ -400,20 +400,15 @@ func _crea_arte() -> void:
 	add_child(_iniziale)
 
 
-## Teatro di carta: la pedana su cui sta la figurina, carta scura con un'ombra ovale al centro.
+## Teatro di carta: la pedana su cui sta la figurina. Una superficie uniforme, senza l'ombra
+## ovale che c'era prima (toglieva risalto alla figurina; Davide, 9 novembre 2026).
+const COLORE_PEDANA: Color = Color("1e1711")
+
+
 func _pedana() -> Texture2D:
-	var sfumatura: Gradient = Gradient.new()
-	sfumatura.set_color(0, Color("060403"))
-	sfumatura.add_point(0.45, Color("120d0a"))
-	sfumatura.set_color(1, Color("1e1711"))
-	var trama: GradientTexture2D = GradientTexture2D.new()
-	trama.gradient = sfumatura
-	trama.fill = GradientTexture2D.FILL_RADIAL
-	trama.fill_from = Vector2(0.5, 0.5)
-	trama.fill_to = Vector2(0.5, 1.15)
-	trama.width = 128
-	trama.height = 128
-	return trama
+	var img: Image = Image.create(4, 4, false, Image.FORMAT_RGB8)
+	img.fill(COLORE_PEDANA)
+	return ImageTexture.create_from_image(img)
 
 
 ## Fondo della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
