@@ -78,6 +78,9 @@ func _calcola_misure() -> void:
 	# Sulla plancia la carta fa da base alla figurina: la pedana è più bassa, i numeri più grandi.
 	elif scheda.come_base and size.y > size.x * 1.3:
 		altezza_arte = size.y * 0.36
+	# Sulla plancia, con il disegno stampato, il disegno cede un po' di spazio ai numeri.
+	elif scheda.sulla_plancia and size.y > size.x * 1.3:
+		altezza_arte = size.y * 0.4
 	_area_arte = Rect2(margine, margine, size.x - margine * 2.0, altezza_arte)
 	var altezza_nome: float = size.y * (0.12 if con_simboli else 0.14)
 	_area_nome = Rect2(_bordo, _area_arte.end.y + lato * 0.02, size.x - _bordo * 2.0, altezza_nome)

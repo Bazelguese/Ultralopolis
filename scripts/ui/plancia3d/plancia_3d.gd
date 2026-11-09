@@ -47,6 +47,8 @@ const PASSO_SPAZIO_VUOTO: float = 0.85
 const SCALA_MASSIMA_SCONTRO: float = 1.3
 ## La plancia piena si rimpicciolisce fino a questa scala per stare nello schermo.
 const SCALA_MINIMA: float = 0.6
+## Larghezza di tavolo che entra nello schermo con l'inquadratura dello scontro.
+const LARGHEZZA_SCONTRO: float = 24.0
 ## Quanto torri, punte e merli sporgono in tutto oltre le carte più esterne.
 const MARGINE_FORMA: float = 1.6
 const DURATA_DISPOSIZIONE: float = 0.45
@@ -60,8 +62,10 @@ const MASSIMO_GEMME_IN_VOLO: int = 24
 const ALTEZZA_STENDARDO: float = 1.9
 ## Altezza delle figurine rispetto alla larghezza della carta: gli edifici più bassi, così le file
 ## stanno vicine senza che le loro figurine coprano i numeri delle truppe.
-const ALTEZZA_FIGURINA_TRUPPA: float = 1.1
-const ALTEZZA_FIGURINA_EDIFICIO: float = 0.7
+## Una volta e un terzo rispetto a prima (Davide, 9 novembre 2026): le figurine escono solo negli
+## scontri e a plancia piena restano leggibili senza coprire i numeri.
+const ALTEZZA_FIGURINA_TRUPPA: float = 1.5
+const ALTEZZA_FIGURINA_EDIFICIO: float = 0.95
 ## Larghezza del telo dello stendardo e altezza da cui parte (più in basso: Davide, 8 novembre 2026).
 const LARGHEZZA_STENDARDO: float = 1.5
 const BASE_TELO: float = 0.45
@@ -83,8 +87,10 @@ const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -0.2)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 0.0
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 24.0, 23.0)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.2)
+## Nello scontro la telecamera guarda più dall'alto e più da vicino (Davide, 9 novembre 2026): le
+## due plance riempiono lo schermo e i numeri delle carte si leggono meglio.
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 23.0, 15.5)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 0.4)
 ## Profondità del tavolo inquadrata nello scontro: se le plance si allontanano (forma «arco»)
 ## la telecamera si allarga in proporzione.
 const PROFONDITA_SCONTRO: float = 13.0
@@ -287,8 +293,9 @@ uniform float forza = 0.045;
 float caso(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 void fragment() {
 	float n = caso(floor(FRAGCOORD.xy) + floor(TIME * 24.0) * vec2(17.0, 31.0));
-	float v = smoothstep(0.38, 0.95, length((SCREEN_UV - 0.5) * vec2(1.25, 1.0)));
-	COLOR = mix(vec4(vec3(n), forza), vec4(0.0, 0.0, 0.0, 0.85), v);
+	// Vignettatura leggera e solo agli angoli: la plancia piena arriva ai bordi dello schermo.
+	float v = smoothstep(0.55, 1.05, length((SCREEN_UV - 0.5) * vec2(1.25, 1.0)));
+	COLOR = mix(vec4(vec3(n), forza), vec4(0.0, 0.0, 0.0, 0.55), v);
 }
 """
 	var materiale: ShaderMaterial = ShaderMaterial.new()
@@ -416,8 +423,8 @@ func _larghezza_per(spazi_truppe: int, spazi_edifici: int, truppe_occupate: int 
 ## Quando la plancia è più larga dello schermo (plancia piena) si rimpicciolisce fino a starci
 ## (prima restava a 1 e la fila degli edifici usciva dai lati). Le torri e le punte delle forme
 ## sporgono oltre le carte: se ne tiene conto con un margine.
-func _scala_per(larghezza: float, massima: float) -> float:
-	return clampf(LARGHEZZA_LASTRA_PIENA / maxf(larghezza + MARGINE_FORMA, 1.0), SCALA_MINIMA, massima)
+func _scala_per(larghezza: float, massima: float, schermo: float = LARGHEZZA_LASTRA_PIENA) -> float:
+	return clampf(schermo / maxf(larghezza + MARGINE_FORMA, 1.0), SCALA_MINIMA, massima)
 
 
 ## Ingrandisce e centra la plancia. In partita la lastra del giocatore cresce attorno al suo centro,
@@ -774,6 +781,7 @@ func _aggiorna_anello(lato: int, millisecondi: int) -> void:
 func _crea_tessera(genitore: Node3D, scheda: SchedaCarta, misura: Vector2, posizione: Vector3, indice: int, nitidezza: float = 1.0, base: bool = false) -> Tessera3D:
 	# Teatro di carta: sulla plancia la carta fa da base alla figurina e non ripete il disegno.
 	scheda.come_base = base and scheda.illustrazione != null
+	scheda.sulla_plancia = true
 	var tessera: Tessera3D = Tessera3D.new()
 	genitore.add_child(tessera)
 	tessera.costruisci(scheda, misura.x, misura.y, nitidezza)
@@ -1509,7 +1517,7 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 		truppe_avversarie.append(SchedaCarta.da_truppa(def))
 	# Nello scontro si vedono solo gli elementi schierati; i due lati hanno la stessa scala.
 	var larghezza: float = maxf(_larghezza_per(truppe.size(), edifici.size()), _larghezza_per(truppe_avversarie.size(), edifici_avversari.size()))
-	var scala: float = _scala_per(larghezza, SCALA_MASSIMA_SCONTRO)
+	var scala: float = _scala_per(larghezza, SCALA_MASSIMA_SCONTRO, LARGHEZZA_SCONTRO)
 	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size(), false, scala, true)
 	# Il nemico ha la forma del popolo del fantasma o quella del suo incontro.
 	_forme[Lato.AVVERSARIO].cambia_forma(run.last_opponent_board_shape)
