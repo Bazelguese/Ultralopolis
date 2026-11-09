@@ -23,11 +23,21 @@ const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
 ## Teatro di carta: fra truppe ed edifici c'è posto per le figurine, che non coprono le carte dietro.
 const Z_EDIFICI: float = 4.85
-## Bordo sinistro del primo spazio: gli spazi si allineano a destra dello stemma.
-const X_INIZIO_SPAZI: float = -10.15
-## Bordo sinistro della lastra (fisso: stemma e riserva stanno qui).
-const BORDO_SINISTRO_LASTRA: float = -12.605
-const MARGINE_DESTRO_LASTRA: float = 0.35
+## Il cuore della nazione al centro della plancia (Davide, 9 novembre 2026): due placche, una per
+## fila, con lo stendardo sulla fila delle truppe e la riserva di mana su quella degli edifici. Le
+## file si dividono in due metà ai suoi lati; l'ordine resta quello di sempre, da sinistra a destra,
+## e un pezzo nuovo arriva in fondo a destra (GDD §7.3).
+const MEZZO_CUORE: float = 0.95
+## Spazio fra il bordo del cuore e lo spazio della prima carta di ogni lato.
+const STACCO_CUORE: float = 0.25
+## Quota della faccia delle placche del cuore (la lastra arriva a 0.02).
+const ALTEZZA_CUORE: float = 0.16
+## Profondità della placca del mana: contiene la croce delle sfere.
+const PROFONDITA_PLACCA_MANA: float = 2.4
+const SCALA_RISERVA: float = 0.8
+const OTTONE: Color = Color("c79a4a")
+## Margine fra le carte più esterne e il bordo della lastra.
+const MARGINE_LASTRA: float = 0.35
 const PROFONDITA_LASTRA: float = 6.2
 ## Quanto il doppio filetto a inchiostro rientra dal bordo della lastra.
 const RIENTRO_FILETTO: float = 0.32
@@ -39,7 +49,6 @@ const SCALA_MASSIMA: float = 1.15
 const PASSO_SPAZIO_VUOTO: float = 0.85
 const SCALA_MASSIMA_SCONTRO: float = 1.3
 const DURATA_DISPOSIZIONE: float = 0.45
-const X_MEDAGLIONE: float = -11.2
 const SPAZI_TRUPPE: int = 12
 const SPAZI_EDIFICI: int = 10
 const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola", &"energetico"]
@@ -58,9 +67,11 @@ const BASE_TELO: float = 0.45
 ## L'asta dello stendardo, che fa anche da timer dello scontro.
 const ALTEZZA_ASTA: float = ALTEZZA_STENDARDO + BASE_TELO + 0.1
 const X_ASTA: float = -LARGHEZZA_STENDARDO * 0.5 - 0.05
-## Lo stendardo steso: la base sta verso il davanti della plancia, il telo si stende all'indietro.
-## (centra il telo steso fra la fila delle truppe e quella degli edifici)
-const POSIZIONE_STESO_Z: float = 1.95
+## Lo stendardo steso: la base sta verso il davanti della placca, il telo si stende all'indietro
+## (così il telo steso sta al centro della placca delle truppe).
+const POSIZIONE_STESO_Z: float = 0.26
+## In piedi, la base dello stendardo sta un po' verso il davanti della placca delle truppe.
+const AVANTI_STENDARDO: float = 0.55
 ## Teatro di carta: il tavolo (x, z, larghezza, profondità) e il sole/luna.
 const LIBRO: Rect2 = Rect2(-45.0, -35.0, 90.0, 70.0)
 const POSIZIONE_ASTRO: Vector3 = Vector3(5.5, 0.0, -9.0)
@@ -127,6 +138,9 @@ var _segnalini_corruzione: Array[Node3D] = [null, null]
 var _scritte_corruzione: Array[Label3D] = [null, null]
 var _nomi_lato: Array[Label3D] = [null, null]
 var _riserve: Array[Node3D] = [null, null]  # RiservaMana
+## Posizioni x degli spazi delle due file di ogni lato (pezzi e spazi vuoti), attorno al cuore.
+var _xs_truppe: Array[Array] = [[], []]
+var _xs_edifici: Array[Array] = [[], []]
 
 var _scelte: Array[Tessera3D] = []
 ## Che cosa rappresenta ogni carta sul tavolo (offerta, via, opzione, ricompensa…), stesso ordine di _scelte.
@@ -319,6 +333,7 @@ func _crea_lato(lato: int) -> void:
 	_radici[lato] = radice
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5 * _segno(lato)
 	_crea_lastra(radice, lato, z_centro, _colore_lato(lato))
+	_crea_cuore(radice, lato)
 	_crea_medaglione(radice, lato, z_centro)
 	_crea_riserva(radice, lato, z_centro)
 	_pezzi[lato] = Node3D.new()
@@ -359,10 +374,11 @@ func _crea_lastra(radice: Node3D, lato: int, z_centro: float, colore: Color) -> 
 		_bordi_lastre[lato].append(bordo)
 
 
-## La lastra parte sempre dallo stemma e si allunga verso destra quanto servono gli spazi.
+## La lastra è centrata sul cuore e si allarga verso i due lati quanto servono gli spazi.
 func _imposta_larghezza_lastra(lato: int, larghezza: float) -> void:
 	_larghezze[lato] = larghezza
-	var centro_x: float = BORDO_SINISTRO_LASTRA + larghezza * 0.5
+	var centro_x: float = 0.0
+	var sinistra: float = -larghezza * 0.5
 	(_lastre[lato].mesh as BoxMesh).size.x = larghezza
 	_lastre[lato].position.x = centro_x
 	var bordi: Array = _bordi_lastre[lato]
@@ -373,22 +389,69 @@ func _imposta_larghezza_lastra(lato: int, larghezza: float) -> void:
 		var filetto: MeshInstance3D = bordi[i + 4]
 		(filetto.mesh as BoxMesh).size.x = larghezza - RIENTRO_FILETTO * 2.0
 		filetto.position.x = centro_x
-	(bordi[2] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA
-	(bordi[3] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + larghezza
-	(bordi[6] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + RIENTRO_FILETTO
-	(bordi[7] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + larghezza - RIENTRO_FILETTO
+	(bordi[2] as MeshInstance3D).position.x = sinistra
+	(bordi[3] as MeshInstance3D).position.x = -sinistra
+	(bordi[6] as MeshInstance3D).position.x = sinistra + RIENTRO_FILETTO
+	(bordi[7] as MeshInstance3D).position.x = -sinistra - RIENTRO_FILETTO
 
 
-## Larghezza della lastra che contiene tanti spazi (almeno due edifici, per non farla troppo corta).
-## Gli spazi vuoti (oltre i pezzi occupati) sono sagome strette (Davide, 8 novembre 2026);
-## senza il numero dei pezzi, tutti gli spazi contano come occupati.
+## Larghezze degli spazi di una fila, da sinistra a destra: prima i pezzi, poi gli spazi vuoti,
+## che sono sagome strette (Davide, 8 novembre 2026).
+static func _larghezze_fila(spazi: int, occupati: int, passo: float) -> Array[float]:
+	var larghezze: Array[float] = []
+	for i: int in range(spazi):
+		larghezze.append(passo if i < occupati else PASSO_SPAZIO_VUOTO)
+	return larghezze
+
+
+## Posizioni (x) degli spazi di una fila attorno al cuore. La fila resta una sola, nell'ordine di
+## sempre da sinistra a destra; il cuore la taglia nel punto che rende le due metà più uguali
+## (a parità, la metà di sinistra è la più corta). Quando arriva un pezzo in fondo a destra le metà
+## si ribilanciano e un pezzo può passare dall'altra parte del cuore.
+static func _posizioni_fila(larghezze: Array[float]) -> Array[float]:
+	var totale: float = 0.0
+	for larghezza: float in larghezze:
+		totale += larghezza
+	var taglio: int = 0
+	var migliore: float = INF
+	var sinistra: float = 0.0
+	for k: int in range(larghezze.size() + 1):
+		if k > 0:
+			sinistra += larghezze[k - 1]
+		var differenza: float = absf(sinistra - (totale - sinistra))
+		if differenza < migliore - 0.001:
+			migliore = differenza
+			taglio = k
+	var xs: Array[float] = []
+	xs.resize(larghezze.size())
+	var x: float = -(MEZZO_CUORE + STACCO_CUORE)
+	for i: int in range(taglio - 1, -1, -1):
+		xs[i] = x - larghezze[i] * 0.5
+		x -= larghezze[i]
+	x = MEZZO_CUORE + STACCO_CUORE
+	for i: int in range(taglio, larghezze.size()):
+		xs[i] = x + larghezze[i] * 0.5
+		x += larghezze[i]
+	return xs
+
+
+## Quanto una fila si allunga dal centro verso il lato più lungo.
+static func _mezza_fila(larghezze: Array[float]) -> float:
+	var xs: Array[float] = _posizioni_fila(larghezze)
+	var mezza: float = MEZZO_CUORE + STACCO_CUORE
+	for i: int in range(xs.size()):
+		mezza = maxf(mezza, absf(xs[i]) + larghezze[i] * 0.5)
+	return mezza
+
+
+## Larghezza della lastra che contiene tanti spazi, simmetrica attorno al cuore (almeno un edificio
+## per lato, per non farla troppo corta). Senza il numero dei pezzi, tutti gli spazi contano come occupati.
 func _larghezza_per(spazi_truppe: int, spazi_edifici: int, truppe_occupate: int = -1, edifici_occupati: int = -1) -> float:
 	var piene_t: int = spazi_truppe if truppe_occupate < 0 else mini(truppe_occupate, spazi_truppe)
 	var piene_e: int = spazi_edifici if edifici_occupati < 0 else mini(edifici_occupati, spazi_edifici)
-	var fila_truppe: float = piene_t * PASSO_TRUPPE + (spazi_truppe - piene_t) * PASSO_SPAZIO_VUOTO
-	var fila_edifici: float = piene_e * PASSO_EDIFICI + (spazi_edifici - piene_e) * PASSO_SPAZIO_VUOTO
-	var contenuto: float = maxf(maxf(fila_truppe, fila_edifici), 2.0 * PASSO_EDIFICI)
-	return (X_INIZIO_SPAZI - BORDO_SINISTRO_LASTRA) + contenuto + MARGINE_DESTRO_LASTRA
+	var mezza: float = maxf(_mezza_fila(_larghezze_fila(spazi_truppe, piene_t, PASSO_TRUPPE)), _mezza_fila(_larghezze_fila(spazi_edifici, piene_e, PASSO_EDIFICI)))
+	mezza = maxf(mezza, MEZZO_CUORE + STACCO_CUORE + PASSO_EDIFICI)
+	return (mezza + MARGINE_LASTRA) * 2.0
 
 
 ## Quanto ingrandire la plancia perché la lastra più larga riempia lo spazio di una plancia piena.
@@ -399,12 +462,12 @@ func _scala_per(larghezza: float, massima: float) -> float:
 ## Ingrandisce e centra la plancia. In partita la lastra del giocatore cresce attorno al suo centro,
 ## un po' spostata verso l'alto per non coprire i comandi; in uno scontro i due lati restano
 ## simmetrici rispetto al centro del tavolo.
-func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: float) -> void:
+func _disponi_plancia(scala: float, _larghezza: float, scontro: bool, durata: float) -> void:
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
 	# La plancia sta più in basso (Davide, 9 novembre 2026): i comandi del round sono in alto a destra.
 	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0 + 0.85
-	# Un po' a destra: a sinistra c'è la colonna con la nazione e il calendario.
-	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
+	# La lastra è centrata sul cuore della nazione: il cuore sta al centro dello schermo.
+	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA, 0.0, z)
 	if _animazione_plancia != null and _animazione_plancia.is_valid():
 		_animazione_plancia.kill()
 	if durata <= 0.0:
@@ -417,10 +480,65 @@ func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: flo
 	_animazione_plancia.tween_property(_plancia, "position", posizione, durata).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
+## Il cuore della nazione: due placche dagli angoli smussati, una per fila, unite da due barrette
+## d'ottone. Ogni placca ha la base di cartone scuro, il profilo d'ottone e il pannello del colore
+## del lato con un filetto d'ottone inciso. Lo stendardo e la riserva di mana ci stanno sopra.
+func _crea_cuore(radice: Node3D, lato: int) -> void:
+	var cuore: Node3D = Node3D.new()
+	radice.add_child(cuore)
+	var segno: float = _segno(lato)
+	var larghezza: float = MEZZO_CUORE * 2.0
+	var misure: Array[Vector2] = [Vector2(larghezza, MISURA_TRUPPA.y + 0.1), Vector2(larghezza, PROFONDITA_PLACCA_MANA)]
+	var zs: Array[float] = [Z_TRUPPE * segno, Z_EDIFICI * segno]
+	var base: StandardMaterial3D = ScenaTeatro.materiale_carta(StileVisivo.CARTONCINO, 1.5)
+	var ottone: StandardMaterial3D = StileVisivo.materiale(OTTONE, 0.3, 0.85)
+	var filetto: StandardMaterial3D = StileVisivo.materiale(OTTONE.darkened(0.15), 0.35, 0.8)
+	var pannello: StandardMaterial3D = ScenaTeatro.materiale_carta(_colore_lato(lato).darkened(0.68), 2.0)
+	# Strati dal basso: [margine rispetto alla placca, smusso, quota della faccia, materiale].
+	var strati: Array = [[-0.05, 0.34, ALTEZZA_CUORE - 0.06, base], [0.02, 0.3, ALTEZZA_CUORE - 0.01, ottone],
+		[0.1, 0.24, ALTEZZA_CUORE, pannello], [0.17, 0.18, ALTEZZA_CUORE + 0.004, filetto], [0.2, 0.15, ALTEZZA_CUORE + 0.008, pannello]]
+	for k: int in range(2):
+		for strato: Array in strati:
+			var rientro: float = float(strato[0])
+			_crea_placca(cuore, Vector3(0.0, float(strato[2]), zs[k]), misure[k] - Vector2(rientro, rientro) * 2.0, float(strato[1]), float(strato[2]), strato[3])
+	# Le due barrette che uniscono le placche.
+	var z0: float = zs[0] + misure[0].y * 0.5 * segno
+	var z1: float = zs[1] - misure[1].y * 0.5 * segno
+	for x: float in [-0.18, 0.18]:
+		var barra: MeshInstance3D = MeshInstance3D.new()
+		var forma: CylinderMesh = CylinderMesh.new()
+		forma.top_radius = 0.045
+		forma.bottom_radius = 0.045
+		forma.height = absf(z1 - z0) + 0.2
+		forma.radial_segments = 12
+		barra.mesh = forma
+		barra.material_override = ottone
+		barra.rotation.x = PI * 0.5
+		barra.position = Vector3(x, 0.08, (z0 + z1) * 0.5)
+		cuore.add_child(barra)
+
+
+## Una placca a otto lati (angoli smussati) con la faccia a quota "cima", spessa fino alla lastra.
+func _crea_placca(genitore: Node3D, centro: Vector3, misura: Vector2, smusso: float, cima: float, materiale: Material) -> void:
+	var w: float = misura.x * 0.5
+	var d: float = misura.y * 0.5
+	var forma: CSGPolygon3D = CSGPolygon3D.new()
+	forma.polygon = PackedVector2Array([Vector2(-w + smusso, -d), Vector2(w - smusso, -d), Vector2(w, -d + smusso), Vector2(w, d - smusso),
+		Vector2(w - smusso, d), Vector2(-w + smusso, d), Vector2(-w, d - smusso), Vector2(-w, -d + smusso)])
+	# Il poligono si estrude lungo z; ruotato, la faccia guarda in alto e lo spessore scende alla lastra.
+	forma.depth = maxf(cima, 0.02)
+	forma.material = materiale
+	forma.rotation.x = -PI * 0.5
+	forma.position = centro
+	genitore.add_child(forma)
+
+
 func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	var colore: Color = _colore_lato(lato)
 	var medaglione: Node3D = Node3D.new()
-	medaglione.position = Vector3(X_MEDAGLIONE, 0.0, z_centro - 1.35)
+	# Lo stendardo sta sulla placca delle truppe del cuore.
+	medaglione.position = Vector3(0.0, ALTEZZA_CUORE, (Z_TRUPPE + AVANTI_STENDARDO * _segno(lato)) * _segno(lato))
+	medaglione.set_meta("base", medaglione.position)
 	radice.add_child(medaglione)
 	_medaglioni[lato] = medaglione
 	# Teatro di carta (Davide, 8 novembre 2026): lo stendardo di carta della nazione. Fuori dagli
@@ -470,7 +588,7 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	_numeri_stendardo[lato] = numero_telo
 	_crea_anello(medaglione, lato)
 	var nome: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 40, StileVisivo.TESTO, 0.0, 8)
-	nome.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.12)
+	nome.position = Vector3(0.0, 0.04, z_centro + 0.12)
 	# Nome e barra della Resistenza servono nello scontro; fuori basta lo stendardo steso.
 	var dati: Node3D = Node3D.new()
 	radice.add_child(dati)
@@ -483,7 +601,7 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	forma_fondo.size = Vector3(1.95, 0.04, 0.4)
 	fondo_barra.mesh = forma_fondo
 	fondo_barra.material_override = StileVisivo.materiale(StileVisivo.NOTTE, 0.9)
-	fondo_barra.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.58)
+	fondo_barra.position = Vector3(0.0, 0.04, z_centro + 0.58)
 	dati.add_child(fondo_barra)
 	var barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_barra: BoxMesh = BoxMesh.new()
@@ -553,14 +671,15 @@ func _scuoti_segnalino(nodo: Node3D) -> void:
 	t.tween_property(nodo, "scale", Vector3.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
-## La riserva di mana sotto lo stendardo: una sfera per colore (Davide, 9 novembre 2026).
-func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
+## La riserva di mana sulla placca degli edifici del cuore: una sfera per colore (Davide, 9 novembre
+## 2026). Resta sempre in vista; fuori dagli scontri le sfere sono vuote e spente.
+func _crea_riserva(radice: Node3D, lato: int, _z_centro: float) -> void:
 	var riserva: RiservaMana = RiservaMana.new()
-	riserva.position = Vector3(X_MEDAGLIONE, 0.0, z_centro + 1.05)
+	riserva.position = Vector3(0.0, ALTEZZA_CUORE - 0.02, Z_EDIFICI * _segno(lato))
+	riserva.scale = Vector3.ONE * SCALA_RISERVA
 	radice.add_child(riserva)
 	riserva.costruisci()
 	_riserve[lato] = riserva
-	riserva.visible = false
 
 
 func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
@@ -573,7 +692,7 @@ func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
 	_teli_stendardo[lato].set_shader_parameter("bruciatura", 0.0 if frazione >= 1.0 else 0.06 + 0.3 * (1.0 - frazione))
 	var barra: MeshInstance3D = _barre_resistenza[lato]
 	barra.scale.x = maxf(frazione, 0.001)
-	barra.position.x = X_MEDAGLIONE - 0.925 * (1.0 - frazione)
+	barra.position.x = -0.925 * (1.0 - frazione)
 	# Verde, poi giallo e rosso quando la Resistenza scende.
 	var colore: Color = Color("3fae6a") if frazione > 0.5 else (Color("e0b23a") if frazione > 0.25 else StileVisivo.PERICOLO)
 	(barra.material_override as StandardMaterial3D).albedo_color = colore
@@ -736,19 +855,11 @@ func _crea_spazio(genitore: Node3D, posizione: Vector3, misura: Vector2, disponi
 	return spazio
 
 
-## Spazio vuoto numero i di una fila che ha "occupati" pezzi: dopo le carte, sagome strette.
-func _posizione_spazio_vuoto(lato: int, truppa: bool, occupati: int, i: int) -> Vector3:
-	var passo: float = PASSO_TRUPPE if truppa else PASSO_EDIFICI
-	var x: float = X_INIZIO_SPAZI + occupati * passo + (i - occupati + 0.5) * PASSO_SPAZIO_VUOTO
-	return Vector3(x, 0.02, (Z_TRUPPE if truppa else Z_EDIFICI) * _segno(lato))
-
-
-func _posizione_truppa(lato: int, i: int) -> Vector3:
-	return Vector3(X_INIZIO_SPAZI + (i + 0.5) * PASSO_TRUPPE, 0.02, Z_TRUPPE * _segno(lato))
-
-
-func _posizione_edificio(lato: int, i: int) -> Vector3:
-	return Vector3(X_INIZIO_SPAZI + (i + 0.5) * PASSO_EDIFICI, 0.02, Z_EDIFICI * _segno(lato))
+## Posizione dello spazio numero i di una fila (pezzo o spazio vuoto), fra quelle calcolate da
+## _posizioni_fila quando si costruisce il lato.
+func _posizione_fila(lato: int, truppa: bool, i: int) -> Vector3:
+	var xs: Array[float] = _xs_truppe[lato] if truppa else _xs_edifici[lato]
+	return Vector3(xs[i], 0.02, (Z_TRUPPE if truppa else Z_EDIFICI) * _segno(lato))
 
 
 ## Quanti spazi mostrare in una fila: quelli occupati o disponibili, più uno chiuso
@@ -775,19 +886,21 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 	var spazi_truppe: int = _spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, spazi_chiusi)
 	var spazi_edifici: int = _spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, spazi_chiusi)
 	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici, truppe.size(), edifici.size()))
+	_xs_truppe[lato] = _posizioni_fila(_larghezze_fila(spazi_truppe, truppe.size(), PASSO_TRUPPE))
+	_xs_edifici[lato] = _posizioni_fila(_larghezze_fila(spazi_edifici, edifici.size(), PASSO_EDIFICI))
 	for i: int in range(spazi_truppe):
 		if i < truppe.size():
-			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i, nitidezza, true))
+			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_fila(lato, true, i), i, nitidezza, true))
 			_lampi[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
-			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_spazio_vuoto(lato, true, truppe.size(), i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_TRUPPA.y), i < capacita_truppe, colore)
+			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_fila(lato, true, i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_TRUPPA.y), i < capacita_truppe, colore)
 			if i < capacita_truppe and _spazio_libero_truppa == null:
 				_spazio_libero_truppa = spazio
 	for i: int in range(spazi_edifici):
 		if i < edifici.size():
-			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i, nitidezza, true))
+			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_fila(lato, false, i), i, nitidezza, true))
 		elif lato == Lato.GIOCATORE:
-			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_spazio_vuoto(lato, false, edifici.size(), i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_EDIFICIO.y), i < capacita_edifici, colore)
+			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_fila(lato, false, i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_EDIFICIO.y), i < capacita_edifici, colore)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
 				_spazio_libero_edificio = spazio
 	_alza_figurine(lato, tutte_animate)
@@ -1403,8 +1516,6 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0, false, scala, true)
 	_disponi_plancia(scala, larghezza, true, 0.7)
 	_nomi_lato[Lato.AVVERSARIO].text = run.last_opponent_name.trim_prefix("Fantasma: ").to_upper()
-	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
-		_riserve[lato].visible = true
 	_aggiorna_visuale_scontro()
 
 	var avversario: Node3D = _radici[Lato.AVVERSARIO]
@@ -1661,7 +1772,7 @@ func _colpo(lato: int, danno: int, nota: String) -> void:
 	salto.tween_property(numero, "modulate:a", 0.0, 0.5).set_delay(0.35)
 	salto.chain().tween_callback(numero.queue_free)
 	_brace(medaglione.global_position + Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.4, 0.2), mini(60, 14 + danno * 4))
-	var centro: Vector3 = Vector3(X_MEDAGLIONE, 0.0, medaglione.position.z)
+	var centro: Vector3 = medaglione.get_meta("base")
 	var scossa: Tween = create_tween()
 	for passo: int in range(4):
 		var spostamento: Vector3 = Vector3(randf_range(-0.12, 0.12), 0.0, randf_range(-0.08, 0.08))
@@ -1781,10 +1892,13 @@ func _chiudi_scontro() -> void:
 	_hud.modalita_scontro(false)
 	_stendi_stendardo(Lato.GIOCATORE, true, true)
 	_scena.mostra_fila_mesi(true)
-	# La plancia torna com'è fuori dagli scontri: niente riserva di mana, Scudo o Corruzione.
+	# La plancia torna com'è fuori dagli scontri: riserva di mana vuota, niente Scudo o Corruzione.
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_aggiorna_anello(lato, 0)
-		_riserve[lato].visible = false
+		var riserva: RiservaMana = _riserve[lato] as RiservaMana
+		for mana: StringName in COLORI_RISERVA:
+			riserva.imposta(mana, 0)
+		riserva.segnala_mancanze([] as Array[StringName])
 		_segnalini_scudo[lato].visible = false
 		_segnalini_corruzione[lato].visible = false
 		_teli_stendardo[lato].set_shader_parameter("corruzione", 0.0)
