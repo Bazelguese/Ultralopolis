@@ -517,6 +517,21 @@ func found_nation(p_name: String, choices: Array[IdentityDef]) -> bool:
 	return true
 
 
+## Nazione di test (solo per le prove, convenzione §16.3): le risorse di partenza prendono il
+## posto della dotazione normale e, se richiesto, si aprono tutti gli spazi della plancia.
+## Va chiamata prima di found_nation, così anche la dotazione dell'identità trova spazio.
+func apply_test_setup(setup: TestNationDef) -> void:
+	if setup == null:
+		return
+	if setup.starting_resources != null:
+		for type: Res.Type in Res.NAMES:
+			stock[type] = setup.starting_resources.internal(type)
+	if setup.open_all_slots:
+		board.base_building_slots = board.max_building_slots
+		board.base_troop_slots = board.max_troop_slots
+	_log("Nazione di test: %s." % setup.describe())
+
+
 ## Testo breve dell'identità, es. "Montanari · Monarchia · ...".
 func identity_summary() -> String:
 	var names: PackedStringArray = PackedStringArray()
