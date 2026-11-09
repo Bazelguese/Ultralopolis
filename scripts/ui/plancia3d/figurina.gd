@@ -13,7 +13,11 @@ const SOGLIA_NERO: float = 0.15
 ## Lato dell'immagine su cui si calcola la sagoma (più piccolo = più veloce, contorno più morbido).
 const LATO_MASCHERA: int = 128
 ## Lato dell'immagine finale della figurina.
-const LATO_FIGURA: int = 256
+const LATO_FIGURA: int = 512
+## Maschere già calcolate, ricordate fra una partita e l'altra (si possono cancellare: si rifanno).
+const CARTELLA_MEMORIA: String = "user://figurine"
+## Da cambiare se cambia il modo di calcolare la maschera, così le vecchie non si usano più.
+const VERSIONE_MASCHERA: int = 1
 ## Quanta parte (dall'alto) della figura fa il mezzo busto.
 const QUOTA_BUSTO: float = 0.72
 
@@ -21,18 +25,30 @@ const SHADER: String = """
 shader_type spatial;
 render_mode cull_disabled, depth_draw_opaque;
 uniform sampler2D tex : source_color, filter_linear_mipmap;
+uniform sampler2D maschera : filter_linear;
 uniform sampler2D rumore;
+uniform bool con_maschera = false;
+uniform vec3 carta : source_color = vec3(0.925, 0.886, 0.8);
+uniform float quota = 1.0;
 uniform float bruciatura = 0.0;
 uniform float lampo = 0.0;
 uniform float spento = 0.0;
 void fragment() {
-	vec4 c = texture(tex, UV);
-	float n = texture(rumore, UV).r;
+	vec2 uv = vec2(UV.x, UV.y * quota);
+	vec4 c = texture(tex, uv);
 	float a = c.a;
+	vec3 base = c.rgb;
+	if (con_maschera) {
+		// La maschera (fatta una volta, piccola) dice dove sta la figura (R) e il bordo di carta (G).
+		vec2 m = texture(maschera, uv).rg;
+		a = smoothstep(0.26, 0.34, m.g);
+		base = mix(carta, c.rgb, smoothstep(0.5, 0.6, m.r));
+	}
+	float n = texture(rumore, uv).r;
 	if (bruciatura > 0.001 && n < bruciatura) { a = 0.0; }
 	float bordo = (bruciatura > 0.001) ? smoothstep(bruciatura + 0.07, bruciatura, n) : 0.0;
-	float g = dot(c.rgb, vec3(0.3, 0.59, 0.11));
-	vec3 col = mix(c.rgb, vec3(g) * 0.4, spento);
+	float g = dot(base, vec3(0.3, 0.59, 0.11));
+	vec3 col = mix(base, vec3(g) * 0.4, spento);
 	ALBEDO = col;
 	EMISSION = col * lampo * 1.2 + vec3(1.0, 0.42, 0.08) * bordo * 4.0;
 	ROUGHNESS = 0.9;
@@ -67,10 +83,8 @@ func costruisci(illustrazione: Texture2D, larghezza: float, z_base: float, y_car
 	var figura: MeshInstance3D = MeshInstance3D.new()
 	figura.mesh = forma
 	figura.position = Vector3(0.0, altezza * 0.5, 0.0)
-	_materiale = ShaderMaterial.new()
-	_materiale.shader = _shader_condiviso()
-	_materiale.set_shader_parameter("tex", ritaglia(illustrazione))
-	_materiale.set_shader_parameter("rumore", _rumore_condiviso())
+	var ritaglio: Array = ritaglia(illustrazione)
+	_materiale = materiale_carta(ritaglio[0], ritaglio[1])
 	figura.material_override = _materiale
 	_perno.add_child(figura)
 	# Piedino di cartone che regge la figurina.
@@ -139,8 +153,9 @@ func _imposta_lampo(valore: float) -> void:
 
 # --- Ritaglio --------------------------------------------------------------------
 
-## La figurina di un'illustrazione: fondo nero tolto, bordo di carta. Il risultato si ricorda.
-static func ritaglia(illustrazione: Texture2D) -> Texture2D:
+## La figurina di un'illustrazione: [immagine, maschera]. La maschera dice dove togliere il fondo
+## nero e dove mettere il bordo di carta; il ritaglio lo fa lo shader. Il risultato si ricorda.
+static func ritaglia(illustrazione: Texture2D) -> Array:
 	var chiave: String = illustrazione.resource_path if illustrazione.resource_path != "" else str(illustrazione.get_instance_id())
 	if _ritagli.has(chiave):
 		return _ritagli[chiave]
@@ -149,6 +164,17 @@ static func ritaglia(illustrazione: Texture2D) -> Texture2D:
 		img.decompress()
 	img.convert(Image.FORMAT_RGBA8)
 	img = _quadrata(img, LATO_FIGURA)
+	img.generate_mipmaps()
+	var immagine: ImageTexture = ImageTexture.create_from_image(img)
+	# La maschera si calcola una volta sola e si ricorda su disco (cambia se cambia il file).
+	var file_memoria: String = _file_memoria(illustrazione.resource_path)
+	if file_memoria != "" and FileAccess.file_exists(file_memoria):
+		var salvata: Image = Image.load_from_file(file_memoria)
+		if salvata != null and not salvata.is_empty():
+			salvata.convert(Image.FORMAT_RG8)
+			var pronto: Array = [immagine, ImageTexture.create_from_image(salvata)]
+			_ritagli[chiave] = pronto
+			return pronto
 	var piccola: Image = img.duplicate() as Image
 	piccola.resize(LATO_MASCHERA, LATO_MASCHERA, Image.INTERPOLATE_BILINEAR)
 	var n: int = LATO_MASCHERA
@@ -181,51 +207,32 @@ static func ritaglia(illustrazione: Texture2D) -> Texture2D:
 	for i: int in range(n * n):
 		dentro[i] = 0.0 if fuori[i] == 1 else 1.0
 	var con_bordo: PackedFloat32Array = _sfoca(dentro, n, 1)
-	var maschera_dentro: Image = _immagine_maschera(_sfoca(dentro, n, 1), n)
-	var maschera_bordo: Image = _immagine_maschera(_sfoca(con_bordo, n, 1), n)
-	maschera_dentro.resize(LATO_FIGURA, LATO_FIGURA, Image.INTERPOLATE_BILINEAR)
-	maschera_bordo.resize(LATO_FIGURA, LATO_FIGURA, Image.INTERPOLATE_BILINEAR)
-	var colori: PackedByteArray = img.get_data()
-	var dentro_dati: PackedByteArray = maschera_dentro.get_data()
-	var bordo_dati: PackedByteArray = maschera_bordo.get_data()
-	var carta: PackedByteArray = PackedByteArray([COLORE_CARTA.r8, COLORE_CARTA.g8, COLORE_CARTA.b8])
-	var uscita: PackedByteArray = PackedByteArray()
-	uscita.resize(LATO_FIGURA * LATO_FIGURA * 4)
-	for i: int in range(LATO_FIGURA * LATO_FIGURA):
-		if bordo_dati[i] < 77:
-			continue
-		var j: int = i * 4
-		if dentro_dati[i] > 140:
-			uscita[j] = colori[j]
-			uscita[j + 1] = colori[j + 1]
-			uscita[j + 2] = colori[j + 2]
-		else:
-			uscita[j] = carta[0]
-			uscita[j + 1] = carta[1]
-			uscita[j + 2] = carta[2]
-		uscita[j + 3] = 255
-	var risultato: Image = Image.create_from_data(LATO_FIGURA, LATO_FIGURA, false, Image.FORMAT_RGBA8, uscita)
-	risultato.generate_mipmaps()
-	var trama: ImageTexture = ImageTexture.create_from_image(risultato)
-	_ritagli[chiave] = trama
-	return trama
+	# La maschera va alla scheda video, che fa il ritaglio mentre disegna (bordi lisci, nessun ciclo
+	# sui pixel dell'immagine grande): R = figura, G = figura con il bordo di carta.
+	var morbida_dentro: PackedFloat32Array = _sfoca(dentro, n, 1)
+	var morbida_bordo: PackedFloat32Array = _sfoca(con_bordo, n, 1)
+	var dati: PackedByteArray = PackedByteArray()
+	dati.resize(n * n * 2)
+	for i: int in range(n * n):
+		dati[i * 2] = int(clampf(morbida_dentro[i], 0.0, 1.0) * 255.0)
+		dati[i * 2 + 1] = int(clampf(morbida_bordo[i], 0.0, 1.0) * 255.0)
+	var maschera: Image = Image.create_from_data(n, n, false, Image.FORMAT_RG8, dati)
+	if file_memoria != "":
+		DirAccess.make_dir_recursive_absolute(CARTELLA_MEMORIA)
+		var da_salvare: Image = maschera.duplicate() as Image
+		da_salvare.convert(Image.FORMAT_RGBA8)
+		da_salvare.save_png(file_memoria)
+	var risultato: Array = [immagine, ImageTexture.create_from_image(maschera)]
+	_ritagli[chiave] = risultato
+	return risultato
 
 
-## Il mezzo busto di un'illustrazione (consiglieri e avvenimenti): la parte alta della figurina
-## ritagliata, tagliata dritta in basso. Il risultato si ricorda.
-static func ritaglia_busto(illustrazione: Texture2D) -> Texture2D:
-	var chiave: String = "busto:" + (illustrazione.resource_path if illustrazione.resource_path != "" else str(illustrazione.get_instance_id()))
-	if _ritagli.has(chiave):
-		return _ritagli[chiave]
-	var intera: Image = ritaglia(illustrazione).get_image()
-	if intera.has_mipmaps():
-		intera.clear_mipmaps()
-	var alto: int = int(intera.get_height() * QUOTA_BUSTO)
-	var busto: Image = intera.get_region(Rect2i(0, 0, intera.get_width(), alto))
-	busto.generate_mipmaps()
-	var trama: ImageTexture = ImageTexture.create_from_image(busto)
-	_ritagli[chiave] = trama
-	return trama
+## Dove si ricordano le maschere già calcolate: un file per illustrazione e versione del file.
+static func _file_memoria(percorso: String) -> String:
+	if percorso == "":
+		return ""
+	var firma: String = "%s|%d|%d|%d" % [percorso, FileAccess.get_modified_time(percorso), LATO_MASCHERA, VERSIONE_MASCHERA]
+	return "%s/%s.png" % [CARTELLA_MEMORIA, firma.md5_text()]
 
 
 ## L'immagine dentro un quadrato, con le sue proporzioni (2:3 in verticale, 3:2 in orizzontale):
@@ -267,40 +274,43 @@ static func _riempi_dai_bordi(libero: PackedByteArray, n: int) -> PackedByteArra
 
 
 ## Sfocatura a scatola (orizzontale poi verticale), ripetuta due volte: quasi una gaussiana.
+## Con le somme scorrevoli costa uguale qualunque sia il raggio.
 static func _sfoca(valori: PackedFloat32Array, n: int, raggio: int) -> PackedFloat32Array:
 	var a: PackedFloat32Array = valori.duplicate()
+	var b: PackedFloat32Array = PackedFloat32Array()
+	b.resize(n * n)
+	var finestra: float = float(raggio * 2 + 1)
 	for _passata: int in range(2):
-		var b: PackedFloat32Array = PackedFloat32Array()
-		b.resize(n * n)
 		for y: int in range(n):
+			var riga: int = y * n
+			var somma: float = 0.0
+			for d: int in range(-raggio, raggio + 1):
+				somma += a[riga + clampi(d, 0, n - 1)]
 			for x: int in range(n):
-				var somma: float = 0.0
-				for d: int in range(-raggio, raggio + 1):
-					somma += a[y * n + clampi(x + d, 0, n - 1)]
-				b[y * n + x] = somma / float(raggio * 2 + 1)
-		for y: int in range(n):
-			for x: int in range(n):
-				var somma2: float = 0.0
-				for d: int in range(-raggio, raggio + 1):
-					somma2 += b[clampi(y + d, 0, n - 1) * n + x]
-				a[y * n + x] = somma2 / float(raggio * 2 + 1)
+				b[riga + x] = somma / finestra
+				somma += a[riga + mini(x + raggio + 1, n - 1)] - a[riga + maxi(x - raggio, 0)]
+		for x: int in range(n):
+			var somma2: float = 0.0
+			for d: int in range(-raggio, raggio + 1):
+				somma2 += b[clampi(d, 0, n - 1) * n + x]
+			for y: int in range(n):
+				a[y * n + x] = somma2 / finestra
+				somma2 += b[mini(y + raggio + 1, n - 1) * n + x] - b[maxi(y - raggio, 0) * n + x]
 	return a
 
 
-static func _immagine_maschera(valori: PackedFloat32Array, n: int) -> Image:
-	var dati: PackedByteArray = PackedByteArray()
-	dati.resize(n * n)
-	for i: int in range(n * n):
-		dati[i] = int(clampf(valori[i], 0.0, 1.0) * 255.0)
-	return Image.create_from_data(n, n, false, Image.FORMAT_L8, dati)
-
-
 ## Materiale di carta del teatro (figurine, stendardi): può bruciare e lampeggiare.
-static func materiale_carta(trama: Texture2D) -> ShaderMaterial:
+## Con la maschera di un ritaglio fa la figurina; quota < 1 mostra solo la parte alta (il mezzo busto).
+static func materiale_carta(trama: Texture2D, maschera: Texture2D = null, quota: float = 1.0) -> ShaderMaterial:
 	var materiale: ShaderMaterial = ShaderMaterial.new()
 	materiale.shader = _shader_condiviso()
 	materiale.set_shader_parameter("tex", trama)
 	materiale.set_shader_parameter("rumore", _rumore_condiviso())
+	materiale.set_shader_parameter("carta", COLORE_CARTA)
+	materiale.set_shader_parameter("quota", quota)
+	if maschera != null:
+		materiale.set_shader_parameter("maschera", maschera)
+		materiale.set_shader_parameter("con_maschera", true)
 	return materiale
 
 

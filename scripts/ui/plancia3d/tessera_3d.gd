@@ -308,7 +308,8 @@ func aggiungi_busto() -> void:
 	forma.size = Vector2(larghezza_busto, altezza_busto)
 	forma.orientation = PlaneMesh.FACE_Y
 	busto.mesh = forma
-	busto.material_override = Figurina.materiale_carta(Figurina.ritaglia_busto(scheda.illustrazione))
+	var ritaglio: Array = Figurina.ritaglia(scheda.illustrazione)
+	busto.material_override = Figurina.materiale_carta(ritaglio[0], ritaglio[1], Figurina.QUOTA_BUSTO)
 	var fondo: float = -profondita * 0.5 + profondita * _faccia.fondo_arte()
 	busto.position = Vector3(0.0, SPESSORE + 0.014, fondo - altezza_busto * 0.5)
 	_corpo.add_child(busto)
