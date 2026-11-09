@@ -31,8 +31,11 @@ uniform bool con_maschera = false;
 uniform vec3 carta : source_color = vec3(0.925, 0.886, 0.8);
 uniform float quota = 1.0;
 uniform float bruciatura = 0.0;
+uniform bool dai_bordi = false;
+uniform float finale = 0.0;
 uniform float lampo = 0.0;
 uniform float spento = 0.0;
+uniform float corruzione = 0.0;
 void fragment() {
 	vec2 uv = vec2(UV.x, UV.y * quota);
 	vec4 c = texture(tex, uv);
@@ -45,8 +48,29 @@ void fragment() {
 		base = mix(carta, c.rgb, smoothstep(0.5, 0.6, m.r));
 	}
 	float n = texture(rumore, uv).r;
-	if (bruciatura > 0.001 && n < bruciatura) { a = 0.0; }
-	float bordo = (bruciatura > 0.001) ? smoothstep(bruciatura + 0.07, bruciatura, n) : 0.0;
+	float bordo = 0.0;
+	float bruciacchiato = 0.0;
+	if (dai_bordi) {
+		// Stendardo (Davide, 9 novembre 2026): brucia dai bordi verso l'interno, ma il centro con le
+		// iniziali e la Resistenza resta intatto e leggibile; la carta vicino al fuoco si annerisce.
+		vec2 q = abs(uv - vec2(0.5, 0.52)) / vec2(0.5, 0.48);
+		float d = max(q.x, q.y) + (n - 0.5) * 0.18;
+		float limite = 1.02 - bruciatura;
+		if (bruciatura > 0.001 && d > limite) { a = 0.0; }
+		bordo = (bruciatura > 0.001) ? smoothstep(limite - 0.05, limite, d) : 0.0;
+		bruciacchiato = (bruciatura > 0.001) ? smoothstep(limite - 0.14, limite, d) : 0.0;
+		if (finale > 0.001 && n < finale) { a = 0.0; }
+		bordo = max(bordo, (finale > 0.001) ? smoothstep(finale + 0.07, finale, n) : 0.0);
+	} else {
+		if (bruciatura > 0.001 && n < bruciatura) { a = 0.0; }
+		bordo = (bruciatura > 0.001) ? smoothstep(bruciatura + 0.07, bruciatura, n) : 0.0;
+	}
+	base = mix(base, vec3(0.16, 0.1, 0.06), bruciacchiato * 0.85);
+	// Corruzione: una macchia magenta che sale dal basso, con il bordo irregolare.
+	if (corruzione > 0.001) {
+		float sale = 1.0 - corruzione + (n - 0.5) * 0.12;
+		base = mix(base, vec3(0.76, 0.22, 0.54), smoothstep(sale, sale + 0.04, uv.y) * 0.75);
+	}
 	float g = dot(base, vec3(0.3, 0.59, 0.11));
 	vec3 col = mix(base, vec3(g) * 0.4, spento);
 	ALBEDO = col;

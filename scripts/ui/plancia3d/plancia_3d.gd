@@ -69,7 +69,7 @@ const FOV_TELECAMERA: float = 30.0
 const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 21.5, 20.0)
 const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -0.2)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
-const SPOSTAMENTO_PLANCIA: float = 1.2
+const SPOSTAMENTO_PLANCIA: float = 0.0
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
 const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 24.0, 23.0)
 const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.2)
@@ -451,6 +451,7 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	forma_telo.size = Vector2(LARGHEZZA_STENDARDO, ALTEZZA_STENDARDO)
 	telo.mesh = forma_telo
 	var materiale_telo: ShaderMaterial = Figurina.materiale_carta(_trama_stendardo(colore))
+	materiale_telo.set_shader_parameter("dai_bordi", true)
 	telo.material_override = materiale_telo
 	telo.position = Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.5, 0.0)
 	stendardo.add_child(telo)
@@ -495,10 +496,14 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	numero.position = fondo_barra.position + Vector3(0.0, 0.06, 0.0)
 	dati.add_child(numero)
 	_scritte_resistenza[lato] = numero
-	var scudo: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, -0.55), Color("2f6fd0"))
+	# Scudo e Corruzione (GDD §7.6) sono distintivi appuntati sul bordo destro dello stendardo,
+	# così si alzano con lui negli scontri.
+	var stendardo_scudo: Node3D = _stendardi[lato]
+	var bordo_destro: float = LARGHEZZA_STENDARDO * 0.5 + 0.02
+	var scudo: Array = _crea_segnalino(stendardo_scudo, Vector3(bordo_destro, BASE_TELO + ALTEZZA_STENDARDO * 0.78, 0.05), Color("2f6fd0"), &"scudo")
 	_segnalini_scudo[lato] = scudo[0]
 	_scritte_scudo[lato] = scudo[1]
-	var corruzione: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, 0.55), StileVisivo.COLORE_CORRUZIONE)
+	var corruzione: Array = _crea_segnalino(stendardo_scudo, Vector3(bordo_destro, BASE_TELO + ALTEZZA_STENDARDO * 0.42, 0.05), StileVisivo.COLORE_CORRUZIONE, &"corruzione")
 	_segnalini_corruzione[lato] = corruzione[0]
 	_scritte_corruzione[lato] = corruzione[1]
 
@@ -507,25 +512,44 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	_stendi_stendardo(lato, true, false)
 
 
-func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color) -> Array:
+func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color, simbolo: StringName) -> Array:
 	var nodo: Node3D = Node3D.new()
 	nodo.position = posizione
 	genitore.add_child(nodo)
-	var disco: MeshInstance3D = MeshInstance3D.new()
-	var forma: CylinderMesh = CylinderMesh.new()
-	forma.top_radius = 0.36
-	forma.bottom_radius = 0.38
-	forma.height = 0.1
-	forma.radial_segments = 6
-	disco.mesh = forma
-	disco.material_override = StileVisivo.materiale_luminoso(colore, 0.5)
-	disco.position.y = 0.05
-	nodo.add_child(disco)
-	var scritta: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 64, Color.WHITE, 0.0, 10)
-	scritta.position.y = 0.12
+	# Un distintivo di carta: bordo crema, tondo del colore dell'effetto, simbolo e numero.
+	for strato: Array in [[0.33, StileVisivo.CARTA_CREMA, 0.0], [0.28, colore.darkened(0.15), 0.012]]:
+		var disco: MeshInstance3D = MeshInstance3D.new()
+		var forma: CylinderMesh = CylinderMesh.new()
+		forma.top_radius = float(strato[0])
+		forma.bottom_radius = float(strato[0])
+		forma.height = 0.02
+		forma.radial_segments = 24
+		disco.mesh = forma
+		disco.material_override = StileVisivo.materiale(strato[1], 0.85)
+		disco.rotation.x = PI * 0.5
+		disco.position.z = float(strato[2])
+		nodo.add_child(disco)
+	var icona: Sprite3D = Sprite3D.new()
+	icona.texture = Simboli.trama(simbolo, 64.0)
+	icona.pixel_size = 0.26 / 64.0
+	icona.position = Vector3(-0.1, 0.0, 0.03)
+	icona.modulate = Color.WHITE
+	icona.shaded = false
+	nodo.add_child(icona)
+	var scritta: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 58, Color.WHITE, 0.0, 8)
+	scritta.rotation = Vector3.ZERO
+	scritta.outline_modulate = colore.darkened(0.6)
+	scritta.position = Vector3(0.1, 0.0, 0.035)
 	nodo.add_child(scritta)
 	nodo.visible = false
 	return [nodo, scritta]
+
+
+## Un distintivo cambia valore: piccolo salto, così si vede che lo scudo assorbe o la Corruzione sale.
+func _scuoti_segnalino(nodo: Node3D) -> void:
+	var t: Tween = create_tween()
+	t.tween_property(nodo, "scale", Vector3.ONE * 1.35, 0.06)
+	t.tween_property(nodo, "scale", Vector3.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 ## La riserva di mana sotto lo stendardo: una sfera per colore (Davide, 9 novembre 2026).
@@ -544,7 +568,8 @@ func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
 	var frazione: float = clampf(float(resistenza) / float(maxi(massimo, 1)), 0.0, 1.0)
 	_numeri_stendardo[lato].text = str(maxi(resistenza, 0))
 	# Lo stendardo brucia fino a metà; a zero brucia del tutto (a fine scontro).
-	_teli_stendardo[lato].set_shader_parameter("bruciatura", 0.0 if frazione >= 1.0 else 0.08 + 0.4 * (1.0 - frazione))
+	# Brucia dai bordi fino a lasciare intatto il centro, dove ci sono iniziali e Resistenza.
+	_teli_stendardo[lato].set_shader_parameter("bruciatura", 0.0 if frazione >= 1.0 else 0.06 + 0.3 * (1.0 - frazione))
 	var barra: MeshInstance3D = _barre_resistenza[lato]
 	barra.scale.x = maxf(frazione, 0.001)
 	barra.position.x = X_MEDAGLIONE - 0.925 * (1.0 - frazione)
@@ -1486,11 +1511,17 @@ func _aggiorna_visuale_scontro() -> void:
 		_aggiorna_anello(lato, _sim.elapsed_ms)
 		_aggiorna_medaglione(lato, _sim.get_resistance(lato), _sim.get_max_resistance(lato))
 		var scudo: int = _sim.get_shield(lato)
+		if _scritte_scudo[lato].text != str(scudo) and scudo > 0:
+			_scuoti_segnalino(_segnalini_scudo[lato])
 		_segnalini_scudo[lato].visible = scudo > 0
 		_scritte_scudo[lato].text = str(scudo)
 		var corruzione: int = _sim.get_corruption(lato)
+		if _scritte_corruzione[lato].text != str(corruzione) and corruzione > 0:
+			_scuoti_segnalino(_segnalini_corruzione[lato])
 		_segnalini_corruzione[lato].visible = corruzione > 0
 		_scritte_corruzione[lato].text = str(corruzione)
+		# La Corruzione macchia lo stendardo dal basso: quando arriva alla Resistenza, il lato cade (GDD §7.6.3).
+		_teli_stendardo[lato].set_shader_parameter("corruzione", clampf(float(corruzione) / float(maxi(_sim.get_resistance(lato), 1)), 0.0, 1.0))
 		for i: int in range(_edifici[lato].size()):
 			var edificio: Tessera3D = _edifici[lato][i]
 			if _sim.get_building_sabotage_ms(lato, i) > 0:
@@ -1655,7 +1686,7 @@ func _richiudi_sconfitto(esito: BattleSim.Outcome) -> void:
 	_brace(_medaglioni[sconfitto].global_position + Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.5, 0.2), 90)
 	var telo: ShaderMaterial = _teli_stendardo[sconfitto]
 	var brucia: Tween = create_tween()
-	brucia.tween_method(func(v: float) -> void: telo.set_shader_parameter("bruciatura", v), 0.5, 1.05, 1.6)
+	brucia.tween_method(func(v: float) -> void: telo.set_shader_parameter("finale", v), 0.0, 1.05, 1.6)
 
 
 ## Scintille di brace che salgono (colpi sullo stemma, sconfitta).
@@ -1755,6 +1786,7 @@ func _chiudi_scontro() -> void:
 		_riserve[lato].visible = false
 		_segnalini_scudo[lato].visible = false
 		_segnalini_corruzione[lato].visible = false
+		_teli_stendardo[lato].set_shader_parameter("corruzione", 0.0)
 		for i: int in range(_lampi[lato].size()):
 			_lampi[lato][i] = 0.0
 	var avversario: Node3D = _radici[Lato.AVVERSARIO]
@@ -1786,10 +1818,11 @@ func _testo_riquadro(tessera: Tessera3D) -> String:
 func _area_sullo_schermo(tessera: Tessera3D, fattore: float = 1.0) -> Rect2:
 	var mezza_x: float = tessera.larghezza * 0.5 * fattore
 	var mezza_z: float = tessera.profondita * 0.5 * fattore
+	var giu: float = tessera.spostamento_ingrandimento() if fattore > 1.0 else 0.0
 	var area: Rect2 = Rect2()
 	var primo: bool = true
 	for angolo: Vector3 in [Vector3(-mezza_x, 0.0, -mezza_z), Vector3(mezza_x, 0.0, -mezza_z), Vector3(-mezza_x, 0.0, mezza_z), Vector3(mezza_x, 0.0, mezza_z)]:
-		var punto: Vector2 = _camera.unproject_position(tessera.to_global(angolo))
+		var punto: Vector2 = _camera.unproject_position(tessera.to_global(angolo + Vector3(0.0, 0.0, giu)))
 		if primo:
 			area = Rect2(punto, Vector2.ZERO)
 			primo = false
