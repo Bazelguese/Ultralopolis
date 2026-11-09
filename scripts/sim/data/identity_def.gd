@@ -78,6 +78,11 @@ const CREATION_DIMENSIONS: Array[Dimension] = [
 ## almeno un tipo di categoria, e lo leggono perk, tratti ed eventi.
 @export var identity_type: StringName = &""
 
+@export_group("Aspetto")
+## Forma della plancia della nazione (solo aspetto, nessun effetto sulle regole; Davide,
+## 9 novembre 2026): la indica il popolo. Valori: &"ali", &"mura", &"arco"; vuoto = nessuna.
+@export var board_shape: StringName = &""
+
 @export_group("Resistenza")
 ## Quota di Resistenza in ogni scontro (GDD §7.1.1).
 @export var resistance_bonus: int = 0

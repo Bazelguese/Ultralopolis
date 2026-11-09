@@ -16,6 +16,7 @@ id = &"pietrosangue"
 display_name = "Pietrosangue"
 description = "Popolo di roccia viva delle montagne, lento a cedere. Parte con i Lancieri e può reclutare le Guardie delle vette. Poi il Bastione di roccia viva (era 2) e i Colossi di pietra (era 3). Capitale: +1 Pietra."
 identity_type = &"Pietrosangue"
+board_shape = &"mura"
 resistance_bonus = 8
 extra_troops = Array[ExtResource("x2")]([ExtResource("x3")])
 exclusive_troops = Array[ExtResource("x2")]([ExtResource("x4"), ExtResource("p3")])

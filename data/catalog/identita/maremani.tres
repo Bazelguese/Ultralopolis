@@ -17,6 +17,7 @@ id = &"maremani"
 display_name = "Maremani"
 description = "Anfibi delle lagune, barcaioli e commercianti. +3 Oro iniziale, il Tesoriere e la sua azione Esattori più frequenti, può costruire il Porto lagunare. Poi i Cantori delle maree (era 2) e la Darsena delle lagune (era 3). Capitale: +1 Influenza."
 identity_type = &"Maremano"
+board_shape = &"arco"
 resistance_bonus = 2
 extra_gold = 3
 favored_opportunities = Array[ExtResource("x2")]([ExtResource("x4")])

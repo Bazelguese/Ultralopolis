@@ -25,5 +25,6 @@ difficulty_label = "Facile"
 loot_gold = 2
 loot_research = 1
 resistance = 25
+board_shape = &"barricata"
 troops = Array[ExtResource("4_8slrt")]([ExtResource("5_l245r"), ExtResource("6_xn28m")])
 rewards = Array[ExtResource("2_hmclc")]([SubResource("Resource_7ngeb"), SubResource("Resource_4v76j")])

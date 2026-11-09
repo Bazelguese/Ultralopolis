@@ -12,6 +12,9 @@ extends Resource
 @export var difficulty_label: String = ""
 ## Resistenza fissa della plancia generata (niente calcolo, GDD §3.3).
 @export var resistance: int = 20
+## Forma della plancia dell'incontro (solo aspetto): una per famiglia di incontri. Vuoto = forma
+## semplice, finché la famiglia non ha la sua.
+@export var board_shape: StringName = &""
 @export var buildings: Array[BuildingDef] = []
 ## Truppe da sinistra a destra.
 @export var troops: Array[TroopDef] = []

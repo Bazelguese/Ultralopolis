@@ -247,7 +247,8 @@ func test_le_offerte_restano_ferme_se_cambia_solo_la_plancia() -> void:
 	assert_false(dopo.is_empty() or dopo[0] == prima[0], "Passando arrivano carte nuove.")
 
 
-## Dopo uno scontro la plancia torna pulita: niente Scudo, Corruzione o riserva di mana rimasti.
+## Dopo uno scontro la plancia torna pulita: niente Scudo o Corruzione, e la riserva di mana (che
+## sta sempre sul cuore della plancia) torna vuota.
 func test_dopo_lo_scontro_la_plancia_si_azzera() -> void:
 	var run: RunState = _run()
 	_fino_allo_scontro(run)
@@ -262,9 +263,14 @@ func test_dopo_lo_scontro_la_plancia_si_azzera() -> void:
 	_scena.call("_mostra_esito")
 	var hud: HudPlancia = _scena.get("_hud")
 	hud.call("_on_continua_esito")
-	for nome: String in ["_segnalini_scudo", "_segnalini_corruzione", "_riserve"]:
+	for nome: String in ["_segnalini_scudo", "_segnalini_corruzione"]:
 		for segnalino: Node3D in (_scena.get(nome) as Array):
 			assert_false(segnalino.visible, "%s nascosto dopo lo scontro." % nome)
+	for riserva: Node3D in (_scena.get("_riserve") as Array):
+		assert_true(riserva.visible, "La riserva di mana resta sul cuore della plancia.")
+		var valori: Dictionary = riserva.get("_valori")
+		for mana: StringName in valori:
+			assert_eq(int(valori[mana]), 0, "La riserva di mana torna vuota dopo lo scontro (%s)." % mana)
 	assert_eq(_carte("_truppe", 0).size(), run.board.troops.size(), "Le carte tornano quelle della plancia.")
 	assert_eq(_scena.get("_modo"), 0)
 

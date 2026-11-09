@@ -183,6 +183,9 @@ var won_encounter: EncounterDef
 var last_battle: BattleSim
 var last_battle_kind: BattleKind = BattleKind.NESSUNA
 var last_opponent_name: String = ""
+## Forma della plancia del nemico dell'ultimo scontro (solo aspetto): quella del popolo del
+## fantasma o quella dell'incontro.
+var last_opponent_board_shape: StringName = &""
 var _last_setups: Array[BattleSideSetup] = []
 ## Seme dell'ultimo scontro, ricavato dal seme della run, dall'anno e dal tipo di scontro (§16.3).
 var last_battle_seed: int = 0
@@ -1222,6 +1225,19 @@ func _assimilated_troop(enemy: TroopDef) -> TroopDef:
 			new_types.append(extra)
 	troop.types = new_types
 	return troop
+
+
+## Forma della plancia della nazione (solo aspetto): la indica il popolo.
+func board_shape() -> StringName:
+	return board_shape_of(identity)
+
+
+## Forma della plancia indicata dal popolo di un'identità; vuota se non ce n'è.
+static func board_shape_of(elements: Array[IdentityDef]) -> StringName:
+	for def: IdentityDef in elements:
+		if def.dimension == IdentityDef.Dimension.POPOLO and def.board_shape != &"":
+			return def.board_shape
+	return &""
 
 
 ## Tipo d'identità della razza della nazione, es. "Pietrosangue"; vuoto se non c'è.
@@ -2340,6 +2356,7 @@ func choose_encounter(index: int) -> bool:
 	var encounter: EncounterDef = encounter_choices[index]
 	var enemy: BattleSideSetup = BattleSideSetup.new(encounter.buildings, encounter.troops, encounter.resistance)
 	_pay_upkeep()
+	last_opponent_board_shape = encounter.board_shape
 	var outcome: BattleSim.Outcome = _fight(BattleKind.INCONTRO, encounter.display_name, enemy)
 	if not history.is_empty():
 		# Due incontri all'anno (v0.25): il riepilogo li elenca in ordine.
@@ -2437,6 +2454,7 @@ func fight_ghost() -> bool:
 		enemy.start_timer_effects = spy_effects.duplicate()
 	spy_effects = []
 	_pay_upkeep()
+	last_opponent_board_shape = board_shape_of(current_ghost.identity) if current_ghost != null else &""
 	var outcome: BattleSim.Outcome = _fight(BattleKind.FANTASMA, ghost_name, enemy)
 	for message: String in modifiers.on_ghost_fight_done():
 		_log(message)

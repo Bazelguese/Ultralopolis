@@ -21,7 +21,7 @@ signal annulla
 signal scegli_cronaca(indice: int)
 
 ## Distanza dal fondo dello schermo dei comandi che stanno sopra la barra delle risorse.
-const SOPRA_BARRA: float = -112.0
+const SOPRA_BARRA: float = -84.0
 ## Distanza minima del pannello della tessera dai bordi dello schermo.
 const MARGINE_PEZZO: float = 20.0
 ## Che cosa succede entrando nella prossima era (GDD §10.2, §10.3).
@@ -436,7 +436,7 @@ func _crea_run() -> void:
 	_rendi_apribile(riquadro)
 	_ancora(riquadro, Control.PRESET_TOP_RIGHT, Vector2(-24, 20))
 	_ultima_possibilita = StileVisivo.etichetta("ULTIMA POSSIBILITÀ", StileVisivo.FONT_TITOLI, 22, StileVisivo.PERICOLO)
-	_ancora(_ultima_possibilita, Control.PRESET_TOP_RIGHT, Vector2(-30, 124))
+	_ancora(_ultima_possibilita, Control.PRESET_TOP_RIGHT, Vector2(-30, 330))
 
 
 ## Barra lunga in fondo allo schermo, sempre visibile: tutte le risorse del Magazzino
@@ -502,10 +502,21 @@ func _crea_risorse() -> void:
 	barra.anchor_top = 1.0
 	barra.anchor_bottom = 1.0
 	barra.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	barra.offset_left = 24.0
-	barra.offset_right = -24.0
-	barra.offset_bottom = -16.0
-	barra.offset_top = -16.0 - barra.get_combined_minimum_size().y
+	# La barra delle risorse arriva fino al bordo dello schermo (Davide, 9 novembre 2026).
+	var stile_barra: StyleBoxFlat = StileVisivo.riquadro(Color(StileVisivo.CARTONCINO, 0.97), Color(StileVisivo.CARTA_CREMA, 0.5))
+	stile_barra.set_corner_radius_all(0)
+	stile_barra.border_width_bottom = 0
+	stile_barra.border_width_left = 0
+	stile_barra.border_width_right = 0
+	stile_barra.content_margin_left = 24
+	stile_barra.content_margin_right = 24
+	stile_barra.content_margin_top = 10
+	stile_barra.content_margin_bottom = 10
+	barra.add_theme_stylebox_override("panel", stile_barra)
+	barra.offset_left = 0.0
+	barra.offset_right = 0.0
+	barra.offset_bottom = 0.0
+	barra.offset_top = -barra.get_combined_minimum_size().y
 
 
 func _crea_magazzino() -> void:
@@ -838,28 +849,28 @@ func _alterna(pannello: Control) -> void:
 		_suggerimento.move_to_front()
 
 
+## I comandi del round (Passa, Rinnova, Nessuna ricompensa) stanno in alto a destra, sotto
+## «Partita · Menu» (Davide, 9 novembre 2026); il suggerimento della fase resta in basso al centro.
 func _crea_comandi() -> void:
-	_comandi = VBoxContainer.new()
-	_comandi.alignment = BoxContainer.ALIGNMENT_CENTER
-	_comandi.add_theme_constant_override("separation", 8)
 	_suggerimento_fase = StileVisivo.etichetta("", StileVisivo.FONT_TESTO_FORTE, 16, Color(StileVisivo.TESTO, 0.85))
 	_suggerimento_fase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_suggerimento_fase.add_theme_constant_override("outline_size", 8)
 	_suggerimento_fase.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
-	_comandi.add_child(_suggerimento_fase)
-	var riga: HBoxContainer = HBoxContainer.new()
-	riga.alignment = BoxContainer.ALIGNMENT_CENTER
-	riga.add_theme_constant_override("separation", 12)
-	_comandi.add_child(riga)
-	_pulsante_rinnova = _pulsante("", func() -> void: rinnova.emit())
-	riga.add_child(_pulsante_rinnova)
-	_pulsante_rinnova_risorsa = _pulsante("", func() -> void: rinnova_risorsa.emit())
-	riga.add_child(_pulsante_rinnova_risorsa)
+	_suggerimento_fase.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ancora(_suggerimento_fase, Control.PRESET_CENTER_BOTTOM, Vector2(0, SOPRA_BARRA))
+	_comandi = VBoxContainer.new()
+	_comandi.add_theme_constant_override("separation", 8)
 	_pulsante_passa = _pulsante("Passa il round", func() -> void: passa.emit())
-	riga.add_child(_pulsante_passa)
+	_pulsante_passa.add_theme_font_size_override("font_size", 24)
+	_pulsante_passa.custom_minimum_size = Vector2(230, 56)
+	_comandi.add_child(_pulsante_passa)
 	_pulsante_nessuna = _pulsante("Nessuna ricompensa", func() -> void: nessuna_ricompensa.emit())
-	riga.add_child(_pulsante_nessuna)
-	_ancora(_comandi, Control.PRESET_CENTER_BOTTOM, Vector2(0, SOPRA_BARRA))
+	_comandi.add_child(_pulsante_nessuna)
+	_pulsante_rinnova = _pulsante("", func() -> void: rinnova.emit())
+	_comandi.add_child(_pulsante_rinnova)
+	_pulsante_rinnova_risorsa = _pulsante("", func() -> void: rinnova_risorsa.emit())
+	_comandi.add_child(_pulsante_rinnova_risorsa)
+	_ancora(_comandi, Control.PRESET_TOP_RIGHT, Vector2(-24, 96))
 
 
 func _crea_principale() -> void:
@@ -1377,6 +1388,7 @@ static func _testo_mantenimento(run: RunState) -> String:
 ## In battaglia restano solo i comandi dello scontro.
 func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 	_comandi.visible = not attiva
+	_suggerimento_fase.visible = not attiva
 	_barra_scontro.visible = attiva
 	_colonna_principale.visible = not attiva
 	_magazzino.visible = false
