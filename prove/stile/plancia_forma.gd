@@ -6,6 +6,10 @@ extends ProvaBase
 ##   0 «Ali»   due fasce sagomate a punta, una per fila, unite dal cuore;
 ##   1 «Mura»  la plancia come le mura della nazione: merli sui lati lunghi, torri agli angoli;
 ##   2 «Arco»  le file curve attorno al cuore, come un anfiteatro.
+## Le plance dei nemici, una per famiglia di incontri del mondo:
+##   3 «Nave»       mare: un ponte di nave in assi, con la prua a punta e la murata;
+##   4 «Pelli»      terra selvaggia: una pelle tesa fra i pali, con il bordo irregolare;
+##   5 «Barricata»  fuorilegge: assi inchiodate di lunghezze diverse, con i pali appuntiti.
 ## L'ordine delle file è quello del gioco: da sinistra a destra, il pezzo nuovo arriva in fondo a
 ## destra e le due metà si ribilanciano.
 
@@ -32,7 +36,7 @@ const OTTONE: Color = Color("c79a4a")
 const FONDO: Color = Color("2a2119")
 const CUOIO: Color = Color("2a3f6e")
 const CARTA: Color = Color("e6d8b8")
-const NOMI: Array[String] = ["Ali", "Mura", "Arco"]
+const NOMI: Array[String] = ["Ali", "Mura", "Arco", "Nave (mare: pirati, flotta, armata)", "Pelli (terra selvaggia: barbari, orda, invasori)", "Barricata (fuorilegge: briganti, predoni, ribelli)"]
 const SHADER_SFERA: String = """
 shader_type spatial;
 render_mode blend_mix, cull_back, depth_draw_always;
@@ -66,6 +70,8 @@ var _strati: Array = []
 ## Estensioni delle file lungo la fila: [sinistra truppe, destra truppe, sinistra edifici, destra edifici].
 var _estensioni: Vector4 = Vector4.ZERO
 var _foto: String = ""
+## Pali, punte e corde delle plance dei nemici, ricreati quando la forma cambia.
+var _decori: Node3D
 
 
 func _ready() -> void:
@@ -177,12 +183,7 @@ void fragment() {
 	add_child(tavolo)
 
 	# Gli strati della plancia: legno, profilo d'ottone, fondo, filetto d'ottone, fondo.
-	var definizioni: Array = [
-		[0.0, 0.0, 0.4, _materiale(LEGNO, _venatura, 0.55)],
-		[0.09, 0.03, 0.1, _materiale(OTTONE, null, 0.3, 0.85)],
-		[0.2, 0.04, 0.1, _materiale(FONDO, _grana, 0.9)],
-		[0.34, 0.045, 0.1, _materiale(OTTONE.darkened(0.2), null, 0.35, 0.8)],
-		[0.39, 0.05, 0.1, _materiale(FONDO, _grana, 0.9)]]
+	var definizioni: Array = _definizioni_strati()
 	for d: Array in definizioni:
 		var forma: CSGPolygon3D = CSGPolygon3D.new()
 		forma.depth = float(d[2])
@@ -191,6 +192,8 @@ void fragment() {
 		forma.position.y = float(d[1])
 		add_child(forma)
 		_strati.append([forma, float(d[0])])
+	_decori = Node3D.new()
+	add_child(_decori)
 	_crea_cuore()
 	for i: int in range(4):
 		_truppe.append(_tessera(_id_truppe[i], true, 0.0))
@@ -429,13 +432,75 @@ func _muovi(n: Node3D, dove: Array, durata: float) -> void:
 	t.tween_property(n, "rotation:y", angolo, durata).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
+## Strati della plancia per ogni forma: [rientro dal bordo, quota, spessore, materiale].
+func _definizioni_strati() -> Array:
+	match variante:
+		3:
+			var assi: ImageTexture = _trama_assi(Color("9a7048"), 26)
+			return [[0.0, 0.0, 0.4, _materiale(Color("3b2416"), _venatura, 0.6)],
+				[0.16, 0.035, 0.1, _materiale(Color("7a4e2c"), _venatura, 0.6)],
+				[0.32, 0.045, 0.1, _materiale_assi(assi)],
+				[0.32, 0.045, 0.1, _materiale_assi(assi)],
+				[0.32, 0.045, 0.1, _materiale_assi(assi)]]
+		4:
+			return [[0.0, 0.0, 0.3, _materiale(Color("2a1a10"), _grana, 0.9)],
+				[0.07, 0.03, 0.1, _materiale(Color("6b4428"), _grana, 0.85)],
+				[0.14, 0.04, 0.1, _materiale(Color("9a6a44"), _grana, 0.95)],
+				[0.3, 0.045, 0.1, _materiale(Color("4a2c18"), null, 0.9)],
+				[0.33, 0.05, 0.1, _materiale(Color("9a6a44"), _grana, 0.95)]]
+		5:
+			var grigie: ImageTexture = _trama_assi(Color("7a7064"), 40)
+			return [[0.0, 0.0, 0.4, _materiale(Color("2e2a26"), _venatura, 0.8)],
+				[0.0, 0.04, 0.1, _materiale_assi(grigie)],
+				[0.0, 0.04, 0.1, _materiale_assi(grigie)],
+				[0.0, 0.04, 0.1, _materiale_assi(grigie)],
+				[0.0, 0.04, 0.1, _materiale_assi(grigie)]]
+	return [[0.0, 0.0, 0.4, _materiale(LEGNO, _venatura, 0.55)],
+		[0.09, 0.03, 0.1, _materiale(OTTONE, null, 0.3, 0.85)],
+		[0.2, 0.04, 0.1, _materiale(FONDO, _grana, 0.9)],
+		[0.34, 0.045, 0.1, _materiale(OTTONE.darkened(0.2), null, 0.35, 0.8)],
+		[0.39, 0.05, 0.1, _materiale(FONDO, _grana, 0.9)]]
+
+
+## Assi di legno lungo x: strisce di tonalità diverse separate da fessure scure.
+func _trama_assi(colore: Color, altezza_asse: int) -> ImageTexture:
+	var img: Image = Image.create(512, 512, false, Image.FORMAT_RGB8)
+	var caso: RandomNumberGenerator = RandomNumberGenerator.new()
+	caso.seed = 7
+	var y: int = 0
+	while y < 512:
+		var tinta: Color = colore.darkened(caso.randf_range(-0.12, 0.18))
+		var fine: int = mini(512, y + altezza_asse)
+		img.fill_rect(Rect2i(0, y, 512, fine - y), tinta)
+		img.fill_rect(Rect2i(0, fine - 3, 512, 3), colore.darkened(0.7))
+		# Giunture sfalsate fra un'asse e l'altra, con i chiodi.
+		var x: int = caso.randi_range(0, 200)
+		while x < 512:
+			img.fill_rect(Rect2i(x, y, 3, fine - y), colore.darkened(0.65))
+			img.fill_rect(Rect2i(x + 8, y + 6, 4, 4), Color("2a2622"))
+			img.fill_rect(Rect2i(x - 12, y + 6, 4, 4), Color("2a2622"))
+			x += caso.randi_range(180, 320)
+		y = fine
+	img.generate_mipmaps()
+	return ImageTexture.create_from_image(img)
+
+
+func _materiale_assi(trama: ImageTexture) -> StandardMaterial3D:
+	var m: StandardMaterial3D = StandardMaterial3D.new()
+	m.albedo_texture = trama
+	m.uv1_triplanar = true
+	m.uv1_scale = Vector3(0.12, 0.12, 0.12)
+	m.roughness = 0.85
+	return m
+
+
 ## Ricostruisce il contorno della plancia e tutti i suoi strati.
 func _imposta_forma(estensioni: Vector4) -> void:
 	_estensioni = estensioni
 	var contorno: PackedVector2Array = _contorno(estensioni)
 	# Angoli appena arrotondati: si stringe e si riallarga con giunture tonde.
 	# (Le Mura arrotondano poco, per non cancellare i merli.)
-	var tondo: float = 0.06 if variante == 1 else 0.25
+	var tondo: float = 0.06 if variante == 1 or variante == 5 else 0.25
 	contorno = _piu_grande(Geometry2D.offset_polygon(contorno, -tondo, Geometry2D.JOIN_MITER))
 	contorno = _piu_grande(Geometry2D.offset_polygon(contorno, tondo, Geometry2D.JOIN_ROUND))
 	for strato: Array in _strati:
@@ -447,6 +512,7 @@ func _imposta_forma(estensioni: Vector4) -> void:
 		for v: Vector2 in p:
 			girato.append(Vector2(v.x, -v.y))
 		forma.polygon = girato
+	_crea_decori(contorno, estensioni)
 
 
 func _piu_grande(poligoni: Array[PackedVector2Array]) -> PackedVector2Array:
@@ -497,7 +563,179 @@ func _contorno(e: Vector4) -> PackedVector2Array:
 			return _contorno_ali(e)
 		1:
 			return _contorno_mura(e)
+		3:
+			return _contorno_nave(e)
+		4:
+			return _contorno_pelli(e)
+		5:
+			return _contorno_barricata(e)
 	return _contorno_arco(e)
+
+
+## Nave: lo scafo visto dall'alto. Fianchi appena bombati, poppa dritta a sinistra, prua a punta
+## a destra; dentro, il ponte in assi.
+func _contorno_nave(e: Vector4) -> PackedVector2Array:
+	var sinistra: float = maxf(e.x, e.z)
+	var destra: float = maxf(e.y, e.w)
+	var dietro: float = Z_T - FASCIA_T - 0.25
+	var davanti: float = Z_E + FASCIA_E + 0.25
+	var mezzo: float = (dietro + davanti) * 0.5
+	var p: PackedVector2Array = PackedVector2Array()
+	var passi: int = 30
+	for k: int in range(passi + 1):
+		var t: float = float(k) / float(passi)
+		p.append(Vector2(lerpf(-sinistra, destra, t), dietro - 0.35 * sin(PI * t)))
+	# La prua: due curve che si chiudono in punta.
+	var punta: float = 2.6
+	for k: int in range(1, 13):
+		var t: float = float(k) / 12.0
+		p.append(Vector2(destra + punta * sin(t * PI * 0.5), lerpf(dietro, mezzo, t * t)))
+	for k: int in range(1, 13):
+		var t: float = 1.0 - float(k) / 12.0
+		p.append(Vector2(destra + punta * sin(t * PI * 0.5), lerpf(davanti, mezzo, t * t)))
+	for k: int in range(passi + 1):
+		var t: float = 1.0 - float(k) / float(passi)
+		p.append(Vector2(lerpf(-sinistra, destra, t), davanti + 0.35 * sin(PI * t)))
+	return p
+
+
+## Pelli: una pelle tesa, dal bordo irregolare, attorno alle file.
+func _contorno_pelli(e: Vector4) -> PackedVector2Array:
+	var centro: Vector2 = Vector2(0.0, (Z_T + Z_E) * 0.5)
+	var mezza_z: float = (Z_E + FASCIA_E - Z_T + FASCIA_T) * 0.5 + 0.45
+	var p: PackedVector2Array = PackedVector2Array()
+	var passi: int = 96
+	for k: int in range(passi):
+		var a: float = TAU * float(k) / float(passi)
+		var c: float = cos(a)
+		var sn: float = sin(a)
+		# Lato sinistro o destro e fila (davanti gli edifici, dietro le truppe).
+		var rx: float = (maxf(e.x, e.z) if c < 0.0 else maxf(e.y, e.w)) + 0.55
+		# Superellisse: quasi un rettangolo dagli angoli molto tondi.
+		var potenza: float = 0.28
+		var x: float = signf(c) * pow(absf(c), potenza) * rx
+		var z: float = signf(sn) * pow(absf(sn), potenza) * mezza_z
+		# Il bordo irregolare della pelle, con le punte dove è tirata dai pali.
+		var irregolare: float = 1.0 + 0.035 * sin(a * 7.0 + 1.3) + 0.025 * sin(a * 13.0) + 0.06 * pow(absf(sin(a * 2.0)), 8.0)
+		p.append(centro + Vector2(x, z - centro.y + centro.y) * Vector2(irregolare, irregolare) - Vector2(0.0, centro.y * (irregolare - 1.0)))
+	return p
+
+
+## Barricata: per ogni fila assi inchiodate di lunghezze diverse, unite al cuore.
+func _contorno_barricata(e: Vector4) -> PackedVector2Array:
+	var caso: RandomNumberGenerator = RandomNumberGenerator.new()
+	caso.seed = 11
+	var forma: PackedVector2Array = _ottagono((MEZZO_CUORE + 0.4) * 2.0, Z_T - FASCIA_T - 0.3, Z_E + FASCIA_E + 0.3, 0.15)
+	for fila: Array in [[Z_T, FASCIA_T, e.x, e.y, 5], [Z_E, FASCIA_E, e.z, e.w, 4]]:
+		var z0: float = float(fila[0]) - float(fila[1])
+		var alto: float = float(fila[1]) * 2.0 / float(fila[4])
+		for k: int in range(int(fila[4])):
+			var a: float = float(fila[2]) + caso.randf_range(-0.15, 0.55)
+			var b: float = float(fila[3]) + caso.randf_range(-0.15, 0.55)
+			var z: float = z0 + alto * k
+			forma = _unisci(forma, _rettangolo(-a, b, z - 0.01, z + alto + 0.01))
+	return forma
+
+
+## Pali, punte e corde delle plance dei nemici.
+func _crea_decori(contorno: PackedVector2Array, e: Vector4) -> void:
+	for figlio: Node in _decori.get_children():
+		figlio.queue_free()
+	match variante:
+		3:
+			# La murata: un corrimano di legno scuro lungo tutto lo scafo.
+			# (un anello: il contorno meno il suo interno, sottratto con la CSG)
+			var murata: CSGPolygon3D = CSGPolygon3D.new()
+			murata.polygon = _girato(contorno)
+			murata.depth = 0.16
+			murata.rotation.x = -PI * 0.5
+			murata.position.y = 0.2
+			murata.material = _materiale(Color("4a2c18"), _venatura, 0.5)
+			var vuoto: CSGPolygon3D = CSGPolygon3D.new()
+			vuoto.operation = CSGShape3D.OPERATION_SUBTRACTION
+			vuoto.polygon = _girato(_piu_grande(Geometry2D.offset_polygon(contorno, -0.18, Geometry2D.JOIN_ROUND)))
+			vuoto.depth = 0.4
+			vuoto.position.z = 0.1
+			murata.add_child(vuoto)
+			_decori.add_child(murata)
+			# Le bitte d'ormeggio lungo i fianchi.
+			var destra: float = maxf(e.y, e.w)
+			var sinistra: float = maxf(e.x, e.z)
+			var x: float = -sinistra + 0.8
+			while x < destra:
+				for z: float in [Z_T - FASCIA_T + 0.05, Z_E + FASCIA_E - 0.05]:
+					_palo(Vector3(x, 0.05, z), 0.07, 0.35, Color("2a1a10"), false)
+				x += 2.4
+		4:
+			# I pali che tengono tesa la pelle, con le corde.
+			var punti: Array[int] = []
+			var n: int = contorno.size()
+			for k: int in range(8):
+				punti.append(int(float(n) * (float(k) + 0.5) / 8.0))
+			for k: int in punti:
+				var v: Vector2 = contorno[k]
+				var verso: Vector2 = (v - Vector2(0.0, (Z_T + Z_E) * 0.5)).normalized()
+				var fuori: Vector2 = v + verso * 0.55
+				_palo(Vector3(fuori.x, 0.0, fuori.y), 0.07, 0.7, Color("3a2414"), true)
+				_corda(Vector3(v.x, 0.06, v.y), Vector3(fuori.x, 0.5, fuori.y))
+		5:
+			# I pali appuntiti dietro la fila delle truppe, inclinati verso il nemico.
+			var x: float = -e.x + 0.3
+			while x < e.y - 0.2:
+				var palo: Node3D = _palo(Vector3(x, 0.0, Z_T - FASCIA_T - 0.05), 0.08, 0.9, Color("5a5046"), true)
+				palo.rotation.x = deg_to_rad(-35.0)
+				x += 0.75
+
+
+func _girato(p: PackedVector2Array) -> PackedVector2Array:
+	var g: PackedVector2Array = PackedVector2Array()
+	for v: Vector2 in p:
+		g.append(Vector2(v.x, -v.y))
+	return g
+
+
+func _palo(dove: Vector3, raggio: float, alto: float, colore: Color, punta: bool) -> Node3D:
+	var nodo: Node3D = Node3D.new()
+	nodo.position = dove
+	_decori.add_child(nodo)
+	var asta: MeshInstance3D = MeshInstance3D.new()
+	var c: CylinderMesh = CylinderMesh.new()
+	c.top_radius = raggio
+	c.bottom_radius = raggio * 1.1
+	c.height = alto
+	c.radial_segments = 8
+	asta.mesh = c
+	asta.material_override = _materiale(colore, _venatura, 0.8)
+	asta.position.y = alto * 0.5
+	nodo.add_child(asta)
+	if punta:
+		var cima: MeshInstance3D = MeshInstance3D.new()
+		var cp: CylinderMesh = CylinderMesh.new()
+		cp.top_radius = 0.0
+		cp.bottom_radius = raggio
+		cp.height = raggio * 3.0
+		cp.radial_segments = 8
+		cima.mesh = cp
+		cima.material_override = _materiale(colore.lightened(0.15), _venatura, 0.8)
+		cima.position.y = alto + raggio * 1.5
+		nodo.add_child(cima)
+	return nodo
+
+
+func _corda(da: Vector3, a: Vector3) -> void:
+	var corda: MeshInstance3D = MeshInstance3D.new()
+	var c: CylinderMesh = CylinderMesh.new()
+	c.top_radius = 0.018
+	c.bottom_radius = 0.018
+	c.height = da.distance_to(a)
+	c.radial_segments = 6
+	corda.mesh = c
+	corda.material_override = _materiale(Color("c8b48a"), _grana, 0.95)
+	_decori.add_child(corda)
+	corda.position = (da + a) * 0.5
+	var su: Vector3 = (a - da).normalized()
+	var lato: Vector3 = su.cross(Vector3.RIGHT if absf(su.x) < 0.9 else Vector3.FORWARD).normalized()
+	corda.basis = Basis(lato, su, lato.cross(su)).orthonormalized()
 
 
 ## Ali: una fascia per fila con le estremità a punta; il cuore le unisce ed esce davanti e dietro.
