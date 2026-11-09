@@ -31,6 +31,8 @@ var ingrandimento: float = 1.06
 var _segnale: Label3D
 ## Teatro di carta: la figura che si alza dalla carta (solo per i pezzi sulla plancia).
 var figurina: Figurina
+## Il punto più alto della carta (bordo o mezzo busto), in coordinate della carta.
+var _alto_locale: float = 0.0
 
 
 func costruisci(p_scheda: SchedaCarta, p_larghezza: float, p_profondita: float, nitidezza: float = 1.0) -> void:
@@ -193,8 +195,19 @@ func evidenzia(attiva: bool) -> void:
 	var altezza: float = ALTEZZA_SOLLEVATA * maxf(1.0, ingrandimento * 2.0 - 1.0)
 	_animazione_sollevamento.tween_property(_corpo, "position:y", altezza if attiva else 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_animazione_sollevamento.tween_property(_corpo, "scale", Vector3.ONE * (ingrandimento if attiva else 1.0), 0.14)
+	# Le carte che si ingrandiscono molto crescono verso il basso: il bordo alto (o il mezzo busto)
+	# resta dov'era e non esce dallo schermo (Davide, 9 novembre 2026).
+	_animazione_sollevamento.tween_property(_corpo, "position:z", spostamento_ingrandimento() if attiva else 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	_aggiorna_alone()
+
+
+## Di quanto si sposta la carta ingrandita perché il suo bordo alto resti fermo.
+func spostamento_ingrandimento() -> float:
+	if ingrandimento <= 1.2:
+		return 0.0
+	var alto: float = minf(-profondita * 0.5, _alto_locale)
+	return -alto * (ingrandimento - 1.0)
 
 
 ## Scritta sopra il bordo alto della carta, es. "POTENZIA" quando la si può potenziare (P4).
@@ -312,6 +325,7 @@ func aggiungi_busto() -> void:
 	busto.material_override = Figurina.materiale_carta(ritaglio[0], ritaglio[1], Figurina.QUOTA_BUSTO)
 	var fondo: float = -profondita * 0.5 + profondita * _faccia.fondo_arte()
 	busto.position = Vector3(0.0, SPESSORE + 0.014, fondo - altezza_busto * 0.5)
+	_alto_locale = minf(_alto_locale, fondo - altezza_busto)
 	_corpo.add_child(busto)
 	# Esce dalla finestra con un piccolo salto.
 	busto.scale = Vector3(0.85, 1.0, 0.6)
