@@ -3,8 +3,11 @@ extends Node3D
 ## Teatro di carta (scelta di Davide, 8 novembre 2026): la figura dell'illustrazione, ritagliata
 ## come una figurina di carta, che si alza dal centro della carta come in un libro pop-up
 ## (la carta le fa da base, Davide 8 novembre 2026).
-## Il ritaglio si fa da solo: si toglie il fondo nero che tocca i bordi dell'immagine (non le linee
-## d'inchiostro dentro la figura) e si aggiunge un bordo di carta color crema.
+## Il ritaglio si fa da solo e si aggiunge un bordo di carta color crema. Due casi, secondo il fondo:
+## - fondo nero (le prime illustrazioni): si toglie il nero che tocca i bordi dell'immagine (non le
+##   linee d'inchiostro dentro la figura); i vuoti chiusi dentro la sagoma restano;
+## - fondo chiaro e uniforme (le illustrazioni dal 9 novembre 2026): si toglie il colore del fondo,
+##   anche nei vuoti chiusi (fra un braccio e lo scudo), e il bordo di carta sta attaccato alla figura.
 ## Solo presentazione: nessuna regola di gioco.
 
 const COLORE_CARTA: Color = StileVisivo.CARTA_CREMA
@@ -12,12 +15,24 @@ const COLORE_CARTA: Color = StileVisivo.CARTA_CREMA
 const SOGLIA_NERO: float = 0.15
 ## Lato dell'immagine su cui si calcola la sagoma (più piccolo = più veloce, contorno più morbido).
 const LATO_MASCHERA: int = 128
+## Lato della maschera per le illustrazioni su fondo chiaro: più fine, perché zampe e antenne
+## sottili non spariscano.
+const LATO_MASCHERA_CHIARO: int = 256
+## Sopra questa luminosità (il canale più chiaro) il colore dei bordi conta come fondo chiaro.
+const SOGLIA_FONDO_CHIARO: float = 0.45
+## Quanto un pixel può scostarsi dal colore del fondo (per canale) ed essere ancora fondo.
+const TOLLERANZA_FONDO: float = 0.10
+## Un vuoto chiuso dentro la figura diventa fondo solo se è almeno così grande (parte dell'immagine):
+## i puntini chiari dentro la figura (riflessi, ali) restano.
+const VUOTO_MINIMO: float = 0.0015
+## I pezzetti staccati più piccoli di così (parte dell'immagine) sono sporco del fondo e si tolgono.
+const PEZZO_MINIMO: float = 0.0008
 ## Lato dell'immagine finale della figurina.
 const LATO_FIGURA: int = 512
 ## Maschere già calcolate, ricordate fra una partita e l'altra (si possono cancellare: si rifanno).
 const CARTELLA_MEMORIA: String = "user://figurine"
 ## Da cambiare se cambia il modo di calcolare la maschera, così le vecchie non si usano più.
-const VERSIONE_MASCHERA: int = 1
+const VERSIONE_MASCHERA: int = 2
 ## Quanta parte (dall'alto) della figura fa il mezzo busto.
 const QUOTA_BUSTO: float = 0.72
 
@@ -154,7 +169,7 @@ func _imposta_lampo(valore: float) -> void:
 # --- Ritaglio --------------------------------------------------------------------
 
 ## La figurina di un'illustrazione: [immagine, maschera]. La maschera dice dove togliere il fondo
-## nero e dove mettere il bordo di carta; il ritaglio lo fa lo shader. Il risultato si ricorda.
+## e dove mettere il bordo di carta; il ritaglio lo fa lo shader. Il risultato si ricorda.
 static func ritaglia(illustrazione: Texture2D) -> Array:
 	var chiave: String = illustrazione.resource_path if illustrazione.resource_path != "" else str(illustrazione.get_instance_id())
 	if _ritagli.has(chiave):
@@ -163,7 +178,9 @@ static func ritaglia(illustrazione: Texture2D) -> Array:
 	if img.is_compressed():
 		img.decompress()
 	img.convert(Image.FORMAT_RGBA8)
-	img = _quadrata(img, LATO_FIGURA)
+	var colore_fondo: Color = colore_dei_bordi(img)
+	var fondo_chiaro: bool = e_fondo_chiaro(colore_fondo)
+	img = _quadrata(img, LATO_FIGURA, colore_fondo if fondo_chiaro else Color.BLACK)
 	img.generate_mipmaps()
 	var immagine: ImageTexture = ImageTexture.create_from_image(img)
 	# La maschera si calcola una volta sola e si ricorda su disco (cambia se cambia il file).
@@ -175,6 +192,144 @@ static func ritaglia(illustrazione: Texture2D) -> Array:
 			var pronto: Array = [immagine, ImageTexture.create_from_image(salvata)]
 			_ritagli[chiave] = pronto
 			return pronto
+	var maschera: Image = maschera_fondo_chiaro(img, colore_fondo) if fondo_chiaro else _maschera_fondo_nero(img)
+	if file_memoria != "":
+		DirAccess.make_dir_recursive_absolute(CARTELLA_MEMORIA)
+		var da_salvare: Image = maschera.duplicate() as Image
+		da_salvare.convert(Image.FORMAT_RGBA8)
+		da_salvare.save_png(file_memoria)
+	var risultato: Array = [immagine, ImageTexture.create_from_image(maschera)]
+	_ritagli[chiave] = risultato
+	return risultato
+
+
+## Il colore del fondo: per ogni canale, il valore più comune (la mediana) dei pixel sul bordo
+## dell'immagine.
+static func colore_dei_bordi(img: Image) -> Color:
+	var w: int = img.get_width()
+	var h: int = img.get_height()
+	var rossi: PackedFloat32Array = PackedFloat32Array()
+	var verdi: PackedFloat32Array = PackedFloat32Array()
+	var blu: PackedFloat32Array = PackedFloat32Array()
+	var punti: Array[Vector2i] = []
+	for x: int in range(w):
+		punti.append(Vector2i(x, 0))
+		punti.append(Vector2i(x, h - 1))
+	for y: int in range(1, h - 1):
+		punti.append(Vector2i(0, y))
+		punti.append(Vector2i(w - 1, y))
+	for p: Vector2i in punti:
+		var c: Color = img.get_pixelv(p)
+		rossi.append(c.r)
+		verdi.append(c.g)
+		blu.append(c.b)
+	rossi.sort()
+	verdi.sort()
+	blu.sort()
+	var meta: int = rossi.size() / 2
+	return Color(rossi[meta], verdi[meta], blu[meta])
+
+
+## Vero se il colore del fondo è chiaro: allora si ritaglia il fondo chiaro, altrimenti il nero.
+static func e_fondo_chiaro(colore_fondo: Color) -> bool:
+	return maxf(colore_fondo.r, maxf(colore_fondo.g, colore_fondo.b)) > SOGLIA_FONDO_CHIARO
+
+
+## Maschera per le illustrazioni su fondo chiaro (R = figura, G = figura con il bordo di carta).
+## È fondo il colore del fondo che tocca i bordi e, dentro la figura, ogni vuoto dello stesso colore
+## abbastanza grande. La figura non si allarga: il bordo di carta le sta attaccato.
+static func maschera_fondo_chiaro(img: Image, colore_fondo: Color) -> Image:
+	var n: int = LATO_MASCHERA_CHIARO
+	var piccola: Image = img.duplicate() as Image
+	if piccola.has_mipmaps():
+		piccola.clear_mipmaps()
+	piccola.resize(n, n, Image.INTERPOLATE_BILINEAR)
+	var simile: PackedByteArray = PackedByteArray()
+	simile.resize(n * n)
+	for y: int in range(n):
+		for x: int in range(n):
+			var c: Color = piccola.get_pixel(x, y)
+			var scarto: float = maxf(absf(c.r - colore_fondo.r), maxf(absf(c.g - colore_fondo.g), absf(c.b - colore_fondo.b)))
+			simile[y * n + x] = 1 if scarto < TOLLERANZA_FONDO else 0
+	# Zone del colore del fondo: sono fondo se toccano i bordi o se sono abbastanza grandi.
+	var vuoti: Array = _zone(simile, n)
+	var etichette: PackedInt32Array = vuoti[0]
+	var grandezze: PackedInt32Array = vuoti[1]
+	var ai_bordi: PackedByteArray = vuoti[2]
+	var minimo_vuoto: int = int(VUOTO_MINIMO * n * n)
+	var figura: PackedByteArray = PackedByteArray()
+	figura.resize(n * n)
+	for i: int in range(n * n):
+		var zona: int = etichette[i]
+		var e_fondo: bool = zona >= 0 and (ai_bordi[zona] == 1 or grandezze[zona] >= minimo_vuoto)
+		figura[i] = 0 if e_fondo else 1
+	# Pezzetti staccati troppo piccoli: sporco del fondo, non parte della figura.
+	var pezzi: Array = _zone(figura, n)
+	var etichette_pezzi: PackedInt32Array = pezzi[0]
+	var grandezze_pezzi: PackedInt32Array = pezzi[1]
+	var minimo_pezzo: int = int(PEZZO_MINIMO * n * n)
+	var dentro: PackedFloat32Array = PackedFloat32Array()
+	dentro.resize(n * n)
+	for i: int in range(n * n):
+		var pezzo: int = etichette_pezzi[i]
+		dentro[i] = 1.0 if pezzo >= 0 and grandezze_pezzi[pezzo] >= minimo_pezzo else 0.0
+	# Bordo di carta: la figura allargata di poco, tutt'attorno.
+	var allargata: PackedFloat32Array = _sfoca(dentro, n, 2)
+	var con_bordo: PackedFloat32Array = PackedFloat32Array()
+	con_bordo.resize(n * n)
+	for i: int in range(n * n):
+		con_bordo[i] = 1.0 if allargata[i] > 0.12 else 0.0
+	return _maschera_da(_sfoca(dentro, n, 1), _sfoca(con_bordo, n, 1), n)
+
+
+## Zone collegate di celle con valore 1: [etichetta per cella (-1 fuori dalle zone),
+## grandezza di ogni zona, 1 se la zona tocca i bordi].
+static func _zone(celle: PackedByteArray, n: int) -> Array:
+	var etichette: PackedInt32Array = PackedInt32Array()
+	etichette.resize(n * n)
+	etichette.fill(-1)
+	var grandezze: PackedInt32Array = PackedInt32Array()
+	var ai_bordi: PackedByteArray = PackedByteArray()
+	var coda: PackedInt32Array = PackedInt32Array()
+	for inizio: int in range(n * n):
+		if celle[inizio] != 1 or etichette[inizio] >= 0:
+			continue
+		var zona: int = grandezze.size()
+		var grandezza: int = 0
+		var tocca: int = 0
+		coda.clear()
+		coda.append(inizio)
+		etichette[inizio] = zona
+		var testa: int = 0
+		while testa < coda.size():
+			var i: int = coda[testa]
+			testa += 1
+			grandezza += 1
+			var x: int = i % n
+			var y: int = i / n
+			if x == 0 or y == 0 or x == n - 1 or y == n - 1:
+				tocca = 1
+			for vicino: int in [i - 1 if x > 0 else -1, i + 1 if x < n - 1 else -1, i - n if y > 0 else -1, i + n if y < n - 1 else -1]:
+				if vicino >= 0 and celle[vicino] == 1 and etichette[vicino] < 0:
+					etichette[vicino] = zona
+					coda.append(vicino)
+		grandezze.append(grandezza)
+		ai_bordi.append(tocca)
+	return [etichette, grandezze, ai_bordi]
+
+
+## Immagine della maschera per la scheda video: R = figura, G = figura con il bordo di carta.
+static func _maschera_da(figura: PackedFloat32Array, bordo: PackedFloat32Array, n: int) -> Image:
+	var dati: PackedByteArray = PackedByteArray()
+	dati.resize(n * n * 2)
+	for i: int in range(n * n):
+		dati[i * 2] = int(clampf(figura[i], 0.0, 1.0) * 255.0)
+		dati[i * 2 + 1] = int(clampf(bordo[i], 0.0, 1.0) * 255.0)
+	return Image.create_from_data(n, n, false, Image.FORMAT_RG8, dati)
+
+
+## Maschera per le illustrazioni su fondo nero (il ritaglio delle prime illustrazioni, invariato).
+static func _maschera_fondo_nero(img: Image) -> Image:
 	var piccola: Image = img.duplicate() as Image
 	piccola.resize(LATO_MASCHERA, LATO_MASCHERA, Image.INTERPOLATE_BILINEAR)
 	var n: int = LATO_MASCHERA
@@ -209,22 +364,7 @@ static func ritaglia(illustrazione: Texture2D) -> Array:
 	var con_bordo: PackedFloat32Array = _sfoca(dentro, n, 1)
 	# La maschera va alla scheda video, che fa il ritaglio mentre disegna (bordi lisci, nessun ciclo
 	# sui pixel dell'immagine grande): R = figura, G = figura con il bordo di carta.
-	var morbida_dentro: PackedFloat32Array = _sfoca(dentro, n, 1)
-	var morbida_bordo: PackedFloat32Array = _sfoca(con_bordo, n, 1)
-	var dati: PackedByteArray = PackedByteArray()
-	dati.resize(n * n * 2)
-	for i: int in range(n * n):
-		dati[i * 2] = int(clampf(morbida_dentro[i], 0.0, 1.0) * 255.0)
-		dati[i * 2 + 1] = int(clampf(morbida_bordo[i], 0.0, 1.0) * 255.0)
-	var maschera: Image = Image.create_from_data(n, n, false, Image.FORMAT_RG8, dati)
-	if file_memoria != "":
-		DirAccess.make_dir_recursive_absolute(CARTELLA_MEMORIA)
-		var da_salvare: Image = maschera.duplicate() as Image
-		da_salvare.convert(Image.FORMAT_RGBA8)
-		da_salvare.save_png(file_memoria)
-	var risultato: Array = [immagine, ImageTexture.create_from_image(maschera)]
-	_ritagli[chiave] = risultato
-	return risultato
+	return _maschera_da(_sfoca(dentro, n, 1), _sfoca(con_bordo, n, 1), n)
 
 
 ## Dove si ricordano le maschere già calcolate: un file per illustrazione e versione del file.
@@ -236,15 +376,15 @@ static func _file_memoria(percorso: String) -> String:
 
 
 ## L'immagine dentro un quadrato, con le sue proporzioni (2:3 in verticale, 3:2 in orizzontale):
-## il margine è nero e il ritaglio lo toglie insieme al fondo.
-static func _quadrata(img: Image, lato: int) -> Image:
+## il margine ha il colore del fondo e il ritaglio lo toglie insieme al fondo.
+static func _quadrata(img: Image, lato: int, colore_margine: Color = Color.BLACK) -> Image:
 	var massimo: int = maxi(img.get_width(), img.get_height())
 	var w: int = maxi(1, int(round(float(img.get_width()) / float(massimo) * lato)))
 	var h: int = maxi(1, int(round(float(img.get_height()) / float(massimo) * lato)))
 	var ridotta: Image = img.duplicate() as Image
 	ridotta.resize(w, h, Image.INTERPOLATE_BILINEAR)
 	var quadrato: Image = Image.create(lato, lato, false, Image.FORMAT_RGBA8)
-	quadrato.fill(Color.BLACK)
+	quadrato.fill(colore_margine)
 	# Le figure stanno in piedi: in un quadrato più largo che alto la figura poggia sul fondo.
 	quadrato.blit_rect(ridotta, Rect2i(0, 0, w, h), Vector2i((lato - w) / 2, lato - h))
 	return quadrato
