@@ -136,7 +136,8 @@ func costruisci(illustrazione: Texture2D, larghezza: float, z_base: float, y_car
 	var forma_piede: BoxMesh = BoxMesh.new()
 	forma_piede.size = Vector3(altezza * 0.3, 0.02, 0.1)
 	piede.mesh = forma_piede
-	piede.material_override = StileVisivo.materiale(COLORE_CARTA.darkened(0.6), 0.95)
+	# Scuro come il fondo della carta: regge la figurina senza farsi notare (Davide, 9 novembre 2026).
+	piede.material_override = StileVisivo.materiale(Color("120d0a"), 0.95)
 	piede.position = Vector3(0.0, 0.01, 0.04)
 	_perno.add_child(piede)
 	# Parte piegata sulla carta, come una pagina chiusa.

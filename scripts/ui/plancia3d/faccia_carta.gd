@@ -31,12 +31,9 @@ var _pastiglie: Array[Rect2] = []
 var _area_simboli: Rect2
 ## Sulla plancia il nome sta sopra il fondo del disegno (vedi _calcola_misure).
 var _nome_sopra_arte: bool = false
-## Prove di disegno delle tessere di truppe ed edifici sulla plancia (Davide, 9 novembre 2026):
-## 0 = attuale, 1 = «Angoli», 2 = «Cartiglio», 3 = «Numeri grandi». Provvisorio, finché non si sceglie.
-static var modello_plancia: int = 0
-var _modello: int = 0
-var _area_cartiglio: Rect2
-const INCHIOSTRO: Color = Color("2a1a10")
+## Tessere di truppe ed edifici sulla plancia: disegno «Angoli» (Davide, 9 novembre 2026). Il
+## disegno occupa tutta la carta, i numeri stanno in stemmi colorati negli angoli in basso.
+var _angoli: bool = false
 
 
 func imposta(p_scheda: SchedaCarta, misura: Vector2) -> void:
@@ -121,70 +118,41 @@ func _calcola_misure() -> void:
 		_pastiglie.append(Rect2(_area_basso.position + Vector2(meta + lato * 0.04, 0.0), Vector2(meta, _area_basso.size.y)))
 	elif scheda.genere == SchedaCarta.Genere.EDIFICIO and (scheda.mana != &"" or _effetto_principale() != ""):
 		_pastiglie.append(_area_basso)
-	_modello = 0
-	if modello_plancia > 0 and scheda.sulla_plancia and not con_simboli and not _pastiglie.is_empty():
-		_modello = modello_plancia
-		_misure_modello()
+	_angoli = scheda.sulla_plancia and not con_simboli and not _pastiglie.is_empty()
+	if _angoli:
+		_misure_angoli()
 
 
-## Le misure dei disegni di prova delle tessere (vedi modello_plancia).
-func _misure_modello() -> void:
+## Le misure del disegno «Angoli»: il disegno su tutta la carta, il nome su una fascia (in alto,
+## oppure in basso sopra gli stemmi nello scontro, dove in alto c'è la figurina) e i numeri in
+## stemmi negli angoli in basso.
+func _misure_angoli() -> void:
 	var verticale: bool = size.y > size.x * 1.3
 	var lato: float = minf(size.x, size.y)
 	var margine: float = _bordo + lato * 0.02
 	var interno: Rect2 = Rect2(margine, margine, size.x - margine * 2.0, size.y - margine * 2.0)
 	var truppa: bool = scheda.genere == SchedaCarta.Genere.TRUPPA
 	_pastiglie.clear()
-	_nome_sopra_arte = _modello != 3
-	match _modello:
-		1:
-			# Angoli: il disegno occupa tutta la carta; nome in alto; numeri in due stemmi negli angoli.
-			_area_arte = interno
-			var alta_nome: float = size.y * (0.12 if verticale else 0.2)
-			_area_nome = Rect2(interno.position.x + lato * 0.1, interno.position.y, interno.size.x - lato * 0.2, alta_nome)
-			if truppa:
-				# L'attacco ha una o due cifre, la ricarica quattro caratteri («1,8s»): più spazio a lei.
-				var h: float = size.y * (0.16 if verticale else 0.27)
-				var stacco: float = lato * 0.03
-				var w_attacco: float = (interno.size.x - stacco) * 0.42
-				var w_ricarica: float = interno.size.x - stacco - w_attacco
-				_pastiglie.append(Rect2(interno.position.x, interno.end.y - h, w_attacco, h))
-				_pastiglie.append(Rect2(interno.end.x - w_ricarica, interno.end.y - h, w_ricarica, h))
-			else:
-				var w: float = interno.size.x * 0.74
-				var h: float = size.y * 0.3
-				_pastiglie.append(Rect2(interno.get_center().x - w * 0.5, interno.end.y - h, w, h))
-			_area_basso = Rect2(interno.position.x, _pastiglie[0].position.y, interno.size.x, _pastiglie[0].size.y)
-		2:
-			# Cartiglio: il disegno occupa tutta la carta; in basso un cartiglio di carta con nome e
-			# numeri scritti a inchiostro.
-			_area_arte = interno
-			var alto: float = size.y * (0.36 if verticale else 0.5)
-			_area_cartiglio = Rect2(interno.position.x - lato * 0.02, interno.end.y - alto, interno.size.x + lato * 0.04, alto)
-			_area_nome = Rect2(interno.position.x, _area_cartiglio.position.y + alto * 0.08, interno.size.x, alto * 0.36)
-			var y0: float = _area_nome.end.y
-			var h: float = _area_cartiglio.end.y - y0 - lato * 0.04
-			if truppa:
-				var w: float = interno.size.x * 0.42
-				_pastiglie.append(Rect2(interno.position.x, y0, w, h))
-				_pastiglie.append(Rect2(interno.position.x + w, y0, interno.size.x - w, h))
-			else:
-				_pastiglie.append(Rect2(interno.position.x, y0, interno.size.x, h))
-			_area_basso = Rect2(interno.position.x, y0, interno.size.x, h)
-		3:
-			# Numeri grandi: disegno ad arco in alto, nome, e sotto i numeri grandi senza pastiglie.
-			_area_arte = Rect2(interno.position, Vector2(interno.size.x, size.y * (0.46 if verticale else 0.5)))
-			var alta_nome: float = size.y * (0.11 if verticale else 0.17)
-			_area_nome = Rect2(_bordo, _area_arte.end.y, size.x - _bordo * 2.0, alta_nome)
-			var y0: float = _area_nome.end.y
-			var h: float = interno.end.y - y0
-			if truppa:
-				var w: float = interno.size.x * 0.5
-				_pastiglie.append(Rect2(interno.position.x, y0, w, h))
-				_pastiglie.append(Rect2(interno.position.x + w, y0, w, h))
-			else:
-				_pastiglie.append(Rect2(interno.position.x, y0, interno.size.x, h))
-			_area_basso = Rect2(interno.position.x, y0, interno.size.x, h)
+	_nome_sopra_arte = true
+	_area_arte = interno
+	var alta_nome: float = size.y * (0.12 if verticale else 0.2)
+	_area_nome = Rect2(interno.position.x + lato * 0.1, interno.position.y, interno.size.x - lato * 0.2, alta_nome)
+	if truppa:
+		# L'attacco ha una o due cifre, la ricarica quattro caratteri («1,8s»): più spazio a lei.
+		var h: float = size.y * (0.16 if verticale else 0.27)
+		var stacco: float = lato * 0.03
+		var w_attacco: float = (interno.size.x - stacco) * 0.42
+		var w_ricarica: float = interno.size.x - stacco - w_attacco
+		_pastiglie.append(Rect2(interno.position.x, interno.end.y - h, w_attacco, h))
+		_pastiglie.append(Rect2(interno.end.x - w_ricarica, interno.end.y - h, w_ricarica, h))
+	else:
+		var w: float = interno.size.x * 0.74
+		var h: float = size.y * 0.3
+		_pastiglie.append(Rect2(interno.get_center().x - w * 0.5, interno.end.y - h, w, h))
+	_area_basso = Rect2(interno.position.x, _pastiglie[0].position.y, interno.size.x, _pastiglie[0].size.y)
+	# Nello scontro in alto c'è la figurina: il nome scende sopra gli stemmi.
+	if scheda.come_base:
+		_area_nome = Rect2(interno.position.x, _area_basso.position.y - alta_nome - lato * 0.02, interno.size.x, alta_nome)
 
 
 ## L'effetto più importante da mostrare nella prima pastiglia: danno, poi scudo, cura, Corruzione, assedio.
@@ -253,23 +221,22 @@ func _disegna_sopra() -> void:
 	var lato: float = minf(size.x, size.y)
 	_sopra.draw_rect(_area_arte, Color(0.0, 0.0, 0.0, 0.0), false, 2.0)
 	_sopra.draw_rect(_area_arte.grow(1.0), scheda.colore_cornice().darkened(0.35), false, 2.0)
-	if _modello == 1:
-		# Fascia del nome in alto, con una sfumatura verso il basso.
-		var fascia: Rect2 = Rect2(_area_arte.position.x, _area_arte.position.y, _area_arte.size.x, _area_nome.size.y)
+	if _angoli:
+		# Fascia del nome (in alto, o in basso nello scontro), sfumata ai bordi.
+		var fascia: Rect2 = Rect2(_area_arte.position.x, _area_nome.position.y, _area_arte.size.x, _area_nome.size.y)
 		_sopra.draw_rect(fascia, Color(StileVisivo.FASCIA_NOME, 0.85))
-		var giu: float = fascia.size.y * 0.5
+		var sfuma: float = fascia.size.y * 0.5
 		for k: int in range(6):
 			var t: float = float(k) / 6.0
-			_sopra.draw_rect(Rect2(fascia.position.x, fascia.end.y + giu * t, fascia.size.x, giu / 6.0 + 1.0), Color(StileVisivo.FASCIA_NOME, 0.6 * (1.0 - t)))
+			var tinta: Color = Color(StileVisivo.FASCIA_NOME, 0.6 * (1.0 - t))
+			_sopra.draw_rect(Rect2(fascia.position.x, fascia.end.y + sfuma * t, fascia.size.x, sfuma / 6.0 + 1.0), tinta)
+			if scheda.come_base:
+				_sopra.draw_rect(Rect2(fascia.position.x, fascia.position.y - sfuma * (t + 1.0 / 6.0), fascia.size.x, sfuma / 6.0 + 1.0), tinta)
 		# Ombra in basso, dietro gli stemmi.
 		var ombra: float = _area_basso.size.y * 1.3
 		for k: int in range(8):
 			var t: float = float(k) / 8.0
 			_sopra.draw_rect(Rect2(_area_arte.position.x, _area_arte.end.y - ombra * (1.0 - t), _area_arte.size.x, ombra / 8.0 + 1.0), Color(0.0, 0.0, 0.0, 0.08 + 0.4 * t))
-	elif _modello == 2:
-		_disegna_cartiglio()
-	elif _modello == 3:
-		_disegna_arco()
 	elif _nome_sopra_arte:
 		# Fascia del nome sopra il fondo del disegno: scura, con una sfumatura verso l'alto.
 		var sfuma: float = _area_nome.size.y * 0.5
@@ -280,8 +247,8 @@ func _disegna_sopra() -> void:
 		_sopra.draw_line(Vector2(_area_nome.position.x, _area_nome.end.y), _area_nome.end, scheda.colore_cornice().darkened(0.2), 2.0)
 
 	# Pastiglie con icone.
-	if _modello > 0:
-		_disegna_numeri_modello()
+	if _angoli:
+		_disegna_stemmi()
 	elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var effetto: String = _effetto_principale()
 		_pastiglia(_pastiglie[0], _colore_effetto(effetto), effetto if effetto != "" else "spada")
@@ -341,75 +308,24 @@ func _icone_pastiglie() -> Array:
 	return [[effetto_edificio, _colore_effetto(effetto_edificio)]]
 
 
-func _disegna_numeri_modello() -> void:
+## Gli stemmi dei numeri del disegno «Angoli»: bordo scuro spesso, colore pieno, icona a sinistra.
+func _disegna_stemmi() -> void:
 	var icone: Array = _icone_pastiglie()
 	for i: int in range(mini(icone.size(), _pastiglie.size())):
 		var area: Rect2 = _pastiglie[i]
 		var icona: String = String(icone[i][0])
 		var colore: Color = icone[i][1]
-		match _modello:
-			1:
-				# Stemma: bordo scuro spesso, colore pieno, icona a sinistra.
-				var bordo_scuro: StyleBoxFlat = StyleBoxFlat.new()
-				bordo_scuro.bg_color = Color("0b0806")
-				bordo_scuro.set_corner_radius_all(int(area.size.y * 0.38))
-				_sopra.draw_style_box(bordo_scuro, area)
-				var fondo: StyleBoxFlat = StyleBoxFlat.new()
-				fondo.bg_color = colore
-				fondo.set_corner_radius_all(int(area.size.y * 0.32))
-				fondo.border_color = colore.lightened(0.35)
-				fondo.border_width_top = 3
-				_sopra.draw_style_box(fondo, area.grow(-area.size.y * 0.07))
-				_icona(Vector2(area.position.x + area.size.y * 0.5, area.get_center().y), area.size.y * 0.5, icona, Color.WHITE)
-			2:
-				# Cartiglio: solo l'icona, a inchiostro del colore dell'effetto.
-				_icona(Vector2(area.position.x + area.size.y * 0.55, area.get_center().y), area.size.y * 0.55, icona, colore.darkened(0.35) if icona != "clessidra" else INCHIOSTRO)
-			3:
-				# Numeri grandi: l'icona sopra il numero.
-				_icona(Vector2(area.get_center().x, area.position.y + area.size.y * 0.2), area.size.y * 0.3, icona, colore.lightened(0.25) if icona != "clessidra" else Color("9fb4dc"))
-		if _modello == 3 and i == 1:
-			_sopra.draw_line(Vector2(area.position.x, area.position.y + area.size.y * 0.15), Vector2(area.position.x, area.end.y - area.size.y * 0.1), Color(StileVisivo.CARTA_CREMA, 0.25), 2.0)
-
-
-## Il cartiglio di carta in basso, con il bordo superiore ondulato e le punte arrotolate.
-func _disegna_cartiglio() -> void:
-	var r: Rect2 = _area_cartiglio
-	var punti: PackedVector2Array = PackedVector2Array()
-	var passi: int = 24
-	for k: int in range(passi + 1):
-		var t: float = float(k) / float(passi)
-		punti.append(Vector2(r.position.x + r.size.x * t, r.position.y + sin(t * TAU * 1.5) * r.size.y * 0.035))
-	punti.append(r.end)
-	punti.append(Vector2(r.position.x, r.end.y))
-	_sopra.draw_colored_polygon(punti, Color("0b0806"))
-	var dentro: PackedVector2Array = PackedVector2Array()
-	for v: Vector2 in punti:
-		dentro.append(v + Vector2(0.0, 3.0))
-	_sopra.draw_colored_polygon(dentro, StileVisivo.CARTA_CREMA.darkened(0.04))
-	var arrotolo: float = r.size.y * 0.12
-	for x: float in [r.position.x + arrotolo * 0.5, r.end.x - arrotolo * 0.5]:
-		_sopra.draw_rect(Rect2(x - arrotolo * 0.5, r.position.y, arrotolo, r.size.y), StileVisivo.CARTA_CREMA.darkened(0.2))
-		_sopra.draw_line(Vector2(x, r.position.y), Vector2(x, r.end.y), StileVisivo.CARTA_CREMA.darkened(0.45), 2.0)
-	# Filetto sotto il nome.
-	var y: float = _area_nome.end.y
-	_sopra.draw_line(Vector2(r.position.x + r.size.x * 0.18, y), Vector2(r.end.x - r.size.x * 0.18, y), Color(INCHIOSTRO, 0.45), 2.0)
-
-
-## Il disegno con il bordo superiore ad arco.
-func _disegna_arco() -> void:
-	var r: Rect2 = _area_arte
-	var raggio: float = r.size.x * 0.5
-	var centro: Vector2 = Vector2(r.get_center().x, r.position.y + raggio)
-	var sopra_arco: PackedVector2Array = PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), Vector2(r.end.x, centro.y)])
-	var linea: PackedVector2Array = PackedVector2Array()
-	for k: int in range(25):
-		var a: float = PI * float(k) / 24.0
-		var punto: Vector2 = centro + Vector2(cos(a), -sin(a)) * raggio
-		sopra_arco.append(punto)
-		linea.append(punto)
-	sopra_arco.append(Vector2(r.position.x, centro.y))
-	_sopra.draw_colored_polygon(sopra_arco, StileVisivo.FACCIA_CARTA)
-	_sopra.draw_polyline(linea, scheda.colore_cornice().darkened(0.2), 3.0)
+		var bordo_scuro: StyleBoxFlat = StyleBoxFlat.new()
+		bordo_scuro.bg_color = Color("0b0806")
+		bordo_scuro.set_corner_radius_all(int(area.size.y * 0.38))
+		_sopra.draw_style_box(bordo_scuro, area)
+		var fondo: StyleBoxFlat = StyleBoxFlat.new()
+		fondo.bg_color = colore
+		fondo.set_corner_radius_all(int(area.size.y * 0.32))
+		fondo.border_color = colore.lightened(0.35)
+		fondo.border_width_top = 3
+		_sopra.draw_style_box(fondo, area.grow(-area.size.y * 0.07))
+		_icona(Vector2(area.position.x + area.size.y * 0.5, area.get_center().y), area.size.y * 0.5, icona, Color.WHITE)
 
 
 func _pastiglia(area: Rect2, colore: Color, icona: String) -> void:
@@ -615,6 +531,10 @@ func fondo_arte() -> float:
 
 ## Centro verticale della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
 func centro_arte() -> float:
+	# Nello scontro, con le tessere «Angoli», la figurina poggia a metà della parte sopra il nome:
+	# così il nome, più vicino alla telecamera, resta scoperto.
+	if _angoli and scheda.come_base:
+		return (_area_arte.position.y + (_area_nome.position.y - _area_arte.position.y) * 0.45) / maxf(size.y, 1.0)
 	return (_area_arte.position.y + _area_arte.size.y * 0.5) / maxf(size.y, 1.0)
 
 
@@ -637,11 +557,8 @@ func _crea_scritte() -> void:
 	_nome.clip_text = true
 	_nome.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_adatta(_nome, StileVisivo.FONT_TITOLI, int(_area_nome.size.y * 0.62), _area_nome.size.x - lato * 0.06)
-	if _modello > 0:
+	if _angoli:
 		_adatta(_nome, StileVisivo.FONT_TITOLI, int(_area_nome.size.y * 0.78), _area_nome.size.x - lato * 0.02)
-	if _modello == 2:
-		_nome.add_theme_color_override("font_color", INCHIOSTRO)
-		_nome.add_theme_constant_override("outline_size", 0)
 	add_child(_nome)
 
 	var testi: Array[String] = []
@@ -657,21 +574,10 @@ func _crea_scritte() -> void:
 		testo.position = area.position + Vector2(area.size.y * 0.85, 0.0)
 		testo.size = Vector2(area.size.x - area.size.y * 0.95, area.size.y)
 		var grandezza: int = int(area.size.y * 0.62)
-		if _modello == 1:
+		if _angoli:
 			grandezza = int(area.size.y * 0.66)
 			testo.position = area.position + Vector2(area.size.y * 0.78, 0.0)
 			testo.size = Vector2(area.size.x - area.size.y * 0.82, area.size.y)
-			testo.add_theme_constant_override("outline_size", 8)
-		elif _modello == 2:
-			grandezza = int(area.size.y * 0.7)
-			testo.position = area.position + Vector2(area.size.y * 0.95, 0.0)
-			testo.size = Vector2(area.size.x - area.size.y * 0.97, area.size.y)
-			testo.add_theme_color_override("font_color", INCHIOSTRO)
-			testo.add_theme_constant_override("outline_size", 0)
-		elif _modello == 3:
-			testo.position = area.position + Vector2(0.0, area.size.y * 0.36)
-			testo.size = Vector2(area.size.x, area.size.y * 0.62)
-			grandezza = int(area.size.y * 0.52)
 			testo.add_theme_constant_override("outline_size", 8)
 		_adatta(testo, StileVisivo.FONT_TITOLI, grandezza, testo.size.x - 6.0)
 		testo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
