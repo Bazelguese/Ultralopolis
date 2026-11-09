@@ -394,18 +394,20 @@ func test_il_flusso_dell_anno_mostra_mesi_e_scontri() -> void:
 
 func test_senza_tecnologia_in_studio_c_e_un_avviso() -> void:
 	# Richiesta di Davide (6 novembre): segnalare chiaramente quando la Ricerca è ferma.
+	# Dal 9 novembre il segno è sul pulsante Ricerca (rosso, «scegli!»), con la spiegazione nel riquadro.
 	var run: RunState = _run()
 	var hud: HudPlancia = _scena.get("_hud")
-	var avviso: Label = hud.get("_avviso_ricerca")
+	var pulsante: Button = hud.get("_pulsante_ricerca")
 	_scena.call("_aggiorna_tutto")
 	assert_null(run.current_tech, "All'inizio nessuna tecnologia è in studio.")
-	assert_true(avviso.visible, "Si vede l'avviso.")
-	assert_string_contains((hud.get("_pulsante_ricerca") as Button).text, "scegli")
+	assert_string_contains(pulsante.text, "scegli")
+	assert_string_contains(Suggerimenti.testo_di(pulsante), "Ricerca resta ferma", "Il riquadro del pulsante spiega perché.")
+	assert_false((hud.get("_avviso_ricerca") as Label).visible, "Niente scritta sopra i pulsanti.")
 	var carte: Array[TechDef] = run.tech_hand_cards()
 	assert_false(carte.is_empty())
 	assert_true(run.choose_tech(carte[0]), run.last_error)
 	_scena.call("_aggiorna_tutto")
-	assert_false(avviso.visible, "Con una tecnologia in studio l'avviso sparisce.")
+	assert_false(pulsante.text.contains("scegli"), "Con una tecnologia in studio il segno sparisce.")
 
 
 func test_annunci_in_alto_e_calendario_a_sinistra() -> void:

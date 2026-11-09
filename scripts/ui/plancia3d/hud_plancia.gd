@@ -479,7 +479,7 @@ func _crea_risorse() -> void:
 	_pulsante_ricerca = _pulsante("Ricerca", func() -> void: _ricerca.visible = not _ricerca.visible)
 	_pulsante_ricerca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	riga.add_child(_pulsante_ricerca)
-	_avviso_ricerca = StileVisivo.etichetta("Nessuna tecnologia in studio: la Ricerca resta ferma. Clicca qui sotto, su Ricerca.",
+	_avviso_ricerca = StileVisivo.etichetta("Nessuna tecnologia in studio: la Ricerca resta ferma. Clicca qui per sceglierne una.",
 			StileVisivo.FONT_TESTO_FORTE, 18, StileVisivo.PERICOLO)
 	_avviso_ricerca.add_theme_constant_override("outline_size", 8)
 	_avviso_ricerca.add_theme_color_override("font_outline_color", StileVisivo.OMBRA_TESTO)
@@ -1338,8 +1338,11 @@ func _testo_fine(run: RunState) -> String:
 ## rosso e pulsa, la casella della Ricerca dice quanta ne aspetta e sopra la barra compare un avviso.
 func _aggiorna_avviso_ricerca(run: RunState) -> void:
 	var ferma: bool = run.current_tech == null and not run.tech_hand_cards().is_empty() and run.phase != RunState.Phase.FINE_RUN
-	_avviso_ricerca.visible = ferma
+	# Niente più scritta rossa sopra i pulsanti (Davide, 9 novembre 2026): il segno è sul pulsante
+	# stesso (rosso, pulsa, «scegli!») e la spiegazione è nel suo riquadro al passaggio del mouse.
+	_avviso_ricerca.visible = false
 	StileVisivo.rendi_allarme(_pulsante_ricerca, ferma)
+	Suggerimenti.imposta(_pulsante_ricerca, _avviso_ricerca.text if ferma else "Le tecnologie: che cosa stai studiando e che cosa puoi studiare.", "Ricerca")
 	if ferma:
 		_pulsante_ricerca.text = "Ricerca · scegli!"
 		_valori_risorse[Res.Type.RICERCA].text = str(run.research_waiting())
@@ -1383,7 +1386,7 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 		_flusso.visible = false
 		_avviso_ricerca.visible = false
 		_fase.text = titolo
-		_sotto_fase.text = "Le truppe agiscono da destra verso sinistra"
+		_sotto_fase.text = ""
 		imposta_pausa(false)
 	# Durante lo scontro il titolo resta in alto al centro; il calendario si nasconde.
 	_riquadro_fase.visible = not attiva
@@ -1391,7 +1394,7 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 		_animazione_messaggio.kill()
 	_messaggio.text = titolo if attiva else ""
 	_messaggio.add_theme_color_override("font_color", StileVisivo.ORO_LUCE)
-	_sotto_messaggio.text = "Le truppe agiscono da destra verso sinistra" if attiva else ""
+	_sotto_messaggio.text = ""
 	_annuncio.modulate.a = 1.0 if attiva else 0.0
 
 
