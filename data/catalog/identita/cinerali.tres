@@ -15,6 +15,7 @@ id = &"cinerali"
 display_name = "Cinerali"
 description = "Popolo alato delle scogliere vulcaniche, rapido a colpire. Le truppe ricaricano del 10% più in fretta; può reclutare gli Arcieri delle ceneri. Poi i Falchi di cenere (era 2) e le Lame del vulcano (era 3). Capitale: +1 Ferro."
 identity_type = &"Cinerale"
+board_shape = &"ali"
 resistance_bonus = 4
 exclusive_troops = Array[ExtResource("x2")]([ExtResource("x3"), ExtResource("p1"), ExtResource("p2")])
 permanent_modifiers = Array[ExtResource("x4")]([ExtResource("x5"), ExtResource("x6")])
