@@ -73,6 +73,19 @@ func test_senza_nazione_scelta_usa_una_nazione_di_prova() -> void:
 	assert_eq(run.nation_name, "Nazione di prova")
 
 
+func test_la_nazione_di_test_parte_con_99_risorse_e_tutti_gli_spazi() -> void:
+	GameSession.selected_nation = GameSession.test_nation()
+	_apri()
+	var run: RunState = _run()
+	var regole: RunRules = GameSession.run_rules()
+	assert_eq(run.nation_name, GameSession.test_nation_setup().nation_name)
+	for tipo: Res.Type in Res.NAMES:
+		if tipo != Res.Type.RICERCA:
+			assert_gte(run.stock[tipo], 99 * Res.scale(tipo), Res.NAMES[tipo])
+	assert_eq(run.board.building_capacity(), regole.max_building_slots, "Spazi edificio tutti liberi.")
+	assert_eq(run.board.troop_capacity(), regole.max_troop_slots, "Spazi truppa tutti liberi.")
+
+
 ## Parte dalla nazione scelta nel menu e attraversa un anno usando solo i comandi della schermata.
 func test_la_partita_parte_dalla_nazione_scelta_e_attraversa_un_anno() -> void:
 	GameSession.selected_nation = _nazione("Regno di Prova")

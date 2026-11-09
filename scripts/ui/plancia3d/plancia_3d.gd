@@ -222,6 +222,9 @@ func _nuova_run() -> void:
 	if nazione == null or nazione.problem(catalogo, regole_run) != "":
 		nazione = _nazione_di_prova(catalogo, regole_run)
 	run = RunState.new(catalogo, regole_run, GameSession.battle_rules(), GameSession.resistance_rules(), randi())
+	# La nazione di test parte con la sua dotazione, prima dell'identità (così tutto trova spazio).
+	if nazione.is_test:
+		run.apply_test_setup(GameSession.test_nation_setup())
 	if run.phase == RunState.Phase.CREAZIONE_NAZIONE:
 		run.found_nation(nazione.nation_name, nazione.resolve(catalogo))
 	_modo = Modo.NORMALE
@@ -246,13 +249,7 @@ func _on_scegli_cronaca(indice: int) -> void:
 
 
 func _nazione_di_prova(catalogo: CatalogDef, regole_run: RunRules) -> NationTemplate:
-	var scelte: Array[IdentityDef] = []
-	for dimensione: IdentityDef.Dimension in IdentityDef.CREATION_DIMENSIONS:
-		var opzioni: Array[IdentityDef] = IdentityRules.options(catalogo, dimensione)
-		var quante: int = IdentityRules.starting_perk_count(catalogo, regole_run) if dimensione == IdentityDef.Dimension.PERK else mini(1, opzioni.size())
-		for i: int in range(quante):
-			scelte.append(opzioni[i])
-	return NationTemplate.from_choices("prova", "Nazione di prova", scelte)
+	return NationTemplate.from_choices("prova", "Nazione di prova", NationTemplate.first_choices(catalogo, regole_run))
 
 
 # --- Ambiente ------------------------------------------------------------------

@@ -13,6 +13,9 @@ const CATALOG_PATH: String = "res://data/catalog/catalog.tres"
 const RUN_RULES_PATH: String = "res://data/rules/run_rules.tres"
 const BATTLE_RULES_PATH: String = "res://data/rules/battle_rules.tres"
 const RESISTANCE_RULES_PATH: String = "res://data/rules/resistance_rules.tres"
+## Dotazione della nazione di test, sempre presente nella lista delle nazioni.
+const TEST_NATION_PATH: String = "res://data/rules/test_nation.tres"
+const TEST_NATION_ID: String = "nazione_di_test"
 
 ## File in cui si salvano le nazioni create.
 var store_path: String = NationStore.DEFAULT_PATH
@@ -46,6 +49,22 @@ func resistance_rules() -> ResistanceRules:
 
 func saved_nations() -> Array[NationTemplate]:
 	return NationStore.load_all(store_path)
+
+
+func test_nation_setup() -> TestNationDef:
+	return load(TEST_NATION_PATH) as TestNationDef
+
+
+## La nazione di test: nome dal file dati, identità con il primo elemento di ogni colonna.
+## null se il file dati manca.
+func test_nation() -> NationTemplate:
+	var setup: TestNationDef = test_nation_setup()
+	if setup == null:
+		return null
+	var nation: NationTemplate = NationTemplate.from_choices(TEST_NATION_ID, setup.nation_name,
+			NationTemplate.first_choices(catalog(), run_rules()))
+	nation.is_test = true
+	return nation
 
 
 func go(scene_path: String) -> void:

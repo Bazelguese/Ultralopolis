@@ -109,3 +109,17 @@ func test_elimina_con_conferma() -> void:
 	assert_eq(GameSession.saved_nations().size(), 1, "Prima della conferma non si elimina nulla.")
 	select.call("_on_delete_confirmed")
 	assert_eq(GameSession.saved_nations().size(), 0)
+
+
+func test_la_nazione_di_test_e_sempre_nella_lista_e_porta_alla_partita() -> void:
+	var select: Control = _open("res://scenes/nation_select.tscn")
+	var list: VBoxContainer = select.get("_list")
+	assert_eq(list.get_child_count(), 2, "Senza nazioni salvate: la nazione di test e la scritta «Nessuna nazione creata».")
+	var nation: NationTemplate = GameSession.test_nation()
+	assert_not_null(nation)
+	assert_true(nation.is_test)
+	assert_eq(nation.problem(GameSession.catalog(), GameSession.run_rules()), "", "La nazione di test è giocabile.")
+	select.call("_on_play", nation)
+	assert_eq(GameSession.last_scene_request, GameSession.GAME_SCENE)
+	assert_true(GameSession.selected_nation.is_test)
+	assert_eq(GameSession.saved_nations().size(), 0, "La nazione di test non si salva nel file delle nazioni.")
