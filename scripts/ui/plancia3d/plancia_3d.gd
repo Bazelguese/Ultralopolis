@@ -38,9 +38,6 @@ const SCALA_RISERVA: float = 0.8
 const OTTONE: Color = Color("c79a4a")
 ## Margine fra le carte più esterne e il bordo della lastra.
 const MARGINE_LASTRA: float = 0.35
-const PROFONDITA_LASTRA: float = 6.2
-## Quanto il doppio filetto a inchiostro rientra dal bordo della lastra.
-const RIENTRO_FILETTO: float = 0.32
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
 ## Con gli spazi vuoti stretti la plancia è più corta e le carte si ingrandiscono di più.
@@ -84,6 +81,9 @@ const SPOSTAMENTO_PLANCIA: float = 0.0
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
 const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 24.0, 23.0)
 const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.2)
+## Profondità del tavolo inquadrata nello scontro: se le plance si allontanano (forma «arco»)
+## la telecamera si allarga in proporzione.
+const PROFONDITA_SCONTRO: float = 13.0
 
 var run: RunState
 
@@ -96,9 +96,13 @@ var _hud: HudPlancia
 ## Contiene i due lati: si ingrandisce e si centra in base a quanti spazi si vedono.
 var _plancia: Node3D
 var _radici: Array[Node3D] = [null, null]
-var _lastre: Array[MeshInstance3D] = [null, null]
-var _bordi_lastre: Array[Array] = [[], []]
+## La plancia sagomata di ogni lato (forma del popolo o dell'incontro).
+var _forme: Array[FormaPlancia] = [null, null]
+## Larghezza di ogni plancia, da cui dipende quanto ingrandirla.
 var _larghezze: Array[float] = [LARGHEZZA_LASTRA_PIENA, LARGHEZZA_LASTRA_PIENA]
+## Inquadratura dello scontro in corso (si allarga se le plance si allontanano).
+var _camera_scontro: Vector3 = CAMERA_SCONTRO
+var _mira_scontro: Vector3 = MIRA_SCONTRO
 var _animazione_plancia: Tween
 ## All'inizio di una partita la plancia compare già della misura giusta, senza animazione.
 var _disponi_subito: bool = true
@@ -325,74 +329,24 @@ func _colore_lato(lato: int) -> Color:
 	return StileVisivo.COLORE_GIOCATORE if lato == Lato.GIOCATORE else StileVisivo.COLORE_FANTASMA
 
 
-## Parti fisse di un lato: lastra con bordo luminoso, stemma con la Resistenza, riserva di mana.
+## Parti fisse di un lato: plancia sagomata, cuore con lo stendardo e la riserva di mana.
 ## Il lato avversario è specchiato: truppe verso il centro, edifici dietro.
 func _crea_lato(lato: int) -> void:
 	var radice: Node3D = Node3D.new()
 	_plancia.add_child(radice)
 	_radici[lato] = radice
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5 * _segno(lato)
-	_crea_lastra(radice, lato, z_centro, _colore_lato(lato))
+	var forma: FormaPlancia = FormaPlancia.new()
+	radice.add_child(forma)
+	forma.costruisci(&"", _segno(lato), Z_TRUPPE, Z_EDIFICI, MEZZO_CUORE, lato == Lato.AVVERSARIO)
+	_forme[lato] = forma
 	_crea_cuore(radice, lato)
 	_crea_medaglione(radice, lato, z_centro)
 	_crea_riserva(radice, lato, z_centro)
 	_pezzi[lato] = Node3D.new()
 	radice.add_child(_pezzi[lato])
-	_imposta_larghezza_lastra(lato, LARGHEZZA_LASTRA_PIENA)
-
-
-## Lastra con bordo luminoso. La larghezza si cambia poi con _imposta_larghezza_lastra.
-func _crea_lastra(radice: Node3D, lato: int, z_centro: float, colore: Color) -> void:
-	var lastra: MeshInstance3D = MeshInstance3D.new()
-	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(LARGHEZZA_LASTRA_PIENA, 0.4, PROFONDITA_LASTRA)
-	lastra.mesh = forma
-	lastra.material_override = ScenaTeatro.materiale_carta(StileVisivo.CARTA_PLANCIA if lato == Lato.GIOCATORE else StileVisivo.CARTA_PLANCIA_NEMICO, 2.0)
-	lastra.position = Vector3(0.0, -0.18, z_centro)
-	radice.add_child(lastra)
-	_lastre[lato] = lastra
-	# Teatro di carta: cornice di carta color crema e, dentro, un filetto a inchiostro.
-	# Il colore del lato sta sulla fascia dello stendardo.
-	var crema: StandardMaterial3D = StileVisivo.materiale(StileVisivo.CARTA_CREMA.darkened(0.12), 0.95)
-	var inchiostro: StandardMaterial3D = StileVisivo.materiale(Color("120d0a"), 0.95)
-	_bordi_lastre[lato] = []
-	for i: int in range(8):
-		var interno: bool = i >= 4
-		var lato_bordo: int = i % 4
-		var spessore: float = 0.035 if interno else 0.16
-		var bordo: MeshInstance3D = MeshInstance3D.new()
-		var forma_bordo: BoxMesh = BoxMesh.new()
-		forma_bordo.size = Vector3(LARGHEZZA_LASTRA_PIENA, 0.04, spessore) if lato_bordo < 2 else Vector3(spessore, 0.04, PROFONDITA_LASTRA)
-		bordo.mesh = forma_bordo
-		bordo.material_override = inchiostro if interno else crema
-		var rientro: float = RIENTRO_FILETTO if interno else 0.0
-		var z: float = z_centro + ((PROFONDITA_LASTRA * 0.5 - rientro) * (-1.0 if lato_bordo == 0 else 1.0) if lato_bordo < 2 else 0.0)
-		bordo.position = Vector3(0.0, 0.03 if not interno else 0.025, z)
-		if lato_bordo >= 2 and interno:
-			forma_bordo.size.z = PROFONDITA_LASTRA - rientro * 2.0
-		radice.add_child(bordo)
-		_bordi_lastre[lato].append(bordo)
-
-
-## La lastra è centrata sul cuore e si allarga verso i due lati quanto servono gli spazi.
-func _imposta_larghezza_lastra(lato: int, larghezza: float) -> void:
-	_larghezze[lato] = larghezza
-	var centro_x: float = 0.0
-	var sinistra: float = -larghezza * 0.5
-	(_lastre[lato].mesh as BoxMesh).size.x = larghezza
-	_lastre[lato].position.x = centro_x
-	var bordi: Array = _bordi_lastre[lato]
-	for i: int in range(2):
-		var bordo: MeshInstance3D = bordi[i]
-		(bordo.mesh as BoxMesh).size.x = larghezza + 0.16
-		bordo.position.x = centro_x
-		var filetto: MeshInstance3D = bordi[i + 4]
-		(filetto.mesh as BoxMesh).size.x = larghezza - RIENTRO_FILETTO * 2.0
-		filetto.position.x = centro_x
-	(bordi[2] as MeshInstance3D).position.x = sinistra
-	(bordi[3] as MeshInstance3D).position.x = -sinistra
-	(bordi[6] as MeshInstance3D).position.x = sinistra + RIENTRO_FILETTO
-	(bordi[7] as MeshInstance3D).position.x = -sinistra - RIENTRO_FILETTO
+	var mezza: float = LARGHEZZA_LASTRA_PIENA * 0.5 - MARGINE_LASTRA
+	forma.imposta(Vector4(mezza, mezza, mezza, mezza))
 
 
 ## Larghezze degli spazi di una fila, da sinistra a destra: prima i pezzi, poi gli spazi vuoti,
@@ -856,10 +810,30 @@ func _crea_spazio(genitore: Node3D, posizione: Vector3, misura: Vector2, disponi
 
 
 ## Posizione dello spazio numero i di una fila (pezzo o spazio vuoto), fra quelle calcolate da
-## _posizioni_fila quando si costruisce il lato.
+## _posizioni_fila quando si costruisce il lato. La forma della plancia decide dove sta il punto
+## (nell'«arco» la fila è curva).
 func _posizione_fila(lato: int, truppa: bool, i: int) -> Vector3:
 	var xs: Array[float] = _xs_truppe[lato] if truppa else _xs_edifici[lato]
-	return Vector3(xs[i], 0.02, (Z_TRUPPE if truppa else Z_EDIFICI) * _segno(lato))
+	var punto: Array = _forme[lato].punto(truppa, xs[i])
+	return (punto[0] as Vector3) + Vector3(0.0, 0.02, 0.0)
+
+
+## Rotazione dello spazio numero i di una fila: le carte seguono la curva dell'«arco».
+func _rotazione_fila(lato: int, truppa: bool, i: int) -> float:
+	var xs: Array[float] = _xs_truppe[lato] if truppa else _xs_edifici[lato]
+	return float(_forme[lato].punto(truppa, xs[i])[1])
+
+
+## Quanto ogni fila si allunga a sinistra e a destra del centro (margine compreso), per la forma.
+static func _estensioni_fila(larghezze: Array[float], xs: Array[float]) -> Vector2:
+	var sinistra: float = MEZZO_CUORE + STACCO_CUORE
+	var destra: float = MEZZO_CUORE + STACCO_CUORE
+	for i: int in range(xs.size()):
+		if xs[i] < 0.0:
+			sinistra = maxf(sinistra, -xs[i] + larghezze[i] * 0.5)
+		else:
+			destra = maxf(destra, xs[i] + larghezze[i] * 0.5)
+	return Vector2(sinistra, destra) + Vector2.ONE * MARGINE_LASTRA
 
 
 ## Quanti spazi mostrare in una fila: quelli occupati o disponibili, più uno chiuso
@@ -885,22 +859,33 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 	var colore: Color = _colore_lato(lato)
 	var spazi_truppe: int = _spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, spazi_chiusi)
 	var spazi_edifici: int = _spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, spazi_chiusi)
-	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici, truppe.size(), edifici.size()))
-	_xs_truppe[lato] = _posizioni_fila(_larghezze_fila(spazi_truppe, truppe.size(), PASSO_TRUPPE))
-	_xs_edifici[lato] = _posizioni_fila(_larghezze_fila(spazi_edifici, edifici.size(), PASSO_EDIFICI))
+	_larghezze[lato] = _larghezza_per(spazi_truppe, spazi_edifici, truppe.size(), edifici.size())
+	var larghezze_t: Array[float] = _larghezze_fila(spazi_truppe, truppe.size(), PASSO_TRUPPE)
+	var larghezze_e: Array[float] = _larghezze_fila(spazi_edifici, edifici.size(), PASSO_EDIFICI)
+	_xs_truppe[lato] = _posizioni_fila(larghezze_t)
+	_xs_edifici[lato] = _posizioni_fila(larghezze_e)
+	var fila_t: Vector2 = _estensioni_fila(larghezze_t, _xs_truppe[lato])
+	var fila_e: Vector2 = _estensioni_fila(larghezze_e, _xs_edifici[lato])
+	_forme[lato].imposta(Vector4(fila_t.x, fila_t.y, fila_e.x, fila_e.y))
 	for i: int in range(spazi_truppe):
 		if i < truppe.size():
-			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_fila(lato, true, i), i, nitidezza, true))
+			var truppa: Tessera3D = _crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_fila(lato, true, i), i, nitidezza, true)
+			truppa.rotation.y = _rotazione_fila(lato, true, i)
+			_truppe[lato].append(truppa)
 			_lampi[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
 			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_fila(lato, true, i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_TRUPPA.y), i < capacita_truppe, colore)
+			spazio.rotation.y = _rotazione_fila(lato, true, i)
 			if i < capacita_truppe and _spazio_libero_truppa == null:
 				_spazio_libero_truppa = spazio
 	for i: int in range(spazi_edifici):
 		if i < edifici.size():
-			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_fila(lato, false, i), i, nitidezza, true))
+			var edificio: Tessera3D = _crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_fila(lato, false, i), i, nitidezza, true)
+			edificio.rotation.y = _rotazione_fila(lato, false, i)
+			_edifici[lato].append(edificio)
 		elif lato == Lato.GIOCATORE:
 			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_fila(lato, false, i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_EDIFICIO.y), i < capacita_edifici, colore)
+			spazio.rotation.y = _rotazione_fila(lato, false, i)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
 				_spazio_libero_edificio = spazio
 	_alza_figurine(lato, tutte_animate)
@@ -937,6 +922,8 @@ func _costruisci_plancia_giocatore() -> void:
 			_spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, true),
 			truppe.size(), edifici.size())
 	var scala: float = _scala_per(larghezza, SCALA_MASSIMA)
+	# La forma della plancia la indica il popolo della nazione (Davide, 9 novembre 2026).
+	_forme[Lato.GIOCATORE].cambia_forma(run.board_shape())
 	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, capacita_edifici, capacita_truppe, true, scala)
 	var animata: bool = not _disponi_subito and (_plancia.scale.x != scala or _modo == Modo.SCONTRO)
 	_disponi_subito = false
@@ -1513,7 +1500,14 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	var larghezza: float = maxf(_larghezza_per(truppe.size(), edifici.size()), _larghezza_per(truppe_avversarie.size(), edifici_avversari.size()))
 	var scala: float = _scala_per(larghezza, SCALA_MASSIMA_SCONTRO)
 	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size(), false, scala, true)
+	# Il nemico ha la forma del popolo del fantasma o quella del suo incontro.
+	_forme[Lato.AVVERSARIO].cambia_forma(run.last_opponent_board_shape)
 	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0, false, scala, true)
+	# Le estremità dell'«arco» rientrano verso il centro del tavolo: la plancia del nemico si
+	# allontana di tanto, per non toccare la tua, e la telecamera si allarga quanto serve.
+	var distanza: float = _forme[Lato.GIOCATORE].rientro() + _forme[Lato.AVVERSARIO].rientro()
+	_mira_scontro = MIRA_SCONTRO + Vector3(0.0, 0.0, -distanza * 0.5)
+	_camera_scontro = _mira_scontro + (CAMERA_SCONTRO - MIRA_SCONTRO) * (1.0 + distanza / PROFONDITA_SCONTRO)
 	_disponi_plancia(scala, larghezza, true, 0.7)
 	_nomi_lato[Lato.AVVERSARIO].text = run.last_opponent_name.trim_prefix("Fantasma: ").to_upper()
 	_aggiorna_visuale_scontro()
@@ -1523,8 +1517,8 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	avversario.position = Vector3(0.0, 0.0, -14.0)
 	var arrivo: Tween = create_tween()
 	arrivo.set_parallel(true)
-	arrivo.tween_property(avversario, "position", Vector3.ZERO, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	arrivo.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_SCONTRO, MIRA_PARTITA, MIRA_SCONTRO), 0.0, 1.0, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	arrivo.tween_property(avversario, "position", Vector3(0.0, 0.0, -distanza), 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	arrivo.tween_method(_muovi_camera.bind(_camera.global_position, _camera_scontro, MIRA_PARTITA, _mira_scontro), 0.0, 1.0, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	_hud.modalita_scontro(true, titolo)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_stendi_stendardo(lato, true, false)
@@ -1908,7 +1902,7 @@ func _chiudi_scontro() -> void:
 	var uscita: Tween = create_tween()
 	uscita.set_parallel(true)
 	uscita.tween_property(avversario, "position", Vector3(0.0, 0.0, -14.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	uscita.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_PARTITA, MIRA_SCONTRO, MIRA_PARTITA), 0.0, 1.0, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	uscita.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_PARTITA, _mira_scontro, MIRA_PARTITA), 0.0, 1.0, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	uscita.chain().tween_callback(avversario.hide)
 	_aggiorna_tutto()
 
