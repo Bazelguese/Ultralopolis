@@ -71,8 +71,8 @@ const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -0.2)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 1.2
 ## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 22.0, 22.0)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.6)
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 24.0, 23.0)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.2)
 
 var run: RunState
 
@@ -894,7 +894,7 @@ func _costruisci_scelte() -> void:
 			misura = MISURA_EDIFICIO
 		elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 			misura = MISURA_TRUPPA
-		var arrivo: Vector3 = Vector3(-0.4 + (i - (schede.size() - 1) * 0.5) * 4.4, 2.3, -3.3)
+		var arrivo: Vector3 = Vector3(-0.4 + (i - (schede.size() - 1) * 0.5) * 4.4, 2.3, -3.85)
 		# Consiglieri e avvenimenti con un'illustrazione: mezzo busto che esce dall'alto, tipi sotto.
 		var busto: bool = scheda.genere == SchedaCarta.Genere.CONSIGLIERE and scheda.illustrazione != null
 		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6, busto)
@@ -909,7 +909,7 @@ func _costruisci_scelte() -> void:
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
 			# Con il mezzo busto sopra, la scritta passa sotto la carta, dopo i tipi e il verbo.
 			if busto:
-				sopra.position.z = misura.y * 0.5 + sotto_tipi + 0.62
+				sopra.position.z = misura.y * 0.5 + sotto_tipi + 0.55
 				sopra.font_size = 34
 			tessera.add_child(sopra)
 		var costo: Label3D = StileVisivo.scritta(scheda.costo, StileVisivo.FONT_TITOLI, 54, StileVisivo.ORO_LUCE if scheda.disponibile else StileVisivo.PERICOLO, 0.0, 12)
@@ -1529,9 +1529,8 @@ func _aggiorna_visuale_scontro() -> void:
 				tessera.imposta_stato("In attesa: servono %d %s, %s %d" % [def.mana_cost, def.mana_type, "ne hai" if lato == Lato.GIOCATORE else "ne ha", disponibile], StileVisivo.PERICOLO)
 			else:
 				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
-				if float(_lampi[lato][i]) > 0.0:
-					tessera.imposta_stato("Si attiva!", StileVisivo.ORO_LUCE)
-				elif _sim.get_troop_slow_ms(lato, i) > 0:
+				# L'attivazione si vede già (scatto, scintille, alone): nessuna fascia sopra i numeri.
+				if _sim.get_troop_slow_ms(lato, i) > 0:
 					tessera.imposta_stato("Inefficiente", Color("e08a2e"))
 				elif _trascurata(lato, true, i):
 					tessera.imposta_stato("Trascurata: mantenimento non pagato", Color("e08a2e"))
