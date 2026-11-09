@@ -55,8 +55,9 @@ const ALTEZZA_FIGURINA_EDIFICIO: float = 0.7
 ## Larghezza del telo dello stendardo e altezza da cui parte (più in basso: Davide, 8 novembre 2026).
 const LARGHEZZA_STENDARDO: float = 1.5
 const BASE_TELO: float = 0.45
-## La miccia del tempo, davanti allo stendardo.
-const POSIZIONE_MICCIA_Z: float = 0.95
+## L'asta dello stendardo, che fa anche da timer dello scontro.
+const ALTEZZA_ASTA: float = ALTEZZA_STENDARDO + BASE_TELO + 0.1
+const X_ASTA: float = -LARGHEZZA_STENDARDO * 0.5 - 0.05
 ## Lo stendardo steso: la base sta verso il davanti della plancia, il telo si stende all'indietro.
 ## (centra il telo steso fra la fila delle truppe e quella degli edifici)
 const POSIZIONE_STESO_Z: float = 1.95
@@ -106,7 +107,6 @@ var _scritte_resistenza: Array[Label3D] = [null, null]
 var _iniziali: Array[Label3D] = [null, null]
 var _anelli: Array[Array] = [[], []]
 var _stato_anelli: Array[int] = [-1, -1]
-var _materiale_anello_spento: StandardMaterial3D
 var _materiale_anello_acceso: StandardMaterial3D
 var _materiale_anello_logoramento: StandardMaterial3D
 ## La brace in testa alla miccia del tempo e le parti dello stendardo che spariscono quando è steso.
@@ -432,10 +432,10 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	var forma_asta: CylinderMesh = CylinderMesh.new()
 	forma_asta.top_radius = 0.05
 	forma_asta.bottom_radius = 0.07
-	forma_asta.height = ALTEZZA_STENDARDO + BASE_TELO + 0.1
+	forma_asta.height = ALTEZZA_ASTA
 	asta.mesh = forma_asta
 	asta.material_override = StileVisivo.materiale(Color("1a1410"), 0.8)
-	asta.position = Vector3(-LARGHEZZA_STENDARDO * 0.5 - 0.05, forma_asta.height * 0.5, 0.0)
+	asta.position = Vector3(X_ASTA, forma_asta.height * 0.5, 0.0)
 	stendardo.add_child(asta)
 	var punta: MeshInstance3D = MeshInstance3D.new()
 	var forma_punta: SphereMesh = SphereMesh.new()
@@ -443,7 +443,7 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	forma_punta.height = 0.22
 	punta.mesh = forma_punta
 	punta.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
-	punta.position = Vector3(-LARGHEZZA_STENDARDO * 0.5 - 0.05, forma_asta.height + 0.05, 0.0)
+	punta.position = Vector3(X_ASTA, forma_asta.height + 0.05, 0.0)
 	stendardo.add_child(punta)
 	_aste_stendardo[lato] = [asta, punta]
 	var telo: MeshInstance3D = MeshInstance3D.new()
@@ -608,56 +608,59 @@ static func _iniziali_di(nome: String) -> String:
 
 
 ## Anello di segmenti attorno al ritratto: il tempo della battaglia.
-## La miccia del tempo dello scontro (Davide, 8 novembre 2026: l'anello attorno allo stendardo non
-## aveva senso). Una corda di carta davanti allo stendardo che brucia da sinistra a destra fino
-## all'inizio del logoramento; da lì in poi è tutta rossa. Si vede solo negli scontri.
-func _crea_anello(medaglione: Node3D, lato: int) -> void:
-	if _materiale_anello_spento == null:
-		_materiale_anello_spento = StileVisivo.materiale(StileVisivo.CARTA_CREMA.darkened(0.25), 0.9)
-		_materiale_anello_acceso = StileVisivo.materiale(Color("1a1410"), 0.95)
-		_materiale_anello_logoramento = StileVisivo.materiale_luminoso(StileVisivo.PERICOLO, 1.4)
-	var lunghezza: float = 2.4
-	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(lunghezza / float(SEGMENTI_ANELLO) * 0.9, 0.05, 0.08)
-	_anelli[lato] = []
-	for i: int in range(SEGMENTI_ANELLO):
-		var segmento: MeshInstance3D = MeshInstance3D.new()
-		segmento.mesh = forma
-		segmento.material_override = _materiale_anello_spento
-		var t: float = float(i) / float(SEGMENTI_ANELLO - 1)
-		# Una leggera onda: è una corda, non un righello.
-		segmento.position = Vector3(-lunghezza * 0.5 + lunghezza * t, 0.05, POSIZIONE_MICCIA_Z + sin(t * TAU * 1.5) * 0.05)
-		medaglione.add_child(segmento)
-		_anelli[lato].append(segmento)
+## Il tempo dello scontro sull'asta dello stendardo (Davide, 9 novembre 2026): una luce dorata sale
+## lungo l'asta dal basso fino all'inizio del logoramento, con la brace in cima; da lì in poi l'asta
+## è tutta rossa e pulsa. Si vede solo negli scontri.
+func _crea_anello(_medaglione: Node3D, lato: int) -> void:
+	if _materiale_anello_acceso == null:
+		_materiale_anello_acceso = StileVisivo.materiale_luminoso(StileVisivo.ORO_LUCE, 1.6)
+		_materiale_anello_logoramento = StileVisivo.materiale_luminoso(StileVisivo.PERICOLO, 2.2)
+	var stendardo: Node3D = _stendardi[lato]
+	var riempimento: MeshInstance3D = MeshInstance3D.new()
+	var forma: CylinderMesh = CylinderMesh.new()
+	forma.top_radius = 0.085
+	forma.bottom_radius = 0.085
+	forma.height = 1.0
+	riempimento.mesh = forma
+	riempimento.material_override = _materiale_anello_acceso
+	riempimento.position = Vector3(X_ASTA, 0.0, 0.0)
+	riempimento.scale = Vector3(1.0, 0.001, 1.0)
+	stendardo.add_child(riempimento)
+	_anelli[lato] = [riempimento]
 	var brace: MeshInstance3D = MeshInstance3D.new()
 	var forma_brace: SphereMesh = SphereMesh.new()
-	forma_brace.radius = 0.08
-	forma_brace.height = 0.16
+	forma_brace.radius = 0.12
+	forma_brace.height = 0.24
 	brace.mesh = forma_brace
 	brace.material_override = StileVisivo.materiale_luminoso(StileVisivo.BRACE, 5.0)
-	medaglione.add_child(brace)
+	stendardo.add_child(brace)
 	_braci_miccia[lato] = brace
 	_stato_anelli[lato] = 0
 
 
-## Brucia la miccia fino all'inizio del logoramento; da lì in poi è tutta rossa.
+## Fa salire la luce lungo l'asta; dall'inizio del logoramento l'asta è tutta rossa.
 func _aggiorna_anello(lato: int, millisecondi: int) -> void:
 	var inizio: int = maxi(1, run.battle_rules.attrition_start_ms)
 	var stato: int = -2 if millisecondi >= inizio else int(float(millisecondi) / float(inizio) * SEGMENTI_ANELLO)
+	var riempimento: MeshInstance3D = _anelli[lato][0]
+	var brace: MeshInstance3D = _braci_miccia[lato]
+	if stato == -2:
+		riempimento.material_override = _materiale_anello_logoramento
+		var battito: float = 1.0 + 0.04 * sin(_tempo * 8.0)
+		riempimento.scale = Vector3(battito, ALTEZZA_ASTA, battito)
+		riempimento.position.y = ALTEZZA_ASTA * 0.5
+		brace.visible = false
+		_stato_anelli[lato] = -2
+		return
 	if stato == _stato_anelli[lato]:
 		return
 	_stato_anelli[lato] = stato
-	for i: int in range(_anelli[lato].size()):
-		var segmento: MeshInstance3D = _anelli[lato][i]
-		if stato == -2:
-			segmento.material_override = _materiale_anello_logoramento
-		else:
-			segmento.material_override = _materiale_anello_acceso if i < stato else _materiale_anello_spento
-	var brace: MeshInstance3D = _braci_miccia[lato]
-	var in_corso: bool = stato >= 0 and stato < _anelli[lato].size() and (_anelli[lato][0] as MeshInstance3D).visible
-	brace.visible = in_corso
-	if in_corso:
-		brace.position = (_anelli[lato][stato] as MeshInstance3D).position + Vector3(0.0, 0.05, 0.0)
+	var altezza: float = ALTEZZA_ASTA * float(stato) / float(SEGMENTI_ANELLO)
+	riempimento.material_override = _materiale_anello_acceso
+	riempimento.scale = Vector3(1.0, maxf(altezza, 0.001), 1.0)
+	riempimento.position.y = altezza * 0.5
+	brace.visible = riempimento.visible and stato > 0
+	brace.position = Vector3(X_ASTA, altezza, 0.0)
 
 
 # --- Carte sulla plancia ---------------------------------------------------------
