@@ -401,7 +401,8 @@ func _scala_per(larghezza: float, massima: float) -> float:
 ## simmetrici rispetto al centro del tavolo.
 func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: float) -> void:
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
-	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0 - 0.15
+	# La plancia sta più in basso (Davide, 9 novembre 2026): i comandi del round sono in alto a destra.
+	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0 + 0.85
 	# Un po' a destra: a sinistra c'è la colonna con la nazione e il calendario.
 	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
 	if _animazione_plancia != null and _animazione_plancia.is_valid():
