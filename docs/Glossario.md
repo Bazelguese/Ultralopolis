@@ -32,7 +32,11 @@ Nel codice i nomi tecnici interni (nomi di variabili, classi, cartelle come `opp
 
 # PARTE 1 — NOMI DA DECIDERE
 
-Nessuna decisione aperta: tutte le questioni sono state decise l'8 novembre 2026 (vedi il registro in fondo).
+| Questione | Proposta | Alternative | Dettagli |
+|---|---|---|---|
+| **Nomi dei quattro popoli** (Davide ha deciso l'8 novembre 2026 che Insettoidi, Acquatici, Uccelli antropomorfi e Bio-macchine sostituiscono Pietrosangue, Maremani e Cinerali, con nomi nuovi) | **Chitinari** (tipo Chitinaro) · **Salmastri** (Salmastro) · **Altivoli** (Altivolo) · **Innestati** (Innestato) | Alveani, Ronzanti · Squamari, Perlacei · Rostrati, Piumanti · Cuorlegno, Germoglianti | `docs/Bozza_popoli.md` §2. Una volta decisi, Pietrosangue, Maremani e Cinerali passano fra i nomi ritirati |
+
+Le altre questioni sono state decise l'8 novembre 2026 (vedi il registro in fondo).
 
 Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due cose, la questione si scrive qui con una proposta. Davide decide, la riga esce da qui, il nome diventa **Deciso** nella Parte 2 e la decisione entra nel registro.
 
