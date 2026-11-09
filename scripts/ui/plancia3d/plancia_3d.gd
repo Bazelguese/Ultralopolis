@@ -1500,6 +1500,13 @@ func _aggiorna_visuale_scontro() -> void:
 				edificio.imposta_stato("", StileVisivo.NOTTE)
 		for mana: StringName in COLORI_RISERVA:
 			(_riserve[lato] as RiservaMana).imposta(mana, _sim.get_mana(lato, mana))
+		var mancanze: Array[StringName] = []
+		for i: int in range(_truppe[lato].size()):
+			if _sim.get_troop_state(lato, i) == BattleSim.TroopState.IN_ATTESA_DI_MANA:
+				var richiesta: StringName = _setups[lato].troops[i].mana_type
+				if not mancanze.has(richiesta):
+					mancanze.append(richiesta)
+		(_riserve[lato] as RiservaMana).segnala_mancanze(mancanze)
 		for i: int in range(_truppe[lato].size()):
 			var tessera: Tessera3D = _truppe[lato][i]
 			var def: TroopDef = _setups[lato].troops[i]

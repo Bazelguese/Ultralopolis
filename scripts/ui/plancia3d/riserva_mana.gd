@@ -7,8 +7,13 @@ extends Node3D
 ## Solo presentazione: legge i numeri dalla simulazione, non decide niente.
 
 const COLORI: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola", &"energetico"]
-const RAGGIO_CERCHIO: float = 0.66
-const RAGGIO_SFERA: float = 0.22
+## Il mana energetico (giallo) sta al centro ed è più grande; gli altri quattro attorno, a croce
+## (Davide, 9 novembre 2026).
+const RAGGIO_CERCHIO: float = 0.78
+## In prospettiva la profondità si accorcia: la croce è più lunga verso la telecamera.
+const PROFONDITA_CROCE: float = 1.3
+const RAGGIO_SFERA: float = 0.25
+const RAGGIO_CENTRO: float = 0.32
 const MASSIMO_SCINTILLE: int = 8
 ## Quanta luce dà la sfera a seconda del mana: piena a questo numero.
 const PIENA: int = 6
@@ -19,6 +24,8 @@ render_mode blend_mix, cull_back, depth_draw_always;
 uniform vec3 colore : source_color = vec3(1.0);
 uniform float carica = 0.0;
 uniform float lampo = 0.0;
+uniform float piena = 0.0;
+uniform float manca = 0.0;
 void fragment() {
 	float bordo = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 2.5);
 	vec2 p = UV * vec2(6.2831, 3.1416);
@@ -26,7 +33,9 @@ void fragment() {
 	float nucleo = pow(clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
 	float accesa = step(0.001, carica);
 	ALBEDO = mix(vec3(0.012, 0.01, 0.01), colore * 0.2, accesa);
-	EMISSION = colore * (carica * (0.8 + 2.2 * vortice * nucleo) + bordo * (0.45 + 1.6 * carica) + lampo * 3.5);
+	float battito = 0.5 + 0.5 * sin(TIME * 5.0);
+	EMISSION = colore * (carica * (0.8 + 2.2 * vortice * nucleo) + bordo * (0.45 + 1.6 * carica + piena * 1.2 * battito) + lampo * 3.5)
+		+ vec3(1.0, 0.12, 0.08) * bordo * manca * (0.6 + 2.4 * step(0.5, fract(TIME * 2.5)));
 	ROUGHNESS = 0.25;
 	SPECULAR = 0.3;
 	ALPHA = clamp(0.8 + 0.2 * bordo, 0.0, 1.0);
@@ -49,16 +58,17 @@ func costruisci() -> void:
 	if _shader == null:
 		_shader = Shader.new()
 		_shader.code = SHADER
-	for i: int in range(COLORI.size()):
-		var mana: StringName = COLORI[i]
-		# A cerchio, il primo in alto (lontano dalla telecamera).
-		var angolo: float = -PI * 0.5 + TAU * float(i) / float(COLORI.size())
-		_crea_sfera(mana, Vector3(cos(angolo) * RAGGIO_CERCHIO, 0.0, sin(angolo) * RAGGIO_CERCHIO * 0.8))
+	var attorno: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola"]
+	for i: int in range(attorno.size()):
+		# A croce: rosso in alto (lontano dalla telecamera), poi in senso orario.
+		var angolo: float = -PI * 0.5 + TAU * float(i) / float(attorno.size())
+		_crea_sfera(attorno[i], Vector3(cos(angolo) * RAGGIO_CERCHIO, 0.0, sin(angolo) * RAGGIO_CERCHIO * PROFONDITA_CROCE), RAGGIO_SFERA)
+	_crea_sfera(&"energetico", Vector3.ZERO, RAGGIO_CENTRO)
 	for mana: StringName in COLORI:
 		imposta(mana, 0)
 
 
-func _crea_sfera(mana: StringName, posizione: Vector3) -> void:
+func _crea_sfera(mana: StringName, posizione: Vector3, raggio: float) -> void:
 	var colore: Color = StileVisivo.colore_mana_nome(mana)
 	var nodo: Node3D = Node3D.new()
 	nodo.position = posizione
@@ -66,8 +76,8 @@ func _crea_sfera(mana: StringName, posizione: Vector3) -> void:
 	# Base: un anello di carta crema su cui la sfera poggia.
 	var base: MeshInstance3D = MeshInstance3D.new()
 	var forma_base: CylinderMesh = CylinderMesh.new()
-	forma_base.top_radius = RAGGIO_SFERA * 0.95
-	forma_base.bottom_radius = RAGGIO_SFERA * 1.15
+	forma_base.top_radius = raggio * 0.95
+	forma_base.bottom_radius = raggio * 1.15
 	forma_base.height = 0.06
 	forma_base.radial_segments = 24
 	base.mesh = forma_base
@@ -76,8 +86,8 @@ func _crea_sfera(mana: StringName, posizione: Vector3) -> void:
 	nodo.add_child(base)
 	var sfera: MeshInstance3D = MeshInstance3D.new()
 	var forma: SphereMesh = SphereMesh.new()
-	forma.radius = RAGGIO_SFERA
-	forma.height = RAGGIO_SFERA * 2.0
+	forma.radius = raggio
+	forma.height = raggio * 2.0
 	forma.radial_segments = 32
 	forma.rings = 16
 	sfera.mesh = forma
@@ -85,7 +95,7 @@ func _crea_sfera(mana: StringName, posizione: Vector3) -> void:
 	materiale.shader = _shader
 	materiale.set_shader_parameter("colore", colore)
 	sfera.material_override = materiale
-	sfera.position.y = 0.06 + RAGGIO_SFERA
+	sfera.position.y = 0.06 + raggio
 	nodo.add_child(sfera)
 	var luce: OmniLight3D = OmniLight3D.new()
 	luce.light_color = colore
@@ -112,8 +122,9 @@ func _crea_sfera(mana: StringName, posizione: Vector3) -> void:
 	numero.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	numero.outline_modulate = colore.darkened(0.75)
 	numero.no_depth_test = true
-	numero.position = Vector3(0.0, sfera.position.y + RAGGIO_SFERA + 0.16, 0.0)
+	numero.position = Vector3(0.0, sfera.position.y + raggio + 0.16, 0.0)
 	nodo.add_child(numero)
+	sfera.set_meta("raggio", raggio)
 	_sfere[mana] = sfera
 	_materiali[mana] = materiale
 	_luci[mana] = luce
@@ -149,11 +160,18 @@ func imposta(mana: StringName, quanti: int) -> void:
 	_cariche[mana] = carica
 	t.tween_method(func(v: float) -> void: materiale.set_shader_parameter("carica", v), da, carica, 0.25)
 	t.tween_property(_luci[mana], "light_energy", carica * 1.6, 0.25)
+	materiale.set_shader_parameter("piena", 1.0 if quanti >= PIENA else 0.0)
 	var gruppo: Array = _scintille[mana]
 	for k: int in range(gruppo.size()):
 		(gruppo[k] as MeshInstance3D).visible = k < quanti
 	if prima >= 0 and quanti < prima:
 		_spegni_un_poco(mana)
+
+
+## Le sfere dei colori che mancano a una truppa in attesa lampeggiano di rosso (principio P4).
+func segnala_mancanze(colori: Array[StringName]) -> void:
+	for mana: StringName in _materiali:
+		(_materiali[mana] as ShaderMaterial).set_shader_parameter("manca", 1.0 if colori.has(mana) else 0.0)
 
 
 ## Un mana è appena arrivato: lampo, salto e "+1" che sale.
@@ -171,7 +189,7 @@ func pulsa(mana: StringName) -> void:
 	piu.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	piu.no_depth_test = true
 	piu.outline_modulate = Color("120d0a")
-	piu.position = sfera.position + Vector3(RAGGIO_SFERA + 0.12, 0.1, 0.0)
+	piu.position = sfera.position + Vector3(float(sfera.get_meta("raggio")) + 0.12, 0.1, 0.0)
 	(sfera.get_parent() as Node3D).add_child(piu)
 	var sale: Tween = create_tween()
 	sale.set_parallel(true)
@@ -194,10 +212,10 @@ func _process(delta: float) -> void:
 		return
 	_tempo += delta
 	for mana: StringName in _scintille:
+		var r: float = float((_sfere[mana] as Node3D).get_meta("raggio")) * 0.55
 		for s: MeshInstance3D in _scintille[mana]:
 			if not s.visible:
 				continue
 			var a: float = float(s.get_meta("fase")) + _tempo * float(s.get_meta("velocita"))
 			var piega: float = float(s.get_meta("piega"))
-			var r: float = RAGGIO_SFERA * 0.55
 			s.position = Vector3(cos(a) * r, sin(a * piega) * r * 0.6, sin(a) * r)
