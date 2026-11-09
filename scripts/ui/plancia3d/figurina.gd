@@ -89,6 +89,9 @@ void fragment() {
 	float g = dot(base, vec3(0.3, 0.59, 0.11));
 	vec3 col = mix(base, vec3(g) * 0.4, spento);
 	ALBEDO = col;
+	// La figurina sta in piedi, ma si illumina come se guardasse in alto, come la carta sotto di
+	// lei: altrimenti le luci, che vengono dall'alto, la sfiorano appena e resta scura.
+	NORMAL = normalize(mix(NORMAL, (VIEW_MATRIX * vec4(0.0, 1.0, 0.0, 0.0)).xyz, 0.75));
 	EMISSION = col * lampo * 1.2 + vec3(1.0, 0.42, 0.08) * bordo * 4.0;
 	ROUGHNESS = 0.9;
 	ALPHA = a;
