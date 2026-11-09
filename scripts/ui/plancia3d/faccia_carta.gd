@@ -29,6 +29,8 @@ var _area_basso: Rect2
 var _pastiglie: Array[Rect2] = []
 ## Zona delle righe di simboli (consiglieri, azioni, eventi): vuota se la carta non ne ha.
 var _area_simboli: Rect2
+## Sulla plancia il nome sta sopra il fondo del disegno (vedi _calcola_misure).
+var _nome_sopra_arte: bool = false
 
 
 func imposta(p_scheda: SchedaCarta, misura: Vector2) -> void:
@@ -78,12 +80,21 @@ func _calcola_misure() -> void:
 	# Sulla plancia la carta fa da base alla figurina: la pedana è più bassa, i numeri più grandi.
 	elif scheda.come_base and size.y > size.x * 1.3:
 		altezza_arte = size.y * 0.36
-	# Sulla plancia, con il disegno stampato, il disegno cede un po' di spazio ai numeri.
-	elif scheda.sulla_plancia and size.y > size.x * 1.3:
-		altezza_arte = size.y * 0.4
+	_nome_sopra_arte = scheda.sulla_plancia and not con_simboli
+	# Sulla plancia (Davide, 9 novembre 2026) il nome sta su una fascia scura sopra il fondo del
+	# disegno, invece di avere una fascia sua: lo spazio guadagnato va ai numeri, più grandi.
+	if _nome_sopra_arte:
+		var verticale: bool = size.y > size.x * 1.3
+		if verticale:
+			altezza_arte = size.y * (0.38 if scheda.come_base else 0.5)
+		else:
+			altezza_arte = size.y * (0.5 if scheda.come_base else 0.56)
 	_area_arte = Rect2(margine, margine, size.x - margine * 2.0, altezza_arte)
 	var altezza_nome: float = size.y * (0.12 if con_simboli else 0.14)
 	_area_nome = Rect2(_bordo, _area_arte.end.y + lato * 0.02, size.x - _bordo * 2.0, altezza_nome)
+	if _nome_sopra_arte:
+		var alta_nome: float = size.y * (0.13 if size.y > size.x * 1.3 else 0.2)
+		_area_nome = Rect2(_area_arte.position.x, _area_arte.end.y - alta_nome, _area_arte.size.x, alta_nome)
 	# Le pastiglie restano ben dentro la cornice anche viste piccole e in prospettiva.
 	var inizio_basso: float = _area_nome.end.y + lato * 0.04
 	var rientro: float = margine + lato * 0.025
@@ -162,8 +173,9 @@ func _draw() -> void:
 	faccia.set_corner_radius_all(int(maxf(_raggio - _bordo, 2.0)))
 	faccia.anti_aliasing = true
 	draw_style_box(faccia, Rect2(Vector2(_bordo, _bordo), size - Vector2(_bordo, _bordo) * 2.0))
-	draw_rect(_area_nome, StileVisivo.FASCIA_NOME)
-	draw_line(_area_nome.position, Vector2(_area_nome.end.x, _area_nome.position.y), cornice.darkened(0.2), 2.0)
+	if not _nome_sopra_arte:
+		draw_rect(_area_nome, StileVisivo.FASCIA_NOME)
+		draw_line(_area_nome.position, Vector2(_area_nome.end.x, _area_nome.position.y), cornice.darkened(0.2), 2.0)
 
 
 ## Tutto ciò che sta sopra l'illustrazione: gemma, livello, pastiglie, nastri, stato.
@@ -171,6 +183,14 @@ func _disegna_sopra() -> void:
 	var lato: float = minf(size.x, size.y)
 	_sopra.draw_rect(_area_arte, Color(0.0, 0.0, 0.0, 0.0), false, 2.0)
 	_sopra.draw_rect(_area_arte.grow(1.0), scheda.colore_cornice().darkened(0.35), false, 2.0)
+	if _nome_sopra_arte:
+		# Fascia del nome sopra il fondo del disegno: scura, con una sfumatura verso l'alto.
+		var sfuma: float = _area_nome.size.y * 0.5
+		for k: int in range(6):
+			var t: float = float(k) / 6.0
+			_sopra.draw_rect(Rect2(_area_nome.position.x, _area_nome.position.y - sfuma * (1.0 - t), _area_nome.size.x, sfuma / 6.0 + 1.0), Color(StileVisivo.FASCIA_NOME, 0.12 + 0.5 * t))
+		_sopra.draw_rect(_area_nome, Color(StileVisivo.FASCIA_NOME, 0.82))
+		_sopra.draw_line(Vector2(_area_nome.position.x, _area_nome.end.y), _area_nome.end, scheda.colore_cornice().darkened(0.2), 2.0)
 
 	# Pastiglie con icone.
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
@@ -474,7 +494,7 @@ func _crea_scritte() -> void:
 
 	_malus = _etichetta(scheda.malus.to_upper(), StileVisivo.FONT_TITOLI, int(lato * 0.075), Color.WHITE, 0)
 	_adatta(_malus, StileVisivo.FONT_TITOLI, int(lato * 0.075), size.x - 24.0 - _bordo * 2.0)
-	_malus.position = Vector2(size.x * 0.5, _area_arte.end.y - lato * 0.11)
+	_malus.position = Vector2(size.x * 0.5, (_area_nome.position.y if _nome_sopra_arte else _area_arte.end.y) - lato * 0.11)
 	_malus.reset_size()
 	_malus.position.x -= _malus.size.x * 0.5
 	_malus.visible = scheda.malus != ""

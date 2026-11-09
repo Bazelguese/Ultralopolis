@@ -284,8 +284,12 @@ func test_le_risorse_sono_tutte_sempre_visibili() -> void:
 		var etichetta: Label = valori[tipo]
 		assert_true(etichetta.is_visible_in_tree(), "%s visibile." % Res.NAMES[tipo])
 	assert_eq((valori[Res.Type.LEGNO] as Label).text, run.stock_text(Res.Type.LEGNO))
+	# Nello scontro resta solo ciò che serve a guardarlo (Davide, 9 novembre 2026): le risorse
+	# spariscono e tornano quando lo scontro finisce.
 	hud.modalita_scontro(true, "Prova")
-	assert_true((valori[Res.Type.ORO] as Label).is_visible_in_tree(), "Anche durante gli scontri.")
+	assert_false((valori[Res.Type.ORO] as Label).is_visible_in_tree(), "Nello scontro la barra delle risorse sparisce.")
+	hud.modalita_scontro(false)
+	assert_true((valori[Res.Type.ORO] as Label).is_visible_in_tree(), "Dopo lo scontro la barra delle risorse torna.")
 
 
 ## La plancia mostra gli spazi disponibili più uno da conquistare, non tutti i 12.

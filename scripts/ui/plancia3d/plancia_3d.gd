@@ -12,9 +12,11 @@ enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGL
 ## Misure delle tessere (Davide, 8 novembre 2026): edifici orizzontali 3:2, tutto il resto
 ## verticale 2:3. Le illustrazioni hanno le stesse proporzioni (768 × 512 e 512 × 768).
 const PASSO_TRUPPE: float = 1.62
-const PASSO_EDIFICI: float = 2.3
+## Edifici stretti, sempre 3:2 (Davide, 9 novembre 2026): la loro fila è larga come quella delle
+## truppe, così a plancia piena tutto si rimpicciolisce meno.
+const PASSO_EDIFICI: float = 1.95
 const MISURA_TRUPPA: Vector2 = Vector2(1.44, 2.16)
-const MISURA_EDIFICIO: Vector2 = Vector2(2.13, 1.42)
+const MISURA_EDIFICIO: Vector2 = Vector2(1.8, 1.2)
 ## Le proposte del Consiglio sono più larghe, così la linguetta dei tipi sta dentro la carta (Davide).
 const MISURA_AZIONE: Vector2 = Vector2(1.8, 2.7)
 const SCALA_SCELTA: float = 1.3
@@ -22,7 +24,7 @@ const SCALA_SCELTA: float = 1.3
 const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
 ## Teatro di carta: fra truppe ed edifici c'è posto per le figurine, che non coprono le carte dietro.
-const Z_EDIFICI: float = 4.85
+const Z_EDIFICI: float = 4.65
 ## Il cuore della nazione al centro della plancia (Davide, 9 novembre 2026): due placche, una per
 ## fila, con lo stendardo sulla fila delle truppe e la riserva di mana su quella degli edifici. Le
 ## file si dividono in due metà ai suoi lati; l'ordine resta quello di sempre, da sinistra a destra,
@@ -49,6 +51,9 @@ const SCALA_MASSIMA_SCONTRO: float = 1.3
 const SCALA_MINIMA: float = 0.6
 ## Larghezza di tavolo che entra nello schermo con l'inquadratura dello scontro.
 const LARGHEZZA_SCONTRO: float = 24.0
+## Durata del volo d'ingresso della telecamera e attesa prima che lo scontro cominci.
+const DURATA_INGRESSO: float = 1.3
+const ATTESA_INGRESSO_MS: float = 1100.0
 ## Quanto torri, punte e merli sporgono in tutto oltre le carte più esterne.
 const MARGINE_FORMA: float = 1.6
 const DURATA_DISPOSIZIONE: float = 0.45
@@ -169,6 +174,13 @@ var _sostituisce_truppa: bool = false
 var _azione_sostituzione: Callable
 var _evidenziata: Tessera3D
 var _tempo: float = 0.0
+## Regia della telecamera negli scontri (Davide, 9 novembre 2026): volo d'ingresso, ondeggiare
+## leggero, scossa ai colpi, avvicinamento allo stendardo di chi perde. Solo presentazione.
+var _camera_viva: bool = false
+var _scossa: float = 0.0
+var _tempo_camera: float = 0.0
+var _mira_attuale: Vector3 = MIRA_PARTITA
+var _caso_camera: RandomNumberGenerator = RandomNumberGenerator.new()
 
 var _sim: BattleSim
 var _setups: Array[BattleSideSetup] = []
@@ -1496,7 +1508,10 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	_modo = Modo.SCONTRO
 	_prima = prima
 	_esito_programmato = false
-	_accumulo_ms = 0.0
+	# Lo scontro comincia quando la telecamera è arrivata e le figurine si sono alzate.
+	_accumulo_ms = -ATTESA_INGRESSO_MS
+	_camera_viva = false
+	_scossa = 0.0
 	_in_pausa = false
 	_togli_scelte()
 	_hud.nascondi_suggerimento()
@@ -1537,7 +1552,11 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	var arrivo: Tween = create_tween()
 	arrivo.set_parallel(true)
 	arrivo.tween_property(avversario, "position", Vector3(0.0, 0.0, -distanza), 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	arrivo.tween_method(_muovi_camera.bind(_camera.global_position, _camera_scontro, MIRA_PARTITA, _mira_scontro), 0.0, 1.0, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	var ingresso: Tween = create_tween()
+	ingresso.tween_method(_volo_ingresso.bind(_camera.global_position, _mira_attuale), 0.0, 1.0, DURATA_INGRESSO).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	ingresso.tween_callback(func() -> void:
+		_tempo_camera = 0.0
+		_camera_viva = true)
 	_hud.modalita_scontro(true, titolo)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_stendi_stendardo(lato, true, false)
@@ -1546,7 +1565,47 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 
 
 func _muovi_camera(t: float, da: Vector3, a: Vector3, mira_da: Vector3, mira_a: Vector3) -> void:
-	_camera.look_at_from_position(da.lerp(a, t), mira_da.lerp(mira_a, t), Vector3.UP)
+	_mira_attuale = mira_da.lerp(mira_a, t)
+	_camera.look_at_from_position(da.lerp(a, t), _mira_attuale, Vector3.UP)
+
+
+## Volo d'ingresso dello scontro: la telecamera sale di lato, gira attorno al tavolo e scende
+## sull'inquadratura dello scontro (una curva fra tre punti).
+func _volo_ingresso(t: float, da: Vector3, mira_da: Vector3) -> void:
+	var colmo: Vector3 = _camera_scontro + Vector3(-11.0, 7.0, -4.0)
+	var u: float = 1.0 - t
+	var posizione: Vector3 = da * u * u + colmo * 2.0 * u * t + _camera_scontro * t * t
+	_mira_attuale = mira_da.lerp(_mira_scontro, smoothstep(0.0, 0.8, t))
+	_camera.look_at_from_position(posizione, _mira_attuale, Vector3.UP)
+
+
+## Ondeggiare leggero e scossa dei colpi, mentre lo scontro va avanti.
+func _aggiorna_camera_scontro(delta: float) -> void:
+	_tempo_camera += delta
+	_scossa = maxf(0.0, _scossa - delta * 1.6)
+	var deriva: Vector3 = Vector3(sin(_tempo_camera * 0.33) * 0.9, sin(_tempo_camera * 0.21) * 0.45, cos(_tempo_camera * 0.27) * 0.35)
+	var colpo: Vector3 = Vector3(_caso_camera.randf_range(-1.0, 1.0), _caso_camera.randf_range(-0.5, 0.5), _caso_camera.randf_range(-1.0, 1.0)) * _scossa
+	# Avvicinamento lento: lo scontro si fa più teso man mano che va avanti.
+	var avvicina: float = minf(_tempo_camera / 40.0, 1.0) * 0.08
+	var base: Vector3 = _mira_scontro + (_camera_scontro - _mira_scontro) * (1.0 - avvicina)
+	_mira_attuale = _mira_scontro + Vector3(deriva.x * 0.35, 0.0, 0.0) + colpo * 0.3
+	_camera.look_at_from_position(base + deriva + colpo, _mira_attuale, Vector3.UP)
+
+
+## Fine dello scontro: la telecamera si avvicina allo stendardo di chi ha perso (al centro se
+## è un pareggio).
+func _inquadra_finale(esito: BattleSim.Outcome) -> void:
+	_camera_viva = false
+	var mira: Vector3 = _mira_scontro
+	if esito == BattleSim.Outcome.VITTORIA_A:
+		mira = _medaglioni[Lato.AVVERSARIO].global_position + Vector3(0.0, 1.0, 0.0)
+	elif esito == BattleSim.Outcome.VITTORIA_B:
+		mira = _medaglioni[Lato.GIOCATORE].global_position + Vector3(0.0, 1.0, 0.0)
+	# Un avvicinamento misurato: lo stendardo si fa più grande, ma la scena resta leggibile.
+	mira = _mira_scontro.lerp(mira, 0.6)
+	var arrivo: Vector3 = mira + (_camera_scontro - _mira_scontro) * 0.78
+	var t: Tween = create_tween()
+	t.tween_method(_muovi_camera.bind(_camera.global_position, arrivo, _mira_attuale, mira), 0.0, 1.0, 0.9).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
 func _on_pausa() -> void:
@@ -1567,6 +1626,8 @@ func _process(delta: float) -> void:
 	_scena.aggiorna(delta)
 	if _modo != Modo.SCONTRO or _sim == null:
 		return
+	if _camera_viva:
+		_aggiorna_camera_scontro(delta)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		for i: int in range(_lampi[lato].size()):
 			_lampi[lato][i] = maxf(0.0, float(_lampi[lato][i]) - delta * _velocita)
@@ -1580,6 +1641,7 @@ func _process(delta: float) -> void:
 	_aggiorna_visuale_scontro()
 	if _sim.outcome != BattleSim.Outcome.IN_CORSO and not _esito_programmato:
 		_esito_programmato = true
+		_inquadra_finale(_sim.outcome)
 		_richiudi_sconfitto(_sim.outcome)
 		var attesa: Tween = create_tween()
 		attesa.tween_interval(0.9)
@@ -1769,6 +1831,8 @@ func _vola_mana(da: Vector3, a: Vector3, mana: StringName, arco: float, al_termi
 func _colpo(lato: int, danno: int, nota: String) -> void:
 	if danno <= 0:
 		return
+	# La telecamera trema, di più con i colpi grandi.
+	_scossa = minf(0.4, _scossa + 0.06 + float(danno) * 0.012)
 	var medaglione: Node3D = _medaglioni[lato]
 	var testo: String = "−%d" % danno if nota == "" else "−%d %s" % [danno, nota]
 	var numero: Label3D = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, 140 if nota == "" else 70, Color.WHITE, 0.0, 22)
@@ -1901,6 +1965,7 @@ func _mostra_esito() -> void:
 
 func _chiudi_scontro() -> void:
 	_sim = null
+	_camera_viva = false
 	_modo = Modo.NORMALE
 	_hud.modalita_scontro(false)
 	_stendi_stendardo(Lato.GIOCATORE, true, true)
@@ -1921,7 +1986,7 @@ func _chiudi_scontro() -> void:
 	var uscita: Tween = create_tween()
 	uscita.set_parallel(true)
 	uscita.tween_property(avversario, "position", Vector3(0.0, 0.0, -14.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	uscita.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_PARTITA, _mira_scontro, MIRA_PARTITA), 0.0, 1.0, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	uscita.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_PARTITA, _mira_attuale, MIRA_PARTITA), 0.0, 1.0, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	uscita.chain().tween_callback(avversario.hide)
 	# Le figurine si ripiegano nelle carte; poi le carte tornano con il disegno stampato.
 	for gruppo: Array in [_truppe[Lato.GIOCATORE], _edifici[Lato.GIOCATORE]]:
