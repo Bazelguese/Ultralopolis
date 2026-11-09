@@ -33,6 +33,8 @@ const LATO_FIGURA: int = 512
 const CARTELLA_MEMORIA: String = "user://figurine"
 ## Da cambiare se cambia il modo di calcolare la maschera, così le vecchie non si usano più.
 const VERSIONE_MASCHERA: int = 3
+## Quanto ci mette una figurina a tornare distesa nella carta a fine scontro.
+const DURATA_RIPONI: float = 0.4
 ## Quanta parte (dall'alto) della figura fa il mezzo busto.
 const QUOTA_BUSTO: float = 0.72
 
@@ -161,6 +163,12 @@ func alza(ritardo: float = 0.0) -> void:
 func in_piedi() -> void:
 	_nuova_animazione().kill()
 	_perno.rotation.x = 0.0
+
+
+## Torna distesa nella carta, come una pagina che si chiude (fine dello scontro).
+func riponi() -> void:
+	var t: Tween = _nuova_animazione()
+	t.tween_property(_perno, "rotation:x", PI * 0.5, DURATA_RIPONI).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 
 
 ## Si richiude, cadendo lontano dall'avversario (il lato ha perso).

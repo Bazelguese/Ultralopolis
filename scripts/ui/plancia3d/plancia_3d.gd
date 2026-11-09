@@ -45,6 +45,10 @@ const SCALA_MASSIMA: float = 1.15
 ## Larghezza di uno spazio vuoto (LIBERO o DA CONQUISTARE): una sagoma stretta, non una carta.
 const PASSO_SPAZIO_VUOTO: float = 0.85
 const SCALA_MASSIMA_SCONTRO: float = 1.3
+## La plancia piena si rimpicciolisce fino a questa scala per stare nello schermo.
+const SCALA_MINIMA: float = 0.6
+## Quanto torri, punte e merli sporgono in tutto oltre le carte più esterne.
+const MARGINE_FORMA: float = 1.6
 const DURATA_DISPOSIZIONE: float = 0.45
 const SPAZI_TRUPPE: int = 12
 const SPAZI_EDIFICI: int = 10
@@ -409,8 +413,11 @@ func _larghezza_per(spazi_truppe: int, spazi_edifici: int, truppe_occupate: int 
 
 
 ## Quanto ingrandire la plancia perché la lastra più larga riempia lo spazio di una plancia piena.
+## Quando la plancia è più larga dello schermo (plancia piena) si rimpicciolisce fino a starci
+## (prima restava a 1 e la fila degli edifici usciva dai lati). Le torri e le punte delle forme
+## sporgono oltre le carte: se ne tiene conto con un margine.
 func _scala_per(larghezza: float, massima: float) -> float:
-	return clampf(LARGHEZZA_LASTRA_PIENA / maxf(larghezza, 1.0), 1.0, massima)
+	return clampf(LARGHEZZA_LASTRA_PIENA / maxf(larghezza + MARGINE_FORMA, 1.0), SCALA_MINIMA, massima)
 
 
 ## Ingrandisce e centra la plancia. In partita la lastra del giocatore cresce attorno al suo centro,
@@ -847,7 +854,10 @@ func _spazi_mostrati(occupati: int, capacita: int, massimo: int, chiuso: bool) -
 
 ## Ricostruisce le carte di un lato e allarga la sua lastra quanto serve.
 ## Gli spazi vuoti si mostrano solo per il giocatore. nitidezza: risoluzione delle facce.
-func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int, spazi_chiusi: bool, nitidezza: float, tutte_animate: bool = false) -> void:
+## Le figurine escono dalle carte solo negli scontri (Davide, 9 novembre 2026): fuori il disegno resta
+## stampato nella carta, più grande e senza coprire la fila dietro. in_scontro: carte come base e
+## figurine che si alzano tutte insieme.
+func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int, spazi_chiusi: bool, nitidezza: float, in_scontro: bool = false) -> void:
 	for figlio: Node in _pezzi[lato].get_children():
 		figlio.queue_free()
 	_truppe[lato] = []
@@ -869,7 +879,7 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 	_forme[lato].imposta(Vector4(fila_t.x, fila_t.y, fila_e.x, fila_e.y))
 	for i: int in range(spazi_truppe):
 		if i < truppe.size():
-			var truppa: Tessera3D = _crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_fila(lato, true, i), i, nitidezza, true)
+			var truppa: Tessera3D = _crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_fila(lato, true, i), i, nitidezza, in_scontro)
 			truppa.rotation.y = _rotazione_fila(lato, true, i)
 			_truppe[lato].append(truppa)
 			_lampi[lato].append(0.0)
@@ -880,7 +890,7 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 				_spazio_libero_truppa = spazio
 	for i: int in range(spazi_edifici):
 		if i < edifici.size():
-			var edificio: Tessera3D = _crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_fila(lato, false, i), i, nitidezza, true)
+			var edificio: Tessera3D = _crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_fila(lato, false, i), i, nitidezza, in_scontro)
 			edificio.rotation.y = _rotazione_fila(lato, false, i)
 			_edifici[lato].append(edificio)
 		elif lato == Lato.GIOCATORE:
@@ -888,7 +898,8 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 			spazio.rotation.y = _rotazione_fila(lato, false, i)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
 				_spazio_libero_edificio = spazio
-	_alza_figurine(lato, tutte_animate)
+	if in_scontro:
+		_alza_figurine(lato, true)
 
 
 ## Teatro di carta: su ogni pezzo con illustrazione si alza la figurina ritagliata.
@@ -1904,7 +1915,14 @@ func _chiudi_scontro() -> void:
 	uscita.tween_property(avversario, "position", Vector3(0.0, 0.0, -14.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	uscita.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_PARTITA, _mira_scontro, MIRA_PARTITA), 0.0, 1.0, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	uscita.chain().tween_callback(avversario.hide)
-	_aggiorna_tutto()
+	# Le figurine si ripiegano nelle carte; poi le carte tornano con il disegno stampato.
+	for gruppo: Array in [_truppe[Lato.GIOCATORE], _edifici[Lato.GIOCATORE]]:
+		for tessera: Tessera3D in gruppo:
+			if tessera.figurina != null:
+				tessera.figurina.riponi()
+	var ritorno: Tween = create_tween()
+	ritorno.tween_interval(Figurina.DURATA_RIPONI)
+	ritorno.tween_callback(_aggiorna_tutto)
 
 
 # --- Mouse ---------------------------------------------------------------------
