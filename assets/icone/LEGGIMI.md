@@ -59,7 +59,7 @@ Se un simbolo manca, al suo posto compare un cerchio con l'iniziale del concetto
 
 ### Tipi (medaglioni sulla linguetta)
 
-Il simbolo di un tipo è `tipo_<nome del tipo>.svg`, tutto minuscolo e con `_` al posto degli spazi (es. «Infrastruttura Bellica» → `tipo_infrastruttura_bellica.svg`). Per dare un simbolo a un tipo nuovo basta aggiungere il file. Un tipo senza file, come i tipi d'identità, usa lo stendardo `tipo_identita.svg`.
+Il simbolo di un tipo è `tipo_<nome del tipo>.svg`, tutto minuscolo e con `_` al posto degli spazi (es. «Infrastruttura Bellica» → `tipo_infrastruttura_bellica.svg`). Per dare un simbolo a un tipo nuovo basta aggiungere il file. Un tipo senza file, come i tipi d'identità, usa il vessillo `tipo_identita.svg`.
 
 | File | Tipo | Icona originale (game-icons.net) |
 |---|---|---|

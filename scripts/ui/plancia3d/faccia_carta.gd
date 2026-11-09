@@ -75,6 +75,9 @@ func _calcola_misure() -> void:
 	# Con i simboli l'illustrazione si abbassa: lo spazio serve alle righe di simboli.
 	if con_simboli:
 		altezza_arte = size.y * 0.27
+	# Sulla plancia la carta fa da base alla figurina: la pedana è più bassa, i numeri più grandi.
+	elif scheda.come_base and size.y > size.x * 1.3:
+		altezza_arte = size.y * 0.36
 	_area_arte = Rect2(margine, margine, size.x - margine * 2.0, altezza_arte)
 	var altezza_nome: float = size.y * (0.12 if con_simboli else 0.14)
 	_area_nome = Rect2(_bordo, _area_arte.end.y + lato * 0.02, size.x - _bordo * 2.0, altezza_nome)
@@ -87,7 +90,12 @@ func _calcola_misure() -> void:
 		var inizio_simboli: float = _area_nome.end.y + lato * 0.03
 		_area_simboli = Rect2(margine, inizio_simboli, size.x - margine * 2.0, size.y - _bordo - lato * 0.04 - inizio_simboli)
 	_pastiglie.clear()
-	if scheda.genere == SchedaCarta.Genere.TRUPPA:
+	if scheda.genere == SchedaCarta.Genere.TRUPPA and size.y > size.x * 1.3:
+		# Tessera verticale 2:3: le due pastiglie una sopra l'altra, larghe quanto la carta.
+		var alta: float = (_area_basso.size.y - lato * 0.04) * 0.5
+		_pastiglie.append(Rect2(_area_basso.position, Vector2(_area_basso.size.x, alta)))
+		_pastiglie.append(Rect2(_area_basso.position + Vector2(0.0, alta + lato * 0.04), Vector2(_area_basso.size.x, alta)))
+	elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var meta: float = (_area_basso.size.x - lato * 0.04) * 0.5
 		_pastiglie.append(Rect2(_area_basso.position, Vector2(meta, _area_basso.size.y)))
 		_pastiglie.append(Rect2(_area_basso.position + Vector2(meta + lato * 0.04, 0.0), Vector2(meta, _area_basso.size.y)))
@@ -355,6 +363,9 @@ func _crea_arte() -> void:
 	_arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	add_child(_arte)
+	if scheda.come_base and scheda.illustrazione != null:
+		_arte.texture = _pedana()
+		return
 	if scheda.illustrazione != null:
 		_arte.texture = scheda.illustrazione
 		return
@@ -387,6 +398,32 @@ func _crea_arte() -> void:
 	_iniziale.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_iniziale.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	add_child(_iniziale)
+
+
+## Teatro di carta: la pedana su cui sta la figurina, carta scura con un'ombra ovale al centro.
+func _pedana() -> Texture2D:
+	var sfumatura: Gradient = Gradient.new()
+	sfumatura.set_color(0, Color("060403"))
+	sfumatura.add_point(0.45, Color("120d0a"))
+	sfumatura.set_color(1, Color("1e1711"))
+	var trama: GradientTexture2D = GradientTexture2D.new()
+	trama.gradient = sfumatura
+	trama.fill = GradientTexture2D.FILL_RADIAL
+	trama.fill_from = Vector2(0.5, 0.5)
+	trama.fill_to = Vector2(0.5, 1.15)
+	trama.width = 128
+	trama.height = 128
+	return trama
+
+
+## Fondo della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
+func fondo_arte() -> float:
+	return _area_arte.end.y / maxf(size.y, 1.0)
+
+
+## Centro verticale della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
+func centro_arte() -> float:
+	return (_area_arte.position.y + _area_arte.size.y * 0.5) / maxf(size.y, 1.0)
 
 
 func _crea_scritte() -> void:

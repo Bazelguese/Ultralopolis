@@ -165,6 +165,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Tessera speciale** | Una tessera esclusiva o di una linea: paga il mantenimento anche al livello 1. | GDD §5.6 (*carte speciali*). Deciso. |
 | **Tipo** | Una caratteristica della tessera (es. Fante, Guardiano, Spirituale). Decide quali consiglieri la propongono e la potenziano. | GDD §6.6. Ha sostituito le *etichette*. Elenco nel GDD §6.6 (Provvisorio). Il tipo *Produzione* si chiama ora **Materie prime**. Deciso. |
 | **Materie prime** | Il tipo degli edifici che producono materie prime, per esempio pietra, legno, ferro e cibo. | GDD §6.6 (tipo *Produzione*). Rinominato perché “produzione” indica già ciò che gli edifici producono. Deciso. |
+| **Stendardo** | Il drappo di carta della tua nazione, con le iniziali e la Resistenza: steso sulla plancia, si alza in piedi negli scontri e brucia quando la Resistenza scende. | GDD §9.1, §14.2 (teatro di carta). Si personalizzerà nella creazione della nazione (Direzione). Non usarlo per il simbolo dei tipi d'identità: quello è il *Vessillo*. Deciso. |
 | **Ordine delle truppe** | Nello scontro le truppe agiscono da destra verso sinistra: la più a destra usa il mana per prima. Puoi riordinarle quando vuoi fuori dallo scontro. | GDD §7.3. Deciso. |
 
 ## Lo scontro
@@ -242,6 +243,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | Nome | Per il giocatore | Per noi |
 |---|---|---|
 | **Simboli** | Le icone che dicono che cosa fa una tessera, un consigliere o un'azione: si leggono da sinistra a destra, “quello che paghi → quello che ottieni”. | GDD §14.4. Deciso. |
+| **Vessillo** | Il simbolo dei tipi d'identità (popolo, governo, credo, cultura) nei medaglioni dei tipi: tutti hanno lo stesso vessillo; il nome del tipo è nei dettagli. | GDD §14.4. Prima chiamato *stendardo*: quel nome ora è del drappo della nazione. Deciso. |
 | **Legenda** | Il pannello che spiega come si leggono i simboli, con esempi presi dal gioco. | GDD §14.4. Deciso. |
 | **Parole chiave** | Le parole colorate nei testi (risorse, effetti, colori del mana, tipi): passandoci sopra se ne legge la spiegazione. | GDD §16.3 (testi colorati). File: `data/ui/lessico.tres`. Le spiegazioni vengono da questo glossario. Deciso. |
 
@@ -334,3 +336,4 @@ Non vanno più usati nel gioco né nei documenti nuovi.
 | 8 novembre 2026 | Edifici e truppe si chiamano **tessere**; “carta” vale **solo per le tecnologie** (mano, carta dorata). Consiglieri, azioni, avvenimenti e vie si chiamano con il loro nome. |
 | 8 novembre 2026 | Il Cibo delle truppe è la **razione**; **mantenimento** è solo il costo delle tessere prima degli scontri. Le tappe delle vie sono **tradizioni** (non *passi*). Il pannello con la storia della partita si chiama **Annali**; **Cronaca** resta la scena di inizio stagione. |
 | 8 novembre 2026 | Le ascensioni sono **minori** e **maggiori** (non di livello 1 e 2): “Livello” resta solo alle tessere. L'ascensione *Consiglio ristretto* diventa **Corte affollata**, perché dà un consigliere in più. |
+| 8 novembre 2026 | **Stendardo** è il drappo di carta della nazione (teatro di carta); il simbolo dei tipi d'identità si chiama **Vessillo**. |

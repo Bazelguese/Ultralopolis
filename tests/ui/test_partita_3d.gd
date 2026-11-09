@@ -286,7 +286,9 @@ func test_le_risorse_sono_tutte_sempre_visibili() -> void:
 func test_la_plancia_mostra_solo_gli_spazi_utili() -> void:
 	var run: RunState = _run()
 	var larghezze: Array = _scena.get("_larghezze")
-	var attesa: float = _scena.call("_larghezza_per", run.board.troop_capacity() + 1, run.board.building_capacity() + 1)
+	# Gli spazi vuoti sono sagome strette (Davide, 8 novembre 2026): contano anche i pezzi occupati.
+	var attesa: float = _scena.call("_larghezza_per", run.board.troop_capacity() + 1, run.board.building_capacity() + 1,
+			run.board.troops.size(), run.board.buildings.size())
 	assert_almost_eq(float(larghezze[0]), attesa, 0.001)
 	var plancia: Node3D = _scena.get("_plancia")
 	assert_gt(plancia.scale.x, 1.0, "Con pochi spazi la plancia si ingrandisce.")
@@ -392,18 +394,20 @@ func test_il_flusso_dell_anno_mostra_mesi_e_scontri() -> void:
 
 func test_senza_tecnologia_in_studio_c_e_un_avviso() -> void:
 	# Richiesta di Davide (6 novembre): segnalare chiaramente quando la Ricerca è ferma.
+	# Dal 9 novembre il segno è sul pulsante Ricerca (rosso, «scegli!»), con la spiegazione nel riquadro.
 	var run: RunState = _run()
 	var hud: HudPlancia = _scena.get("_hud")
-	var avviso: Label = hud.get("_avviso_ricerca")
+	var pulsante: Button = hud.get("_pulsante_ricerca")
 	_scena.call("_aggiorna_tutto")
 	assert_null(run.current_tech, "All'inizio nessuna tecnologia è in studio.")
-	assert_true(avviso.visible, "Si vede l'avviso.")
-	assert_string_contains((hud.get("_pulsante_ricerca") as Button).text, "scegli")
+	assert_string_contains(pulsante.text, "scegli")
+	assert_string_contains(Suggerimenti.testo_di(pulsante), "Ricerca resta ferma", "Il riquadro del pulsante spiega perché.")
+	assert_false((hud.get("_avviso_ricerca") as Label).visible, "Niente scritta sopra i pulsanti.")
 	var carte: Array[TechDef] = run.tech_hand_cards()
 	assert_false(carte.is_empty())
 	assert_true(run.choose_tech(carte[0]), run.last_error)
 	_scena.call("_aggiorna_tutto")
-	assert_false(avviso.visible, "Con una tecnologia in studio l'avviso sparisce.")
+	assert_false(pulsante.text.contains("scegli"), "Con una tecnologia in studio il segno sparisce.")
 
 
 func test_annunci_in_alto_e_calendario_a_sinistra() -> void:
@@ -420,8 +424,8 @@ func test_annunci_in_alto_e_calendario_a_sinistra() -> void:
 	assert_string_contains((hud.get("_sotto_messaggio") as Label).text, run.month_name())
 
 
-func test_scheda_della_nazione_con_ricomincia_e_spiegazioni() -> void:
-	# Richiesta di Davide (6 novembre): Ricomincia accanto al nome; ogni caratteristica si spiega.
+func test_scheda_della_nazione_spiega_le_caratteristiche() -> void:
+	# Richiesta di Davide (6 novembre): ogni caratteristica si spiega. Dall'8 novembre Ricomincia non c'è più.
 	var run: RunState = _run()
 	var hud: HudPlancia = _scena.get("_hud")
 	var voci: HFlowContainer = hud.get("_identita")

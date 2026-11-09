@@ -29,6 +29,8 @@ var _animazione_sollevamento: Tween
 ## (consiglieri, azioni, eventi) si ingrandiscono molto, perché i simboli si leggano bene.
 var ingrandimento: float = 1.06
 var _segnale: Label3D
+## Teatro di carta: la figura che si alza dalla carta (solo per i pezzi sulla plancia).
+var figurina: Figurina
 
 
 func costruisci(p_scheda: SchedaCarta, p_larghezza: float, p_profondita: float, nitidezza: float = 1.0) -> void:
@@ -66,8 +68,9 @@ func _crea_faccia(nitidezza: float) -> void:
 	materiale.albedo_texture = _viewport.get_texture()
 	materiale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 	materiale.alpha_scissor_threshold = 0.5
-	materiale.roughness = 0.45
-	materiale.metallic_specular = 0.6
+	# Cartoncino opaco: niente riflessi biancastri della lanterna.
+	materiale.roughness = 0.9
+	materiale.metallic_specular = 0.15
 	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
 	carta.material_override = materiale
 	_materiale_faccia = materiale
@@ -75,8 +78,8 @@ func _crea_faccia(nitidezza: float) -> void:
 	_corpo.add_child(carta)
 
 
-## La linguetta dei tipi sopra la carta (GDD §14.4): un pezzo attaccato alla carta, che si
-## solleva e si ingrandisce con lei. Allineata a sinistra se c'è posto, altrimenti centrata.
+## La linguetta dei tipi sotto la carta (GDD §14.4, Davide 8 novembre 2026): un pezzo attaccato alla
+## carta, che si solleva e si ingrandisce con lei. Allineata a sinistra se c'è posto, altrimenti centrata.
 func _crea_linguetta(nitidezza: float) -> void:
 	if scheda.tipi.is_empty():
 		return
@@ -91,7 +94,7 @@ func _crea_linguetta(nitidezza: float) -> void:
 	add_child(viewport)
 	var linguetta: LinguettaTipi = LinguettaTipi.new()
 	viewport.add_child(linguetta)
-	linguetta.imposta(scheda.tipi, scheda.colore_cornice(), scala)
+	linguetta.imposta(scheda.tipi, scheda.colore_cornice(), scala, true)
 	var piano: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
 	forma.size = misura
@@ -105,7 +108,9 @@ func _crea_linguetta(nitidezza: float) -> void:
 	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
 	piano.material_override = materiale
 	var rientro: float = minf(larghezza * 0.08, maxf(0.0, (larghezza - misura.x) * 0.5))
-	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, SPESSORE * 0.6, -profondita * 0.5 - misura.y * 0.5 + LinguettaTipi.SOTTO_LA_CARTA)
+	# I tipi stanno sotto la carta (Davide, 8 novembre 2026): sopra c'è la figura.
+	var z_linguetta: float = profondita * 0.5 + misura.y * 0.5 - LinguettaTipi.SOTTO_LA_CARTA
+	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, SPESSORE * 0.6, z_linguetta)
 	_corpo.add_child(piano)
 
 
@@ -202,7 +207,8 @@ func imposta_segnale(testo: String, colore: Color = StileVisivo.ORO_LUCE) -> voi
 	if _segnale == null:
 		_segnale = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, 44, colore, 0.0, 14)
 		# Sotto la carta: sopra ci sono già i prezzi delle offerte.
-		_segnale.position = Vector3(0.0, SPESSORE + 0.03, profondita * 0.5 + 0.3)
+		var sotto_tipi: float = 0.0 if scheda.tipi.is_empty() else LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA
+		_segnale.position = Vector3(0.0, SPESSORE + 0.03, profondita * 0.5 + 0.3 + sotto_tipi)
 		_corpo.add_child(_segnale)
 	_segnale.text = testo
 	_segnale.modulate = colore
@@ -276,6 +282,8 @@ func attiva(verso: float) -> void:
 	animazione.parallel().tween_property(_corpo, "scale", Vector3.ONE, 0.28)
 	var colore: Color = StileVisivo.ORO_LUCE if scheda.mana == &"" else StileVisivo.colore_mana_nome(scheda.mana)
 	scintille(colore, Vector3(0.0, 0.3, 0.0))
+	if figurina != null:
+		figurina.scatta()
 	var lampo: Color = _colore_alone
 	imposta_alone(Color(colore, 0.8))
 	var spegni: Tween = create_tween()
@@ -283,11 +291,64 @@ func attiva(verso: float) -> void:
 	spegni.tween_callback(imposta_alone.bind(lampo))
 
 
+## Consiglieri e avvenimenti con un'illustrazione: il mezzo busto esce dall'alto della carta, come
+## i ritratti nei dialoghi dei giochi di ruolo (Davide, 8 novembre 2026).
+func con_busto() -> bool:
+	return scheda.genere == SchedaCarta.Genere.CONSIGLIERE and scheda.illustrazione != null
+
+
+## Il mezzo busto ritagliato: poggia sul fondo della finestra del disegno e sporge oltre il bordo alto.
+func aggiungi_busto() -> void:
+	if not con_busto():
+		return
+	var larghezza_busto: float = larghezza * 1.08
+	var altezza_busto: float = larghezza_busto * Figurina.QUOTA_BUSTO
+	var busto: MeshInstance3D = MeshInstance3D.new()
+	var forma: QuadMesh = QuadMesh.new()
+	forma.size = Vector2(larghezza_busto, altezza_busto)
+	forma.orientation = PlaneMesh.FACE_Y
+	busto.mesh = forma
+	var ritaglio: Array = Figurina.ritaglia(scheda.illustrazione)
+	busto.material_override = Figurina.materiale_carta(ritaglio[0], ritaglio[1], Figurina.QUOTA_BUSTO)
+	var fondo: float = -profondita * 0.5 + profondita * _faccia.fondo_arte()
+	busto.position = Vector3(0.0, SPESSORE + 0.014, fondo - altezza_busto * 0.5)
+	_corpo.add_child(busto)
+	# Esce dalla finestra con un piccolo salto.
+	busto.scale = Vector3(0.85, 1.0, 0.6)
+	var t: Tween = create_tween()
+	t.tween_interval(0.25)
+	t.tween_property(busto, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Teatro di carta: la figurina ritagliata dall'illustrazione si alza dal bordo della carta.
+## verso: -1 se l'avversario è lontano dalla telecamera, +1 se è vicino.
+## Senza illustrazione non c'è figurina.
+func aggiungi_figurina(verso: float, ritardo: float, animata: bool, fattore_altezza: float = 0.95) -> void:
+	if scheda.illustrazione == null or figurina != null:
+		return
+	figurina = Figurina.new()
+	_corpo.add_child(figurina)
+	var z_base: float = -profondita * 0.5 + profondita * _faccia.centro_arte()
+	figurina.costruisci(scheda.illustrazione, larghezza, z_base, SPESSORE, verso, fattore_altezza)
+	if animata:
+		figurina.alza(ritardo)
+	else:
+		figurina.in_piedi()
+
+
+## Figurina grigia: la truppa aspetta il mana o è sabotata (principio P4). 0 = normale, 1 = spenta.
+func imposta_spenta(valore: float) -> void:
+	if figurina != null:
+		figurina.imposta_spenta(valore)
+
+
 ## Piccola scossa (per esempio quando un edificio produce mana).
 func pulsa() -> void:
 	var animazione: Tween = create_tween()
 	animazione.tween_property(_corpo, "scale", Vector3.ONE * 1.06, 0.07)
 	animazione.tween_property(_corpo, "scale", Vector3.ONE, 0.12)
+	if figurina != null:
+		figurina.lampeggia(0.5)
 
 
 ## Esplosione di scintille (usata anche dalla scena per i colpi).

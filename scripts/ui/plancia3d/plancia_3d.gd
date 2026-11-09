@@ -9,26 +9,35 @@ enum Lato { GIOCATORE, AVVERSARIO }
 enum Modo { NORMALE, SOSTITUZIONE, SCONTRO }
 enum TipoScelta { NESSUNA, OFFERTA, INCONTRO, RICOMPENSA, FANTASMA, VIA, CONSIGLIERE, OPZIONE, GOVERNO, ASCENSIONE }
 
-const PASSO_TRUPPE: float = 1.75
-const PASSO_EDIFICI: float = 2.1
-const MISURA_TRUPPA: Vector2 = Vector2(1.58, 1.95)
-const MISURA_EDIFICIO: Vector2 = Vector2(1.9, 1.6)
-const MISURA_AZIONE: Vector2 = Vector2(1.7, 1.95)
-const SCALA_SCELTA: float = 1.45
+## Misure delle tessere (Davide, 8 novembre 2026): edifici orizzontali 3:2, tutto il resto
+## verticale 2:3. Le illustrazioni hanno le stesse proporzioni (768 × 512 e 512 × 768).
+const PASSO_TRUPPE: float = 1.62
+const PASSO_EDIFICI: float = 2.3
+const MISURA_TRUPPA: Vector2 = Vector2(1.44, 2.16)
+const MISURA_EDIFICIO: Vector2 = Vector2(2.13, 1.42)
+## Le proposte del Consiglio sono più larghe, così la linguetta dei tipi sta dentro la carta (Davide).
+const MISURA_AZIONE: Vector2 = Vector2(1.8, 2.7)
+const SCALA_SCELTA: float = 1.3
 ## Le scelte con le righe di simboli si ingrandiscono così tanto al passaggio del mouse.
 const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
-const Z_EDIFICI: float = 4.4
+## Teatro di carta: fra truppe ed edifici c'è posto per le figurine, che non coprono le carte dietro.
+const Z_EDIFICI: float = 4.85
 ## Bordo sinistro del primo spazio: gli spazi si allineano a destra dello stemma.
-const X_INIZIO_SPAZI: float = -9.6
+const X_INIZIO_SPAZI: float = -10.15
 ## Bordo sinistro della lastra (fisso: stemma e riserva stanno qui).
 const BORDO_SINISTRO_LASTRA: float = -12.605
 const MARGINE_DESTRO_LASTRA: float = 0.35
-const PROFONDITA_LASTRA: float = 5.0
+const PROFONDITA_LASTRA: float = 6.2
+## Quanto il doppio filetto a inchiostro rientra dal bordo della lastra.
+const RIENTRO_FILETTO: float = 0.32
 ## Larghezza della lastra con tutti gli spazi: la plancia si ingrandisce quando è più corta.
 const LARGHEZZA_LASTRA_PIENA: float = 24.35
-const SCALA_MASSIMA: float = 1.4
-const SCALA_MASSIMA_SCONTRO: float = 1.2
+## Con gli spazi vuoti stretti la plancia è più corta e le carte si ingrandiscono di più.
+const SCALA_MASSIMA: float = 1.15
+## Larghezza di uno spazio vuoto (LIBERO o DA CONQUISTARE): una sagoma stretta, non una carta.
+const PASSO_SPAZIO_VUOTO: float = 0.85
+const SCALA_MASSIMA_SCONTRO: float = 1.3
 const DURATA_DISPOSIZIONE: float = 0.45
 const X_MEDAGLIONE: float = -11.2
 const SPAZI_TRUPPE: int = 12
@@ -37,17 +46,41 @@ const COLORI_RISERVA: Array[StringName] = [&"rosso", &"verde", &"blu", &"viola",
 ## Oltre questo numero di gemme in volo non se ne lanciano altre (solo effetto visivo).
 const MASSIMO_GEMME_IN_VOLO: int = 24
 
-const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 27.0, 14.6)
-const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, 0.9)
+## Altezza del telo dello stendardo della nazione.
+const ALTEZZA_STENDARDO: float = 1.9
+## Altezza delle figurine rispetto alla larghezza della carta: gli edifici più bassi, così le file
+## stanno vicine senza che le loro figurine coprano i numeri delle truppe.
+const ALTEZZA_FIGURINA_TRUPPA: float = 1.1
+const ALTEZZA_FIGURINA_EDIFICIO: float = 0.7
+## Larghezza del telo dello stendardo e altezza da cui parte (più in basso: Davide, 8 novembre 2026).
+const LARGHEZZA_STENDARDO: float = 1.5
+const BASE_TELO: float = 0.45
+## L'asta dello stendardo, che fa anche da timer dello scontro.
+const ALTEZZA_ASTA: float = ALTEZZA_STENDARDO + BASE_TELO + 0.1
+const X_ASTA: float = -LARGHEZZA_STENDARDO * 0.5 - 0.05
+## Lo stendardo steso: la base sta verso il davanti della plancia, il telo si stende all'indietro.
+## (centra il telo steso fra la fila delle truppe e quella degli edifici)
+const POSIZIONE_STESO_Z: float = 1.95
+## Teatro di carta: il tavolo (x, z, larghezza, profondità) e il sole/luna.
+const LIBRO: Rect2 = Rect2(-45.0, -35.0, 90.0, 70.0)
+const POSIZIONE_ASTRO: Vector3 = Vector3(5.5, 0.0, -9.0)
+
+const FOV_TELECAMERA: float = 30.0
+const CAMERA_PARTITA: Vector3 = Vector3(-0.4, 21.5, 20.0)
+const MIRA_PARTITA: Vector3 = Vector3(-0.4, 0.0, -0.2)
 ## Spostamento a destra della plancia, per lasciare spazio alla colonna di sinistra.
 const SPOSTAMENTO_PLANCIA: float = 1.2
-const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 28.4, 15.6)
-const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.1)
+## Teatro di carta: nello scontro la telecamera scende, così le figurine si vedono in piedi.
+const CAMERA_SCONTRO: Vector3 = Vector3(-0.4, 24.0, 23.0)
+const MIRA_SCONTRO: Vector3 = Vector3(-0.4, 0.0, 1.2)
 
 var run: RunState
 
 var _camera: Camera3D
-var _luce_atmosfera: OmniLight3D
+## Teatro di carta: luci, tempo atmosferico e calendario (solo scenografia).
+var _scena: ScenaTeatro
+## La prima volta di una partita la scena si imposta senza animazioni.
+var _scena_subito: bool = true
 var _hud: HudPlancia
 ## Contiene i due lati: si ingrandisce e si centra in base a quanti spazi si vedono.
 var _plancia: Node3D
@@ -55,7 +88,6 @@ var _radici: Array[Node3D] = [null, null]
 var _lastre: Array[MeshInstance3D] = [null, null]
 var _bordi_lastre: Array[Array] = [[], []]
 var _larghezze: Array[float] = [LARGHEZZA_LASTRA_PIENA, LARGHEZZA_LASTRA_PIENA]
-var _nota_ordine: Label3D
 var _animazione_plancia: Tween
 ## All'inizio di una partita la plancia compare già della misura giusta, senza animazione.
 var _disponi_subito: bool = true
@@ -75,20 +107,26 @@ var _scritte_resistenza: Array[Label3D] = [null, null]
 var _iniziali: Array[Label3D] = [null, null]
 var _anelli: Array[Array] = [[], []]
 var _stato_anelli: Array[int] = [-1, -1]
-var _materiale_anello_spento: StandardMaterial3D
 var _materiale_anello_acceso: StandardMaterial3D
 var _materiale_anello_logoramento: StandardMaterial3D
+## La brace in testa alla miccia del tempo e le parti dello stendardo che spariscono quando è steso.
+var _braci_miccia: Array[MeshInstance3D] = [null, null]
+var _aste_stendardo: Array[Array] = [[], []]
 const SEGMENTI_ANELLO: int = 48
 var _barre_resistenza: Array[MeshInstance3D] = [null, null]
+## Teatro di carta: lo stendardo di ogni lato (materiale del telo e numero della Resistenza).
+var _teli_stendardo: Array[ShaderMaterial] = [null, null]
+var _stendardi: Array[Node3D] = [null, null]
+## Nome e barra della Resistenza accanto allo stendardo: si vedono solo negli scontri.
+var _dati_scontro: Array[Node3D] = [null, null]
+var _numeri_stendardo: Array[Label3D] = [null, null]
 ## Scudo e Corruzione accanto allo stemma (GDD §7.6), visibili solo se non sono zero.
 var _segnalini_scudo: Array[Node3D] = [null, null]
 var _scritte_scudo: Array[Label3D] = [null, null]
 var _segnalini_corruzione: Array[Node3D] = [null, null]
 var _scritte_corruzione: Array[Label3D] = [null, null]
 var _nomi_lato: Array[Label3D] = [null, null]
-var _riserve: Array[Node3D] = [null, null]
-var _scritte_riserva: Array[Dictionary] = [{}, {}]
-var _gemme_riserva: Array[Dictionary] = [{}, {}]
+var _riserve: Array[Node3D] = [null, null]  # RiservaMana
 
 var _scelte: Array[Tessera3D] = []
 ## Che cosa rappresenta ogni carta sul tavolo (offerta, via, opzione, ricompensa…), stesso ordine di _scelte.
@@ -115,11 +153,13 @@ var _lampi: Array[Array] = [[], []]
 var _gemme_in_volo: int = 0
 ## Conta le scritte uscite da ogni stemma, per non sovrapporle.
 var _scritte_uscite: Array[int] = [0, 0]
+## Teatro di carta: quante carte di ogni elemento c'erano nell'ultima costruzione di un lato.
+## Solo le figurine dei pezzi nuovi si alzano con l'animazione pop-up.
+var _gia_viste: Array[Dictionary] = [{}, {}]
 
 
 func _ready() -> void:
 	_crea_ambiente()
-	_crea_tavolo()
 	_plancia = Node3D.new()
 	add_child(_plancia)
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
@@ -127,6 +167,7 @@ func _ready() -> void:
 	_contenitore_scelte = Node3D.new()
 	add_child(_contenitore_scelte)
 	_crea_atmosfera()
+	_crea_grana()
 	var livello: CanvasLayer = CanvasLayer.new()
 	add_child(livello)
 	_hud = HudPlancia.new()
@@ -167,6 +208,7 @@ func _nuova_run() -> void:
 		run.found_nation(nazione.nation_name, nazione.resolve(catalogo))
 	_modo = Modo.NORMALE
 	_disponi_subito = true
+	_scena_subito = true
 	_firma_scelte = ""
 	_aggiorna_tutto()
 
@@ -198,54 +240,39 @@ func _nazione_di_prova(catalogo: CatalogDef, regole_run: RunRules) -> NationTemp
 # --- Ambiente ------------------------------------------------------------------
 
 func _crea_ambiente() -> void:
-	var mondo: WorldEnvironment = WorldEnvironment.new()
-	var ambiente: Environment = Environment.new()
-	ambiente.background_mode = Environment.BG_COLOR
-	ambiente.background_color = StileVisivo.NOTTE
-	ambiente.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	ambiente.ambient_light_color = Color("4a5a80")
-	ambiente.ambient_light_energy = 0.45
-	ambiente.tonemap_mode = Environment.TONE_MAPPER_ACES
-	ambiente.glow_enabled = true
-	ambiente.glow_intensity = 0.55
-	ambiente.glow_bloom = 0.0
-	ambiente.glow_hdr_threshold = 1.2
-	mondo.environment = ambiente
-	add_child(mondo)
-
-	var sole: DirectionalLight3D = DirectionalLight3D.new()
-	sole.light_color = Color("fff0d8")
-	sole.light_energy = 0.9
-	sole.shadow_enabled = true
-	sole.rotation_degrees = Vector3(-60.0, -25.0, 0.0)
-	add_child(sole)
-
-	var controluce: DirectionalLight3D = DirectionalLight3D.new()
-	controluce.light_color = Color("6a8cff")
-	controluce.light_energy = 0.35
-	controluce.rotation_degrees = Vector3(-30.0, 155.0, 0.0)
-	add_child(controluce)
-
-	_luce_atmosfera = OmniLight3D.new()
-	_luce_atmosfera.light_color = Color("4f6bff")
-	_luce_atmosfera.light_energy = 1.6
-	_luce_atmosfera.omni_range = 22.0
-	_luce_atmosfera.position = Vector3(-15.0, 5.0, -8.0)
-	add_child(_luce_atmosfera)
-
+	# Teatro di carta: luci del momento del giorno, tempo atmosferico, pagina del tavolo,
+	# sole/luna e calendario pop-up (solo scenografia).
+	_scena = ScenaTeatro.new()
+	add_child(_scena)
+	_scena.costruisci(LIBRO, POSIZIONE_ASTRO)
 	_camera = Camera3D.new()
-	_camera.fov = 30.0
+	_camera.fov = FOV_TELECAMERA
 	add_child(_camera)
 
 
-func _crea_tavolo() -> void:
-	var terreno: MeshInstance3D = MeshInstance3D.new()
-	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(70.0, 0.5, 50.0)
-	terreno.mesh = forma
-	terreno.material_override = StileVisivo.materiale_pietra(StileVisivo.PIETRA_SCURA.darkened(0.2), 3.0)
-	terreno.position.y = -0.45
-	add_child(terreno)
+## Grana da stampa e vignetta sopra la scena 3D, sotto l'interfaccia (che resta nitida).
+func _crea_grana() -> void:
+	var strato: CanvasLayer = CanvasLayer.new()
+	strato.layer = 0
+	add_child(strato)
+	var velo: ColorRect = ColorRect.new()
+	velo.set_anchors_preset(Control.PRESET_FULL_RECT)
+	velo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var shader: Shader = Shader.new()
+	shader.code = """
+shader_type canvas_item;
+uniform float forza = 0.045;
+float caso(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+void fragment() {
+	float n = caso(floor(FRAGCOORD.xy) + floor(TIME * 24.0) * vec2(17.0, 31.0));
+	float v = smoothstep(0.38, 0.95, length((SCREEN_UV - 0.5) * vec2(1.25, 1.0)));
+	COLOR = mix(vec4(vec3(n), forza), vec4(0.0, 0.0, 0.0, 0.85), v);
+}
+"""
+	var materiale: ShaderMaterial = ShaderMaterial.new()
+	materiale.shader = shader
+	velo.material = materiale
+	strato.add_child(velo)
 
 
 ## Pulviscolo luminoso che fluttua sopra il tavolo (solo atmosfera).
@@ -254,7 +281,7 @@ func _crea_atmosfera() -> void:
 	var granello: SphereMesh = SphereMesh.new()
 	granello.radius = 0.018
 	granello.height = 0.036
-	var materiale: StandardMaterial3D = StileVisivo.materiale_velo(Color(0.62, 0.76, 1.0, 0.35))
+	var materiale: StandardMaterial3D = StileVisivo.materiale_velo(Color(StileVisivo.BRACE, 0.4))
 	materiale.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	granello.material = materiale
 	polvere.mesh = granello
@@ -296,12 +323,6 @@ func _crea_lato(lato: int) -> void:
 	_crea_riserva(radice, lato, z_centro)
 	_pezzi[lato] = Node3D.new()
 	radice.add_child(_pezzi[lato])
-	if lato == Lato.GIOCATORE:
-		# Fra la fila delle truppe e quella degli edifici, allineata a destra.
-		_nota_ordine = StileVisivo.scritta("LE TRUPPE AGISCONO DA DESTRA VERSO SINISTRA  ←", StileVisivo.FONT_TESTO_FORTE, 42, StileVisivo.TESTO_TENUE)
-		_nota_ordine.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		_nota_ordine.position = Vector3(0.0, 0.02, (Z_TRUPPE + MISURA_TRUPPA.y * 0.5 + Z_EDIFICI - MISURA_EDIFICIO.y * 0.5) * 0.5)
-		radice.add_child(_nota_ordine)
 	_imposta_larghezza_lastra(lato, LARGHEZZA_LASTRA_PIENA)
 
 
@@ -311,21 +332,29 @@ func _crea_lastra(radice: Node3D, lato: int, z_centro: float, colore: Color) -> 
 	var forma: BoxMesh = BoxMesh.new()
 	forma.size = Vector3(LARGHEZZA_LASTRA_PIENA, 0.4, PROFONDITA_LASTRA)
 	lastra.mesh = forma
-	lastra.material_override = StileVisivo.materiale_pietra(StileVisivo.PIETRA, 2.5)
+	lastra.material_override = ScenaTeatro.materiale_carta(StileVisivo.CARTA_PLANCIA if lato == Lato.GIOCATORE else StileVisivo.CARTA_PLANCIA_NEMICO, 2.0)
 	lastra.position = Vector3(0.0, -0.18, z_centro)
 	radice.add_child(lastra)
 	_lastre[lato] = lastra
-	var luce: StandardMaterial3D = StileVisivo.materiale_luminoso(colore, 1.3)
-	_materiali_bordo.append(luce)
+	# Teatro di carta: cornice di carta color crema e, dentro, un filetto a inchiostro.
+	# Il colore del lato sta sulla fascia dello stendardo.
+	var crema: StandardMaterial3D = StileVisivo.materiale(StileVisivo.CARTA_CREMA.darkened(0.12), 0.95)
+	var inchiostro: StandardMaterial3D = StileVisivo.materiale(Color("120d0a"), 0.95)
 	_bordi_lastre[lato] = []
-	for i: int in range(4):
+	for i: int in range(8):
+		var interno: bool = i >= 4
+		var lato_bordo: int = i % 4
+		var spessore: float = 0.035 if interno else 0.16
 		var bordo: MeshInstance3D = MeshInstance3D.new()
 		var forma_bordo: BoxMesh = BoxMesh.new()
-		forma_bordo.size = Vector3(LARGHEZZA_LASTRA_PIENA + 0.1, 0.07, 0.07) if i < 2 else Vector3(0.07, 0.07, PROFONDITA_LASTRA + 0.1)
+		forma_bordo.size = Vector3(LARGHEZZA_LASTRA_PIENA, 0.04, spessore) if lato_bordo < 2 else Vector3(spessore, 0.04, PROFONDITA_LASTRA)
 		bordo.mesh = forma_bordo
-		bordo.material_override = luce
-		var z: float = z_centro + (PROFONDITA_LASTRA * (-0.5 if i == 0 else 0.5) if i < 2 else 0.0)
-		bordo.position = Vector3(0.0, 0.035, z)
+		bordo.material_override = inchiostro if interno else crema
+		var rientro: float = RIENTRO_FILETTO if interno else 0.0
+		var z: float = z_centro + ((PROFONDITA_LASTRA * 0.5 - rientro) * (-1.0 if lato_bordo == 0 else 1.0) if lato_bordo < 2 else 0.0)
+		bordo.position = Vector3(0.0, 0.03 if not interno else 0.025, z)
+		if lato_bordo >= 2 and interno:
+			forma_bordo.size.z = PROFONDITA_LASTRA - rientro * 2.0
 		radice.add_child(bordo)
 		_bordi_lastre[lato].append(bordo)
 
@@ -339,17 +368,26 @@ func _imposta_larghezza_lastra(lato: int, larghezza: float) -> void:
 	var bordi: Array = _bordi_lastre[lato]
 	for i: int in range(2):
 		var bordo: MeshInstance3D = bordi[i]
-		(bordo.mesh as BoxMesh).size.x = larghezza + 0.1
+		(bordo.mesh as BoxMesh).size.x = larghezza + 0.16
 		bordo.position.x = centro_x
+		var filetto: MeshInstance3D = bordi[i + 4]
+		(filetto.mesh as BoxMesh).size.x = larghezza - RIENTRO_FILETTO * 2.0
+		filetto.position.x = centro_x
 	(bordi[2] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA
 	(bordi[3] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + larghezza
-	if lato == Lato.GIOCATORE and _nota_ordine != null:
-		_nota_ordine.position.x = BORDO_SINISTRO_LASTRA + larghezza - MARGINE_DESTRO_LASTRA
+	(bordi[6] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + RIENTRO_FILETTO
+	(bordi[7] as MeshInstance3D).position.x = BORDO_SINISTRO_LASTRA + larghezza - RIENTRO_FILETTO
 
 
 ## Larghezza della lastra che contiene tanti spazi (almeno due edifici, per non farla troppo corta).
-func _larghezza_per(spazi_truppe: int, spazi_edifici: int) -> float:
-	var contenuto: float = maxf(maxf(spazi_truppe * PASSO_TRUPPE, spazi_edifici * PASSO_EDIFICI), 2.0 * PASSO_EDIFICI)
+## Gli spazi vuoti (oltre i pezzi occupati) sono sagome strette (Davide, 8 novembre 2026);
+## senza il numero dei pezzi, tutti gli spazi contano come occupati.
+func _larghezza_per(spazi_truppe: int, spazi_edifici: int, truppe_occupate: int = -1, edifici_occupati: int = -1) -> float:
+	var piene_t: int = spazi_truppe if truppe_occupate < 0 else mini(truppe_occupate, spazi_truppe)
+	var piene_e: int = spazi_edifici if edifici_occupati < 0 else mini(edifici_occupati, spazi_edifici)
+	var fila_truppe: float = piene_t * PASSO_TRUPPE + (spazi_truppe - piene_t) * PASSO_SPAZIO_VUOTO
+	var fila_edifici: float = piene_e * PASSO_EDIFICI + (spazi_edifici - piene_e) * PASSO_SPAZIO_VUOTO
+	var contenuto: float = maxf(maxf(fila_truppe, fila_edifici), 2.0 * PASSO_EDIFICI)
 	return (X_INIZIO_SPAZI - BORDO_SINISTRO_LASTRA) + contenuto + MARGINE_DESTRO_LASTRA
 
 
@@ -363,7 +401,7 @@ func _scala_per(larghezza: float, massima: float) -> float:
 ## simmetrici rispetto al centro del tavolo.
 func _disponi_plancia(scala: float, larghezza: float, scontro: bool, durata: float) -> void:
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
-	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 1.1
+	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0 - 0.15
 	# Un po' a destra: a sinistra c'è la colonna con la nazione e il calendario.
 	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA - scala * (BORDO_SINISTRO_LASTRA + larghezza * 0.5), 0.0, z)
 	if _animazione_plancia != null and _animazione_plancia.is_valid():
@@ -384,53 +422,78 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 	medaglione.position = Vector3(X_MEDAGLIONE, 0.0, z_centro - 1.35)
 	radice.add_child(medaglione)
 	_medaglioni[lato] = medaglione
-	var bordo: MeshInstance3D = MeshInstance3D.new()
-	var forma_bordo: CylinderMesh = CylinderMesh.new()
-	forma_bordo.top_radius = 0.95
-	forma_bordo.bottom_radius = 1.0
-	forma_bordo.height = 0.16
-	bordo.mesh = forma_bordo
-	bordo.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
-	bordo.position.y = 0.08
-	medaglione.add_child(bordo)
-	var disco: MeshInstance3D = MeshInstance3D.new()
-	var forma_disco: CylinderMesh = CylinderMesh.new()
-	forma_disco.top_radius = 0.8
-	forma_disco.bottom_radius = 0.8
-	forma_disco.height = 0.18
-	disco.mesh = forma_disco
-	disco.material_override = StileVisivo.materiale(colore.darkened(0.55), 0.5)
-	disco.position.y = 0.09
-	medaglione.add_child(disco)
-	# Al centro del ritratto le iniziali della nazione, come lo stemma di un eroe.
-	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 120, Color.WHITE, 0.0, 18)
-	iniziali.position.y = 0.2
-	medaglione.add_child(iniziali)
+	# Teatro di carta (Davide, 8 novembre 2026): lo stendardo di carta della nazione. Fuori dagli
+	# scontri sta steso piatto sulla plancia; quando comincia la battaglia si alza in piedi.
+	var stendardo: Node3D = Node3D.new()
+	medaglione.add_child(stendardo)
+	_stendardi[lato] = stendardo
+	# Porta le iniziali e la Resistenza, e brucia dal basso man mano che la Resistenza scende.
+	var asta: MeshInstance3D = MeshInstance3D.new()
+	var forma_asta: CylinderMesh = CylinderMesh.new()
+	forma_asta.top_radius = 0.05
+	forma_asta.bottom_radius = 0.07
+	forma_asta.height = ALTEZZA_ASTA
+	asta.mesh = forma_asta
+	asta.material_override = StileVisivo.materiale(Color("1a1410"), 0.8)
+	asta.position = Vector3(X_ASTA, forma_asta.height * 0.5, 0.0)
+	stendardo.add_child(asta)
+	var punta: MeshInstance3D = MeshInstance3D.new()
+	var forma_punta: SphereMesh = SphereMesh.new()
+	forma_punta.radius = 0.11
+	forma_punta.height = 0.22
+	punta.mesh = forma_punta
+	punta.material_override = StileVisivo.materiale_metallo(StileVisivo.ORO)
+	punta.position = Vector3(X_ASTA, forma_asta.height + 0.05, 0.0)
+	stendardo.add_child(punta)
+	_aste_stendardo[lato] = [asta, punta]
+	var telo: MeshInstance3D = MeshInstance3D.new()
+	var forma_telo: QuadMesh = QuadMesh.new()
+	forma_telo.size = Vector2(LARGHEZZA_STENDARDO, ALTEZZA_STENDARDO)
+	telo.mesh = forma_telo
+	var materiale_telo: ShaderMaterial = Figurina.materiale_carta(_trama_stendardo(colore))
+	telo.material_override = materiale_telo
+	telo.position = Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.5, 0.0)
+	stendardo.add_child(telo)
+	_teli_stendardo[lato] = materiale_telo
+	# Al centro dello stendardo le iniziali della nazione, come lo stemma di un eroe.
+	var iniziali: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 112, Color("1a1410"), 0.0, 0)
+	iniziali.position = Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.68, 0.02)
+	iniziali.rotation = Vector3.ZERO
+	stendardo.add_child(iniziali)
 	_iniziali[lato] = iniziali
+	var numero_telo: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 140, Color("1a1410"), 0.0, 0)
+	numero_telo.position = Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.36, 0.02)
+	numero_telo.rotation = Vector3.ZERO
+	stendardo.add_child(numero_telo)
+	_numeri_stendardo[lato] = numero_telo
 	_crea_anello(medaglione, lato)
 	var nome: Label3D = StileVisivo.scritta("", StileVisivo.FONT_TITOLI, 40, StileVisivo.TESTO, 0.0, 8)
 	nome.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.12)
-	radice.add_child(nome)
+	# Nome e barra della Resistenza servono nello scontro; fuori basta lo stendardo steso.
+	var dati: Node3D = Node3D.new()
+	radice.add_child(dati)
+	_dati_scontro[lato] = dati
+	dati.add_child(nome)
 	_nomi_lato[lato] = nome
 	# Sotto il nome la barra della Resistenza con i numeri sopra, come la vita di un eroe.
 	var fondo_barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_fondo: BoxMesh = BoxMesh.new()
-	forma_fondo.size = Vector3(2.3, 0.04, 0.4)
+	forma_fondo.size = Vector3(1.95, 0.04, 0.4)
 	fondo_barra.mesh = forma_fondo
 	fondo_barra.material_override = StileVisivo.materiale(StileVisivo.NOTTE, 0.9)
 	fondo_barra.position = Vector3(X_MEDAGLIONE, 0.04, z_centro + 0.58)
-	radice.add_child(fondo_barra)
+	dati.add_child(fondo_barra)
 	var barra: MeshInstance3D = MeshInstance3D.new()
 	var forma_barra: BoxMesh = BoxMesh.new()
-	forma_barra.size = Vector3(2.2, 0.05, 0.32)
+	forma_barra.size = Vector3(1.85, 0.05, 0.32)
 	barra.mesh = forma_barra
 	barra.material_override = StileVisivo.materiale_luminoso(Color("3fae6a"), 0.7)
 	barra.position = fondo_barra.position + Vector3(0.0, 0.01, 0.0)
-	radice.add_child(barra)
+	dati.add_child(barra)
 	_barre_resistenza[lato] = barra
 	var numero: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 60, Color.WHITE, 0.0, 12)
 	numero.position = fondo_barra.position + Vector3(0.0, 0.06, 0.0)
-	radice.add_child(numero)
+	dati.add_child(numero)
 	_scritte_resistenza[lato] = numero
 	var scudo: Array = _crea_segnalino(medaglione, Vector3(1.5, 0.0, -0.55), Color("2f6fd0"))
 	_segnalini_scudo[lato] = scudo[0]
@@ -441,6 +504,9 @@ func _crea_medaglione(radice: Node3D, lato: int, z_centro: float) -> void:
 
 
 ## Piccolo disco con un numero accanto allo stemma. Restituisce [nodo, scritta].
+	_stendi_stendardo(lato, true, false)
+
+
 func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color) -> Array:
 	var nodo: Node3D = Node3D.new()
 	nodo.position = posizione
@@ -462,43 +528,72 @@ func _crea_segnalino(genitore: Node3D, posizione: Vector3, colore: Color) -> Arr
 	return [nodo, scritta]
 
 
+## La riserva di mana sotto lo stendardo: una sfera per colore (Davide, 9 novembre 2026).
 func _crea_riserva(radice: Node3D, lato: int, z_centro: float) -> void:
-	var nodo: Node3D = Node3D.new()
-	nodo.position = Vector3(X_MEDAGLIONE, 0.0, z_centro + 1.05)
-	radice.add_child(nodo)
-	_riserve[lato] = nodo
-	for i: int in range(COLORI_RISERVA.size()):
-		var mana: StringName = COLORI_RISERVA[i]
-		var x: float = (i - (COLORI_RISERVA.size() - 1) * 0.5) * 0.55
-		var gemma: MeshInstance3D = MeshInstance3D.new()
-		var forma: CylinderMesh = CylinderMesh.new()
-		forma.top_radius = 0.19
-		forma.bottom_radius = 0.23
-		forma.height = 0.12
-		forma.radial_segments = 6
-		gemma.mesh = forma
-		gemma.material_override = StileVisivo.materiale_gemma(StileVisivo.mana_da_nome(mana))
-		gemma.position = Vector3(x, 0.08, 0.0)
-		nodo.add_child(gemma)
-		var conteggio: Label3D = StileVisivo.scritta("0", StileVisivo.FONT_TITOLI, 64, Color.WHITE, 0.0, 10)
-		conteggio.position = Vector3(x, 0.04, 0.5)
-		nodo.add_child(conteggio)
-		_scritte_riserva[lato][mana] = conteggio
-		_gemme_riserva[lato][mana] = gemma
-	nodo.visible = false
+	var riserva: RiservaMana = RiservaMana.new()
+	riserva.position = Vector3(X_MEDAGLIONE, 0.0, z_centro + 1.05)
+	radice.add_child(riserva)
+	riserva.costruisci()
+	_riserve[lato] = riserva
+	riserva.visible = false
 
 
 func _aggiorna_medaglione(lato: int, resistenza: int, massimo: int) -> void:
 	_scritte_resistenza[lato].text = "%d / %d" % [maxi(resistenza, 0), maxi(massimo, 0)]
 	_iniziali[lato].text = _iniziali_di(_nomi_lato[lato].text)
 	var frazione: float = clampf(float(resistenza) / float(maxi(massimo, 1)), 0.0, 1.0)
+	_numeri_stendardo[lato].text = str(maxi(resistenza, 0))
+	# Lo stendardo brucia fino a metà; a zero brucia del tutto (a fine scontro).
+	_teli_stendardo[lato].set_shader_parameter("bruciatura", 0.0 if frazione >= 1.0 else 0.08 + 0.4 * (1.0 - frazione))
 	var barra: MeshInstance3D = _barre_resistenza[lato]
 	barra.scale.x = maxf(frazione, 0.001)
-	barra.position.x = X_MEDAGLIONE - 1.1 * (1.0 - frazione)
+	barra.position.x = X_MEDAGLIONE - 0.925 * (1.0 - frazione)
 	# Verde, poi giallo e rosso quando la Resistenza scende.
 	var colore: Color = Color("3fae6a") if frazione > 0.5 else (Color("e0b23a") if frazione > 0.25 else StileVisivo.PERICOLO)
 	(barra.material_override as StandardMaterial3D).albedo_color = colore
 	(barra.material_override as StandardMaterial3D).emission = colore
+
+
+## Lo stendardo steso piatto sulla plancia (fuori dagli scontri) oppure in piedi (in battaglia).
+## Steso, mostra solo iniziali e Resistenza; in piedi compaiono anche nome, barra e anello del tempo.
+func _stendi_stendardo(lato: int, steso: bool, animato: bool) -> void:
+	var stendardo: Node3D = _stendardi[lato]
+	# Steso a faccia in su, con l'asta verso il davanti della plancia: resta dentro la colonna.
+	var angolo: float = -PI * 0.5 if steso else 0.0
+	var posizione: Vector3 = Vector3(0.0, 0.05, POSIZIONE_STESO_Z + BASE_TELO) if steso else Vector3.ZERO
+	var scala: Vector3 = Vector3.ONE * (0.9 if steso else 1.0)
+	# La Resistenza sta solo sullo stendardo (Davide, 8 novembre 2026): niente nome e barra ripetuti.
+	_dati_scontro[lato].visible = false
+	for segmento: MeshInstance3D in _anelli[lato]:
+		segmento.visible = not steso
+	_braci_miccia[lato].visible = false
+	# Steso a terra lo stendardo non ha l'asta.
+	for parte: Node3D in _aste_stendardo[lato]:
+		parte.visible = not steso
+	if not animato:
+		stendardo.rotation.x = angolo
+		stendardo.position = posizione
+		stendardo.scale = scala
+		return
+	var t: Tween = create_tween()
+	t.set_parallel(true)
+	t.tween_property(stendardo, "rotation:x", angolo, 0.55 if not steso else 0.4).set_trans(Tween.TRANS_BACK if not steso else Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(stendardo, "position", posizione, 0.4)
+	t.tween_property(stendardo, "scale", scala, 0.4)
+
+
+## Telo dello stendardo: carta color crema, fascia del colore del lato in alto, coda a punte in basso.
+func _trama_stendardo(colore: Color) -> ImageTexture:
+	var img: Image = Image.create(256, 336, false, Image.FORMAT_RGBA8)
+	img.fill(Figurina.COLORE_CARTA)
+	img.fill_rect(Rect2i(0, 0, 256, 44), colore.darkened(0.35))
+	img.fill_rect(Rect2i(0, 44, 256, 6), Color("1a1410"))
+	for x: int in range(256):
+		var taglio: int = 296 + int(absf(float(x % 64) - 32.0) * 1.2)
+		for y: int in range(taglio, 336):
+			img.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
+	img.generate_mipmaps()
+	return ImageTexture.create_from_image(img)
 
 
 ## Iniziali delle prime due parole del nome, saltando le parole brevi ("di", "del"…).
@@ -513,46 +608,66 @@ static func _iniziali_di(nome: String) -> String:
 
 
 ## Anello di segmenti attorno al ritratto: il tempo della battaglia.
-func _crea_anello(medaglione: Node3D, lato: int) -> void:
-	if _materiale_anello_spento == null:
-		_materiale_anello_spento = StileVisivo.materiale(Color("26304a"), 0.9)
-		_materiale_anello_acceso = StileVisivo.materiale_luminoso(StileVisivo.ORO, 0.7)
-		_materiale_anello_logoramento = StileVisivo.materiale_luminoso(StileVisivo.PERICOLO, 1.4)
-	var raggio: float = 1.13
-	var forma: BoxMesh = BoxMesh.new()
-	forma.size = Vector3(0.11, 0.06, 0.13)
-	_anelli[lato] = []
-	for i: int in range(SEGMENTI_ANELLO):
-		# Dall'alto, in senso orario come una lancetta.
-		var angolo: float = -PI / 2.0 + TAU * float(i) / float(SEGMENTI_ANELLO)
-		var segmento: MeshInstance3D = MeshInstance3D.new()
-		segmento.mesh = forma
-		segmento.material_override = _materiale_anello_spento
-		segmento.position = Vector3(cos(angolo) * raggio, 0.05, sin(angolo) * raggio)
-		segmento.rotation.y = -angolo + PI / 2.0
-		medaglione.add_child(segmento)
-		_anelli[lato].append(segmento)
+## Il tempo dello scontro sull'asta dello stendardo (Davide, 9 novembre 2026): una luce dorata sale
+## lungo l'asta dal basso fino all'inizio del logoramento, con la brace in cima; da lì in poi l'asta
+## è tutta rossa e pulsa. Si vede solo negli scontri.
+func _crea_anello(_medaglione: Node3D, lato: int) -> void:
+	if _materiale_anello_acceso == null:
+		_materiale_anello_acceso = StileVisivo.materiale_luminoso(StileVisivo.ORO_LUCE, 1.6)
+		_materiale_anello_logoramento = StileVisivo.materiale_luminoso(StileVisivo.PERICOLO, 2.2)
+	var stendardo: Node3D = _stendardi[lato]
+	var riempimento: MeshInstance3D = MeshInstance3D.new()
+	var forma: CylinderMesh = CylinderMesh.new()
+	forma.top_radius = 0.085
+	forma.bottom_radius = 0.085
+	forma.height = 1.0
+	riempimento.mesh = forma
+	riempimento.material_override = _materiale_anello_acceso
+	riempimento.position = Vector3(X_ASTA, 0.0, 0.0)
+	riempimento.scale = Vector3(1.0, 0.001, 1.0)
+	stendardo.add_child(riempimento)
+	_anelli[lato] = [riempimento]
+	var brace: MeshInstance3D = MeshInstance3D.new()
+	var forma_brace: SphereMesh = SphereMesh.new()
+	forma_brace.radius = 0.12
+	forma_brace.height = 0.24
+	brace.mesh = forma_brace
+	brace.material_override = StileVisivo.materiale_luminoso(StileVisivo.BRACE, 5.0)
+	stendardo.add_child(brace)
+	_braci_miccia[lato] = brace
 	_stato_anelli[lato] = 0
 
 
-## Riempie l'anello fino all'inizio del logoramento; da lì in poi è tutto rosso.
+## Fa salire la luce lungo l'asta; dall'inizio del logoramento l'asta è tutta rossa.
 func _aggiorna_anello(lato: int, millisecondi: int) -> void:
 	var inizio: int = maxi(1, run.battle_rules.attrition_start_ms)
 	var stato: int = -2 if millisecondi >= inizio else int(float(millisecondi) / float(inizio) * SEGMENTI_ANELLO)
+	var riempimento: MeshInstance3D = _anelli[lato][0]
+	var brace: MeshInstance3D = _braci_miccia[lato]
+	if stato == -2:
+		riempimento.material_override = _materiale_anello_logoramento
+		var battito: float = 1.0 + 0.04 * sin(_tempo * 8.0)
+		riempimento.scale = Vector3(battito, ALTEZZA_ASTA, battito)
+		riempimento.position.y = ALTEZZA_ASTA * 0.5
+		brace.visible = false
+		_stato_anelli[lato] = -2
+		return
 	if stato == _stato_anelli[lato]:
 		return
 	_stato_anelli[lato] = stato
-	for i: int in range(_anelli[lato].size()):
-		var segmento: MeshInstance3D = _anelli[lato][i]
-		if stato == -2:
-			segmento.material_override = _materiale_anello_logoramento
-		else:
-			segmento.material_override = _materiale_anello_acceso if i < stato else _materiale_anello_spento
+	var altezza: float = ALTEZZA_ASTA * float(stato) / float(SEGMENTI_ANELLO)
+	riempimento.material_override = _materiale_anello_acceso
+	riempimento.scale = Vector3(1.0, maxf(altezza, 0.001), 1.0)
+	riempimento.position.y = altezza * 0.5
+	brace.visible = riempimento.visible and stato > 0
+	brace.position = Vector3(X_ASTA, altezza, 0.0)
 
 
 # --- Carte sulla plancia ---------------------------------------------------------
 
-func _crea_tessera(genitore: Node3D, scheda: SchedaCarta, misura: Vector2, posizione: Vector3, indice: int, nitidezza: float = 1.0) -> Tessera3D:
+func _crea_tessera(genitore: Node3D, scheda: SchedaCarta, misura: Vector2, posizione: Vector3, indice: int, nitidezza: float = 1.0, base: bool = false) -> Tessera3D:
+	# Teatro di carta: sulla plancia la carta fa da base alla figurina e non ripete il disegno.
+	scheda.come_base = base and scheda.illustrazione != null
 	var tessera: Tessera3D = Tessera3D.new()
 	genitore.add_child(tessera)
 	tessera.costruisci(scheda, misura.x, misura.y, nitidezza)
@@ -561,20 +676,45 @@ func _crea_tessera(genitore: Node3D, scheda: SchedaCarta, misura: Vector2, posiz
 	return tessera
 
 
-## Spazio vuoto: velato del colore del lato se è disponibile, scuro se va ancora conquistato.
+## Spazio vuoto: una sagoma stretta velata del colore del lato se è disponibile (con il +), scura
+## con il lucchetto se va ancora conquistata. La scritta corre in verticale.
 func _crea_spazio(genitore: Node3D, posizione: Vector3, misura: Vector2, disponibile: bool, colore_lato: Color) -> Node3D:
 	var spazio: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
 	forma.size = misura
 	spazio.mesh = forma
-	var colore: Color = Color(colore_lato, 0.16) if disponibile else Color(0.0, 0.0, 0.0, 0.28)
+	var colore: Color = Color(StileVisivo.CARTA_CREMA, 0.06) if disponibile else Color(0.0, 0.0, 0.0, 0.3)
 	spazio.material_override = StileVisivo.materiale_velo(colore)
+	# Il ritaglio: una sottile cornice di carta attorno allo spazio.
+	var cornice: StandardMaterial3D = StileVisivo.materiale_velo(Color(StileVisivo.CARTA_CREMA, 0.35 if disponibile else 0.12))
+	for k: int in range(4):
+		var striscia: MeshInstance3D = MeshInstance3D.new()
+		var forma_striscia: PlaneMesh = PlaneMesh.new()
+		forma_striscia.size = Vector2(misura.x, 0.035) if k < 2 else Vector2(0.035, misura.y)
+		striscia.mesh = forma_striscia
+		striscia.material_override = cornice
+		striscia.position = Vector3(0.0, 0.002, (misura.y * 0.5 * (-1.0 if k == 0 else 1.0)) if k < 2 else 0.0)
+		if k >= 2:
+			striscia.position.x = misura.x * 0.5 * (-1.0 if k == 2 else 1.0)
+		spazio.add_child(striscia)
 	spazio.position = posizione + Vector3(0.0, 0.012, 0.0)
 	genitore.add_child(spazio)
-	var scritta: Label3D = StileVisivo.scritta("LIBERO" if disponibile else "DA CONQUISTARE", StileVisivo.FONT_TITOLI, 46 if disponibile else 34, Color(colore_lato, 0.85) if disponibile else Color(StileVisivo.TESTO_TENUE, 0.6), 0.0, 6)
-	scritta.position = Vector3(0.0, 0.004, 0.0)
+	var tinta: Color = Color(StileVisivo.CARTA_CREMA, 0.7) if disponibile else Color(StileVisivo.CARTA_CREMA, 0.3)
+	var segno: Label3D = StileVisivo.scritta("+" if disponibile else "×", StileVisivo.FONT_TITOLI, 120, tinta, 0.0, 6)
+	segno.position = Vector3(0.0, 0.004, -misura.y * 0.3)
+	spazio.add_child(segno)
+	var scritta: Label3D = StileVisivo.scritta("LIBERO" if disponibile else "DA CONQUISTARE", StileVisivo.FONT_TITOLI, 34 if disponibile else 26, tinta, 0.0, 6)
+	scritta.rotation_degrees = Vector3(-90.0, 90.0, 0.0)
+	scritta.position = Vector3(0.0, 0.004, misura.y * 0.12)
 	spazio.add_child(scritta)
 	return spazio
+
+
+## Spazio vuoto numero i di una fila che ha "occupati" pezzi: dopo le carte, sagome strette.
+func _posizione_spazio_vuoto(lato: int, truppa: bool, occupati: int, i: int) -> Vector3:
+	var passo: float = PASSO_TRUPPE if truppa else PASSO_EDIFICI
+	var x: float = X_INIZIO_SPAZI + occupati * passo + (i - occupati + 0.5) * PASSO_SPAZIO_VUOTO
+	return Vector3(x, 0.02, (Z_TRUPPE if truppa else Z_EDIFICI) * _segno(lato))
 
 
 func _posizione_truppa(lato: int, i: int) -> Vector3:
@@ -596,7 +736,7 @@ func _spazi_mostrati(occupati: int, capacita: int, massimo: int, chiuso: bool) -
 
 ## Ricostruisce le carte di un lato e allarga la sua lastra quanto serve.
 ## Gli spazi vuoti si mostrano solo per il giocatore. nitidezza: risoluzione delle facce.
-func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int, spazi_chiusi: bool, nitidezza: float) -> void:
+func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[SchedaCarta], capacita_edifici: int, capacita_truppe: int, spazi_chiusi: bool, nitidezza: float, tutte_animate: bool = false) -> void:
 	for figlio: Node in _pezzi[lato].get_children():
 		figlio.queue_free()
 	_truppe[lato] = []
@@ -608,22 +748,40 @@ func _costruisci_lato(lato: int, edifici: Array[SchedaCarta], truppe: Array[Sche
 	var colore: Color = _colore_lato(lato)
 	var spazi_truppe: int = _spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, spazi_chiusi)
 	var spazi_edifici: int = _spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, spazi_chiusi)
-	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici))
+	_imposta_larghezza_lastra(lato, _larghezza_per(spazi_truppe, spazi_edifici, truppe.size(), edifici.size()))
 	for i: int in range(spazi_truppe):
 		if i < truppe.size():
-			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i, nitidezza))
+			_truppe[lato].append(_crea_tessera(_pezzi[lato], truppe[i], MISURA_TRUPPA, _posizione_truppa(lato, i), i, nitidezza, true))
 			_lampi[lato].append(0.0)
 		elif lato == Lato.GIOCATORE:
-			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_truppa(lato, i), MISURA_TRUPPA, i < capacita_truppe, colore)
+			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_spazio_vuoto(lato, true, truppe.size(), i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_TRUPPA.y), i < capacita_truppe, colore)
 			if i < capacita_truppe and _spazio_libero_truppa == null:
 				_spazio_libero_truppa = spazio
 	for i: int in range(spazi_edifici):
 		if i < edifici.size():
-			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i, nitidezza))
+			_edifici[lato].append(_crea_tessera(_pezzi[lato], edifici[i], MISURA_EDIFICIO, _posizione_edificio(lato, i), i, nitidezza, true))
 		elif lato == Lato.GIOCATORE:
-			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_edificio(lato, i), MISURA_EDIFICIO, i < capacita_edifici, colore)
+			var spazio: Node3D = _crea_spazio(_pezzi[lato], _posizione_spazio_vuoto(lato, false, edifici.size(), i), Vector2(PASSO_SPAZIO_VUOTO - 0.18, MISURA_EDIFICIO.y), i < capacita_edifici, colore)
 			if i < capacita_edifici and _spazio_libero_edificio == null:
 				_spazio_libero_edificio = spazio
+	_alza_figurine(lato, tutte_animate)
+
+
+## Teatro di carta: su ogni pezzo con illustrazione si alza la figurina ritagliata.
+## Si animano tutte (inizio di uno scontro) oppure solo quelle dei pezzi appena arrivati.
+func _alza_figurine(lato: int, tutte_animate: bool) -> void:
+	var verso: float = -1.0 if lato == Lato.GIOCATORE else 1.0
+	var conteggi: Dictionary = {}
+	var ritardo: float = 0.1
+	for gruppo: Array in [_edifici[lato], _truppe[lato]]:
+		for tessera: Tessera3D in gruppo:
+			var chiave: String = "%d:%s" % [tessera.scheda.genere, tessera.scheda.id]
+			conteggi[chiave] = int(conteggi.get(chiave, 0)) + 1
+			var nuova: bool = tutte_animate or int(conteggi[chiave]) > int(_gia_viste[lato].get(chiave, 0))
+			tessera.aggiungi_figurina(verso, ritardo, nuova, ALTEZZA_FIGURINA_TRUPPA if gruppo == _truppe[lato] else ALTEZZA_FIGURINA_EDIFICIO)
+			if nuova:
+				ritardo += 0.07
+	_gia_viste[lato] = conteggi
 
 
 func _costruisci_plancia_giocatore() -> void:
@@ -637,7 +795,8 @@ func _costruisci_plancia_giocatore() -> void:
 	var capacita_truppe: int = run.board.troop_capacity()
 	var larghezza: float = _larghezza_per(
 			_spazi_mostrati(truppe.size(), capacita_truppe, SPAZI_TRUPPE, true),
-			_spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, true))
+			_spazi_mostrati(edifici.size(), capacita_edifici, SPAZI_EDIFICI, true),
+			truppe.size(), edifici.size())
 	var scala: float = _scala_per(larghezza, SCALA_MASSIMA)
 	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, capacita_edifici, capacita_truppe, true, scala)
 	var animata: bool = not _disponi_subito and (_plancia.scale.x != scala or _modo == Modo.SCONTRO)
@@ -735,21 +894,26 @@ func _costruisci_scelte() -> void:
 			misura = MISURA_EDIFICIO
 		elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 			misura = MISURA_TRUPPA
-		var arrivo: Vector3 = Vector3(-0.4 + (i - (schede.size() - 1) * 0.5) * 4.4, 1.8, -2.4)
-		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6)
-		tessera.rotation_degrees = Vector3(28.0, 0.0, 0.0)
+		var arrivo: Vector3 = Vector3(-0.4 + (i - (schede.size() - 1) * 0.5) * 4.4, 2.3, -3.85)
+		# Consiglieri e avvenimenti con un'illustrazione: mezzo busto che esce dall'alto, tipi sotto.
+		var busto: bool = scheda.genere == SchedaCarta.Genere.CONSIGLIERE and scheda.illustrazione != null
+		var tessera: Tessera3D = _crea_tessera(_contenitore_scelte, scheda, misura, arrivo + Vector3(0.0, 6.0, -4.0), i, 1.6, busto)
+		tessera.aggiungi_busto()
+		var sotto_tipi: float = LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA if not scheda.tipi.is_empty() else 0.0
+		tessera.rotation_degrees = Vector3(38.0, 0.0, 0.0)
 		tessera.scale = Vector3.ONE * SCALA_SCELTA
 		if not scheda.simboli.is_empty():
 			tessera.imposta_ingrandimento(INGRANDIMENTO_SIMBOLI)
 		if scheda.sopratitolo != "":
 			var sopra: Label3D = StileVisivo.scritta(scheda.sopratitolo.to_upper(), StileVisivo.FONT_TITOLI, 42, StileVisivo.TESTO, 0.0, 10)
 			sopra.position = Vector3(0.0, 0.02, -misura.y * 0.5 - 0.24)
-			# Sopra la carta c'è la linguetta dei tipi: la scritta sale sopra la linguetta.
-			if not scheda.tipi.is_empty():
-				sopra.position.z -= LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA
+			# Con il mezzo busto sopra, la scritta passa sotto la carta, dopo i tipi e il verbo.
+			if busto:
+				sopra.position.z = misura.y * 0.5 + sotto_tipi + 0.55
+				sopra.font_size = 34
 			tessera.add_child(sopra)
 		var costo: Label3D = StileVisivo.scritta(scheda.costo, StileVisivo.FONT_TITOLI, 54, StileVisivo.ORO_LUCE if scheda.disponibile else StileVisivo.PERICOLO, 0.0, 12)
-		costo.position = Vector3(0.0, 0.02, misura.y * 0.5 + 0.27)
+		costo.position = Vector3(0.0, 0.02, misura.y * 0.5 + 0.27 + sotto_tipi)
 		tessera.add_child(costo)
 		_costi_scelte.append(costo)
 		_scelte.append(tessera)
@@ -789,7 +953,13 @@ func _aggiorna_tutto() -> void:
 	_aggiorna_stato_consiglieri()
 	_mostra_potenziabili(run.chosen_advisor)
 	_nomi_lato[Lato.GIOCATORE].text = run.nation_name.to_upper()
+	_scena.imposta_iniziali(_iniziali_di(run.nation_name))
 	_aggiorna_medaglione(Lato.GIOCATORE, run.player_resistance(), run.player_resistance())
+	# Il mese mostrato resta dentro la stagione in corso (durante un incontro il round va oltre il terzo).
+	var primo_mese: int = int(run.season) * run.run_rules.rounds_per_season + 1
+	var mese: int = clampi(run.month(), primo_mese, primo_mese + run.run_rules.rounds_per_season - 1)
+	_scena.imposta_mese(run.year, int(run.season), mese, RunState.MONTH_NAMES[mese - 1], run.season_name(), hash(run.nation_name), _scena_subito)
+	_scena_subito = false
 	_hud.aggiorna_partita(run)
 	# Annuncio in alto al centro: l'azione appena fatta e, sotto, che cosa è cambiato.
 	var novita: String = _novita_momento()
@@ -1203,8 +1373,8 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	# Nello scontro si vedono solo gli elementi schierati; i due lati hanno la stessa scala.
 	var larghezza: float = maxf(_larghezza_per(truppe.size(), edifici.size()), _larghezza_per(truppe_avversarie.size(), edifici_avversari.size()))
 	var scala: float = _scala_per(larghezza, SCALA_MASSIMA_SCONTRO)
-	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size(), false, scala)
-	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0, false, scala)
+	_costruisci_lato(Lato.GIOCATORE, edifici, truppe, edifici.size(), truppe.size(), false, scala, true)
+	_costruisci_lato(Lato.AVVERSARIO, edifici_avversari, truppe_avversarie, 0, 0, false, scala, true)
 	_disponi_plancia(scala, larghezza, true, 0.7)
 	_nomi_lato[Lato.AVVERSARIO].text = run.last_opponent_name.trim_prefix("Fantasma: ").to_upper()
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
@@ -1219,6 +1389,10 @@ func _avvia_scontro(titolo: String, prima: Dictionary) -> void:
 	arrivo.tween_property(avversario, "position", Vector3.ZERO, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	arrivo.tween_method(_muovi_camera.bind(_camera.global_position, CAMERA_SCONTRO, MIRA_PARTITA, MIRA_SCONTRO), 0.0, 1.0, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	_hud.modalita_scontro(true, titolo)
+	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
+		_stendi_stendardo(lato, true, false)
+		_stendi_stendardo(lato, false, true)
+	_scena.mostra_fila_mesi(false)
 
 
 func _muovi_camera(t: float, da: Vector3, a: Vector3, mira_da: Vector3, mira_a: Vector3) -> void:
@@ -1240,9 +1414,7 @@ func _salta_scontro() -> void:
 
 func _process(delta: float) -> void:
 	_tempo += delta
-	_luce_atmosfera.light_energy = 1.6 + sin(_tempo * 1.3) * 0.25
-	for materiale: StandardMaterial3D in _materiali_bordo:
-		materiale.emission_energy_multiplier = 1.2 + sin(_tempo * 2.0) * 0.25
+	_scena.aggiorna(delta)
 	if _modo != Modo.SCONTRO or _sim == null:
 		return
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
@@ -1258,6 +1430,7 @@ func _process(delta: float) -> void:
 	_aggiorna_visuale_scontro()
 	if _sim.outcome != BattleSim.Outcome.IN_CORSO and not _esito_programmato:
 		_esito_programmato = true
+		_richiudi_sconfitto(_sim.outcome)
 		var attesa: Tween = create_tween()
 		attesa.tween_interval(0.9)
 		attesa.tween_callback(_mostra_esito)
@@ -1277,6 +1450,7 @@ func _mostra_eventi() -> void:
 					var truppa: Tessera3D = _truppe[evento.side][evento.index]
 					truppa.attiva(-1.0 if evento.side == Lato.GIOCATORE else 1.0)
 					_lampi[evento.side][evento.index] = 0.5
+					_consuma_mana(evento.side, evento.index)
 				_colpo(1 - evento.side, evento.amount, "")
 			BattleEvent.Kind.LOGORAMENTO:
 				_colpo(evento.side, evento.amount, "logoramento")
@@ -1328,13 +1502,21 @@ func _aggiorna_visuale_scontro() -> void:
 			else:
 				edificio.imposta_stato("", StileVisivo.NOTTE)
 		for mana: StringName in COLORI_RISERVA:
-			var scritta: Label3D = _scritte_riserva[lato][mana]
-			scritta.text = str(_sim.get_mana(lato, mana))
+			(_riserve[lato] as RiservaMana).imposta(mana, _sim.get_mana(lato, mana))
+		var mancanze: Array[StringName] = []
+		for i: int in range(_truppe[lato].size()):
+			if _sim.get_troop_state(lato, i) == BattleSim.TroopState.IN_ATTESA_DI_MANA:
+				var richiesta: StringName = _setups[lato].troops[i].mana_type
+				if not mancanze.has(richiesta):
+					mancanze.append(richiesta)
+		(_riserve[lato] as RiservaMana).segnala_mancanze(mancanze)
 		for i: int in range(_truppe[lato].size()):
 			var tessera: Tessera3D = _truppe[lato][i]
 			var def: TroopDef = _setups[lato].troops[i]
 			var rimasto: int = _sim.get_troop_cooldown_left_ms(lato, i)
 			var stato: BattleSim.TroopState = _sim.get_troop_state(lato, i)
+			var ferma: bool = stato in [BattleSim.TroopState.SABOTATA, BattleSim.TroopState.MANA_PRENOTATO, BattleSim.TroopState.IN_ATTESA_DI_MANA]
+			tessera.imposta_spenta(0.85 if ferma else 0.0)
 			if stato == BattleSim.TroopState.SABOTATA:
 				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
 				tessera.imposta_stato("Sabotata: non può attivarsi", StileVisivo.COLORE_SABOTATO)
@@ -1347,9 +1529,8 @@ func _aggiorna_visuale_scontro() -> void:
 				tessera.imposta_stato("In attesa: servono %d %s, %s %d" % [def.mana_cost, def.mana_type, "ne hai" if lato == Lato.GIOCATORE else "ne ha", disponibile], StileVisivo.PERICOLO)
 			else:
 				tessera.imposta_ricarica(1.0 - float(rimasto) / float(maxi(def.cooldown_ms, 1)))
-				if float(_lampi[lato][i]) > 0.0:
-					tessera.imposta_stato("Si attiva!", StileVisivo.ORO_LUCE)
-				elif _sim.get_troop_slow_ms(lato, i) > 0:
+				# L'attivazione si vede già (scatto, scintille, alone): nessuna fascia sopra i numeri.
+				if _sim.get_troop_slow_ms(lato, i) > 0:
 					tessera.imposta_stato("Inefficiente", Color("e08a2e"))
 				elif _trascurata(lato, true, i):
 					tessera.imposta_stato("Trascurata: mantenimento non pagato", Color("e08a2e"))
@@ -1365,54 +1546,67 @@ func _trascurata(lato: int, truppa: bool, i: int) -> bool:
 	return i >= 0 and i < fila.size() and fila[i].neglected
 
 
-## Una gemma vola dall'edificio alla riserva di mana del suo lato, lasciando una scia.
+## Il mana vola dall'edificio alla sua sfera nella riserva, lasciando una scia; all'arrivo la sfera
+## si illumina e mostra "+1".
 func _lancia_mana(lato: int, edificio: Tessera3D, mana: StringName) -> void:
-	if _gemme_in_volo >= MASSIMO_GEMME_IN_VOLO or not _gemme_riserva[lato].has(mana):
+	var riserva: RiservaMana = _riserve[lato] as RiservaMana
+	if _gemme_in_volo >= MASSIMO_GEMME_IN_VOLO or not riserva.ha(mana):
 		return
 	_gemme_in_volo += 1
+	_vola_mana(edificio.punto_gemma(), riserva.arrivo(mana).global_position, mana, 2.2, func() -> void:
+		_gemme_in_volo -= 1
+		riserva.pulsa(mana))
+
+
+## Una truppa spende il mana: dalla sua sfera parte una scia verso la truppa.
+func _consuma_mana(lato: int, indice: int) -> void:
+	if indice < 0 or indice >= _setups[lato].troops.size() or indice >= _truppe[lato].size():
+		return
+	var def: TroopDef = _setups[lato].troops[indice]
+	var riserva: RiservaMana = _riserve[lato] as RiservaMana
+	if def.mana_cost <= 0 or not riserva.ha(def.mana_type) or _gemme_in_volo >= MASSIMO_GEMME_IN_VOLO:
+		return
+	var truppa: Tessera3D = _truppe[lato][indice]
+	for k: int in range(mini(def.mana_cost, 3)):
+		_gemme_in_volo += 1
+		var ritardo: Tween = create_tween()
+		ritardo.tween_interval(0.06 * k)
+		ritardo.tween_callback(func() -> void:
+			_vola_mana(riserva.arrivo(def.mana_type).global_position, truppa.punto_gemma(), def.mana_type, 1.0, func() -> void: _gemme_in_volo -= 1))
+
+
+func _vola_mana(da: Vector3, a: Vector3, mana: StringName, arco: float, al_termine: Callable) -> void:
 	var colore: Color = StileVisivo.colore_mana_nome(mana)
-	var gemma: MeshInstance3D = MeshInstance3D.new()
+	var goccia_volante: MeshInstance3D = MeshInstance3D.new()
 	var forma: SphereMesh = SphereMesh.new()
-	forma.radius = 0.16
-	forma.height = 0.32
-	gemma.mesh = forma
-	gemma.material_override = StileVisivo.materiale_luminoso(colore, 2.0)
-	add_child(gemma)
+	forma.radius = 0.09
+	forma.height = 0.18
+	goccia_volante.mesh = forma
+	goccia_volante.material_override = StileVisivo.materiale_luminoso(colore.lightened(0.3), 4.0)
+	add_child(goccia_volante)
 	var scia: CPUParticles3D = CPUParticles3D.new()
 	var goccia: SphereMesh = SphereMesh.new()
-	goccia.radius = 0.06
-	goccia.height = 0.12
-	goccia.material = StileVisivo.materiale_luminoso(colore, 2.5)
+	goccia.radius = 0.04
+	goccia.height = 0.08
+	goccia.material = StileVisivo.materiale_luminoso(colore, 3.0)
 	scia.mesh = goccia
-	scia.amount = 24
-	scia.lifetime = 0.35
+	scia.amount = 30
+	scia.lifetime = 0.4
 	scia.local_coords = false
 	scia.spread = 180.0
 	scia.initial_velocity_min = 0.0
-	scia.initial_velocity_max = 0.3
+	scia.initial_velocity_max = 0.25
 	scia.gravity = Vector3.ZERO
 	scia.scale_amount_min = 0.4
 	scia.scale_amount_max = 1.0
-	gemma.add_child(scia)
-	var partenza: Vector3 = edificio.punto_gemma()
-	var destinazione: Node3D = _gemme_riserva[lato][mana]
-	var arrivo: Vector3 = destinazione.global_position + Vector3(0.0, 0.2, 0.0)
-	gemma.global_position = partenza
+	goccia_volante.add_child(scia)
+	goccia_volante.global_position = da
 	var volo: Tween = create_tween()
-	volo.tween_method(_muovi_gemma.bind(gemma, partenza, arrivo), 0.0, 1.0, 0.6 / maxf(_velocita, 1.0)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	volo.tween_callback(_gemma_arrivata.bind(gemma, destinazione))
-
-
-func _muovi_gemma(t: float, gemma: MeshInstance3D, da: Vector3, a: Vector3) -> void:
-	gemma.global_position = da.lerp(a, t) + Vector3(0.0, sin(t * PI) * 2.2, 0.0)
-
-
-func _gemma_arrivata(gemma: MeshInstance3D, destinazione: Node3D) -> void:
-	_gemme_in_volo -= 1
-	gemma.queue_free()
-	var animazione: Tween = create_tween()
-	animazione.tween_property(destinazione, "scale", Vector3.ONE * 1.35, 0.06)
-	animazione.tween_property(destinazione, "scale", Vector3.ONE, 0.12)
+	volo.tween_method(func(t: float) -> void:
+		goccia_volante.global_position = da.lerp(a, t) + Vector3(0.0, sin(t * PI) * arco, 0.0), 0.0, 1.0, 0.6 / maxf(_velocita, 1.0)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	volo.tween_callback(func() -> void:
+		goccia_volante.queue_free()
+		al_termine.call())
 
 
 ## Colpo sulla Resistenza di un lato: numero che salta fuori e stemma che trema.
@@ -1434,6 +1628,7 @@ func _colpo(lato: int, danno: int, nota: String) -> void:
 	salto.tween_property(numero, "global_position", base + Vector3(0.0, 1.2, 0.0), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	salto.tween_property(numero, "modulate:a", 0.0, 0.5).set_delay(0.35)
 	salto.chain().tween_callback(numero.queue_free)
+	_brace(medaglione.global_position + Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.4, 0.2), mini(60, 14 + danno * 4))
 	var centro: Vector3 = Vector3(X_MEDAGLIONE, 0.0, medaglione.position.z)
 	var scossa: Tween = create_tween()
 	for passo: int in range(4):
@@ -1442,11 +1637,67 @@ func _colpo(lato: int, danno: int, nota: String) -> void:
 	scossa.tween_property(medaglione, "position", centro, 0.05)
 
 
+## Teatro di carta: a fine scontro le figurine del lato sconfitto si richiudono come un libro.
+func _richiudi_sconfitto(esito: BattleSim.Outcome) -> void:
+	var sconfitto: int = -1
+	if esito == BattleSim.Outcome.VITTORIA_A:
+		sconfitto = Lato.AVVERSARIO
+	elif esito == BattleSim.Outcome.VITTORIA_B:
+		sconfitto = Lato.GIOCATORE
+	if sconfitto < 0:
+		return
+	var ritardo: float = 0.0
+	for gruppo: Array in [_truppe[sconfitto], _edifici[sconfitto]]:
+		for tessera: Tessera3D in gruppo:
+			if tessera.figurina != null:
+				tessera.figurina.richiudi(ritardo)
+				ritardo += 0.06
+	_brace(_medaglioni[sconfitto].global_position + Vector3(0.0, BASE_TELO + ALTEZZA_STENDARDO * 0.5, 0.2), 90)
+	var telo: ShaderMaterial = _teli_stendardo[sconfitto]
+	var brucia: Tween = create_tween()
+	brucia.tween_method(func(v: float) -> void: telo.set_shader_parameter("bruciatura", v), 0.5, 1.05, 1.6)
+
+
+## Scintille di brace che salgono (colpi sullo stemma, sconfitta).
+func _brace(dove: Vector3, quante: int) -> void:
+	var particelle: CPUParticles3D = CPUParticles3D.new()
+	var granello: QuadMesh = QuadMesh.new()
+	granello.size = Vector2(0.09, 0.09)
+	var materiale: StandardMaterial3D = StileVisivo.materiale_luminoso(StileVisivo.BRACE, 4.0)
+	materiale.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	materiale.vertex_color_use_as_albedo = true
+	materiale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	materiale.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	granello.material = materiale
+	particelle.mesh = granello
+	particelle.amount = quante
+	particelle.lifetime = 1.0
+	particelle.one_shot = true
+	particelle.explosiveness = 0.95
+	particelle.direction = Vector3.UP
+	particelle.spread = 180.0
+	particelle.initial_velocity_min = 1.5
+	particelle.initial_velocity_max = 4.5
+	particelle.gravity = Vector3(0.0, 2.0, 0.0)
+	particelle.damping_min = 1.0
+	particelle.damping_max = 3.0
+	var rampa: Gradient = Gradient.new()
+	rampa.set_color(0, Color("ffd27a"))
+	rampa.set_color(1, Color(StileVisivo.BRACE, 0.0))
+	particelle.color_ramp = rampa
+	add_child(particelle)
+	particelle.global_position = dove
+	particelle.emitting = true
+	var pulizia: Tween = create_tween()
+	pulizia.tween_interval(1.6)
+	pulizia.tween_callback(particelle.queue_free)
+
+
 ## Punto di partenza delle scritte sopra lo stemma: si alternano su tre posizioni.
 func _punto_scritta(lato: int) -> Vector3:
 	_scritte_uscite[lato] += 1
 	var turno: int = _scritte_uscite[lato] % 3
-	return _medaglioni[lato].global_position + Vector3(-0.7 + turno * 0.7, 1.6 + turno * 0.25, 0.1)
+	return _medaglioni[lato].global_position + Vector3(0.8 + turno * 0.6, 0.8 + ALTEZZA_STENDARDO * 0.6 + turno * 0.3, 0.3)
 
 
 ## Scritta che sale dallo stemma di un lato (scudo, cura, Corruzione, assedio).
@@ -1496,6 +1747,8 @@ func _chiudi_scontro() -> void:
 	_sim = null
 	_modo = Modo.NORMALE
 	_hud.modalita_scontro(false)
+	_stendi_stendardo(Lato.GIOCATORE, true, true)
+	_scena.mostra_fila_mesi(true)
 	# La plancia torna com'è fuori dagli scontri: niente riserva di mana, Scudo o Corruzione.
 	for lato: int in [Lato.GIOCATORE, Lato.AVVERSARIO]:
 		_aggiorna_anello(lato, 0)

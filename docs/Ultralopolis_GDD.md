@@ -404,7 +404,7 @@ Il **Malcontento** è un contatore della nazione, distinto dal Magazzino. Insiem
 | Sale con sconfitte, carestie (Cibo insufficiente), malus subiti e alcune opzioni degli eventi | Confermato |
 | Scende soprattutto spendendo **Stabilità** con un'azione del Cancelliere; anche con Fede (Sacerdote), Cibo (Fattore) e alcune opzioni degli eventi | Confermato nella forma; azioni Proposta |
 | Raggiunta una **soglia**, scatta la **Rivoluzione** (§9.4.2); dopo la rivoluzione si azzera | Confermato |
-| È sempre visibile con la sua soglia, e il gioco avverte quando la rivoluzione si avvicina (come P4) | Proposta |
+| Si consulta con la sua soglia nella linguetta «Partita» in alto a destra (si apre passando il mouse o con un clic: Davide, 8 novembre 2026), e il gioco avverte quando la rivoluzione si avvicina (come P4) | Confermato (Davide, 8 novembre 2026); avviso Proposta |
 | Vive fuori dalla battaglia: non entra nella simulazione e non cambia la Resistenza | Proposta |
 | Non si vende al mercato; si conserva da un anno all'altro | Proposta |
 | Gli eventi possono avere come radice “Malcontento sopra una soglia” | Proposta |
@@ -794,6 +794,7 @@ Il rapporto fra la Corruzione e la Diplomazia come sistema di accordi o diserzio
 | Il **governo** cambia durante la run per evoluzione o rivoluzione (§9.4.2). Popolo, credo e cultura restano fissi per ora. L’identità **cresce** anche con le vie scelte entrando nelle ere (§10.4) | Confermato (v0.24) |
 | Anche i fantasmi hanno un’identità, che vale per la loro Resistenza e per i loro tratti in battaglia | Confermato |
 | Le nazioni create **restano salvate** sul PC; si possono **modificare** o **eliminare** (con conferma). Da una nazione salvata si possono giocare più run | Confermato |
+| Lo **stendardo della nazione** (il drappo di carta con le iniziali e la Resistenza, §14.2) si **personalizza nella creazione della nazione**; che cosa si sceglie (colori, simbolo, forma) è da definire. Richiesta di Davide, 8 novembre 2026 | Direzione |
 
 ### 9.2 Che cosa fa un elemento dell’identità — Confermato, elenco aperto
 
@@ -892,7 +893,7 @@ Davide vuole che la nazione sembri **viva**, non una serie di tasselli, e che og
 
 | Regola | Stato |
 |---|---|
-| Quattro coppie di tendenze opposte, **sempre visibili** sulla scheda della nazione come barre fra due poli: **Spada** (Conquistatrice / Pacifica), **Porta** (Aperta / Chiusa), **Altare** (Devota / Profana), **Legge** (Ordinata / Libera) | Confermato (Davide, v0.29); nomi placeholder |
+| Quattro coppie di tendenze opposte, sulla scheda della nazione come barre fra due poli: **Spada** (Conquistatrice / Pacifica), **Porta** (Aperta / Chiusa), **Altare** (Devota / Profana), **Legge** (Ordinata / Libera). Stanno nei **dettagli a scomparsa** della scheda: si aprono passando il mouse o con un clic (Davide, 8 novembre 2026; prima erano sempre visibili) | Confermato (Davide, v0.29 e 8 novembre 2026); nomi placeholder |
 | Ogni reazione sposta una o due inclinazioni; la reazione mostra in anticipo dove spinge la nazione (P4) | Confermato (v0.29) |
 | Le inclinazioni partono dall'identità: popoli, governi, credi e culture danno una spinta iniziale (es. Pietrosangue verso Chiusa, Teocrazia verso Devota) | Confermato (v0.29); valori placeholder |
 | Le inclinazioni sono una **radice** delle cronache: alcune arrivano solo a una nazione molto devota, guerriera, chiusa o libera | Confermato (v0.29) |
@@ -1218,13 +1219,13 @@ Testi, numeri e indicatori restano elementi di interfaccia separati dalle illust
 
 | Contesto | Informazioni essenziali |
 |---|---|
-| Run | Anno, stagione, era, vittorie, Prestigio, ultima possibilità. |
+| Run | Anno, stagione, era, vittorie, Prestigio, ultima possibilità. Sempre visibili: anno, stagione, mese e tema del round; Prestigio, vittorie, era e Malcontento sono nella linguetta «Partita», che si apre passando il mouse (Davide, 8 novembre 2026). |
 | Economia | Risorse nel Magazzino; produzione prevista per stagione. |
 | Plancia | Elementi presenti, spazi liberi, ordine delle truppe. |
 | Opportunità | Costo, requisiti, effetto, disponibilità nell’era corrente; con i simboli di §14.4 (v0.30). |
 | Ricerca | Tecnologia in corso, Ricerca raccolta su quella necessaria, Ricerca prevista alla prossima produzione, tecnologie che mancano alla prossima era e pulsante per entrarvi; schermata dell’albero con tecnologie completate, iniziate e bloccate e il motivo del blocco (v0.26). |
 | Tradizioni | Per ogni via adottata: le 4 tradizioni, l'impresa con quanto manca, l'effetto; le ascensioni prese (v0.27). |
-| Nazione | Le quattro inclinazioni come barre fra due poli, le usanze, la vocazione e i personaggi con la loro fiducia (v0.29). |
+| Nazione | Le quattro inclinazioni come barre fra due poli, le usanze, la vocazione e i personaggi con la loro fiducia (v0.29). Sempre visibile solo il nome; il resto si apre passando il mouse sulla scheda o con un clic (Davide, 8 novembre 2026). |
 | Cronaca | Momento e anno, la scena, il personaggio coinvolto; per ogni reazione che cosa fa, dove spinge la nazione e, se è spenta, perché (v0.29). |
 | Modificatori | Effetti attivi, durata residua e, quando previsto, origine. |
 | Battaglia | Resistenza delle due parti, scudo, Corruzione accumulata rispetto alla Resistenza, danno assorbito dallo scudo, mana, ricarica, unità in attesa e motivo dell’attesa, elementi inefficienti o sabotati con durata residua e origine. |
@@ -1274,9 +1275,10 @@ Come nei giochi da tavolo, consiglieri, azioni e avvenimenti dicono **che cosa f
 |---|---|
 | Ogni **tipo** (§6.6) ha un simbolo in un **medaglione tondo**: la forma tonda lo distingue dalle risorse; come i tipi, i medaglioni non hanno colore | Confermato |
 | I medaglioni stanno su una **linguetta sopra la tessera**, del colore della sua cornice, allineata a sinistra: su edifici e truppe i loro tipi, sul consigliere i tipi della sua categoria | Confermato |
+| **Consiglieri e avvenimenti con un'illustrazione**: il **mezzo busto** del personaggio esce dal bordo alto della carta, come i ritratti nei dialoghi dei giochi di ruolo; per questo la linguetta dei tipi sta **sotto la carta** (Davide, 8 novembre 2026) | Confermato |
 | Sopra e non di lato: sulla plancia le tessere della stessa fila sono troppo vicine per una linguetta laterale | Confermato |
-| I **tipi d'identità** hanno tutti lo stesso simbolo, uno **stendardo**; il nome è nei dettagli. La **Capitale** ha il suo | Confermato |
-| Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg`: un tipo nuovo prende un simbolo aggiungendo il file, senza toccare il codice; senza file prende lo stendardo | Confermato |
+| I **tipi d'identità** hanno tutti lo stesso simbolo, un **vessillo**; il nome è nei dettagli. La **Capitale** ha il suo | Confermato |
+| Il simbolo di un tipo è il file `assets/icone/tipo_<nome>.svg`: un tipo nuovo prende un simbolo aggiungendo il file, senza toccare il codice; senza file prende il vessillo | Confermato |
 | Lo stesso simbolo compare accanto al nome del tipo nei testi colorati (§16.3) e nella legenda | Confermato |
 
 | Questione | Stato |
@@ -1604,7 +1606,7 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 ## Registro delle versioni
 
 **v0.32 — 8 novembre 2026**
-- **Tipi sulla linguetta** (§14.4): ogni tipo ha un simbolo in un medaglione, su una linguetta sopra tessere e consiglieri; i tipi d'identità hanno tutti lo stendardo. Idea e scelte di Davide (linguetta sopra, medaglioni grandi, stendardo unico, anche sul consigliere).
+- **Tipi sulla linguetta** (§14.4): ogni tipo ha un simbolo in un medaglione, su una linguetta sopra tessere e consiglieri; i tipi d'identità hanno tutti il vessillo (prima chiamato stendardo). Idea e scelte di Davide (linguetta sopra, medaglioni grandi, vessillo unico, anche sul consigliere).
 
 **v0.31 — 8 novembre 2026** (solo nomi: nessuna regola cambia)
 - Nuovo glossario in un documento a parte (`docs/Glossario.md`), approvato da Davide; la §19 rimanda a quello, e da lì vengono le spiegazioni delle parole chiave (§16.3).

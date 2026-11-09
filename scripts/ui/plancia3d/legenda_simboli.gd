@@ -103,7 +103,7 @@ func costruisci(catalogo: CatalogDef) -> void:
 
 
 ## I tipi da spiegare: quelli delle categorie dei consiglieri (dai dati), la Capitale e lo
-## stendardo dei tipi d'identità. [medaglione, nome].
+## vessillo dei tipi d'identità. [medaglione, nome].
 static func tipi_delle_tessere(catalogo: CatalogDef) -> Array:
 	var tipi: Array = []
 	var visti: Array[StringName] = []
@@ -113,10 +113,10 @@ static func tipi_delle_tessere(catalogo: CatalogDef) -> Array:
 				visti.append(tipo)
 				tipi.append([RigaSimboli.new().tipo(tipo), String(tipo)])
 	tipi.append([RigaSimboli.new().tipo(&"Capitale"), "Capitale"])
-	var stendardo: RigaSimboli = RigaSimboli.new()
-	stendardo.icona(Simboli.TIPO_IDENTITA)
-	stendardo.simboli[0].tipo = true
-	tipi.append([stendardo, "Tipo d'identità (es. Pietrosangue, Monarchico)"])
+	var vessillo: RigaSimboli = RigaSimboli.new()
+	vessillo.icona(Simboli.TIPO_IDENTITA)
+	vessillo.simboli[0].tipo = true
+	tipi.append([vessillo, "Tipo d'identità (es. Pietrosangue, Monarchico)"])
 	return tipi
 
 
