@@ -1438,6 +1438,7 @@ La separazione fra simulazione e presentazione permette di verificare le regole 
 | I potenziamenti pagati non vengono rimborsati alla vendita | Provvisoria. |
 | Il Cibo si conta internamente in decimi per restare con numeri interi | Convenzione tecnica. |
 | Avviando da sola la scena della partita (solo in Godot, per prova) si gioca con una nazione di prova | Convenzione tecnica. |
+| Nazione di test: sempre in cima alla lista delle nazioni, identità con il primo elemento di ogni colonna, 99 di ogni risorsa tranne la Ricerca, tutti gli spazi liberi (`data/rules/test_nation.tres`) | Convenzione tecnica, solo per le prove (9 novembre 2026). |
 | Un modificatore ricevuto a metà anno vale subito per il resto dell’anno, più gli anni di durata | Provvisoria. |
 | Valori di scudo, cura, Corruzione e danno d’assedio di edifici e truppe | Placeholder. |
 | Intensità dell’Inefficienza: il timer avanza a metà velocità; durate di Inefficienza e Sabotaggio | Placeholder. |
@@ -1604,6 +1605,9 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 ---
 
 ## Registro delle versioni
+
+**Aggiunta del 9 novembre 2026** (v0.32, nessuna modifica del nucleo)
+- Nuova convenzione tecnica in §16.3: la **nazione di test**, sempre nella lista delle nazioni, per provare il gioco con 99 di ogni risorsa (Ricerca esclusa) e tutti gli spazi della plancia liberi. Richiesta di Davide.
 
 **v0.32 — 8 novembre 2026**
 - **Tipi sulla linguetta** (§14.4): ogni tipo ha un simbolo in un medaglione, su una linguetta sopra tessere e consiglieri; i tipi d'identità hanno tutti il vessillo (prima chiamato stendardo). Idea e scelte di Davide (linguetta sopra, medaglioni grandi, vessillo unico, anche sul consigliere).
