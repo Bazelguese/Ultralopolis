@@ -12,14 +12,17 @@ const PIXEL_PER_UNITA: float = 150.0
 ## Prove delle tessere in rilievo (Davide, 9 novembre 2026), solo per i pezzi della plancia.
 ## rilievo: lastrina di cartone spessa, bordo dorato in rilievo, stemmi dei numeri che sporgono.
 ## diorama: il disegno a strati, con la figura staccata dallo sfondo. Provvisorie finché non si sceglie.
-static var rilievo: bool = false
+## materiale: 0 = tessera sottile di sempre, 1 = cartone fustellato, 2 = legno, 3 = metallo e smalto.
+static var materiale_tessera: int = 0
 static var diorama: bool = false
-const SPESSORE_RILIEVO: float = 0.16
+## [spessore, smusso del bordo, cornice di materiale attorno alla carta] per materiale.
+const MISURE_MATERIALE: Array = [[0.07, 0.0, 0.0], [0.06, 0.014, 0.0], [0.11, 0.035, 0.07], [0.09, 0.04, 0.05]]
 ## Di quanto la figura del diorama si alza dalla carta (0 = distesa, 90 = in piedi).
 const INCLINAZIONE_DIORAMA: float = 40.0
 
 var scheda: SchedaCarta
 var _spessore: float = SPESSORE
+var _materiale: int = 0
 var larghezza: float = 1.6
 var profondita: float = 1.9
 ## Per chi usa la tessera (es. posizione nella fila, indice dell'offerta).
@@ -49,9 +52,10 @@ func costruisci(p_scheda: SchedaCarta, p_larghezza: float, p_profondita: float, 
 	scheda = p_scheda
 	larghezza = p_larghezza
 	profondita = p_profondita
-	var in_rilievo: bool = rilievo and scheda.sulla_plancia
+	var in_rilievo: bool = materiale_tessera > 0 and scheda.sulla_plancia
 	if in_rilievo:
-		_spessore = SPESSORE_RILIEVO
+		_materiale = materiale_tessera
+		_spessore = float(MISURE_MATERIALE[_materiale][0])
 	scheda.diorama = diorama and scheda.sulla_plancia and not scheda.come_base and scheda.illustrazione != null
 	_corpo = Node3D.new()
 	add_child(_corpo)
@@ -83,7 +87,9 @@ func _crea_faccia(nitidezza: float) -> void:
 
 	var carta: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
-	forma.size = Vector2(larghezza, profondita)
+	# Con il legno e il metallo la carta è incassata in una cornice del materiale.
+	var cornice_materiale: float = float(MISURE_MATERIALE[_materiale][2]) + float(MISURE_MATERIALE[_materiale][1])
+	forma.size = Vector2(larghezza, profondita) - Vector2.ONE * cornice_materiale * 2.0
 	carta.mesh = forma
 	var materiale: StandardMaterial3D = StandardMaterial3D.new()
 	materiale.albedo_texture = _viewport.get_texture()
@@ -147,67 +153,161 @@ func _crea_supporto() -> void:
 	_corpo.add_child(spessore)
 
 
-## Tessera in rilievo: una lastrina di cartone spessa dagli angoli tondi, un bordo dorato che
-## sporge sopra la faccia e gli stemmi dei numeri rialzati come medaglie.
+## Tessera in rilievo, in tre materiali (prove, Davide 10 novembre 2026). Il corpo è una lastra
+## dagli angoli tondi con lo spigolo di sopra smussato; i lati hanno la trama del materiale.
 func _crea_rilievo() -> void:
 	var lato: float = minf(larghezza, profondita)
-	var raggio: float = lato * 0.08
+	var raggio: float = lato * 0.09
+	var smusso: float = float(MISURE_MATERIALE[_materiale][1])
 	var cornice: Color = scheda.colore_cornice()
-	# Il corpo di cartone, con una fascia più chiara in cima (gli strati della carta).
-	var corpo: CSGPolygon3D = CSGPolygon3D.new()
-	corpo.polygon = _rettangolo_tondo(larghezza, profondita, raggio)
-	corpo.depth = _spessore - 0.03
-	corpo.rotation.x = -PI * 0.5
-	# (CSGPolygon3D ruotato così si estrude verso il basso: la posizione è la faccia di sopra.)
-	corpo.position.y = _spessore - 0.03
-	corpo.material = StileVisivo.materiale(cornice.darkened(0.62), 0.85)
+	var corpo: MeshInstance3D = MeshInstance3D.new()
+	corpo.mesh = _lastra_smussata(larghezza, profondita, raggio, _spessore, smusso)
 	_corpo.add_child(corpo)
-	var labbro: CSGPolygon3D = CSGPolygon3D.new()
-	labbro.polygon = _rettangolo_tondo(larghezza, profondita, raggio)
-	labbro.depth = 0.03
-	labbro.rotation.x = -PI * 0.5
-	labbro.position.y = _spessore
-	labbro.material = StileVisivo.materiale(cornice.darkened(0.3), 0.6, 0.5)
-	_corpo.add_child(labbro)
-	# Il bordo dorato in rilievo: un anello sopra la cornice disegnata.
-	var bordo: float = lato * 0.06
-	var anello: CSGPolygon3D = CSGPolygon3D.new()
-	anello.polygon = _rettangolo_tondo(larghezza, profondita, raggio)
-	anello.depth = 0.035
-	anello.rotation.x = -PI * 0.5
-	anello.position.y = _spessore + 0.035
-	anello.material = StileVisivo.materiale(cornice.lightened(0.25), 0.25, 0.9)
-	var vuoto: CSGPolygon3D = CSGPolygon3D.new()
-	vuoto.operation = CSGShape3D.OPERATION_SUBTRACTION
-	vuoto.polygon = _rettangolo_tondo(larghezza - bordo * 2.0, profondita - bordo * 2.0, maxf(raggio - bordo, 0.01))
-	vuoto.depth = 0.2
-	vuoto.position.z = 0.05
-	anello.add_child(vuoto)
-	_corpo.add_child(anello)
-	# Gli stemmi dei numeri: un pezzo della faccia, rialzato su una basetta scura.
-	for area: Rect2 in _faccia.aree_stemmi():
-		var w: float = area.size.x * larghezza
-		var d: float = area.size.y * profondita
-		var centro: Vector3 = Vector3((area.get_center().x - 0.5) * larghezza, 0.0, (area.get_center().y - 0.5) * profondita)
-		var base: CSGPolygon3D = CSGPolygon3D.new()
-		base.polygon = _rettangolo_tondo(w, d, d * 0.38)
-		base.depth = 0.08
-		base.rotation.x = -PI * 0.5
-		base.position = centro + Vector3(0.0, _spessore + 0.08, 0.0)
-		base.material = StileVisivo.materiale(Color("0b0806"), 0.7)
-		_corpo.add_child(base)
-		var stemma: MeshInstance3D = MeshInstance3D.new()
-		var piano: PlaneMesh = PlaneMesh.new()
-		piano.size = Vector2(w, d)
-		stemma.mesh = piano
-		var materiale: StandardMaterial3D = _materiale_faccia.duplicate() as StandardMaterial3D
-		materiale.uv1_scale = Vector3(area.size.x, area.size.y, 1.0)
-		materiale.uv1_offset = Vector3(area.position.x, area.position.y, 0.0)
-		materiale.roughness = 0.45
-		materiale.metallic_specular = 0.5
-		stemma.material_override = materiale
-		stemma.position = centro + Vector3(0.0, _spessore + 0.082, 0.0)
-		_corpo.add_child(stemma)
+	match _materiale:
+		1:
+			# Cartone fustellato: lati a strati di carta, una riga crema sullo spigolo.
+			corpo.material_override = _materiale_strati(Color("3a2c22"), Color("b9a684"))
+		2:
+			# Legno: venatura sui lati e sulla cornice, verniciato lucido.
+			corpo.material_override = _materiale_legno(Color("6b4426"))
+		3:
+			# Metallo: bordo dorato lucido, lati di bronzo scuro.
+			corpo.material_override = _materiale_metallo(cornice.lerp(StileVisivo.ORO, 0.6))
+	# Gli stemmi coniati del metallo: una medaglia dorata smussata sotto ogni stemma.
+	if _materiale == 3:
+		var scala: Vector2 = Vector2(larghezza, profondita) - Vector2.ONE * (float(MISURE_MATERIALE[3][2]) + smusso) * 2.0
+		for area: Rect2 in _faccia.aree_stemmi():
+			var w: float = area.size.x * scala.x + 0.05
+			var d: float = area.size.y * scala.y + 0.05
+			var centro: Vector3 = Vector3((area.get_center().x - 0.5) * scala.x, 0.0, (area.get_center().y - 0.5) * scala.y)
+			var medaglia: MeshInstance3D = MeshInstance3D.new()
+			medaglia.mesh = _lastra_smussata(w, d, d * 0.45, 0.06, 0.025)
+			medaglia.material_override = corpo.material_override
+			medaglia.position = centro + Vector3(0.0, _spessore - 0.01, 0.0)
+			_corpo.add_child(medaglia)
+			var stemma: MeshInstance3D = MeshInstance3D.new()
+			var piano: PlaneMesh = PlaneMesh.new()
+			piano.size = Vector2(area.size.x * scala.x, area.size.y * scala.y)
+			stemma.mesh = piano
+			var materiale: StandardMaterial3D = _materiale_faccia.duplicate() as StandardMaterial3D
+			materiale.uv1_scale = Vector3(area.size.x, area.size.y, 1.0)
+			materiale.uv1_offset = Vector3(area.position.x, area.position.y, 0.0)
+			materiale.roughness = 0.35
+			materiale.metallic_specular = 0.6
+			stemma.material_override = materiale
+			stemma.position = centro + Vector3(0.0, _spessore + 0.052, 0.0)
+			_corpo.add_child(stemma)
+
+
+## Una lastra dagli angoli tondi (raggio), alta "alto", con lo spigolo di sopra smussato di
+## "smusso". UV: u lungo il contorno, v lungo l'altezza (per la trama dei lati); sopra, u e v piani.
+static func _lastra_smussata(w: float, d: float, raggio: float, alto: float, smusso: float) -> ArrayMesh:
+	var esterno: PackedVector2Array = _rettangolo_tondo(w, d, raggio)
+	var interno: PackedVector2Array = _rettangolo_tondo(w - smusso * 2.0, d - smusso * 2.0, maxf(raggio - smusso, 0.005))
+	var n: int = esterno.size()
+	var st: SurfaceTool = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var giro: float = 0.0
+	var lunghezze: Array[float] = [0.0]
+	for i: int in range(n):
+		giro += esterno[i].distance_to(esterno[(i + 1) % n])
+		lunghezze.append(giro)
+	var basso: float = alto - smusso
+	for i: int in range(n):
+		var j: int = (i + 1) % n
+		var a: Vector2 = esterno[i]
+		var b: Vector2 = esterno[j]
+		var ai: Vector2 = interno[i]
+		var bi: Vector2 = interno[j]
+		var na: Vector3 = Vector3(a.x, 0.0, a.y).normalized()
+		var nb: Vector3 = Vector3(b.x, 0.0, b.y).normalized()
+		# Normale del lato: perpendicolare al segmento, verso l'esterno.
+		var tangente: Vector2 = (b - a).normalized()
+		var fuori: Vector3 = Vector3(tangente.y, 0.0, -tangente.x)
+		if fuori.dot(na + nb) < 0.0:
+			fuori = -fuori
+		var u0: float = lunghezze[i] * 4.0
+		var u1: float = lunghezze[i + 1] * 4.0
+		# Lato verticale.
+		_quad(st, Vector3(a.x, 0.0, a.y), Vector3(b.x, 0.0, b.y), Vector3(b.x, basso, b.y), Vector3(a.x, basso, a.y), fuori, Vector2(u0, 1.0), Vector2(u1, 1.0), Vector2(u1, 0.15), Vector2(u0, 0.15))
+		# Smusso: dal lato alla faccia di sopra.
+		if smusso > 0.0:
+			var inclinata: Vector3 = (fuori + Vector3.UP).normalized()
+			_quad(st, Vector3(a.x, basso, a.y), Vector3(b.x, basso, b.y), Vector3(bi.x, alto, bi.y), Vector3(ai.x, alto, ai.y), inclinata, Vector2(u0, 0.15), Vector2(u1, 0.15), Vector2(u1, 0.0), Vector2(u0, 0.0))
+	# Faccia di sopra (a ventaglio dal centro).
+	for i: int in range(n):
+		var j: int = (i + 1) % n
+		st.set_normal(Vector3.UP)
+		st.set_uv(Vector2(0.5, 0.5))
+		st.add_vertex(Vector3(0.0, alto, 0.0))
+		st.set_normal(Vector3.UP)
+		st.set_uv(interno[i] / Vector2(w, d) + Vector2(0.5, 0.5))
+		st.add_vertex(Vector3(interno[i].x, alto, interno[i].y))
+		st.set_normal(Vector3.UP)
+		st.set_uv(interno[j] / Vector2(w, d) + Vector2(0.5, 0.5))
+		st.add_vertex(Vector3(interno[j].x, alto, interno[j].y))
+	return st.commit()
+
+
+static func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, e: Vector3, normale: Vector3, ua: Vector2, ub: Vector2, uc: Vector2, ue: Vector2) -> void:
+	# Due triangoli a, b, c e a, c, e.
+	for coppia: Array in [[a, ua], [b, ub], [c, uc], [a, ua], [c, uc], [e, ue]]:
+		st.set_normal(normale)
+		st.set_uv(coppia[1])
+		st.add_vertex(coppia[0])
+
+
+static var _trame_rilievo: Dictionary = {}
+
+
+## Strati di carta pressata: righe sottili chiare e scure, con un po' di fibra.
+static func _materiale_strati(scuro: Color, chiaro: Color) -> StandardMaterial3D:
+	if not _trame_rilievo.has("strati"):
+		var img: Image = Image.create(256, 64, false, Image.FORMAT_RGB8)
+		var caso: RandomNumberGenerator = RandomNumberGenerator.new()
+		caso.seed = 3
+		for y: int in range(64):
+			var strato: Color = chiaro if y < 8 else scuro.lerp(chiaro, 0.25 + 0.2 * float((y / 6) % 2))
+			for x: int in range(256):
+				img.set_pixel(x, y, strato.darkened(caso.randf_range(-0.05, 0.12)))
+		img.generate_mipmaps()
+		_trame_rilievo["strati"] = ImageTexture.create_from_image(img)
+	var m: StandardMaterial3D = StileVisivo.materiale(Color.WHITE, 0.95)
+	m.albedo_texture = _trame_rilievo["strati"]
+	return m
+
+
+## Legno verniciato: venature lunghe, un riflesso morbido.
+static func _materiale_legno(colore: Color) -> StandardMaterial3D:
+	if not _trame_rilievo.has("legno"):
+		var img: Image = Image.create(512, 128, false, Image.FORMAT_RGB8)
+		var rumore: FastNoiseLite = FastNoiseLite.new()
+		rumore.frequency = 0.02
+		rumore.fractal_octaves = 4
+		for y: int in range(128):
+			for x: int in range(512):
+				var v: float = rumore.get_noise_2d(float(x) * 0.15, float(y) * 3.0)
+				var anelli: float = 0.5 + 0.5 * sin(v * 18.0)
+				img.set_pixel(x, y, Color.WHITE.darkened(0.12 + 0.3 * anelli))
+		img.generate_mipmaps()
+		_trame_rilievo["legno"] = ImageTexture.create_from_image(img)
+	var m: StandardMaterial3D = StileVisivo.materiale(colore, 0.38)
+	m.albedo_texture = _trame_rilievo["legno"]
+	m.uv1_triplanar = true
+	m.uv1_scale = Vector3(0.9, 0.9, 0.9)
+	m.clearcoat_enabled = true
+	m.clearcoat = 0.6
+	m.clearcoat_roughness = 0.25
+	return m
+
+
+## Metallo dorato spazzolato: lucido, con un filo di luce sugli spigoli.
+static func _materiale_metallo(colore: Color) -> StandardMaterial3D:
+	var m: StandardMaterial3D = StileVisivo.materiale(colore, 0.28, 0.9)
+	m.rim_enabled = true
+	m.rim = 0.4
+	m.rim_tint = 0.8
+	return m
 
 
 ## Diorama: sulla faccia resta lo sfondo sfocato del disegno; la figura ritagliata si alza dal
