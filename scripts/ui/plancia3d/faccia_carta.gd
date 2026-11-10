@@ -150,8 +150,8 @@ func _misure_angoli() -> void:
 		var h: float = size.y * 0.3
 		_pastiglie.append(Rect2(interno.get_center().x - w * 0.5, interno.end.y - h, w, h))
 	_area_basso = Rect2(interno.position.x, _pastiglie[0].position.y, interno.size.x, _pastiglie[0].size.y)
-	# Nello scontro (e nel diorama) in alto c'è la figura: il nome scende sopra gli stemmi.
-	if scheda.come_base or scheda.diorama:
+	# Nello scontro in alto c'è la figurina: il nome scende sopra gli stemmi.
+	if scheda.come_base:
 		_area_nome = Rect2(interno.position.x, _area_basso.position.y - alta_nome - lato * 0.02, interno.size.x, alta_nome)
 
 
@@ -230,7 +230,7 @@ func _disegna_sopra() -> void:
 			var t: float = float(k) / 6.0
 			var tinta: Color = Color(StileVisivo.FASCIA_NOME, 0.6 * (1.0 - t))
 			_sopra.draw_rect(Rect2(fascia.position.x, fascia.end.y + sfuma * t, fascia.size.x, sfuma / 6.0 + 1.0), tinta)
-			if scheda.come_base or scheda.diorama:
+			if scheda.come_base:
 				_sopra.draw_rect(Rect2(fascia.position.x, fascia.position.y - sfuma * (t + 1.0 / 6.0), fascia.size.x, sfuma / 6.0 + 1.0), tinta)
 		# Ombra in basso, dietro gli stemmi.
 		var ombra: float = _area_basso.size.y * 1.3
@@ -479,9 +479,6 @@ func _crea_arte() -> void:
 	if scheda.come_base and scheda.illustrazione != null:
 		_arte.texture = _pedana()
 		return
-	if scheda.diorama:
-		_arte.texture = _sfondo_sfocato(scheda.illustrazione)
-		return
 	if scheda.illustrazione != null:
 		_arte.texture = scheda.illustrazione
 		return
@@ -525,48 +522,6 @@ func _pedana() -> Texture2D:
 	var img: Image = Image.create(4, 4, false, Image.FORMAT_RGB8)
 	img.fill(COLORE_PEDANA)
 	return ImageTexture.create_from_image(img)
-
-
-static var _sfondi: Dictionary = {}
-
-
-## Lo sfondo del diorama: il disegno molto sfocato e scurito, come una scena lontana.
-static func _sfondo_sfocato(illustrazione: Texture2D) -> Texture2D:
-	var chiave: int = illustrazione.get_instance_id()
-	if not _sfondi.has(chiave):
-		var img: Image = illustrazione.get_image()
-		if img.is_compressed():
-			img.decompress()
-		img.convert(Image.FORMAT_RGBA8)
-		img.resize(12, 12, Image.INTERPOLATE_BILINEAR)
-		img.resize(192, 192, Image.INTERPOLATE_CUBIC)
-		for y: int in range(img.get_height()):
-			for x: int in range(img.get_width()):
-				img.set_pixel(x, y, img.get_pixel(x, y).darkened(0.55))
-		_sfondi[chiave] = ImageTexture.create_from_image(img)
-	return _sfondi[chiave]
-
-
-## Le zone degli stemmi dei numeri, in parti della carta (da 0 a 1), per rialzarli in 3D.
-func aree_stemmi() -> Array[Rect2]:
-	var aree: Array[Rect2] = []
-	if not _angoli:
-		return aree
-	for area: Rect2 in _pastiglie:
-		aree.append(Rect2(area.position / size, area.size / size))
-	return aree
-
-
-## La zona del disegno, in parti della carta (da 0 a 1).
-func area_arte_normalizzata() -> Rect2:
-	var area: Rect2 = _area_arte
-	if _angoli and scheda.diorama:
-		# Dalla cima della carta alla fascia del nome, che nel diorama sta in basso.
-		area = Rect2(_area_arte.position.x, _area_arte.position.y, _area_arte.size.x, _area_nome.position.y - _area_arte.position.y)
-	elif _angoli and not scheda.come_base:
-		# Fra la fascia del nome (in alto) e gli stemmi (in basso).
-		area = Rect2(_area_arte.position.x, _area_nome.end.y, _area_arte.size.x, _area_basso.position.y - _area_nome.end.y)
-	return Rect2(area.position / size, area.size / size)
 
 
 ## Fondo della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
