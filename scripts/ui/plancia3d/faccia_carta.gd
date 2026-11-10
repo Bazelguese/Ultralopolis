@@ -34,10 +34,6 @@ var _nome_sopra_arte: bool = false
 ## Tessere di truppe ed edifici sulla plancia: disegno «Angoli» (Davide, 9 novembre 2026). Il
 ## disegno occupa tutta la carta, i numeri stanno in stemmi colorati negli angoli in basso.
 var _angoli: bool = false
-## Prova (Davide, 10 novembre 2026): come si vede il colore del mana di una tessera.
-## 1 = fascia del nome, 2 = filo luminoso attorno al disegno, 3 = cornice, 4 = sfondo del disegno
-## (il soggetto ritagliato su un fondo del colore del mana). Provvisoria.
-static var variante_mana: int = 4
 
 
 func imposta(p_scheda: SchedaCarta, misura: Vector2) -> void:
@@ -208,8 +204,6 @@ func _colore_effetto(effetto: String) -> Color:
 ## Fondo della carta: cornice del colore dell'era, faccia scura, fascia del nome.
 func _draw() -> void:
 	var cornice: Color = scheda.colore_cornice()
-	if _angoli and variante_mana == 3 and scheda.mana != &"":
-		cornice = StileVisivo.colore_mana_nome(scheda.mana).darkened(0.15)
 	var esterno: StyleBoxFlat = StyleBoxFlat.new()
 	esterno.bg_color = cornice
 	esterno.set_corner_radius_all(int(_raggio))
@@ -237,20 +231,10 @@ func _disegna_sopra() -> void:
 	var lato: float = minf(size.x, size.y)
 	_sopra.draw_rect(_area_arte, Color(0.0, 0.0, 0.0, 0.0), false, 2.0)
 	_sopra.draw_rect(_area_arte.grow(1.0), scheda.colore_cornice().darkened(0.35), false, 2.0)
-	if _angoli and variante_mana == 2 and scheda.mana != &"":
-		# Filo luminoso del colore del mana attorno al disegno, con un alone verso l'interno.
-		var tinta: Color = StileVisivo.colore_mana_nome(scheda.mana)
-		var spesso: float = maxf(3.0, lato * 0.022)
-		for k: int in range(5):
-			_sopra.draw_rect(_area_arte.grow(-spesso * (0.5 + k)), Color(tinta, 0.32 - k * 0.06), false, spesso)
-		_sopra.draw_rect(_area_arte.grow(-spesso * 0.5), tinta.lightened(0.2), false, spesso)
 	if _angoli:
 		# Fascia del nome (in alto, o in basso nello scontro), sfumata ai bordi.
 		var fascia: Rect2 = Rect2(_area_arte.position.x, _area_nome.position.y, _area_arte.size.x, _area_nome.size.y)
-		var tinta_fascia: Color = Color(StileVisivo.FASCIA_NOME, 0.85)
-		if variante_mana == 1 and scheda.mana != &"":
-			tinta_fascia = Color(StileVisivo.colore_mana_nome(scheda.mana).darkened(0.45), 0.92)
-		_sopra.draw_rect(fascia, tinta_fascia)
+		_sopra.draw_rect(fascia, Color(StileVisivo.FASCIA_NOME, 0.85))
 		var sfuma: float = fascia.size.y * 0.5
 		for k: int in range(6):
 			var t: float = float(k) / 6.0
@@ -509,7 +493,8 @@ func _crea_arte() -> void:
 	if scheda.come_base and scheda.illustrazione != null:
 		_arte.texture = _pedana()
 		return
-	if scheda.illustrazione != null and _angoli and variante_mana == 4:
+	# Sulle tessere «Angoli» il colore del mana è lo sfondo del disegno (Davide, 10 novembre 2026).
+	if scheda.illustrazione != null and _angoli:
 		_arte_su_sfondo_mana()
 		return
 	if scheda.illustrazione != null:
@@ -573,7 +558,9 @@ void fragment() {
 	vec4 c = texture(tex, uv);
 	vec2 m = texture(maschera, uv).rg;
 	float figura = smoothstep(0.5, 0.6, m.r);
-	float bordo = smoothstep(0.26, 0.34, m.g);
+	// Dentro la tessera il bordo di carta è un filo sottile (Davide, 10 novembre 2026): si prende
+	// appena fuori dalla figura, non dal bordo largo delle figurine.
+	float bordo = smoothstep(0.18, 0.32, m.r) * 0.85;
 	// Fondo del colore del mana: più chiaro al centro, scuro ai bordi.
 	float d = length((UV - vec2(0.5, 0.45)) * vec2(1.0, 0.8));
 	vec3 sfondo = mix(fondo * 1.25, fondo * 0.45, smoothstep(0.05, 0.75, d));
