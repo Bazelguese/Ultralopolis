@@ -25,7 +25,7 @@ const INGRANDIMENTO_SIMBOLI: float = 1.7
 const Z_TRUPPE: float = 1.75
 ## Teatro di carta: fra truppe ed edifici c'è posto per le figurine, che non coprono le carte dietro.
 const Z_EDIFICI: float = 4.65
-## Il cuore della nazione al centro della plancia (Davide, 9 novembre 2026): due placche, una per
+## Il Cuore al centro della plancia (Davide, 9 novembre 2026): due placche, una per
 ## fila, con lo stendardo sulla fila delle truppe e la riserva di mana su quella degli edifici. Le
 ## file si dividono in due metà ai suoi lati; l'ordine resta quello di sempre, da sinistra a destra,
 ## e un pezzo nuovo arriva in fondo a destra (GDD §7.3).
@@ -443,7 +443,7 @@ func _disponi_plancia(scala: float, _larghezza: float, scontro: bool, durata: fl
 	var z_centro: float = (Z_TRUPPE + Z_EDIFICI) * 0.5
 	# La plancia sta più in basso (Davide, 9 novembre 2026): i comandi del round sono in alto a destra.
 	var z: float = 0.0 if scontro else z_centro * (1.0 - scala) - (scala - 1.0) * 2.0 + 0.85
-	# La lastra è centrata sul cuore della nazione: il cuore sta al centro dello schermo.
+	# La lastra è centrata sul Cuore: il Cuore sta al centro dello schermo.
 	var posizione: Vector3 = Vector3(MIRA_PARTITA.x + SPOSTAMENTO_PLANCIA, 0.0, z)
 	if _animazione_plancia != null and _animazione_plancia.is_valid():
 		_animazione_plancia.kill()
@@ -457,7 +457,7 @@ func _disponi_plancia(scala: float, _larghezza: float, scontro: bool, durata: fl
 	_animazione_plancia.tween_property(_plancia, "position", posizione, durata).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
-## Il cuore della nazione: due placche dagli angoli smussati, una per fila, unite da due barrette
+## Il Cuore: due placche dagli angoli smussati, una per fila, unite da due barrette
 ## d'ottone. Ogni placca ha la base di cartone scuro, il profilo d'ottone e il pannello del colore
 ## del lato con un filetto d'ottone inciso. Lo stendardo e la riserva di mana ci stanno sopra.
 func _crea_cuore(radice: Node3D, lato: int) -> void:

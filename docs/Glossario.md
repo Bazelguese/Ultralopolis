@@ -1,6 +1,6 @@
 # ULTRALOPOLIS — Glossario
 
-**Versione:** 2 — 8 novembre 2026
+**Versione:** 3 — 10 novembre 2026
 **Riferimento:** Game Design Document v0.31 (`docs/Ultralopolis_GDD.md`)
 **Stato:** **approvato da Davide l'8 novembre 2026.** Raccoglie i termini del GDD, del Catalogo e dei testi del gioco; tutti i nomi doppi sono stati decisi (registro in fondo). I nomi segnati **Provvisorio** restano placeholder e possono cambiare. Il GDD (dalla v0.31), il Catalogo, la direzione artistica e i testi del gioco usano i nomi decisi.
 
@@ -87,7 +87,7 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Tratto** | Un effetto che dura tutta la partita, dato dal popolo, dal governo, dal credo, dalla cultura o da una via. | GDD §9.2, §10.4 (*tratto permanente*). Deciso. |
 | **Tessera esclusiva** | Una tessera che ti viene proposta solo grazie al tuo popolo, governo, credo, cultura o a una via. | GDD §9.2, §10.4. Anche *esclusiva*. Deciso. |
 | **Tipo d'identità** | Il tipo che porta una tessera esclusiva (es. Pietrosangue, Monarchico, Solare). Non decide quali consiglieri la propongono, ma conta per peculiarità ed eventi. | GDD §6.6. Deciso. |
-| **Capitale** | Il cuore della nazione. Produce Oro, Cibo, Ricerca e una risorsa per ogni elemento dell'identità; nello scontro dà mana energetico. Non si vende e non si sostituisce. | GDD §6.2. Ha un tipo proprio, Capitale (Proposta). Deciso. |
+| **Capitale** | La sede del governo della nazione. Produce Oro, Cibo, Ricerca e una risorsa per ogni elemento dell'identità; nello scontro dà mana energetico. Non si vende e non si sostituisce. | GDD §6.2. Ha un tipo proprio, Capitale (Proposta). Deciso. |
 | **Malcontento** | La pressione del popolo. Sale con sconfitte, carestie, malus e tessere trascurate; scende soprattutto spendendo Stabilità. Se raggiunge la soglia, scoppia la Rivoluzione. | GDD §5.5, §5.6. È un contatore, non una risorsa da vendere. Deciso. |
 
 ## Le cronache della nazione
@@ -166,6 +166,14 @@ Quando un nome nuovo ha un doppione, o lo stesso nome finisce per indicare due c
 | **Tipo** | Una caratteristica della tessera (es. Fante, Guardiano, Spirituale). Decide quali consiglieri la propongono e la potenziano. | GDD §6.6. Ha sostituito le *etichette*. Elenco nel GDD §6.6 (Provvisorio). Il tipo *Produzione* si chiama ora **Materie prime**. Deciso. |
 | **Materie prime** | Il tipo degli edifici che producono materie prime, per esempio pietra, legno, ferro e cibo. | GDD §6.6 (tipo *Produzione*). Rinominato perché “produzione” indica già ciò che gli edifici producono. Deciso. |
 | **Stendardo** | Il drappo di carta della tua nazione, con le iniziali e la Resistenza: steso sulla plancia, si alza in piedi negli scontri e brucia quando la Resistenza scende. | GDD §9.1, §14.2 (teatro di carta). Si personalizzerà nella creazione della nazione (Direzione). Non usarlo per il simbolo dei tipi d'identità: quello è il *Vessillo*. Deciso. |
+| **Cuore** | Il centro della plancia: sulla fila delle truppe lo stendardo con la Resistenza, su quella degli edifici la riserva di mana. Le tue tessere stanno ai suoi due lati. | GDD §14.2. Non usare *cuore della nazione* (sembrava la Capitale, che ora è *la sede del governo*). Deciso. |
+| **Forma della plancia** | L'aspetto della plancia, scelto dal tuo popolo: non cambia nulla nelle regole. | GDD §9.2, §14.2. Solo aspetto. Deciso. |
+| **Bastione** | La forma della plancia con merli e torri. | GDD §14.2. Popolo: Pietrosangue. Non *Mura*: il nome c'è già in usanze e peculiarità (Mura dei padri, Mura antiche…). Deciso. |
+| **Arco** | La forma della plancia con le file curve, come le gradinate di un anfiteatro. | GDD §14.2. Popolo: Maremani. Deciso. |
+| **Ali** | La forma della plancia con due fasce a punta, una per fila. | GDD §14.2. Popolo: Cinerali. Deciso. |
+| **Nave** | La plancia dei nemici del mare (pirati, flotta pirata, armata del mare): un ponte con la prua puntata verso di te. | GDD §14.2. Deciso. |
+| **Pelli** | La plancia dei nemici della terra selvaggia (barbari, orda, invasori): una pelle tesa fra pali con zanne d'osso. | GDD §14.2. Deciso. |
+| **Barricata** | La plancia dei fuorilegge (briganti, predoni, ribelli): assi inchiodate e pali appuntiti. | GDD §14.2. Deciso. |
 | **Ordine delle truppe** | Nello scontro le truppe agiscono da destra verso sinistra: la più a destra usa il mana per prima. Puoi riordinarle quando vuoi fuori dallo scontro. | GDD §7.3. Deciso. |
 
 ## Lo scontro
@@ -337,3 +345,4 @@ Non vanno più usati nel gioco né nei documenti nuovi.
 | 8 novembre 2026 | Il Cibo delle truppe è la **razione**; **mantenimento** è solo il costo delle tessere prima degli scontri. Le tappe delle vie sono **tradizioni** (non *passi*). Il pannello con la storia della partita si chiama **Annali**; **Cronaca** resta la scena di inizio stagione. |
 | 8 novembre 2026 | Le ascensioni sono **minori** e **maggiori** (non di livello 1 e 2): “Livello” resta solo alle tessere. L'ascensione *Consiglio ristretto* diventa **Corte affollata**, perché dà un consigliere in più. |
 | 8 novembre 2026 | **Stendardo** è il drappo di carta della nazione (teatro di carta); il simbolo dei tipi d'identità si chiama **Vessillo**. |
+| 10 novembre 2026 | Il centro della plancia si chiama **Cuore**; la Capitale non è più «il cuore della nazione» ma «la sede del governo». Le forme della plancia sono **Bastione** (non *Mura*, già usato in usanze e peculiarità), **Arco**, **Ali**, e per i nemici **Nave**, **Pelli**, **Barricata**. |

@@ -1,10 +1,10 @@
 class_name FormaPlancia
 extends Node3D
-## La plancia di un lato, sagomata attorno al cuore della nazione (Davide, 9 novembre 2026).
+## La plancia di un lato, sagomata attorno al Cuore (Davide, 9 novembre 2026).
 ## Non è più un rettangolo: segue le due file e cresce con loro. La forma la indica il popolo
 ## (IdentityDef.board_shape) o l'incontro del mondo (EncounterDef.board_shape):
 ##   «ali»   due fasce a punta, una per fila, unite dal cuore;
-##   «mura»  un blocco a gradini con merli sui lati lunghi e una torre a ogni angolo;
+##   «mura» (Bastione) un blocco a gradini con merli sui lati lunghi e una torre a ogni angolo;
 ##   «arco»  le file curve attorno a un centro lontano, come le gradinate di un anfiteatro;
 ##   vuoto   una lastra semplice dagli angoli tondi (incontri senza forma propria).
 ## Le plance dei nemici, una per famiglia di incontri, hanno il tratto caratteristico sul lato
@@ -264,7 +264,7 @@ func _contorno_ali(e: Vector4) -> PackedVector2Array:
 	return _unisci(_unisci(_cuore(0.45, 0.7), truppe), edifici)
 
 
-## Mura: un blocco a gradini (le file hanno lunghezze diverse), merli sui lati lunghi esterni,
+## Bastione: un blocco a gradini (le file hanno lunghezze diverse), merli sui lati lunghi esterni,
 ## una torre tonda a ogni angolo e il cuore come porta che sporge davanti e dietro.
 func _contorno_mura(e: Vector4) -> PackedVector2Array:
 	var dietro: float = z_truppe - FASCIA_TRUPPE
