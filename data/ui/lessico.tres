@@ -670,7 +670,7 @@ famiglia = 8
 forme = PackedStringArray("Capitale")
 colore = Color(0.9412, 0.851, 0.6588, 1)
 simbolo = &"tipo_capitale"
-definizione = "Il cuore della nazione. Produce Oro, Cibo, Ricerca e una risorsa per ogni elemento dell'identità; nello scontro dà mana energetico. Non si vende e non si sostituisce."
+definizione = "La sede del governo della nazione. Produce Oro, Cibo, Ricerca e una risorsa per ogni elemento dell'identità; nello scontro dà mana energetico. Non si vende e non si sostituisce."
 
 [sub_resource type="Resource" id="voce_n27"]
 script = ExtResource("1_voce")

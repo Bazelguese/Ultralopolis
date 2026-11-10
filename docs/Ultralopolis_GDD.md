@@ -808,7 +808,8 @@ Popoli, governi, credi, culture e peculiarità usano la stessa scheda. Ogni elem
 - dare un **tratto permanente**, cioè un modificatore che dura tutta la run (§8);
 - cambiare **il Consiglio**: consiglieri in più o in meno nel round, un consigliere sempre presente o escluso, opportunità in più, Oro in più o in meno sulle opportunità (v0.24);
 - cambiare **l'uso delle risorse**: tasso del mercato, costo delle azioni di un consigliere, costo di Potenzia (v0.24);
-- dare il suo **tipo d'identità** alle tessere esclusive (§6.6, v0.24).
+- dare il suo **tipo d'identità** alle tessere esclusive (§6.6, v0.24);
+- solo il popolo: indicare la **forma della plancia** della nazione (§14.2); è solo aspetto, senza effetti sulle regole (Davide, 9 novembre 2026).
 
 Altri effetti verranno aggiunti man mano che le meccaniche si ampliano.
 
@@ -1212,6 +1213,11 @@ La plancia è una scena 3D; edifici, truppe e segnalini sono pezzi 2D con illust
 | Plancia a geometria semplice, con l’aspetto affidato ai materiali e alle texture | Proposta |
 | Inquadratura quasi dall’alto, perché fino a 12 truppe in fila restino leggibili | Proposta |
 | Stile visivo e materiali della plancia | Da definire |
+| **Cuore** al centro della plancia: due placche, una per fila; su quella delle truppe lo stendardo con la Resistenza, su quella degli edifici la riserva di mana. Le file stanno ai due lati del cuore | Confermato (Davide, 9 novembre 2026); nome deciso il 10 novembre 2026 |
+| L'ordine delle file non cambia (§7.3): si legge da sinistra a destra attraverso il cuore; una tessera nuova arriva in fondo a destra e le due metà si ribilanciano, quindi una tessera può passare dall'altra parte del cuore | Confermato (Davide, 9 novembre 2026) |
+| La plancia non è un rettangolo: segue le file e cresce con loro verso i due lati. La sua **forma** è solo aspetto, senza effetti sulle regole | Confermato (Davide, 9 novembre 2026) |
+| La forma della plancia del giocatore la indica il **popolo** (§9.2): Pietrosangue = **Bastione** (merli e torri), Maremani = **Arco** (file curve come un anfiteatro), Cinerali = **Ali** (due fasce a punta). Un fantasma mostra la forma del suo popolo | Confermato (Davide, 9 novembre 2026); forme dei popoli nuovi da decidere |
+| Gli incontri del mondo hanno una forma per famiglia, con il tratto caratteristico sul lato rivolto verso il giocatore: mare (pirati, flotta pirata, armata del mare) = **Nave**, con la prua; terra selvaggia (barbari, orda, invasori) = **Pelli**, con pali e zanne; fuorilegge (briganti, predoni, ribelli) = **Barricata**, con un cavallo di Frisia | Confermato (Davide, 9 novembre 2026) |
 
 Testi, numeri e indicatori restano elementi di interfaccia separati dalle illustrazioni.
 
@@ -1605,6 +1611,10 @@ Il glossario è in un documento a parte: `docs/Glossario.md`. Per ogni termine i
 ---
 
 ## Registro delle versioni
+
+**Aggiunta del 10 novembre 2026** (v0.32, nessuna modifica del nucleo)
+- **Plancia** (§14.2): il **Cuore** al centro, con lo stendardo e la riserva di mana; le file ai suoi lati nell'ordine di sempre; la forma della plancia, solo aspetto, la indica il popolo (Bastione, Arco, Ali) e per gli incontri del mondo la famiglia (Nave, Pelli, Barricata). Decisioni di Davide del 9 novembre 2026; nomi decisi il 10 novembre 2026 (glossario).
+- §9.2: il popolo indica la forma della plancia.
 
 **Aggiunta del 9 novembre 2026** (v0.32, nessuna modifica del nucleo)
 - Nuova convenzione tecnica in §16.3: la **nazione di test**, sempre nella lista delle nazioni, per provare il gioco con 99 di ogni risorsa (Ricerca esclusa) e tutti gli spazi della plancia liberi. Richiesta di Davide.

@@ -137,7 +137,17 @@ func _misure_angoli() -> void:
 	_area_arte = interno
 	var alta_nome: float = size.y * (0.12 if verticale else 0.2)
 	_area_nome = Rect2(interno.position.x + lato * 0.1, interno.position.y, interno.size.x - lato * 0.2, alta_nome)
-	if truppa:
+	if truppa and scheda.mana != &"":
+		# Tre stemmi (Davide, 10 novembre 2026): attacco, mana che costa ogni azione, ricarica.
+		var h: float = size.y * (0.19 if verticale else 0.27)
+		var stacco: float = lato * 0.02
+		var w_piccolo: float = (interno.size.x - stacco * 2.0) * 0.3
+		var w_ricarica: float = interno.size.x - stacco * 2.0 - w_piccolo * 2.0
+		var y: float = interno.end.y - h
+		_pastiglie.append(Rect2(interno.position.x, y, w_piccolo, h))
+		_pastiglie.append(Rect2(interno.position.x + w_piccolo + stacco, y, w_piccolo, h))
+		_pastiglie.append(Rect2(interno.end.x - w_ricarica, y, w_ricarica, h))
+	elif truppa:
 		# L'attacco ha una o due cifre, la ricarica quattro caratteri («1,8s»): più spazio a lei.
 		var h: float = size.y * (0.16 if verticale else 0.27)
 		var stacco: float = lato * 0.03
@@ -260,8 +270,8 @@ func _disegna_sopra() -> void:
 			var effetto_edificio: String = _effetto_principale()
 			_pastiglia(_pastiglie[0], _colore_effetto(effetto_edificio), effetto_edificio)
 
-	# Gemma del mana nell'angolo.
-	if scheda.mana != &"":
+	# Gemma del mana nell'angolo (sulle tessere «Angoli» il mana sta negli stemmi e nel colore).
+	if scheda.mana != &"" and not _angoli:
 		var centro: Vector2 = Vector2(_bordo + lato * 0.1, _bordo + lato * 0.1)
 		var raggio: float = lato * 0.105
 		var colore: Color = StileVisivo.colore_mana_nome(scheda.mana)
@@ -301,6 +311,8 @@ func _disegna_sopra() -> void:
 func _icone_pastiglie() -> Array:
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var effetto: String = _effetto_principale()
+		if _angoli and scheda.mana != &"":
+			return [[effetto if effetto != "" else "spada", _colore_effetto(effetto)], ["gemma", StileVisivo.colore_mana_nome(scheda.mana).darkened(0.35)], ["clessidra", Color("33415e")]]
 		return [[effetto if effetto != "" else "spada", _colore_effetto(effetto)], ["clessidra", Color("33415e")]]
 	if scheda.mana != &"":
 		return [["gemma", StileVisivo.colore_mana_nome(scheda.mana).darkened(0.35)]]
@@ -325,7 +337,9 @@ func _disegna_stemmi() -> void:
 		fondo.border_color = colore.lightened(0.35)
 		fondo.border_width_top = 3
 		_sopra.draw_style_box(fondo, area.grow(-area.size.y * 0.07))
-		_icona(Vector2(area.position.x + area.size.y * 0.5, area.get_center().y), area.size.y * 0.5, icona, Color.WHITE)
+		# Con tre stemmi l'icona è più piccola e più vicina al bordo: più posto al numero.
+		var stretto: bool = _pastiglie.size() == 3
+		_icona(Vector2(area.position.x + area.size.y * (0.32 if stretto else 0.5), area.get_center().y), area.size.y * (0.4 if stretto else 0.5), icona, Color.WHITE)
 
 
 func _pastiglia(area: Rect2, colore: Color, icona: String) -> void:
@@ -479,6 +493,10 @@ func _crea_arte() -> void:
 	if scheda.come_base and scheda.illustrazione != null:
 		_arte.texture = _pedana()
 		return
+	# Sulle tessere «Angoli» il colore del mana è lo sfondo del disegno (Davide, 10 novembre 2026).
+	if scheda.illustrazione != null and _angoli:
+		_arte_su_sfondo_mana()
+		return
 	if scheda.illustrazione != null:
 		_arte.texture = scheda.illustrazione
 		return
@@ -524,6 +542,70 @@ func _pedana() -> Texture2D:
 	return ImageTexture.create_from_image(img)
 
 
+const SHADER_SFONDO_MANA: String = """
+shader_type canvas_item;
+uniform sampler2D tex : source_color, filter_linear_mipmap;
+uniform sampler2D maschera : filter_linear;
+uniform vec4 posto;
+uniform vec4 taglio;
+uniform vec3 fondo : source_color;
+uniform vec3 carta : source_color = vec3(0.925, 0.886, 0.8);
+void fragment() {
+	// Dal punto della zona del disegno al punto dell'illustrazione (ritagliata come «coperta»)
+	// e poi al quadrato del ritaglio, dove l'illustrazione sta in basso al centro.
+	vec2 uv_img = taglio.xy + UV * taglio.zw;
+	vec2 uv = posto.xy + uv_img * posto.zw;
+	vec4 c = texture(tex, uv);
+	vec2 m = texture(maschera, uv).rg;
+	float figura = smoothstep(0.5, 0.6, m.r);
+	// Dentro la tessera il bordo di carta è un filo sottile (Davide, 10 novembre 2026): si prende
+	// appena fuori dalla figura, non dal bordo largo delle figurine.
+	float bordo = smoothstep(0.18, 0.32, m.r) * 0.85;
+	// Fondo del colore del mana: più chiaro al centro, scuro ai bordi.
+	float d = length((UV - vec2(0.5, 0.45)) * vec2(1.0, 0.8));
+	vec3 sfondo = mix(fondo * 1.25, fondo * 0.45, smoothstep(0.05, 0.75, d));
+	vec3 col = mix(sfondo, carta, bordo);
+	col = mix(col, c.rgb, figura);
+	COLOR = vec4(col, 1.0);
+}
+"""
+static var _shader_sfondo: Shader
+
+
+## Il soggetto dell'illustrazione, ritagliato come le figurine, su un fondo del colore del mana
+## della tessera (Davide, 10 novembre 2026). Senza mana il fondo è neutro.
+func _arte_su_sfondo_mana() -> void:
+	if _shader_sfondo == null:
+		_shader_sfondo = Shader.new()
+		_shader_sfondo.code = SHADER_SFONDO_MANA
+	var ritaglio: Array = Figurina.ritaglia(scheda.illustrazione)
+	var dimensioni: Vector2 = Vector2(scheda.illustrazione.get_size())
+	var quota: Vector2 = dimensioni / maxf(dimensioni.x, dimensioni.y)
+	# Dove sta l'illustrazione nel quadrato del ritaglio: in basso, al centro.
+	var posto: Vector4 = Vector4((1.0 - quota.x) * 0.5, 1.0 - quota.y, quota.x, quota.y)
+	# La parte dell'illustrazione che copre la zona del disegno senza deformarla.
+	var aspetto_zona: float = _area_arte.size.x / maxf(_area_arte.size.y, 1.0)
+	var aspetto_img: float = dimensioni.x / maxf(dimensioni.y, 1.0)
+	var taglio: Vector4 = Vector4(0.0, 0.0, 1.0, 1.0)
+	if aspetto_zona > aspetto_img:
+		var parte: float = aspetto_img / aspetto_zona
+		taglio = Vector4(0.0, (1.0 - parte) * 0.5, 1.0, parte)
+	else:
+		var parte: float = aspetto_zona / aspetto_img
+		taglio = Vector4((1.0 - parte) * 0.5, 0.0, parte, 1.0)
+	var fondo: Color = StileVisivo.colore_mana_nome(scheda.mana).darkened(0.2) if scheda.mana != &"" else Color("6a5a48")
+	var materiale: ShaderMaterial = ShaderMaterial.new()
+	materiale.shader = _shader_sfondo
+	materiale.set_shader_parameter("tex", ritaglio[0])
+	materiale.set_shader_parameter("maschera", ritaglio[1])
+	materiale.set_shader_parameter("posto", posto)
+	materiale.set_shader_parameter("taglio", taglio)
+	materiale.set_shader_parameter("fondo", fondo)
+	_arte.stretch_mode = TextureRect.STRETCH_SCALE
+	_arte.texture = ritaglio[0]
+	_arte.material = materiale
+
+
 ## Fondo della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
 func fondo_arte() -> float:
 	return _area_arte.end.y / maxf(size.y, 1.0)
@@ -540,7 +622,7 @@ func centro_arte() -> float:
 
 func _crea_scritte() -> void:
 	var lato: float = minf(size.x, size.y)
-	if scheda.mana != &"":
+	if scheda.mana != &"" and not _angoli:
 		var centro: Vector2 = Vector2(_bordo + lato * 0.1, _bordo + lato * 0.1)
 		_numero_gemma = _etichetta(str(scheda.mana_numero), StileVisivo.FONT_TITOLI, int(lato * 0.14), Color.WHITE, 8)
 		_numero_gemma.position = centro - Vector2(lato * 0.1, lato * 0.1)
@@ -563,7 +645,9 @@ func _crea_scritte() -> void:
 
 	var testi: Array[String] = []
 	var ritmo: String = SchedaCarta.secondi(scheda.ritmo_ms).replace(" ", "")
-	if scheda.genere == SchedaCarta.Genere.TRUPPA:
+	if scheda.genere == SchedaCarta.Genere.TRUPPA and _angoli and scheda.mana != &"":
+		testi = [str(_valore_effetto(_effetto_principale())), str(scheda.mana_numero), ritmo]
+	elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 		testi = [str(_valore_effetto(_effetto_principale())), ritmo]
 	elif _pastiglie.size() == 1:
 		var quanto: int = scheda.mana_numero if scheda.mana != &"" else _valore_effetto(_effetto_principale())
@@ -576,8 +660,9 @@ func _crea_scritte() -> void:
 		var grandezza: int = int(area.size.y * 0.62)
 		if _angoli:
 			grandezza = int(area.size.y * 0.66)
-			testo.position = area.position + Vector2(area.size.y * 0.78, 0.0)
-			testo.size = Vector2(area.size.x - area.size.y * 0.82, area.size.y)
+			var inizio: float = area.size.y * (0.5 if _pastiglie.size() == 3 else 0.78)
+			testo.position = area.position + Vector2(inizio, 0.0)
+			testo.size = Vector2(area.size.x - inizio - area.size.y * 0.06, area.size.y)
 			testo.add_theme_constant_override("outline_size", 8)
 		_adatta(testo, StileVisivo.FONT_TITOLI, grandezza, testo.size.x - 6.0)
 		testo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
