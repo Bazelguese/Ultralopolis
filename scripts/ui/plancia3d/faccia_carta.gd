@@ -34,6 +34,9 @@ var _nome_sopra_arte: bool = false
 ## Tessere di truppe ed edifici sulla plancia: disegno «Angoli» (Davide, 9 novembre 2026). Il
 ## disegno occupa tutta la carta, i numeri stanno in stemmi colorati negli angoli in basso.
 var _angoli: bool = false
+## Prova (Davide, 10 novembre 2026): come si vede il colore del mana di una tessera.
+## 1 = fascia del nome, 2 = filo luminoso attorno al disegno, 3 = cornice. Provvisoria.
+static var variante_mana: int = 1
 
 
 func imposta(p_scheda: SchedaCarta, misura: Vector2) -> void:
@@ -137,7 +140,17 @@ func _misure_angoli() -> void:
 	_area_arte = interno
 	var alta_nome: float = size.y * (0.12 if verticale else 0.2)
 	_area_nome = Rect2(interno.position.x + lato * 0.1, interno.position.y, interno.size.x - lato * 0.2, alta_nome)
-	if truppa:
+	if truppa and scheda.mana != &"":
+		# Tre stemmi (Davide, 10 novembre 2026): attacco, mana che costa ogni azione, ricarica.
+		var h: float = size.y * (0.15 if verticale else 0.27)
+		var stacco: float = lato * 0.025
+		var w_piccolo: float = (interno.size.x - stacco * 2.0) * 0.3
+		var w_ricarica: float = interno.size.x - stacco * 2.0 - w_piccolo * 2.0
+		var y: float = interno.end.y - h
+		_pastiglie.append(Rect2(interno.position.x, y, w_piccolo, h))
+		_pastiglie.append(Rect2(interno.position.x + w_piccolo + stacco, y, w_piccolo, h))
+		_pastiglie.append(Rect2(interno.end.x - w_ricarica, y, w_ricarica, h))
+	elif truppa:
 		# L'attacco ha una o due cifre, la ricarica quattro caratteri («1,8s»): più spazio a lei.
 		var h: float = size.y * (0.16 if verticale else 0.27)
 		var stacco: float = lato * 0.03
@@ -194,6 +207,8 @@ func _colore_effetto(effetto: String) -> Color:
 ## Fondo della carta: cornice del colore dell'era, faccia scura, fascia del nome.
 func _draw() -> void:
 	var cornice: Color = scheda.colore_cornice()
+	if _angoli and variante_mana == 3 and scheda.mana != &"":
+		cornice = StileVisivo.colore_mana_nome(scheda.mana).darkened(0.15)
 	var esterno: StyleBoxFlat = StyleBoxFlat.new()
 	esterno.bg_color = cornice
 	esterno.set_corner_radius_all(int(_raggio))
@@ -221,10 +236,20 @@ func _disegna_sopra() -> void:
 	var lato: float = minf(size.x, size.y)
 	_sopra.draw_rect(_area_arte, Color(0.0, 0.0, 0.0, 0.0), false, 2.0)
 	_sopra.draw_rect(_area_arte.grow(1.0), scheda.colore_cornice().darkened(0.35), false, 2.0)
+	if _angoli and variante_mana == 2 and scheda.mana != &"":
+		# Filo luminoso del colore del mana attorno al disegno, con un alone verso l'interno.
+		var tinta: Color = StileVisivo.colore_mana_nome(scheda.mana)
+		var spesso: float = maxf(3.0, lato * 0.022)
+		for k: int in range(5):
+			_sopra.draw_rect(_area_arte.grow(-spesso * (0.5 + k)), Color(tinta, 0.32 - k * 0.06), false, spesso)
+		_sopra.draw_rect(_area_arte.grow(-spesso * 0.5), tinta.lightened(0.2), false, spesso)
 	if _angoli:
 		# Fascia del nome (in alto, o in basso nello scontro), sfumata ai bordi.
 		var fascia: Rect2 = Rect2(_area_arte.position.x, _area_nome.position.y, _area_arte.size.x, _area_nome.size.y)
-		_sopra.draw_rect(fascia, Color(StileVisivo.FASCIA_NOME, 0.85))
+		var tinta_fascia: Color = Color(StileVisivo.FASCIA_NOME, 0.85)
+		if variante_mana == 1 and scheda.mana != &"":
+			tinta_fascia = Color(StileVisivo.colore_mana_nome(scheda.mana).darkened(0.45), 0.92)
+		_sopra.draw_rect(fascia, tinta_fascia)
 		var sfuma: float = fascia.size.y * 0.5
 		for k: int in range(6):
 			var t: float = float(k) / 6.0
@@ -260,8 +285,8 @@ func _disegna_sopra() -> void:
 			var effetto_edificio: String = _effetto_principale()
 			_pastiglia(_pastiglie[0], _colore_effetto(effetto_edificio), effetto_edificio)
 
-	# Gemma del mana nell'angolo.
-	if scheda.mana != &"":
+	# Gemma del mana nell'angolo (sulle tessere «Angoli» il mana sta negli stemmi e nel colore).
+	if scheda.mana != &"" and not _angoli:
 		var centro: Vector2 = Vector2(_bordo + lato * 0.1, _bordo + lato * 0.1)
 		var raggio: float = lato * 0.105
 		var colore: Color = StileVisivo.colore_mana_nome(scheda.mana)
@@ -301,6 +326,8 @@ func _disegna_sopra() -> void:
 func _icone_pastiglie() -> Array:
 	if scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var effetto: String = _effetto_principale()
+		if _angoli and scheda.mana != &"":
+			return [[effetto if effetto != "" else "spada", _colore_effetto(effetto)], ["gemma", StileVisivo.colore_mana_nome(scheda.mana).darkened(0.35)], ["clessidra", Color("33415e")]]
 		return [[effetto if effetto != "" else "spada", _colore_effetto(effetto)], ["clessidra", Color("33415e")]]
 	if scheda.mana != &"":
 		return [["gemma", StileVisivo.colore_mana_nome(scheda.mana).darkened(0.35)]]
@@ -540,7 +567,7 @@ func centro_arte() -> float:
 
 func _crea_scritte() -> void:
 	var lato: float = minf(size.x, size.y)
-	if scheda.mana != &"":
+	if scheda.mana != &"" and not _angoli:
 		var centro: Vector2 = Vector2(_bordo + lato * 0.1, _bordo + lato * 0.1)
 		_numero_gemma = _etichetta(str(scheda.mana_numero), StileVisivo.FONT_TITOLI, int(lato * 0.14), Color.WHITE, 8)
 		_numero_gemma.position = centro - Vector2(lato * 0.1, lato * 0.1)
@@ -563,7 +590,9 @@ func _crea_scritte() -> void:
 
 	var testi: Array[String] = []
 	var ritmo: String = SchedaCarta.secondi(scheda.ritmo_ms).replace(" ", "")
-	if scheda.genere == SchedaCarta.Genere.TRUPPA:
+	if scheda.genere == SchedaCarta.Genere.TRUPPA and _angoli and scheda.mana != &"":
+		testi = [str(_valore_effetto(_effetto_principale())), str(scheda.mana_numero), ritmo]
+	elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 		testi = [str(_valore_effetto(_effetto_principale())), ritmo]
 	elif _pastiglie.size() == 1:
 		var quanto: int = scheda.mana_numero if scheda.mana != &"" else _valore_effetto(_effetto_principale())
