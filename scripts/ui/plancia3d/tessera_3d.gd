@@ -9,7 +9,21 @@ const ALTEZZA_SOLLEVATA: float = 0.3
 ## Pixel della faccia per unità di lunghezza: più alto = carta più nitida.
 const PIXEL_PER_UNITA: float = 150.0
 
+## Prove delle tessere in rilievo (Davide, 9 novembre 2026), solo per i pezzi della plancia.
+## rilievo: lastrina di cartone spessa, bordo dorato in rilievo, stemmi dei numeri che sporgono.
+## diorama: il disegno a strati, con la figura staccata dallo sfondo. Provvisorie finché non si sceglie.
+## materiale: 0 = tessera sottile di sempre, 1 = cartone fustellato, 2 = legno, 3 = metallo e smalto.
+## Scelto il cartone fustellato (Davide, 10 novembre 2026); legno e metallo restano come prove.
+static var materiale_tessera: int = 1
+static var diorama: bool = false
+## [spessore, smusso del bordo, cornice di materiale attorno alla carta] per materiale.
+const MISURE_MATERIALE: Array = [[0.07, 0.0, 0.0], [0.06, 0.014, 0.0], [0.11, 0.035, 0.07], [0.09, 0.04, 0.05]]
+## Di quanto la figura del diorama si alza dalla carta (0 = distesa, 90 = in piedi).
+const INCLINAZIONE_DIORAMA: float = 40.0
+
 var scheda: SchedaCarta
+var _spessore: float = SPESSORE
+var _materiale: int = 0
 var larghezza: float = 1.6
 var profondita: float = 1.9
 ## Per chi usa la tessera (es. posizione nella fila, indice dell'offerta).
@@ -39,11 +53,21 @@ func costruisci(p_scheda: SchedaCarta, p_larghezza: float, p_profondita: float, 
 	scheda = p_scheda
 	larghezza = p_larghezza
 	profondita = p_profondita
+	var in_rilievo: bool = materiale_tessera > 0 and scheda.sulla_plancia
+	if in_rilievo:
+		_materiale = materiale_tessera
+		_spessore = float(MISURE_MATERIALE[_materiale][0])
+	scheda.diorama = diorama and scheda.sulla_plancia and not scheda.come_base and scheda.illustrazione != null
 	_corpo = Node3D.new()
 	add_child(_corpo)
 	_crea_faccia(nitidezza)
 	_crea_linguetta(nitidezza)
-	_crea_supporto()
+	if in_rilievo:
+		_crea_rilievo()
+	else:
+		_crea_supporto()
+	if scheda.diorama:
+		_crea_diorama()
 	_crea_alone()
 	_crea_velo()
 	_crea_area_mouse()
@@ -64,7 +88,9 @@ func _crea_faccia(nitidezza: float) -> void:
 
 	var carta: MeshInstance3D = MeshInstance3D.new()
 	var forma: PlaneMesh = PlaneMesh.new()
-	forma.size = Vector2(larghezza, profondita)
+	# Con il legno e il metallo la carta è incassata in una cornice del materiale.
+	var cornice_materiale: float = float(MISURE_MATERIALE[_materiale][2]) + float(MISURE_MATERIALE[_materiale][1])
+	forma.size = Vector2(larghezza, profondita) - Vector2.ONE * cornice_materiale * 2.0
 	carta.mesh = forma
 	var materiale: StandardMaterial3D = StandardMaterial3D.new()
 	materiale.albedo_texture = _viewport.get_texture()
@@ -76,7 +102,7 @@ func _crea_faccia(nitidezza: float) -> void:
 	materiale.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
 	carta.material_override = materiale
 	_materiale_faccia = materiale
-	carta.position.y = SPESSORE + 0.002
+	carta.position.y = _spessore + 0.002
 	_corpo.add_child(carta)
 
 
@@ -112,7 +138,7 @@ func _crea_linguetta(nitidezza: float) -> void:
 	var rientro: float = minf(larghezza * 0.08, maxf(0.0, (larghezza - misura.x) * 0.5))
 	# I tipi stanno sotto la carta (Davide, 8 novembre 2026): sopra c'è la figura.
 	var z_linguetta: float = profondita * 0.5 + misura.y * 0.5 - LinguettaTipi.SOTTO_LA_CARTA
-	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, SPESSORE * 0.6, z_linguetta)
+	piano.position = Vector3(-larghezza * 0.5 + rientro + misura.x * 0.5, _spessore * 0.6, z_linguetta)
 	_corpo.add_child(piano)
 
 
@@ -121,11 +147,211 @@ func _crea_supporto() -> void:
 	var spessore: MeshInstance3D = MeshInstance3D.new()
 	var forma: BoxMesh = BoxMesh.new()
 	var rientro: float = minf(larghezza, profondita) * 0.07
-	forma.size = Vector3(larghezza - rientro, SPESSORE, profondita - rientro)
+	forma.size = Vector3(larghezza - rientro, _spessore, profondita - rientro)
 	spessore.mesh = forma
 	spessore.material_override = StileVisivo.materiale(scheda.colore_cornice().darkened(0.55), 0.6, 0.4)
-	spessore.position.y = SPESSORE * 0.5
+	spessore.position.y = _spessore * 0.5
 	_corpo.add_child(spessore)
+
+
+## Tessera in rilievo, in tre materiali (prove, Davide 10 novembre 2026). Il corpo è una lastra
+## dagli angoli tondi con lo spigolo di sopra smussato; i lati hanno la trama del materiale.
+func _crea_rilievo() -> void:
+	var lato: float = minf(larghezza, profondita)
+	var raggio: float = lato * 0.09
+	var smusso: float = float(MISURE_MATERIALE[_materiale][1])
+	var cornice: Color = scheda.colore_cornice()
+	var corpo: MeshInstance3D = MeshInstance3D.new()
+	corpo.mesh = _lastra_smussata(larghezza, profondita, raggio, _spessore, smusso)
+	_corpo.add_child(corpo)
+	match _materiale:
+		1:
+			# Cartone fustellato: lati a strati di carta, una riga crema sullo spigolo.
+			corpo.material_override = _materiale_strati(Color("3a2c22"), Color("b9a684"))
+		2:
+			# Legno: venatura sui lati e sulla cornice, verniciato lucido.
+			corpo.material_override = _materiale_legno(Color("6b4426"))
+		3:
+			# Metallo: bordo dorato lucido, lati di bronzo scuro.
+			corpo.material_override = _materiale_metallo(cornice.lerp(StileVisivo.ORO, 0.6))
+	# Gli stemmi coniati del metallo: una medaglia dorata smussata sotto ogni stemma.
+	if _materiale == 3:
+		var scala: Vector2 = Vector2(larghezza, profondita) - Vector2.ONE * (float(MISURE_MATERIALE[3][2]) + smusso) * 2.0
+		for area: Rect2 in _faccia.aree_stemmi():
+			var w: float = area.size.x * scala.x + 0.05
+			var d: float = area.size.y * scala.y + 0.05
+			var centro: Vector3 = Vector3((area.get_center().x - 0.5) * scala.x, 0.0, (area.get_center().y - 0.5) * scala.y)
+			var medaglia: MeshInstance3D = MeshInstance3D.new()
+			medaglia.mesh = _lastra_smussata(w, d, d * 0.45, 0.06, 0.025)
+			medaglia.material_override = corpo.material_override
+			medaglia.position = centro + Vector3(0.0, _spessore - 0.01, 0.0)
+			_corpo.add_child(medaglia)
+			var stemma: MeshInstance3D = MeshInstance3D.new()
+			var piano: PlaneMesh = PlaneMesh.new()
+			piano.size = Vector2(area.size.x * scala.x, area.size.y * scala.y)
+			stemma.mesh = piano
+			var materiale: StandardMaterial3D = _materiale_faccia.duplicate() as StandardMaterial3D
+			materiale.uv1_scale = Vector3(area.size.x, area.size.y, 1.0)
+			materiale.uv1_offset = Vector3(area.position.x, area.position.y, 0.0)
+			materiale.roughness = 0.35
+			materiale.metallic_specular = 0.6
+			stemma.material_override = materiale
+			stemma.position = centro + Vector3(0.0, _spessore + 0.052, 0.0)
+			_corpo.add_child(stemma)
+
+
+## Una lastra dagli angoli tondi (raggio), alta "alto", con lo spigolo di sopra smussato di
+## "smusso". UV: u lungo il contorno, v lungo l'altezza (per la trama dei lati); sopra, u e v piani.
+static func _lastra_smussata(w: float, d: float, raggio: float, alto: float, smusso: float) -> ArrayMesh:
+	var esterno: PackedVector2Array = _rettangolo_tondo(w, d, raggio)
+	var interno: PackedVector2Array = _rettangolo_tondo(w - smusso * 2.0, d - smusso * 2.0, maxf(raggio - smusso, 0.005))
+	var n: int = esterno.size()
+	var st: SurfaceTool = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var giro: float = 0.0
+	var lunghezze: Array[float] = [0.0]
+	for i: int in range(n):
+		giro += esterno[i].distance_to(esterno[(i + 1) % n])
+		lunghezze.append(giro)
+	var basso: float = alto - smusso
+	for i: int in range(n):
+		var j: int = (i + 1) % n
+		var a: Vector2 = esterno[i]
+		var b: Vector2 = esterno[j]
+		var ai: Vector2 = interno[i]
+		var bi: Vector2 = interno[j]
+		var na: Vector3 = Vector3(a.x, 0.0, a.y).normalized()
+		var nb: Vector3 = Vector3(b.x, 0.0, b.y).normalized()
+		# Normale del lato: perpendicolare al segmento, verso l'esterno.
+		var tangente: Vector2 = (b - a).normalized()
+		var fuori: Vector3 = Vector3(tangente.y, 0.0, -tangente.x)
+		if fuori.dot(na + nb) < 0.0:
+			fuori = -fuori
+		var u0: float = lunghezze[i] * 4.0
+		var u1: float = lunghezze[i + 1] * 4.0
+		# Lato verticale.
+		_quad(st, Vector3(a.x, 0.0, a.y), Vector3(b.x, 0.0, b.y), Vector3(b.x, basso, b.y), Vector3(a.x, basso, a.y), fuori, Vector2(u0, 1.0), Vector2(u1, 1.0), Vector2(u1, 0.15), Vector2(u0, 0.15))
+		# Smusso: dal lato alla faccia di sopra.
+		if smusso > 0.0:
+			var inclinata: Vector3 = (fuori + Vector3.UP).normalized()
+			_quad(st, Vector3(a.x, basso, a.y), Vector3(b.x, basso, b.y), Vector3(bi.x, alto, bi.y), Vector3(ai.x, alto, ai.y), inclinata, Vector2(u0, 0.15), Vector2(u1, 0.15), Vector2(u1, 0.0), Vector2(u0, 0.0))
+	# Faccia di sopra (a ventaglio dal centro).
+	for i: int in range(n):
+		var j: int = (i + 1) % n
+		st.set_normal(Vector3.UP)
+		st.set_uv(Vector2(0.5, 0.5))
+		st.add_vertex(Vector3(0.0, alto, 0.0))
+		st.set_normal(Vector3.UP)
+		st.set_uv(interno[i] / Vector2(w, d) + Vector2(0.5, 0.5))
+		st.add_vertex(Vector3(interno[i].x, alto, interno[i].y))
+		st.set_normal(Vector3.UP)
+		st.set_uv(interno[j] / Vector2(w, d) + Vector2(0.5, 0.5))
+		st.add_vertex(Vector3(interno[j].x, alto, interno[j].y))
+	return st.commit()
+
+
+static func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, e: Vector3, normale: Vector3, ua: Vector2, ub: Vector2, uc: Vector2, ue: Vector2) -> void:
+	# Due triangoli a, b, c e a, c, e.
+	for coppia: Array in [[a, ua], [b, ub], [c, uc], [a, ua], [c, uc], [e, ue]]:
+		st.set_normal(normale)
+		st.set_uv(coppia[1])
+		st.add_vertex(coppia[0])
+
+
+static var _trame_rilievo: Dictionary = {}
+
+
+## Strati di carta pressata: righe sottili chiare e scure, con un po' di fibra.
+static func _materiale_strati(scuro: Color, chiaro: Color) -> StandardMaterial3D:
+	if not _trame_rilievo.has("strati"):
+		var img: Image = Image.create(256, 64, false, Image.FORMAT_RGB8)
+		var caso: RandomNumberGenerator = RandomNumberGenerator.new()
+		caso.seed = 3
+		for y: int in range(64):
+			var strato: Color = chiaro if y < 8 else scuro.lerp(chiaro, 0.25 + 0.2 * float((y / 6) % 2))
+			for x: int in range(256):
+				img.set_pixel(x, y, strato.darkened(caso.randf_range(-0.05, 0.12)))
+		img.generate_mipmaps()
+		_trame_rilievo["strati"] = ImageTexture.create_from_image(img)
+	var m: StandardMaterial3D = StileVisivo.materiale(Color.WHITE, 0.95)
+	m.albedo_texture = _trame_rilievo["strati"]
+	return m
+
+
+## Legno verniciato: venature lunghe, un riflesso morbido.
+static func _materiale_legno(colore: Color) -> StandardMaterial3D:
+	if not _trame_rilievo.has("legno"):
+		var img: Image = Image.create(512, 128, false, Image.FORMAT_RGB8)
+		var rumore: FastNoiseLite = FastNoiseLite.new()
+		rumore.frequency = 0.02
+		rumore.fractal_octaves = 4
+		for y: int in range(128):
+			for x: int in range(512):
+				var v: float = rumore.get_noise_2d(float(x) * 0.15, float(y) * 3.0)
+				var anelli: float = 0.5 + 0.5 * sin(v * 18.0)
+				img.set_pixel(x, y, Color.WHITE.darkened(0.12 + 0.3 * anelli))
+		img.generate_mipmaps()
+		_trame_rilievo["legno"] = ImageTexture.create_from_image(img)
+	var m: StandardMaterial3D = StileVisivo.materiale(colore, 0.38)
+	m.albedo_texture = _trame_rilievo["legno"]
+	m.uv1_triplanar = true
+	m.uv1_scale = Vector3(0.9, 0.9, 0.9)
+	m.clearcoat_enabled = true
+	m.clearcoat = 0.6
+	m.clearcoat_roughness = 0.25
+	return m
+
+
+## Metallo dorato spazzolato: lucido, con un filo di luce sugli spigoli.
+static func _materiale_metallo(colore: Color) -> StandardMaterial3D:
+	var m: StandardMaterial3D = StileVisivo.materiale(colore, 0.28, 0.9)
+	m.rim_enabled = true
+	m.rim = 0.4
+	m.rim_tint = 0.8
+	return m
+
+
+## Diorama: sulla faccia resta lo sfondo sfocato del disegno; la figura ritagliata si alza dal
+## fondo della scena inclinata all'indietro, come in un libro pop-up socchiuso, e proietta la sua
+## ombra sullo sfondo.
+func _crea_diorama() -> void:
+	var area: Rect2 = _faccia.area_arte_normalizzata()
+	var ritaglio: Array = Figurina.ritaglia(scheda.illustrazione)
+	# Il ritaglio è un quadrato con dentro il disegno (3:2 o 2:3) appoggiato in basso.
+	var dimensioni: Vector2 = Vector2(scheda.illustrazione.get_size())
+	var quota: Vector2 = dimensioni / maxf(dimensioni.x, dimensioni.y)
+	var lato_figura: float = minf(area.size.x * larghezza / quota.x, profondita * 1.15 / quota.y)
+	var fondo_z: float = (area.end.y - 0.5) * profondita - 0.04
+	var perno: Node3D = Node3D.new()
+	perno.position = Vector3((area.get_center().x - 0.5) * larghezza, _spessore + 0.01, fondo_z)
+	perno.rotation.x = deg_to_rad(INCLINAZIONE_DIORAMA)
+	_corpo.add_child(perno)
+	var figura: MeshInstance3D = MeshInstance3D.new()
+	var piano: PlaneMesh = PlaneMesh.new()
+	piano.size = Vector2(lato_figura, lato_figura)
+	figura.mesh = piano
+	figura.material_override = Figurina.materiale_carta(ritaglio[0], ritaglio[1])
+	figura.position = Vector3(0.0, 0.0, -lato_figura * 0.5)
+	perno.add_child(figura)
+	# La piega di carta alla base della figura.
+	var piega: MeshInstance3D = MeshInstance3D.new()
+	var scatola: BoxMesh = BoxMesh.new()
+	scatola.size = Vector3(lato_figura * quota.x * 0.5, 0.02, 0.08)
+	piega.mesh = scatola
+	piega.material_override = StileVisivo.materiale(Color("120d0a"), 0.9)
+	piega.position = Vector3(perno.position.x, _spessore + 0.012, fondo_z + 0.02)
+	_corpo.add_child(piega)
+
+
+static func _rettangolo_tondo(w: float, d: float, raggio: float) -> PackedVector2Array:
+	var punti: PackedVector2Array = PackedVector2Array()
+	var r: float = minf(raggio, minf(w, d) * 0.5)
+	var angoli: Array[Vector2] = [Vector2(w * 0.5 - r, d * 0.5 - r), Vector2(-w * 0.5 + r, d * 0.5 - r), Vector2(-w * 0.5 + r, -d * 0.5 + r), Vector2(w * 0.5 - r, -d * 0.5 + r)]
+	for k: int in range(4):
+		for passo: int in range(7):
+			var a: float = PI * 0.5 * k + PI * 0.5 * float(passo) / 6.0
+			punti.append(angoli[k] + Vector2(cos(a), sin(a)) * r)
+	return punti
 
 
 ## Alone luminoso sotto la carta: mouse sopra, selezione, bersaglio di una sostituzione.
@@ -150,7 +376,7 @@ func _crea_velo() -> void:
 	forma.size = Vector2(larghezza - rientro, profondita - rientro)
 	_velo.mesh = forma
 	_velo.material_override = StileVisivo.materiale_velo(Color(0.02, 0.04, 0.09, 0.6))
-	_velo.position.y = SPESSORE + 0.02
+	_velo.position.y = _spessore + 0.02
 	_velo.visible = false
 	_corpo.add_child(_velo)
 
@@ -221,7 +447,7 @@ func imposta_segnale(testo: String, colore: Color = StileVisivo.ORO_LUCE) -> voi
 		_segnale = StileVisivo.scritta(testo, StileVisivo.FONT_TITOLI, 44, colore, 0.0, 14)
 		# Sotto la carta: sopra ci sono già i prezzi delle offerte.
 		var sotto_tipi: float = 0.0 if scheda.tipi.is_empty() else LinguettaTipi.misura(scheda.tipi.size()).y - LinguettaTipi.SOTTO_LA_CARTA
-		_segnale.position = Vector3(0.0, SPESSORE + 0.03, profondita * 0.5 + 0.3 + sotto_tipi)
+		_segnale.position = Vector3(0.0, _spessore + 0.03, profondita * 0.5 + 0.3 + sotto_tipi)
 		_corpo.add_child(_segnale)
 	_segnale.text = testo
 	_segnale.modulate = colore
@@ -324,7 +550,7 @@ func aggiungi_busto() -> void:
 	var ritaglio: Array = Figurina.ritaglia(scheda.illustrazione)
 	busto.material_override = Figurina.materiale_carta(ritaglio[0], ritaglio[1], Figurina.QUOTA_BUSTO)
 	var fondo: float = -profondita * 0.5 + profondita * _faccia.fondo_arte()
-	busto.position = Vector3(0.0, SPESSORE + 0.014, fondo - altezza_busto * 0.5)
+	busto.position = Vector3(0.0, _spessore + 0.014, fondo - altezza_busto * 0.5)
 	_alto_locale = minf(_alto_locale, fondo - altezza_busto)
 	_corpo.add_child(busto)
 	# Esce dalla finestra con un piccolo salto.
@@ -343,7 +569,7 @@ func aggiungi_figurina(verso: float, ritardo: float, animata: bool, fattore_alte
 	figurina = Figurina.new()
 	_corpo.add_child(figurina)
 	var z_base: float = -profondita * 0.5 + profondita * _faccia.centro_arte()
-	figurina.costruisci(scheda.illustrazione, larghezza, z_base, SPESSORE, verso, fattore_altezza)
+	figurina.costruisci(scheda.illustrazione, larghezza, z_base, _spessore, verso, fattore_altezza)
 	if animata:
 		figurina.alza(ritardo)
 	else:

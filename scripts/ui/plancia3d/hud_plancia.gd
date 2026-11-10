@@ -86,6 +86,8 @@ var _pulsante_nessuna: Button
 var _colonna_principale: VBoxContainer
 var _principale: Button
 var _barra_scontro: PanelContainer
+## La barra delle risorse in basso: sparisce negli scontri (Davide, 9 novembre 2026).
+var _barra_risorse: PanelContainer
 var _tempo: Label
 var _pulsante_pausa: Button
 var _pulsanti_velocita: Array[Button] = []
@@ -443,6 +445,7 @@ func _crea_run() -> void:
 ## con la quantità e, accanto, quanto producono a ogni fase.
 func _crea_risorse() -> void:
 	var barra: PanelContainer = PanelContainer.new()
+	_barra_risorse = barra
 	var riga: HBoxContainer = HBoxContainer.new()
 	riga.add_theme_constant_override("separation", 20)
 	barra.add_child(riga)
@@ -902,7 +905,8 @@ func _crea_barra_scontro() -> void:
 		riga.add_child(pulsante)
 		_pulsanti_velocita.append(pulsante)
 	riga.add_child(_pulsante("Salta alla fine", func() -> void: azione_principale.emit()))
-	_ancora(_barra_scontro, Control.PRESET_CENTER_BOTTOM, Vector2(0, SOPRA_BARRA))
+	# Nello scontro la barra delle risorse sparisce: i comandi scendono vicino al bordo.
+	_ancora(_barra_scontro, Control.PRESET_CENTER_BOTTOM, Vector2(0, -18))
 	_barra_scontro.visible = false
 
 
@@ -1404,6 +1408,13 @@ func modalita_scontro(attiva: bool, titolo: String = "") -> void:
 		imposta_pausa(false)
 	# Durante lo scontro il titolo resta in alto al centro; il calendario si nasconde.
 	_riquadro_fase.visible = not attiva
+	# Nello scontro resta solo ciò che serve a guardarlo (Davide, 9 novembre 2026): titolo e comandi
+	# di tempo. Spariscono barra delle risorse, scheda della nazione e linguetta «Partita».
+	_barra_risorse.visible = not attiva
+	_colonna_sinistra.visible = not attiva
+	_riquadro_run.visible = not attiva
+	_avviso_ricerca.visible = not attiva and _avviso_ricerca.visible
+	_ultima_possibilita.visible = not attiva and _ultima_possibilita.visible
 	if _animazione_messaggio != null and _animazione_messaggio.is_valid():
 		_animazione_messaggio.kill()
 	_messaggio.text = titolo if attiva else ""

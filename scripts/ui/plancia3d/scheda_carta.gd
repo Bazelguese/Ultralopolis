@@ -45,6 +45,11 @@ var illustrazione: Texture2D
 ## Teatro di carta: la carta fa da base alla figurina, quindi non ripete l'illustrazione
 ## (al suo posto c'è la pedana di carta su cui la figurina sta in piedi).
 var come_base: bool = false
+## La carta sta sulla plancia (non fra le offerte): numeri più grandi, perché la plancia piena
+## rimpicciolisce tutto (Davide, 9 novembre 2026).
+var sulla_plancia: bool = false
+## Prova del diorama: sulla faccia solo lo sfondo sfocato, la figura sta sopra (Tessera3D.diorama).
+var diorama: bool = false
 ## false se l'offerta non si può pagare: la carta appare spenta.
 var disponibile: bool = true
 ## Colore della categoria di un consigliere (solo grafica).

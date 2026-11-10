@@ -32,14 +32,16 @@ const LATO_FIGURA: int = 512
 ## Maschere già calcolate, ricordate fra una partita e l'altra (si possono cancellare: si rifanno).
 const CARTELLA_MEMORIA: String = "user://figurine"
 ## Da cambiare se cambia il modo di calcolare la maschera, così le vecchie non si usano più.
-const VERSIONE_MASCHERA: int = 2
+const VERSIONE_MASCHERA: int = 3
+## Quanto ci mette una figurina a tornare distesa nella carta a fine scontro.
+const DURATA_RIPONI: float = 0.4
 ## Quanta parte (dall'alto) della figura fa il mezzo busto.
 const QUOTA_BUSTO: float = 0.72
 
 const SHADER: String = """
 shader_type spatial;
 render_mode cull_disabled, depth_draw_opaque;
-uniform sampler2D tex : source_color, filter_linear_mipmap;
+uniform sampler2D tex : source_color, filter_linear_mipmap_anisotropic;
 uniform sampler2D maschera : filter_linear;
 uniform sampler2D rumore;
 uniform bool con_maschera = false;
@@ -89,6 +91,9 @@ void fragment() {
 	float g = dot(base, vec3(0.3, 0.59, 0.11));
 	vec3 col = mix(base, vec3(g) * 0.4, spento);
 	ALBEDO = col;
+	// La figurina sta in piedi, ma si illumina come se guardasse in alto, come la carta sotto di
+	// lei: altrimenti le luci, che vengono dall'alto, la sfiorano appena e resta scura.
+	NORMAL = normalize(mix(NORMAL, (VIEW_MATRIX * vec4(0.0, 1.0, 0.0, 0.0)).xyz, 0.75));
 	EMISSION = col * lampo * 1.2 + vec3(1.0, 0.42, 0.08) * bordo * 4.0;
 	ROUGHNESS = 0.9;
 	ALPHA = a;
@@ -131,7 +136,8 @@ func costruisci(illustrazione: Texture2D, larghezza: float, z_base: float, y_car
 	var forma_piede: BoxMesh = BoxMesh.new()
 	forma_piede.size = Vector3(altezza * 0.3, 0.02, 0.1)
 	piede.mesh = forma_piede
-	piede.material_override = StileVisivo.materiale(COLORE_CARTA.darkened(0.6), 0.95)
+	# Scuro come il fondo della carta: regge la figurina senza farsi notare (Davide, 9 novembre 2026).
+	piede.material_override = StileVisivo.materiale(Color("120d0a"), 0.95)
 	piede.position = Vector3(0.0, 0.01, 0.04)
 	_perno.add_child(piede)
 	# Parte piegata sulla carta, come una pagina chiusa.
@@ -158,6 +164,12 @@ func alza(ritardo: float = 0.0) -> void:
 func in_piedi() -> void:
 	_nuova_animazione().kill()
 	_perno.rotation.x = 0.0
+
+
+## Torna distesa nella carta, come una pagina che si chiude (fine dello scontro).
+func riponi() -> void:
+	var t: Tween = _nuova_animazione()
+	t.tween_property(_perno, "rotation:x", PI * 0.5, DURATA_RIPONI).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 
 
 ## Si richiude, cadendo lontano dall'avversario (il lato ha perso).
@@ -406,7 +418,7 @@ static func _quadrata(img: Image, lato: int, colore_margine: Color = Color.BLACK
 	var w: int = maxi(1, int(round(float(img.get_width()) / float(massimo) * lato)))
 	var h: int = maxi(1, int(round(float(img.get_height()) / float(massimo) * lato)))
 	var ridotta: Image = img.duplicate() as Image
-	ridotta.resize(w, h, Image.INTERPOLATE_BILINEAR)
+	ridotta.resize(w, h, Image.INTERPOLATE_LANCZOS)
 	var quadrato: Image = Image.create(lato, lato, false, Image.FORMAT_RGBA8)
 	quadrato.fill(colore_margine)
 	# Le figure stanno in piedi: in un quadrato più largo che alto la figura poggia sul fondo.

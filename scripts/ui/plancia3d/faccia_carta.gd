@@ -29,6 +29,11 @@ var _area_basso: Rect2
 var _pastiglie: Array[Rect2] = []
 ## Zona delle righe di simboli (consiglieri, azioni, eventi): vuota se la carta non ne ha.
 var _area_simboli: Rect2
+## Sulla plancia il nome sta sopra il fondo del disegno (vedi _calcola_misure).
+var _nome_sopra_arte: bool = false
+## Tessere di truppe ed edifici sulla plancia: disegno «Angoli» (Davide, 9 novembre 2026). Il
+## disegno occupa tutta la carta, i numeri stanno in stemmi colorati negli angoli in basso.
+var _angoli: bool = false
 
 
 func imposta(p_scheda: SchedaCarta, misura: Vector2) -> void:
@@ -78,9 +83,21 @@ func _calcola_misure() -> void:
 	# Sulla plancia la carta fa da base alla figurina: la pedana è più bassa, i numeri più grandi.
 	elif scheda.come_base and size.y > size.x * 1.3:
 		altezza_arte = size.y * 0.36
+	_nome_sopra_arte = scheda.sulla_plancia and not con_simboli
+	# Sulla plancia (Davide, 9 novembre 2026) il nome sta su una fascia scura sopra il fondo del
+	# disegno, invece di avere una fascia sua: lo spazio guadagnato va ai numeri, più grandi.
+	if _nome_sopra_arte:
+		var verticale: bool = size.y > size.x * 1.3
+		if verticale:
+			altezza_arte = size.y * (0.38 if scheda.come_base else 0.5)
+		else:
+			altezza_arte = size.y * (0.5 if scheda.come_base else 0.56)
 	_area_arte = Rect2(margine, margine, size.x - margine * 2.0, altezza_arte)
 	var altezza_nome: float = size.y * (0.12 if con_simboli else 0.14)
 	_area_nome = Rect2(_bordo, _area_arte.end.y + lato * 0.02, size.x - _bordo * 2.0, altezza_nome)
+	if _nome_sopra_arte:
+		var alta_nome: float = size.y * (0.13 if size.y > size.x * 1.3 else 0.2)
+		_area_nome = Rect2(_area_arte.position.x, _area_arte.end.y - alta_nome, _area_arte.size.x, alta_nome)
 	# Le pastiglie restano ben dentro la cornice anche viste piccole e in prospettiva.
 	var inizio_basso: float = _area_nome.end.y + lato * 0.04
 	var rientro: float = margine + lato * 0.025
@@ -101,6 +118,41 @@ func _calcola_misure() -> void:
 		_pastiglie.append(Rect2(_area_basso.position + Vector2(meta + lato * 0.04, 0.0), Vector2(meta, _area_basso.size.y)))
 	elif scheda.genere == SchedaCarta.Genere.EDIFICIO and (scheda.mana != &"" or _effetto_principale() != ""):
 		_pastiglie.append(_area_basso)
+	_angoli = scheda.sulla_plancia and not con_simboli and not _pastiglie.is_empty()
+	if _angoli:
+		_misure_angoli()
+
+
+## Le misure del disegno «Angoli»: il disegno su tutta la carta, il nome su una fascia (in alto,
+## oppure in basso sopra gli stemmi nello scontro, dove in alto c'è la figurina) e i numeri in
+## stemmi negli angoli in basso.
+func _misure_angoli() -> void:
+	var verticale: bool = size.y > size.x * 1.3
+	var lato: float = minf(size.x, size.y)
+	var margine: float = _bordo + lato * 0.02
+	var interno: Rect2 = Rect2(margine, margine, size.x - margine * 2.0, size.y - margine * 2.0)
+	var truppa: bool = scheda.genere == SchedaCarta.Genere.TRUPPA
+	_pastiglie.clear()
+	_nome_sopra_arte = true
+	_area_arte = interno
+	var alta_nome: float = size.y * (0.12 if verticale else 0.2)
+	_area_nome = Rect2(interno.position.x + lato * 0.1, interno.position.y, interno.size.x - lato * 0.2, alta_nome)
+	if truppa:
+		# L'attacco ha una o due cifre, la ricarica quattro caratteri («1,8s»): più spazio a lei.
+		var h: float = size.y * (0.16 if verticale else 0.27)
+		var stacco: float = lato * 0.03
+		var w_attacco: float = (interno.size.x - stacco) * 0.42
+		var w_ricarica: float = interno.size.x - stacco - w_attacco
+		_pastiglie.append(Rect2(interno.position.x, interno.end.y - h, w_attacco, h))
+		_pastiglie.append(Rect2(interno.end.x - w_ricarica, interno.end.y - h, w_ricarica, h))
+	else:
+		var w: float = interno.size.x * 0.74
+		var h: float = size.y * 0.3
+		_pastiglie.append(Rect2(interno.get_center().x - w * 0.5, interno.end.y - h, w, h))
+	_area_basso = Rect2(interno.position.x, _pastiglie[0].position.y, interno.size.x, _pastiglie[0].size.y)
+	# Nello scontro (e nel diorama) in alto c'è la figura: il nome scende sopra gli stemmi.
+	if scheda.come_base or scheda.diorama:
+		_area_nome = Rect2(interno.position.x, _area_basso.position.y - alta_nome - lato * 0.02, interno.size.x, alta_nome)
 
 
 ## L'effetto più importante da mostrare nella prima pastiglia: danno, poi scudo, cura, Corruzione, assedio.
@@ -159,8 +211,9 @@ func _draw() -> void:
 	faccia.set_corner_radius_all(int(maxf(_raggio - _bordo, 2.0)))
 	faccia.anti_aliasing = true
 	draw_style_box(faccia, Rect2(Vector2(_bordo, _bordo), size - Vector2(_bordo, _bordo) * 2.0))
-	draw_rect(_area_nome, StileVisivo.FASCIA_NOME)
-	draw_line(_area_nome.position, Vector2(_area_nome.end.x, _area_nome.position.y), cornice.darkened(0.2), 2.0)
+	if not _nome_sopra_arte:
+		draw_rect(_area_nome, StileVisivo.FASCIA_NOME)
+		draw_line(_area_nome.position, Vector2(_area_nome.end.x, _area_nome.position.y), cornice.darkened(0.2), 2.0)
 
 
 ## Tutto ciò che sta sopra l'illustrazione: gemma, livello, pastiglie, nastri, stato.
@@ -168,9 +221,35 @@ func _disegna_sopra() -> void:
 	var lato: float = minf(size.x, size.y)
 	_sopra.draw_rect(_area_arte, Color(0.0, 0.0, 0.0, 0.0), false, 2.0)
 	_sopra.draw_rect(_area_arte.grow(1.0), scheda.colore_cornice().darkened(0.35), false, 2.0)
+	if _angoli:
+		# Fascia del nome (in alto, o in basso nello scontro), sfumata ai bordi.
+		var fascia: Rect2 = Rect2(_area_arte.position.x, _area_nome.position.y, _area_arte.size.x, _area_nome.size.y)
+		_sopra.draw_rect(fascia, Color(StileVisivo.FASCIA_NOME, 0.85))
+		var sfuma: float = fascia.size.y * 0.5
+		for k: int in range(6):
+			var t: float = float(k) / 6.0
+			var tinta: Color = Color(StileVisivo.FASCIA_NOME, 0.6 * (1.0 - t))
+			_sopra.draw_rect(Rect2(fascia.position.x, fascia.end.y + sfuma * t, fascia.size.x, sfuma / 6.0 + 1.0), tinta)
+			if scheda.come_base or scheda.diorama:
+				_sopra.draw_rect(Rect2(fascia.position.x, fascia.position.y - sfuma * (t + 1.0 / 6.0), fascia.size.x, sfuma / 6.0 + 1.0), tinta)
+		# Ombra in basso, dietro gli stemmi.
+		var ombra: float = _area_basso.size.y * 1.3
+		for k: int in range(8):
+			var t: float = float(k) / 8.0
+			_sopra.draw_rect(Rect2(_area_arte.position.x, _area_arte.end.y - ombra * (1.0 - t), _area_arte.size.x, ombra / 8.0 + 1.0), Color(0.0, 0.0, 0.0, 0.08 + 0.4 * t))
+	elif _nome_sopra_arte:
+		# Fascia del nome sopra il fondo del disegno: scura, con una sfumatura verso l'alto.
+		var sfuma: float = _area_nome.size.y * 0.5
+		for k: int in range(6):
+			var t: float = float(k) / 6.0
+			_sopra.draw_rect(Rect2(_area_nome.position.x, _area_nome.position.y - sfuma * (1.0 - t), _area_nome.size.x, sfuma / 6.0 + 1.0), Color(StileVisivo.FASCIA_NOME, 0.12 + 0.5 * t))
+		_sopra.draw_rect(_area_nome, Color(StileVisivo.FASCIA_NOME, 0.82))
+		_sopra.draw_line(Vector2(_area_nome.position.x, _area_nome.end.y), _area_nome.end, scheda.colore_cornice().darkened(0.2), 2.0)
 
 	# Pastiglie con icone.
-	if scheda.genere == SchedaCarta.Genere.TRUPPA:
+	if _angoli:
+		_disegna_stemmi()
+	elif scheda.genere == SchedaCarta.Genere.TRUPPA:
 		var effetto: String = _effetto_principale()
 		_pastiglia(_pastiglie[0], _colore_effetto(effetto), effetto if effetto != "" else "spada")
 		_pastiglia(_pastiglie[1], Color("33415e"), "clessidra")
@@ -218,6 +297,37 @@ func _disegna_sopra() -> void:
 		_sopra.draw_style_box(velo, Rect2(Vector2.ZERO, size))
 
 
+## Icone e colori delle pastiglie della carta, nell'ordine di _pastiglie.
+func _icone_pastiglie() -> Array:
+	if scheda.genere == SchedaCarta.Genere.TRUPPA:
+		var effetto: String = _effetto_principale()
+		return [[effetto if effetto != "" else "spada", _colore_effetto(effetto)], ["clessidra", Color("33415e")]]
+	if scheda.mana != &"":
+		return [["gemma", StileVisivo.colore_mana_nome(scheda.mana).darkened(0.35)]]
+	var effetto_edificio: String = _effetto_principale()
+	return [[effetto_edificio, _colore_effetto(effetto_edificio)]]
+
+
+## Gli stemmi dei numeri del disegno «Angoli»: bordo scuro spesso, colore pieno, icona a sinistra.
+func _disegna_stemmi() -> void:
+	var icone: Array = _icone_pastiglie()
+	for i: int in range(mini(icone.size(), _pastiglie.size())):
+		var area: Rect2 = _pastiglie[i]
+		var icona: String = String(icone[i][0])
+		var colore: Color = icone[i][1]
+		var bordo_scuro: StyleBoxFlat = StyleBoxFlat.new()
+		bordo_scuro.bg_color = Color("0b0806")
+		bordo_scuro.set_corner_radius_all(int(area.size.y * 0.38))
+		_sopra.draw_style_box(bordo_scuro, area)
+		var fondo: StyleBoxFlat = StyleBoxFlat.new()
+		fondo.bg_color = colore
+		fondo.set_corner_radius_all(int(area.size.y * 0.32))
+		fondo.border_color = colore.lightened(0.35)
+		fondo.border_width_top = 3
+		_sopra.draw_style_box(fondo, area.grow(-area.size.y * 0.07))
+		_icona(Vector2(area.position.x + area.size.y * 0.5, area.get_center().y), area.size.y * 0.5, icona, Color.WHITE)
+
+
 func _pastiglia(area: Rect2, colore: Color, icona: String) -> void:
 	var fondo: StyleBoxFlat = StyleBoxFlat.new()
 	fondo.bg_color = colore
@@ -225,30 +335,33 @@ func _pastiglia(area: Rect2, colore: Color, icona: String) -> void:
 	fondo.border_color = colore.lightened(0.25)
 	fondo.border_width_top = 2
 	_sopra.draw_style_box(fondo, area)
-	var lato_icona: float = area.size.y * 0.54
-	var centro: Vector2 = Vector2(area.position.x + area.size.y * 0.5, area.get_center().y)
+	_icona(Vector2(area.position.x + area.size.y * 0.5, area.get_center().y), area.size.y * 0.54, icona, Color.WHITE)
+
+
+## Un'icona (spada, clessidra, gemma, scudo, cura, Corruzione) centrata in "centro".
+func _icona(centro: Vector2, lato_icona: float, icona: String, tinta: Color) -> void:
 	match icona:
 		"spada":
 			var l: float = lato_icona * 0.5
-			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(0, -l), centro + Vector2(l * 0.18, -l * 0.3), centro + Vector2(l * 0.18, l * 0.35), centro + Vector2(-l * 0.18, l * 0.35), centro + Vector2(-l * 0.18, -l * 0.3)]), Color.WHITE)
-			_sopra.draw_rect(Rect2(centro + Vector2(-l * 0.55, l * 0.35), Vector2(l * 1.1, l * 0.16)), Color.WHITE)
-			_sopra.draw_rect(Rect2(centro + Vector2(-l * 0.12, l * 0.5), Vector2(l * 0.24, l * 0.45)), Color.WHITE)
+			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(0, -l), centro + Vector2(l * 0.18, -l * 0.3), centro + Vector2(l * 0.18, l * 0.35), centro + Vector2(-l * 0.18, l * 0.35), centro + Vector2(-l * 0.18, -l * 0.3)]), tinta)
+			_sopra.draw_rect(Rect2(centro + Vector2(-l * 0.55, l * 0.35), Vector2(l * 1.1, l * 0.16)), tinta)
+			_sopra.draw_rect(Rect2(centro + Vector2(-l * 0.12, l * 0.5), Vector2(l * 0.24, l * 0.45)), tinta)
 		"clessidra":
 			var l: float = lato_icona * 0.45
-			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(-l * 0.7, -l), centro + Vector2(l * 0.7, -l), centro]), Color.WHITE)
-			_sopra.draw_colored_polygon(PackedVector2Array([centro, centro + Vector2(l * 0.7, l), centro + Vector2(-l * 0.7, l)]), Color.WHITE)
+			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(-l * 0.7, -l), centro + Vector2(l * 0.7, -l), centro]), tinta)
+			_sopra.draw_colored_polygon(PackedVector2Array([centro, centro + Vector2(l * 0.7, l), centro + Vector2(-l * 0.7, l)]), tinta)
 		"gemma":
 			_esagono(centro, lato_icona * 0.42, StileVisivo.colore_mana_nome(scheda.mana).lightened(0.3))
 		"scudo", "assedio":
 			var l: float = lato_icona * 0.45
-			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(-l * 0.8, -l), centro + Vector2(l * 0.8, -l), centro + Vector2(l * 0.8, 0.0), centro + Vector2(0.0, l), centro + Vector2(-l * 0.8, 0.0)]), Color.WHITE)
+			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(-l * 0.8, -l), centro + Vector2(l * 0.8, -l), centro + Vector2(l * 0.8, 0.0), centro + Vector2(0.0, l), centro + Vector2(-l * 0.8, 0.0)]), tinta)
 		"cura":
 			var l: float = lato_icona * 0.45
-			_sopra.draw_rect(Rect2(centro + Vector2(-l * 0.25, -l), Vector2(l * 0.5, l * 2.0)), Color.WHITE)
-			_sopra.draw_rect(Rect2(centro + Vector2(-l, -l * 0.25), Vector2(l * 2.0, l * 0.5)), Color.WHITE)
+			_sopra.draw_rect(Rect2(centro + Vector2(-l * 0.25, -l), Vector2(l * 0.5, l * 2.0)), tinta)
+			_sopra.draw_rect(Rect2(centro + Vector2(-l, -l * 0.25), Vector2(l * 2.0, l * 0.5)), tinta)
 		"corruzione":
 			var l: float = lato_icona * 0.45
-			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(0.0, -l), centro + Vector2(l * 0.7, l * 0.2), centro + Vector2(0.0, l), centro + Vector2(-l * 0.7, l * 0.2)]), Color.WHITE)
+			_sopra.draw_colored_polygon(PackedVector2Array([centro + Vector2(0.0, -l), centro + Vector2(l * 0.7, l * 0.2), centro + Vector2(0.0, l), centro + Vector2(-l * 0.7, l * 0.2)]), tinta)
 
 
 func _esagono(centro: Vector2, raggio: float, colore: Color) -> void:
@@ -366,6 +479,9 @@ func _crea_arte() -> void:
 	if scheda.come_base and scheda.illustrazione != null:
 		_arte.texture = _pedana()
 		return
+	if scheda.diorama:
+		_arte.texture = _sfondo_sfocato(scheda.illustrazione)
+		return
 	if scheda.illustrazione != null:
 		_arte.texture = scheda.illustrazione
 		return
@@ -400,20 +516,57 @@ func _crea_arte() -> void:
 	add_child(_iniziale)
 
 
-## Teatro di carta: la pedana su cui sta la figurina, carta scura con un'ombra ovale al centro.
+## Teatro di carta: la pedana su cui sta la figurina. Una superficie uniforme, senza l'ombra
+## ovale che c'era prima (toglieva risalto alla figurina; Davide, 9 novembre 2026).
+const COLORE_PEDANA: Color = Color("1e1711")
+
+
 func _pedana() -> Texture2D:
-	var sfumatura: Gradient = Gradient.new()
-	sfumatura.set_color(0, Color("060403"))
-	sfumatura.add_point(0.45, Color("120d0a"))
-	sfumatura.set_color(1, Color("1e1711"))
-	var trama: GradientTexture2D = GradientTexture2D.new()
-	trama.gradient = sfumatura
-	trama.fill = GradientTexture2D.FILL_RADIAL
-	trama.fill_from = Vector2(0.5, 0.5)
-	trama.fill_to = Vector2(0.5, 1.15)
-	trama.width = 128
-	trama.height = 128
-	return trama
+	var img: Image = Image.create(4, 4, false, Image.FORMAT_RGB8)
+	img.fill(COLORE_PEDANA)
+	return ImageTexture.create_from_image(img)
+
+
+static var _sfondi: Dictionary = {}
+
+
+## Lo sfondo del diorama: il disegno molto sfocato e scurito, come una scena lontana.
+static func _sfondo_sfocato(illustrazione: Texture2D) -> Texture2D:
+	var chiave: int = illustrazione.get_instance_id()
+	if not _sfondi.has(chiave):
+		var img: Image = illustrazione.get_image()
+		if img.is_compressed():
+			img.decompress()
+		img.convert(Image.FORMAT_RGBA8)
+		img.resize(12, 12, Image.INTERPOLATE_BILINEAR)
+		img.resize(192, 192, Image.INTERPOLATE_CUBIC)
+		for y: int in range(img.get_height()):
+			for x: int in range(img.get_width()):
+				img.set_pixel(x, y, img.get_pixel(x, y).darkened(0.55))
+		_sfondi[chiave] = ImageTexture.create_from_image(img)
+	return _sfondi[chiave]
+
+
+## Le zone degli stemmi dei numeri, in parti della carta (da 0 a 1), per rialzarli in 3D.
+func aree_stemmi() -> Array[Rect2]:
+	var aree: Array[Rect2] = []
+	if not _angoli:
+		return aree
+	for area: Rect2 in _pastiglie:
+		aree.append(Rect2(area.position / size, area.size / size))
+	return aree
+
+
+## La zona del disegno, in parti della carta (da 0 a 1).
+func area_arte_normalizzata() -> Rect2:
+	var area: Rect2 = _area_arte
+	if _angoli and scheda.diorama:
+		# Dalla cima della carta alla fascia del nome, che nel diorama sta in basso.
+		area = Rect2(_area_arte.position.x, _area_arte.position.y, _area_arte.size.x, _area_nome.position.y - _area_arte.position.y)
+	elif _angoli and not scheda.come_base:
+		# Fra la fascia del nome (in alto) e gli stemmi (in basso).
+		area = Rect2(_area_arte.position.x, _area_nome.end.y, _area_arte.size.x, _area_basso.position.y - _area_nome.end.y)
+	return Rect2(area.position / size, area.size / size)
 
 
 ## Fondo della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
@@ -423,6 +576,10 @@ func fondo_arte() -> float:
 
 ## Centro verticale della zona dell'illustrazione, da 0 (alto della carta) a 1 (basso).
 func centro_arte() -> float:
+	# Nello scontro, con le tessere «Angoli», la figurina poggia a metà della parte sopra il nome:
+	# così il nome, più vicino alla telecamera, resta scoperto.
+	if _angoli and scheda.come_base:
+		return (_area_arte.position.y + (_area_nome.position.y - _area_arte.position.y) * 0.45) / maxf(size.y, 1.0)
 	return (_area_arte.position.y + _area_arte.size.y * 0.5) / maxf(size.y, 1.0)
 
 
@@ -445,6 +602,8 @@ func _crea_scritte() -> void:
 	_nome.clip_text = true
 	_nome.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_adatta(_nome, StileVisivo.FONT_TITOLI, int(_area_nome.size.y * 0.62), _area_nome.size.x - lato * 0.06)
+	if _angoli:
+		_adatta(_nome, StileVisivo.FONT_TITOLI, int(_area_nome.size.y * 0.78), _area_nome.size.x - lato * 0.02)
 	add_child(_nome)
 
 	var testi: Array[String] = []
@@ -459,7 +618,13 @@ func _crea_scritte() -> void:
 		var testo: Label = _etichetta(testi[i], StileVisivo.FONT_TITOLI, int(area.size.y * 0.62), Color.WHITE, 6)
 		testo.position = area.position + Vector2(area.size.y * 0.85, 0.0)
 		testo.size = Vector2(area.size.x - area.size.y * 0.95, area.size.y)
-		_adatta(testo, StileVisivo.FONT_TITOLI, int(area.size.y * 0.62), testo.size.x - 6.0)
+		var grandezza: int = int(area.size.y * 0.62)
+		if _angoli:
+			grandezza = int(area.size.y * 0.66)
+			testo.position = area.position + Vector2(area.size.y * 0.78, 0.0)
+			testo.size = Vector2(area.size.x - area.size.y * 0.82, area.size.y)
+			testo.add_theme_constant_override("outline_size", 8)
+		_adatta(testo, StileVisivo.FONT_TITOLI, grandezza, testo.size.x - 6.0)
 		testo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		testo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		add_child(testo)
@@ -476,7 +641,7 @@ func _crea_scritte() -> void:
 
 	_malus = _etichetta(scheda.malus.to_upper(), StileVisivo.FONT_TITOLI, int(lato * 0.075), Color.WHITE, 0)
 	_adatta(_malus, StileVisivo.FONT_TITOLI, int(lato * 0.075), size.x - 24.0 - _bordo * 2.0)
-	_malus.position = Vector2(size.x * 0.5, _area_arte.end.y - lato * 0.11)
+	_malus.position = Vector2(size.x * 0.5, (_area_nome.position.y if _nome_sopra_arte else _area_arte.end.y) - lato * 0.11)
 	_malus.reset_size()
 	_malus.position.x -= _malus.size.x * 0.5
 	_malus.visible = scheda.malus != ""
