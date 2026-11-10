@@ -13,7 +13,8 @@ const PIXEL_PER_UNITA: float = 150.0
 ## rilievo: lastrina di cartone spessa, bordo dorato in rilievo, stemmi dei numeri che sporgono.
 ## diorama: il disegno a strati, con la figura staccata dallo sfondo. Provvisorie finché non si sceglie.
 ## materiale: 0 = tessera sottile di sempre, 1 = cartone fustellato, 2 = legno, 3 = metallo e smalto.
-static var materiale_tessera: int = 0
+## Scelto il cartone fustellato (Davide, 10 novembre 2026); legno e metallo restano come prove.
+static var materiale_tessera: int = 1
 static var diorama: bool = false
 ## [spessore, smusso del bordo, cornice di materiale attorno alla carta] per materiale.
 const MISURE_MATERIALE: Array = [[0.07, 0.0, 0.0], [0.06, 0.014, 0.0], [0.11, 0.035, 0.07], [0.09, 0.04, 0.05]]
